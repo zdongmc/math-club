@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Announcements - Hallie Wells Middle School Competition Math Club</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 40px 20px;
+        }
+
+        .section {
+            max-width: 1200px;
+            margin: 0 auto 50px auto;
+        }
+
+        .section h2 {
+            font-size: 2.2rem;
+            color: #333;
+            margin-bottom: 25px;
+            text-align: center;
+            position: relative;
+        }
+
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            border-radius: 2px;
+        }
+
+        /* Announcements */
+        .announcements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .announcement {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-left: 5px solid;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .announcement::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .announcement:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .announcement.urgent {
+            border-left-color: #dc2626;
+            background: linear-gradient(135deg, rgba(220,38,38,0.05), rgba(220,38,38,0.02));
+        }
+
+        .announcement.info {
+            border-left-color: #374151;
+            background: linear-gradient(135deg, rgba(55,65,81,0.05), rgba(55,65,81,0.02));
+        }
+
+        .announcement.success {
+            border-left-color: #6b7280;
+            background: linear-gradient(135deg, rgba(107,114,128,0.05), rgba(107,114,128,0.02));
+        }
+
+        .announcement-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .announcement-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .announcement-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .announcement-date {
+            font-size: 0.9rem;
+            color: #666;
+            margin-left: auto;
+        }
+
+        .announcement-content {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px 15px;
+            }
+            
+            .announcements-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Announcements Section -->
+            <section id="announcements" class="section">
+                <h2>📢 Recent Announcements</h2>
+                <div class="announcements-grid">
+                    <div class="announcement success">
+                        <div class="announcement-header">
+                            <div class="announcement-icon">🎉</div>
+                            <div class="announcement-title">Welcome to Our Math Club!</div>
+                            <div class="announcement-date">2025-2026 School Year</div>
+                        </div>
+                        <div class="announcement-content">
+                            Welcome to the Hallie Wells Middle School Competition Math Club! We're excited to have you join us for another year of mathematical discovery, problem-solving, and friendly competition. Whether you're new to math competitions or a returning member, we have exciting challenges and opportunities waiting for you. Check out our Club Info page to learn more about meeting times and how to get involved, and visit our Competition Info page to see what competitions we'll be participating in this year. Let's make this a fantastic year of mathematical exploration together!
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
