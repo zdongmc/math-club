@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Middle School Math Competitions 2025-2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.9rem;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background: linear-gradient(135deg, #374151 0%, #111827 100%);
+            color: white;
+            font-weight: 600;
+            padding: 15px 12px;
+            text-align: left;
+            font-size: 0.95rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: top;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+        tr:hover {
+            background-color: #f3f4f6;
+            transform: scale(1.01);
+            transition: all 0.2s ease;
+        }
+
+        .competition-name {
+            font-weight: 600;
+            color: #dc2626;
+            font-size: 1rem;
+        }
+
+        .website-link {
+            color: #dc2626;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 6px 12px;
+            background: rgba(220, 38, 38, 0.1);
+            border-radius: 15px;
+            display: inline-block;
+            margin: 2px;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .website-link:hover {
+            background: #dc2626;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
+        }
+
+        .cost {
+            font-weight: 600;
+        }
+
+        .cost.free {
+            color: #059669;
+            background: rgba(5, 150, 105, 0.1);
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        .cost.paid {
+            color: #dc2626;
+            background: rgba(220, 38, 38, 0.1);
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        .deadline {
+            font-weight: 500;
+        }
+
+        .deadline.urgent {
+            color: #dc2626;
+            background: rgba(220, 38, 38, 0.1);
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        .deadline.coming {
+            color: #d97706;
+            background: rgba(217, 119, 6, 0.1);
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        .deadline.future {
+            color: #059669;
+            background: rgba(5, 150, 105, 0.1);
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        .grade-range {
+            background: rgba(107, 114, 128, 0.1);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .format-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin: 2px;
+        }
+
+        .format-individual {
+            background: rgba(59, 130, 246, 0.1);
+            color: #1d4ed8;
+        }
+
+        .format-team {
+            background: rgba(16, 185, 129, 0.1);
+            color: #047857;
+        }
+
+        .format-both {
+            background: rgba(147, 51, 234, 0.1);
+            color: #7c2d12;
+        }
+
+        .notes {
+            font-size: 0.85rem;
+            color: #6b7280;
+            font-style: italic;
+        }
+
+        .legend {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px;
+            border-left: 5px solid #dc2626;
+        }
+
+        .legend h3 {
+            color: #dc2626;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .timeline {
+            background: white;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #dc2626;
+        }
+
+        .timeline h3 {
+            color: #dc2626;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .timeline-date {
+            min-width: 120px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .timeline-event {
+            color: #6b7280;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            table {
+                font-size: 0.8rem;
+            }
+            
+            th, td {
+                padding: 8px 6px;
+            }
+            
+            .website-link {
+                display: block;
+                margin: 4px 0;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Middle School Math Competitions</h1>
+            <p>2025-2026 Season Overview</p>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Competition</th>
+                        <th>Website & Registration</th>
+                        <th>Eligibility</th>
+                        <th>Format</th>
+                        <th>Registration Deadlines</th>
+                        <th>Cost</th>
+                        <th>Competition Dates</th>
+                        <th>Key Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="border-left: 5px solid #1e40af; background: linear-gradient(135deg, rgba(30,64,175,0.08), rgba(30,64,175,0.03));">
+                            <div class="competition-name">MOEMS</div>
+                            <div class="notes">Math Olympiads for Elementary & Middle Schools</div>
+                        </td>
+                        <td>
+                            <a href="https://moems.org/" target="_blank" class="website-link">Official Site</a>
+                            <a href="https://moems.org/sample/" target="_blank" class="website-link">Sample Problems</a>
+                        </td>
+                        <td>
+                            <div class="grade-range">Grades 6-8</div>
+                            <div class="notes">Through schools</div>
+                        </td>
+                        <td>
+                            <span class="format-badge format-individual">Individual</span>
+                            <div class="notes">5 problems, 30 minutes each contest</div>
+                        </td>
+                        <td>
+                            <div class="deadline future">Early Bird: Jul 31, 2025 ($175)</div>
+                            <div class="deadline coming">Standard: Oct 15, 2025 ($200)</div>
+                            <div class="deadline urgent">Late: Oct 31, 2025 ($250)</div>
+                            <div class="deadline urgent">Last Chance: Nov 1, 2025 ($300)</div>
+                        </td>
+                        <td>
+                            <div class="cost paid">$175-$300</div>
+                            <div class="notes">Per team (up to 35 students)</div>
+                        </td>
+                        <td>
+                            <strong>Contest 1:</strong> November 2025<br>
+                            <strong>Contest 2:</strong> December 2025<br>
+                            <strong>Contest 3:</strong> January 2026<br>
+                            <strong>Contest 4:</strong> February 2026<br>
+                            <strong>Contest 5:</strong> March 2026
+                            <div class="notes">(Flexible timing within each month)</div>
+                        </td>
+                        <td>
+                            • 5 monthly contests<br>
+                            • No calculator allowed<br>
+                            • 4-week administration window per contest<br>
+                            • Awards based on cumulative score
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border-left: 5px solid #f59e0b; background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(245,158,11,0.03));">
+                            <div class="competition-name">Math Kangaroo</div>
+                            <div class="notes">International competition</div>
+                        </td>
+                        <td>
+                            <a href="https://mathkangaroo.org/mks/" target="_blank" class="website-link">Official Site</a>
+                            <a href="https://mathkangaroo.org/mks/sample-tests/" target="_blank" class="website-link">Sample Tests</a>
+                        </td>
+                        <td>
+                            <div class="grade-range">Grades K-12</div>
+                            <div class="notes">Individual or school registration</div>
+                        </td>
+                        <td>
+                            <span class="format-badge format-individual">Individual</span>
+                            <div class="notes">24-30 questions, 75 minutes</div>
+                        </td>
+                        <td>
+                            <div class="deadline future">Regular: Sep 15 - Dec 31, 2025 ($18)</div>
+                            <div class="deadline urgent">Late: Jan 1 - Feb 1, 2026 ($35)</div>
+                        </td>
+                        <td>
+                            <div class="cost paid">$18-$35</div>
+                            <div class="notes">Per student</div>
+                        </td>
+                        <td>
+                            <strong>March 20, 2026</strong>
+                            <div class="notes">(3rd Thursday of March)</div>
+                        </td>
+                        <td>
+                            • Multiple choice<br>
+                            • Word and logic problems<br>
+                            • Global participation<br>
+                            • Awards at multiple levels
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border-left: 5px solid #059669; background: linear-gradient(135deg, rgba(5,150,105,0.08), rgba(5,150,105,0.03));">
+                            <div class="competition-name">MATHCOUNTS</div>
+                            <div class="notes">National competition series</div>
+                        </td>
+                        <td>
+                            <a href="https://www.mathcounts.org/" target="_blank" class="website-link">Official Site</a>
+                            <a href="https://www.mathcounts.org/programs/chapter-state-competition-search" target="_blank" class="website-link">Find Local Competition</a>
+                        </td>
+                        <td>
+                            <div class="grade-range">Grades 6-8</div>
+                            <div class="notes">Through schools only</div>
+                        </td>
+                        <td>
+                            <span class="format-badge format-both">Individual & Team</span>
+                            <div class="notes">4 rounds: Sprint, Target, Team, Countdown</div>
+                        </td>
+                        <td>
+                            <div class="deadline future">Early Bird: Nov 1, 2025 ($40)</div>
+                            <div class="deadline coming">Regular: Dec 16, 2025 ($45)</div>
+                            <div class="deadline urgent">Late: After Dec 16 ($50)</div>
+                        </td>
+                        <td>
+                            <div class="cost paid">$40-$50</div>
+                            <div class="notes">Per student</div>
+                        </td>
+                        <td>
+                            <strong>School:</strong> Nov 6, 2025 available<br>
+                            <strong>Chapter:</strong> Feb 1-28, 2026<br>
+                            <strong>State:</strong> Mar 1-31, 2026<br>
+                            <strong>National:</strong> May 10-11, 2026
+                        </td>
+                        <td>
+                            • 4-level progression<br>
+                            • Up to 14 students per school<br>
+                            • Free advancement to higher levels<br>
+                            • National competition in DC
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border-left: 5px solid #dc2626; background: linear-gradient(135deg, rgba(220,38,38,0.08), rgba(220,38,38,0.03));">
+                            <div class="competition-name">AMC 8</div>
+                            <div class="notes">American Mathematics Contest</div>
+                        </td>
+                        <td>
+                            <a href="https://maa.org/amcreg/" target="_blank" class="website-link">Official MAA Site</a>
+                            <a href="https://artofproblemsolving.com/wiki/index.php/AMC_8" target="_blank" class="website-link">Problem Archive</a>
+                        </td>
+                        <td>
+                            <div class="grade-range">Grade 8 & below</div>
+                            <div class="notes">Under 14.5 years old, through schools</div>
+                        </td>
+                        <td>
+                            <span class="format-badge format-individual">Individual</span>
+                            <div class="notes">25 questions, 40 minutes</div>
+                        </td>
+                        <td>
+                            <div class="deadline future">Early Bird: Oct 30, 2025 ($53)</div>
+                            <div class="deadline coming">Regular: Dec 23, 2025 ($73)</div>
+                            <div class="deadline urgent">Late: Jan 15, 2026 ($113)</div>
+                        </td>
+                        <td>
+                            <div class="cost paid">$53-$113</div>
+                            <div class="notes">Registration fee</div>
+                            <div class="cost paid">+ $25/bundle</div>
+                            <div class="notes">10 students per bundle</div>
+                        </td>
+                        <td>
+                            <strong>Jan 22-28, 2026</strong>
+                            <div class="notes">(competition window)</div>
+                        </td>
+                        <td>
+                            • Multiple choice<br>
+                            • No calculator allowed<br>
+                            • Honor Roll: top performers<br>
+                            • Gateway to AMC 10/12
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border-left: 5px solid #7c3aed; background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(124,58,237,0.03));">
+                            <div class="competition-name">Purple Comet</div>
+                            <div class="notes">Math Meet (online team competition)</div>
+                        </td>
+                        <td>
+                            <a href="https://purplecomet.org/" target="_blank" class="website-link">Official Site</a>
+                            <a href="https://www.awesomemath.org/product/purple-comet-math-meet/" target="_blank" class="website-link">Problem Book</a>
+                        </td>
+                        <td>
+                            <div class="grade-range">Middle School</div>
+                            <div class="notes">Under 16, not completed 8th grade</div>
+                        </td>
+                        <td>
+                            <span class="format-badge format-team">Team (1-6 students)</span>
+                            <div class="notes">20 problems, 60 minutes</div>
+                        </td>
+                        <td>
+                            <div class="deadline future">Registration Opens: Feb 1, 2026</div>
+                            <div class="deadline coming">Through competition window</div>
+                        </td>
+                        <td>
+                            <div class="cost free">FREE</div>
+                        </td>
+                        <td>
+                            <strong>Mid-April 2026</strong>
+                            <div class="notes">10-day window</div>
+                            <div class="notes">Teams choose start time</div>
+                        </td>
+                        <td>
+                            • Online competition<br>
+                            • Teams work collaboratively<br>
+                            • International participation<br>
+                            • Flexible scheduling within window
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="timeline-visual">
+            <h3>📅 Competition Schedule 2025-2026</h3>
+            <div class="competition-list">
+                <div class="timeline-event moems-color">
+                    <div class="event-month">November 2025</div>
+                    <div class="event-name">MOEMS Contest #1</div>
+                </div>
+
+                <div class="timeline-event moems-color">
+                    <div class="event-month">December 2025</div>
+                    <div class="event-name">MOEMS Contest #2</div>
+                </div>
+
+                <div class="timeline-event moems-color">
+                    <div class="event-month">January 2026</div>
+                    <div class="event-name">MOEMS Contest #3</div>
+                </div>
+
+                <div class="timeline-event amc-color">
+                    <div class="event-month">January 2026</div>
+                    <div class="event-name">AMC 8</div>
+                    <div class="event-detail">January 22-28</div>
+                </div>
+
+                <div class="timeline-event moems-color">
+                    <div class="event-month">February 2026</div>
+                    <div class="event-name">MOEMS Contest #4</div>
+                </div>
+
+                <div class="timeline-event mathcounts-color">
+                    <div class="event-month">February 2026</div>
+                    <div class="event-name">MATHCOUNTS Chapter Competitions</div>
+                </div>
+
+                <div class="timeline-event moems-color">
+                    <div class="event-month">March 2026</div>
+                    <div class="event-name">MOEMS Contest #5 (Final)</div>
+                </div>
+
+                <div class="timeline-event mathcounts-color">
+                    <div class="event-month">March 2026</div>
+                    <div class="event-name">MATHCOUNTS State Competitions</div>
+                </div>
+
+                <div class="timeline-event kangaroo-color">
+                    <div class="event-month">March 2026</div>
+                    <div class="event-name">Math Kangaroo</div>
+                    <div class="event-detail">March 20</div>
+                </div>
+
+                <div class="timeline-event purple-color">
+                    <div class="event-month">April 2026</div>
+                    <div class="event-name">Purple Comet Math Meet</div>
+                    <div class="event-detail">Mid-April (10-day window)</div>
+                </div>
+
+                <div class="timeline-event mathcounts-color">
+                    <div class="event-month">May 2026</div>
+                    <div class="event-name">MATHCOUNTS National Competition</div>
+                    <div class="event-detail">May 10-11, Washington DC</div>
+                </div>
+            </div>
+        </div>
+
+        <style>
+        .timeline-visual {
+            background: white;
+            margin: 20px;
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #dc2626;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .timeline-visual h3 {
+            color: #dc2626;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            text-align: center;
+        }
+
+        .competition-list {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .timeline-event {
+            margin-bottom: 12px;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 5px solid;
+            background: white;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .event-month {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #374151;
+            min-width: 120px;
+            flex-shrink: 0;
+        }
+
+        .event-name {
+            font-weight: 600;
+            font-size: 1rem;
+            flex-grow: 1;
+        }
+
+        .event-detail {
+            font-size: 0.85rem;
+            color: #6b7280;
+            font-style: italic;
+        }
+
+        .amc-color {
+            border-left-color: #dc2626;
+            background: linear-gradient(135deg, rgba(220,38,38,0.03), rgba(220,38,38,0.01));
+        }
+
+        .mathcounts-color {
+            border-left-color: #059669;
+            background: linear-gradient(135deg, rgba(5,150,105,0.03), rgba(5,150,105,0.01));
+        }
+
+        .moems-color {
+            border-left-color: #1e40af;
+            background: linear-gradient(135deg, rgba(30,64,175,0.03), rgba(30,64,175,0.01));
+        }
+
+        .kangaroo-color {
+            border-left-color: #f59e0b;
+            background: linear-gradient(135deg, rgba(245,158,11,0.03), rgba(245,158,11,0.01));
+        }
+
+        .purple-color {
+            border-left-color: #7c3aed;
+            background: linear-gradient(135deg, rgba(124,58,237,0.03), rgba(124,58,237,0.01));
+        }
+
+        @media (max-width: 768px) {
+            .timeline-event {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .event-month {
+                min-width: auto;
+                font-size: 0.85rem;
+            }
+            
+            .event-name {
+                font-size: 0.95rem;
+            }
+            
+            .event-detail {
+                font-size: 0.8rem;
+            }
+        }
+        </style>
+    </div>
+</body>
+</html>
