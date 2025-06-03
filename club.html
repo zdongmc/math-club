@@ -28,93 +28,6 @@
             overflow: hidden;
         }
 
-        /* Header Styles */
-        .header {
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            color: white;
-            text-align: center;
-            padding: 40px 20px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: pulse 4s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.3; }
-            50% { transform: scale(1.1); opacity: 0.1; }
-        }
-
-        .header-content {
-            position: relative;
-            z-index: 2;
-        }
-
-        .header h1 {
-            font-size: 2.8rem;
-            margin-bottom: 10px;
-            font-weight: 700;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .header .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            margin-bottom: 20px;
-        }
-
-        /* Navigation */
-        .nav {
-            background: #f8f9fa;
-            padding: 15px 0;
-            border-bottom: 3px solid #e9ecef;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .nav-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 30px;
-            padding: 0 20px;
-        }
-
-        .nav-item {
-            padding: 10px 20px;
-            background: white;
-            border-radius: 25px;
-            text-decoration: none;
-            color: #333;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .nav-item:hover {
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-        }
-
-        .nav-item.active {
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            color: white;
-        }
-
         /* Main Content */
         .main-content {
             padding: 40px 20px;
@@ -290,6 +203,18 @@
             border-bottom: none;
         }
 
+        .competitions-list a {
+            color: #dc2626;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .competitions-list a:hover {
+            color: #991b1b;
+            text-decoration: underline;
+        }
+
         /* Footer */
         .footer {
             background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
@@ -316,14 +241,6 @@
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .header .subtitle {
-                font-size: 1rem;
-            }
-            
             .main-content {
                 padding: 20px 15px;
             }
@@ -346,26 +263,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-content">
-                <div class="header-logo">
-                    <img src="HWMS.jpeg" alt="Hallie Wells Middle School Logo" style="height: 80px; width: auto; margin-bottom: 20px; border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-                </div>
-                <h1>Hallie Wells Middle School</h1>
-                <p class="subtitle">Competition Math Club</p>
-            </div>
-        </header>
-
-        <!-- Navigation -->
-        <nav class="nav">
-            <div class="nav-content">
-                <a href="index.html" class="nav-item">📢 Announcements</a>
-                <a href="#info" class="nav-item active">ℹ️ Club Info</a>
-                <a href="competitions.html" class="nav-item">📅 Competition Info</a>
-            </div>
-        </nav>
-
         <!-- Main Content -->
         <main class="main-content">
             <!-- Club Info Section -->
@@ -376,15 +273,15 @@
                         <div class="quick-info-item">
                             <div class="quick-info-icon">🕐</div>
                             <div class="quick-info-title">Meeting Times</div>
-                            <div class="quick-info-detail">Tuesdays & Thursdays<br>3:30 - 4:30 PM</div>
+                            <div class="quick-info-detail">TBA</div>
                         </div>
                         <div class="quick-info-item">
                             <div class="quick-info-icon">📍</div>
                             <div class="quick-info-title">Location</div>
-                            <div class="quick-info-detail">Room 204<br>Math Wing</div>
+                            <div class="quick-info-detail">TBA</div>
                         </div>
                         <div class="quick-info-item">
-                            <div class="quick-info-icon">👨‍🏫</div>
+                            <div class="quick-info-icon">👩🏻‍🏫</div>
                             <div class="quick-info-title">Math Coach</div>
                             <div class="quick-info-detail">Prof. Jojo</div>
                         </div>
@@ -419,11 +316,12 @@
                         <div class="competitions-list">
                             <h3 style="margin-bottom: 15px; color: #333;">Competitions We Participate In:</h3>
                             <ul>
-                                <li><strong>AMC 8:</strong> American Mathematics Competitions for grades 8 and below</li>
-                                <li><strong>MATHCOUNTS:</strong> National middle school mathematics competition</li>
-                                <li><strong>MOEMS:</strong> Mathematical Olympiads for Elementary and Middle Schools</li>
-                                <li><strong>Purple Comet! Math Meet:</strong> Online team-based mathematics competition</li>
-                                <li><strong>Math Kangaroo:</strong> International mathematics competition for students</li>
+                                <li><a href="https://maa.org/amcreg/" target="_blank"><strong>AMC 8</strong></a><strong>:</strong> American Mathematics Competitions for grades 8 and below</li>
+                                <li><a href="https://www.mathcounts.org/" target="_blank"><strong>MATHCOUNTS</strong></a><strong>:</strong> National middle school mathematics competition</li>
+                                <li><a href="https://moems.org/" target="_blank"><strong>MOEMS</strong></a><strong>:</strong> Mathematical Olympiads for Elementary and Middle Schools</li>
+                                <li><a href="https://purplecomet.org/" target="_blank"><strong>Purple Comet! Math Meet</strong></a><strong>:</strong> Online team-based mathematics competition</li>
+                                <li><a href="https://mathkangaroo.org/mks/" target="_blank"><strong>Math Kangaroo</strong></a><strong>:</strong> International mathematics competition for students</li>
+                                <li><a href="https://www.noetic-learning.com/mathcontest/" target="_blank"><strong>Noetic Learning Math Contest</strong></a><strong>:</strong> Semiannual problem-solving competition</li>
                             </ul>
                         </div>
 
@@ -443,11 +341,10 @@
                                 <div class="contact-title">Email</div>
                             </div>
                             <div class="contact-details">
-                                <strong>Coach Prof. Jojo:</strong><br>
+                                <strong>Prof. Jojo:</strong><br>
                                 zdongmc@gmail.com<br><br>
                                 For questions about club activities, competition registration, or general inquiries.
-                            </div>
-                        </div>
+                            </div></div>
 
                         <div class="contact-item">
                             <div class="contact-header">
@@ -458,8 +355,7 @@
                                 <strong>Hallie Wells Middle School</strong><br>
                                 11701 Little Seneca Parkway<br>Clarksburg, MD 20871<br><br>
                                 <strong>Meeting Times:</strong><br>
-                                Tuesdays & Thursdays<br>
-                                3:30 - 4:30 PM
+                                TBA
                             </div>
                         </div>
 
@@ -534,13 +430,13 @@
             });
         });
 
-        // Add hover effect to navigation
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('mouseenter', function() {
-                this.style.transform = 'scale(1.05)';
+        // Add hover effect to competition links
+        document.querySelectorAll('.competitions-list a').forEach(link => {
+            link.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.02)';
             });
             
-            item.addEventListener('mouseleave', function() {
+            link.addEventListener('mouseleave', function() {
                 this.style.transform = 'scale(1)';
             });
         });
