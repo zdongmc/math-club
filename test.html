@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hallie Wells Middle School Competition Math Club</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.1); opacity: 0.1; }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .header-icons {
+            font-size: 3rem;
+            margin: 20px 0;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* Navigation */
+        .nav {
+            background: #f8f9fa;
+            padding: 15px 0;
+            border-bottom: 3px solid #e9ecef;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            padding: 0 20px;
+        }
+
+        .nav-item {
+            padding: 10px 20px;
+            background: white;
+            border-radius: 25px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+        }
+
+        /* Content Frame Container */
+        .content-frame-container {
+            flex: 1;
+            padding: 0;
+            margin: 0;
+            background: white;
+        }
+
+        .content-frame {
+            width: 100%;
+            height: calc(100vh - 300px); /* Adjust based on header height */
+            border: none;
+            background: white;
+            min-height: 600px;
+        }
+
+        /* Loading indicator */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        /* Error message */
+        .error-message {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: #dc2626;
+            font-size: 1.1rem;
+            background: #f8f9fa;
+            margin: 20px;
+            border-radius: 10px;
+            border: 2px solid #dc2626;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header .subtitle {
+                font-size: 1rem;
+            }
+
+            .nav-content {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .content-frame {
+                height: calc(100vh - 400px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-logo">
+                    <img src="HWMS.jpeg" alt="Hallie Wells Middle School Logo" style="height: 80px; width: auto; margin-bottom: 20px; border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                </div>
+                <h1>Hallie Wells Middle School</h1>
+                <p class="subtitle">Competition Math Club</p>
+                <p>"When I entered middle school I was exposed to the first math competition called "Mathcounts". I thought this was actually kind of fun. I thought that creativeness, that thinking out of the box was fun. I got addicted to it. Then I decided that I like this. I fell in love with thinking."</p>
+                <p>~ Po-Shen Loh</p>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav">
+            <div class="nav-content">
+                <a class="nav-item active" data-page="announcements.html">📢 Announcements</a>
+                <a class="nav-item" data-page="club-info.html">ℹ️ Club Info</a>
+                <a class="nav-item" data-page="competitions.html">📅 Competition Info</a>
+            </div>
+        </nav>
+
+        <!-- Content Frame Container -->
+        <div class="content-frame-container">
+            <div class="loading" id="loading">
+                🔄 Loading content...
+            </div>
+            <div class="error-message" id="error-message">
+                ❌ Unable to load content. Please check that the page file exists.
+            </div>
+            <iframe id="content-frame" class="content-frame" src="announcements.html" 
+                    onload="handleFrameLoad()" 
+                    onerror="handleFrameError()">
+            </iframe>
+        </div>
+    </div>
+
+    <script>
+        // Navigation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const navItems = document.querySelectorAll('.nav-item');
+            const contentFrame = document.getElementById('content-frame');
+            const loading = document.getElementById('loading');
+            const errorMessage = document.getElementById('error-message');
+
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all nav items
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    
+                    // Add active class to clicked item
+                    this.classList.add('active');
+                    
+                    // Get the page to load
+                    const pageUrl = this.getAttribute('data-page');
+                    
+                    // Show loading indicator
+                    showLoading();
+                    
+                    // Load the page in the iframe
+                    contentFrame.src = pageUrl;
+                });
+
+                // Add hover effects
+                item.addEventListener('mouseenter', function() {
+                    if (!this.classList.contains('active')) {
+                        this.style.transform = 'scale(1.05)';
+                    }
+                });
+                
+                item.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+        });
+
+        function showLoading() {
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('error-message').classList.remove('show');
+            document.getElementById('content-frame').style.display = 'none';
+        }
+
+        function handleFrameLoad() {
+            // Hide loading indicator when frame loads successfully
+            document.getElementById('loading').classList.remove('show');
+            document.getElementById('error-message').classList.remove('show');
+            document.getElementById('content-frame').style.display = 'block';
+        }
+
+        function handleFrameError() {
+            // Show error message if frame fails to load
+            document.getElementById('loading').classList.remove('show');
+            document.getElementById('error-message').classList.add('show');
+            document.getElementById('content-frame').style.display = 'none';
+        }
+
+        // Header animation on scroll
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const headerIcons = document.querySelector('.header-icons');
+            if (headerIcons) {
+                headerIcons.style.transform = `translateY(${scrolled * 0.5}px)`;
+            }
+        });
+
+        // Handle iframe communication (optional - for advanced features)
+        window.addEventListener('message', function(event) {
+            // You can use this to receive messages from the iframe content
+            // For example, to update the page title or handle special navigation
+            if (event.data && event.data.type === 'updateTitle') {
+                document.title = event.data.title + ' - HWMS Math Club';
+            }
+        });
+    </script>
+</body>
+</html>
