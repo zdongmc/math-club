@@ -15,12 +15,12 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: #333;
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            background: white;
             min-height: 100vh;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             background: white;
             border-radius: 0 0 20px 20px;
@@ -28,35 +28,37 @@
             overflow: hidden;
         }
 
-        .header {
-            background: white;
-            color: #333;
+        /* Main Content */
+        .main-content {
             padding: 40px 20px;
+        }
+
+        .section {
+            max-width: 1200px;
+            margin: 0 auto 50px auto;
+        }
+
+        .section h2 {
+            font-size: 2.2rem;
+            color: #333;
+            margin-bottom: 25px;
             text-align: center;
+            position: relative;
         }
 
-        .header-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .header-icon {
-            font-size: 2.5rem;
-            color: #dc2626;
-        }
-
-        .header-subtitle {
-            font-size: 1.2rem;
-            color: #666;
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            border-radius: 2px;
         }
 
         .form-container {
-            padding: 40px 20px;
             text-align: center;
             min-height: 400px;
             display: flex;
@@ -72,61 +74,52 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .header {
-                padding: 30px 15px;
+            .main-content {
+                padding: 20px 15px;
             }
             
-            .header-title {
-                font-size: 2rem;
-                flex-direction: column;
-                gap: 10px;
+            .section h2 {
+                font-size: 1.8rem;
             }
             
             .form-container {
                 padding: 20px 10px;
             }
-            
-            .form-iframe {
-                height: 900px;
-            }
         }
 
         @media (max-width: 480px) {
-            .header-title {
-                font-size: 1.8rem;
-            }
-            
-            .form-iframe {
-                height: 1000px;
+            .section h2 {
+                font-size: 1.6rem;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1 class="header-title">
-                <span class="header-icon">📝</span>
-                <span>Club Registration Form</span>
-            </h1>
-        </div>
-        
-        <div class="form-container">
-            <div class="form-notice">
-                <p style="margin-bottom: 20px; font-size: 1.1rem;">Click the button below to open the registration form:</p>
-                <a href="https://forms.gle/PMdmzV79ZZd5jBso6" 
-                   target="_blank" 
-                   style="display: inline-block; background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 1.1rem; box-shadow: 0 10px 30px rgba(220, 38, 38, 0.3); transition: transform 0.3s ease;"
-                   onmouseover="this.style.transform='translateY(-2px)'"
-                   onmouseout="this.style.transform='translateY(0)'">
-                    Open Registration Form →
-                </a>
-                <p style="margin-top: 20px; color: #666; font-size: 0.95rem;">
-                    The form will open in a new tab. After completing your registration, you can close that tab and return here.
-                </p>
-            </div>
-        </div>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Registration Section -->
+            <section id="registration" class="section">
+                <h2>📝 Club Registration Form</h2>
+                <div class="form-container">
+                    <div class="form-notice">
+                        <p style="margin-bottom: 20px; font-size: 1.1rem;">Click the button below to open the registration form:</p>
+                        <a href="https://forms.gle/PMdmzV79ZZd5jBso6" 
+                           target="_blank" 
+                           style="display: inline-block; background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 1.1rem; box-shadow: 0 10px 30px rgba(220, 38, 38, 0.3); transition: transform 0.3s ease;"
+                           onmouseover="this.style.transform='translateY(-2px)'"
+                           onmouseout="this.style.transform='translateY(0)'">
+                            Open Registration Form →
+                        </a>
+                        <p style="margin-top: 20px; color: #666; font-size: 0.95rem;">
+                            The form will open in a new tab. After completing your registration, you can close that tab and return here.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
 </body>
 </html>
