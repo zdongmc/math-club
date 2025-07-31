@@ -122,8 +122,8 @@
         .nav-item:hover {
             background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
             color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.25);
         }
 
         .nav-item.active {
@@ -229,7 +229,7 @@
         <header class="header">
             <div class="header-content">
                 <div class="header-logo">
-                    <img src="HWMS.jpeg" alt="Hallie Wells Middle School Logo" style="height: 80px; width: auto; margin-bottom: 20px; border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                    <img src="HWMS.jpeg" alt="Hallie Wells Middle School Logo" style="height: 80px; width: auto; margin-bottom: 20px; border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                 </div>
                 <h1>Competition Math Club</h1>
                 <p class="subtitle">Hallie Wells Middle School</p>
