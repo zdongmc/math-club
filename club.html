@@ -15,10 +15,14 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: #333;
-            background: transparent;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
             margin: 0;
             padding: 0;
-            min-height: auto;
+            min-height: 100vh;
+        }
+
+        #header-container {
+            /* Header will be injected here */
         }
 
         .container {
@@ -103,6 +107,32 @@
         .quick-info-detail {
             color: #666;
             font-size: 0.9rem;
+        }
+
+        /* Quote Section */
+        .quote-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 30px 20px;
+            text-align: center;
+            border-radius: 15px;
+            margin: 40px 0;
+        }
+
+        .quote-content {
+            max-width: 800px;
+            margin: 0 auto;
+            font-family: Georgia, 'Times New Roman', serif;
+            font-style: italic;
+            font-size: 1.1rem;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .quote-author {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
         }
 
         /* Contact Section */
@@ -217,6 +247,30 @@
             text-decoration: underline;
         }
 
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 50px;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .footer h3 {
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .footer p {
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .main-content {
@@ -241,6 +295,9 @@
 </head>
 <body>
     <div class="container">
+        <!-- Header will be loaded here -->
+        <div id="header-container"></div>
+        
         <!-- Main Content -->
         <main class="main-content">
             <!-- Club Info Section -->
@@ -282,6 +339,16 @@
                 </div>
             </section>
 
+            <!-- Quote Section -->
+            <section class="section">
+                <div class="quote-section">
+                    <div class="quote-content">
+                        "When I entered middle school I was exposed to the first math competition called 'Mathcounts'. I thought this was actually kind of fun. I thought that creativeness, that thinking out of the box was fun. I got addicted to it. Then I decided that I like this. I fell in love with thinking."
+                        <div class="quote-author">~ Po-Shen Loh, 4-time Gold Medal Math Olympiad USA Coach</div>
+                    </div>
+                </div>
+            </section>
+
             <!-- About Section -->
             <section class="section">
                 <div class="about-section">
@@ -308,7 +375,28 @@
                 </div>
             </section>
         </main>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <h3>Hallie Wells Middle School Competition Math Club</h3>
+                <p style="margin-top: 15px; font-size: 1rem; opacity: 0.9;">
+                    <strong>Coach:</strong> Prof. Jojo Dong | <strong>Contact:</strong> zdongmc@gmail.com
+                </p>
+                <p style="margin-top: 20px; font-size: 0.9rem; opacity: 0.8;">
+                    © 2025 Hallie Wells Middle School Competition Math Club
+                </p>
+            </div>
+        </footer>
+    </div>
 
+    <script src="header-template.js"></script>
+    <script>
+        // Load shared header component
+        document.addEventListener('DOMContentLoaded', function() {
+            loadHeader();
+        });
+    </script>
     <script>
         // Add entrance animations
         document.addEventListener('DOMContentLoaded', function() {
