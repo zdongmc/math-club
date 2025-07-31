@@ -135,56 +135,6 @@
             font-weight: 500;
         }
 
-        /* Contact Section */
-        .contact-section {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-radius: 15px;
-            padding: 30px;
-            margin: 40px 0;
-        }
-
-        .contact-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-top: 20px;
-        }
-
-        .contact-item {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-            border-left: 5px solid #dc2626;
-        }
-
-        .contact-item:hover {
-            transform: translateY(-3px);
-        }
-
-        .contact-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .contact-icon {
-            font-size: 1.5rem;
-            margin-right: 10px;
-            color: #dc2626;
-        }
-
-        .contact-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .contact-details {
-            color: #555;
-            line-height: 1.6;
-        }
 
         /* About Section */
         .about-section {
@@ -275,16 +225,6 @@
         @media (max-width: 768px) {
             .main-content {
                 padding: 20px 15px;
-            }
-
-            .nav-content {
-                flex-direction: column;
-                align-items: center;
-                gap: 15px;
-            }
-
-            .contact-info {
-                grid-template-columns: 1fr;
             }
 
             .quick-info-grid {
@@ -395,61 +335,6 @@
         // Load shared header component
         document.addEventListener('DOMContentLoaded', function() {
             loadHeader();
-        });
-    </script>
-    <script>
-        // Add entrance animations
-        document.addEventListener('DOMContentLoaded', function() {
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach((entry, index) => {
-                    if (entry.isIntersecting) {
-                        setTimeout(() => {
-                            entry.target.style.opacity = '1';
-                            entry.target.style.transform = 'translateY(0)';
-                        }, index * 100);
-                    }
-                });
-            }, observerOptions);
-
-            // Animate quick info items
-            document.querySelectorAll('.quick-info-item').forEach(item => {
-                item.style.opacity = '0';
-                item.style.transform = 'scale(0.9)';
-                item.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-                observer.observe(item);
-            });
-
-            // Animate contact items
-            document.querySelectorAll('.contact-item').forEach(item => {
-                item.style.opacity = '0';
-                item.style.transform = 'translateY(30px)';
-                item.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-                observer.observe(item);
-            });
-
-            // Animate about section
-            document.querySelectorAll('.about-section').forEach(item => {
-                item.style.opacity = '0';
-                item.style.transform = 'translateY(30px)';
-                item.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-                observer.observe(item);
-            });
-        });
-
-        // Add hover effect to competition links
-        document.querySelectorAll('.competitions-list a').forEach(link => {
-            link.addEventListener('mouseenter', function() {
-                this.style.transform = 'scale(1.02)';
-            });
-            
-            link.addEventListener('mouseleave', function() {
-                this.style.transform = 'scale(1)';
-            });
         });
     </script>
 </body>
