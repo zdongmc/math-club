@@ -25,10 +25,8 @@
             background: white;
             border-radius: 0 0 20px 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
+            overflow: visible;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
         }
 
         /* Header Styles */
@@ -141,7 +139,6 @@
 
         /* Content Frame */
         .content-frame-container {
-            flex: 1;
             padding: 0;
             background: white;
             overflow: visible;
@@ -152,8 +149,9 @@
             height: auto;
             min-height: 600px;
             border: none;
-            background: white;
+            background: transparent;
             overflow: visible;
+            display: block;
         }
 
         
@@ -265,17 +263,36 @@
     </div>
 
     <script>
-        // Iframe auto-resize functionality
+        // Iframe auto-resize functionality for seamless integration
         function resizeIframe(iframe) {
             try {
                 const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
                 if (iframeDoc) {
-                    // Set iframe height to match content
-                    iframe.style.height = iframeDoc.body.scrollHeight + 'px';
+                    // Ensure iframe body has no margins/padding that could cause gaps
+                    iframeDoc.body.style.margin = '0';
+                    iframeDoc.body.style.padding = '0';
+                    iframeDoc.documentElement.style.margin = '0';
+                    iframeDoc.documentElement.style.padding = '0';
+                    
+                    // Set iframe height to match content exactly
+                    const contentHeight = Math.max(
+                        iframeDoc.body.scrollHeight,
+                        iframeDoc.body.offsetHeight,
+                        iframeDoc.documentElement.clientHeight,
+                        iframeDoc.documentElement.scrollHeight,
+                        iframeDoc.documentElement.offsetHeight
+                    );
+                    
+                    iframe.style.height = contentHeight + 'px';
+                    
+                    // Remove any scrollbars from iframe
+                    iframe.scrolling = 'no';
                 }
             } catch (e) {
                 // Fallback for cross-origin issues
                 console.log('Cannot access iframe content for resizing');
+                // Set a reasonable default height
+                iframe.style.height = '800px';
             }
         }
 
