@@ -197,6 +197,185 @@
             text-decoration: underline;
         }
 
+        /* Calendar Section */
+        .calendar-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 40px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .calendar-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .calendar-instructions {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .calendar-instructions p:first-child {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .calendar-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .calendar-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .view-btn {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+        }
+
+        .view-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220,38,38,0.3);
+        }
+
+        .subscribe-btn {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: #333;
+            border: 2px solid #dee2e6;
+        }
+
+        .subscribe-btn:hover {
+            background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .calendar-embed {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        /* Materials Section */
+        .materials-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 40px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .materials-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .materials-instructions {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .materials-instructions p:first-child {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .materials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .materials-category {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid #dc2626;
+        }
+
+        .materials-category h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .materials-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .material-link {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .material-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(220,38,38,0.15);
+            color: #dc2626;
+        }
+
+        .material-icon {
+            font-size: 1.5rem;
+            margin-right: 12px;
+            color: #dc2626;
+        }
+
+        .material-info {
+            flex: 1;
+        }
+
+        .material-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+            color: inherit;
+        }
+
+        .material-desc {
+            font-size: 0.85rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .materials-note {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 1px solid #ffd93d;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            color: #856404;
+            font-size: 0.9rem;
+        }
+
         /* Footer */
         .footer {
             background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
@@ -270,10 +449,76 @@
                             <div class="quick-info-title">Membership</div>
                             <div class="quick-info-detail">Free to join<br>Competition fees vary</div>
                         </div>
-                        <div class="quick-info-item">
-                            <div class="quick-info-icon">📚</div>
-                            <div class="quick-info-title">Materials</div>
-                            <div class="quick-info-detail">Provided by club<br>Bring pencil & paper</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Calendar Section -->
+            <section class="section">
+                <div class="calendar-section">
+                    <h2>Club Events Calendar</h2>
+                    <div class="calendar-container">
+                        <div class="calendar-instructions">
+                            <p><strong>📅 Stay up to date with all our club events!</strong></p>
+                            <p>View meetings, competition dates, and deadlines. You can also subscribe to get updates in your own calendar app.</p>
+                        </div>
+                        
+                        <!-- Calendar Actions -->
+                        <div class="calendar-actions">
+                            <a href="https://calendar.google.com/calendar/u/0?cid=classroom106021208745386534380@group.calendar.google.com" target="_blank" class="calendar-btn view-btn">
+                                📱 View in Google Calendar
+                            </a>
+                            <a href="https://calendar.google.com/calendar/ical/classroom106021208745386534380%40group.calendar.google.com/public/basic.ics" target="_blank" class="calendar-btn subscribe-btn">
+                                📥 Subscribe to Calendar
+                            </a>
+                        </div>
+                        
+                        <!-- Embedded Calendar -->
+                        <div class="calendar-embed">
+                            <iframe 
+                                src="https://calendar.google.com/calendar/embed?src=classroom106021208745386534380%40group.calendar.google.com&ctz=America%2FNew_York&mode=AGENDA&showTitle=0&showPrint=0&showTabs=0&showCalendars=0&showTz=0"
+                                style="border: 0; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);"
+                                width="100%" 
+                                height="500" 
+                                frameborder="0" 
+                                scrolling="no">
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Materials & Resources Section -->
+            <section class="section">
+                <div class="materials-section">
+                    <h2>Club Materials & Resources</h2>
+                    <div class="materials-container">
+                        <div class="materials-instructions">
+                            <p><strong>📚 Everything you need for our math club activities!</strong></p>
+                            <p>Practice problems, competition prep materials, and helpful resources. Click any document to open and view.</p>
+                        </div>
+                        
+                        <div class="materials-grid">
+                            <!-- Club Documents -->
+                            <div class="materials-category">
+                                <h3>📋 Club Documents</h3>
+                                <div class="materials-list">
+                                    <a href="https://drive.google.com/file/d/1xLw2ZKH3ZeXx0Asrb6nxFDR1zOFt9MQv/view?usp=drive_link" class="material-link" target="_blank">
+                                        <div class="material-icon">📄</div>
+                                        <div class="material-info">
+                                            <div class="material-title">Math Club Flyer</div>
+                                            <div class="material-desc">Club information and overview</div>
+                                        </div>
+                                    </a>
+                                    <a href="https://drive.google.com/file/d/1SZ4xkDLQ5XZrwuuD011zhc9PtN-WGzMR/view?usp=drive_link" class="material-link" target="_blank">
+                                        <div class="material-icon">📄</div>
+                                        <div class="material-info">
+                                            <div class="material-title">MOEMS Message to Parents</div>
+                                            <div class="material-desc">MOEMS competition information for parents</div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
