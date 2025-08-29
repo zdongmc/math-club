@@ -650,6 +650,51 @@
             0% { text-shadow: 0 0 5px rgba(220, 38, 38, 0.5); }
             100% { text-shadow: 0 0 15px rgba(220, 38, 38, 0.8), 0 0 25px rgba(220, 38, 38, 0.6); }
         }
+
+        /* Question Navigation */
+        .question {
+            display: none;
+        }
+
+        .question.active {
+            display: block;
+        }
+
+
+        .nav-btn {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 60px;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
+        }
+
+        .nav-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .submit-case-btn {
+            background: linear-gradient(135deg, #059669, #047857);
+            padding: 10px 20px;
+            font-size: 1rem;
+        }
+
+        .submit-case-btn:hover {
+            box-shadow: 0 4px 8px rgba(5, 150, 105, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -788,8 +833,11 @@
                     <p><strong>🚨 URGENT CASE BRIEF:</strong> <em>A suspicious number has been found at the scene: <strong>121</strong>. Our forensics team needs you to identify all its mathematical properties. This number may be connected to a larger pattern of numerical crimes. Use your MOEMS training to crack the code!</em></p>
                 </div>
                 
-                <div class="question">
-                    <h4>🔍 Evidence Analysis: Which properties apply to the suspect number 121?</h4>
+                <div class="question active" id="station1-q1">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>🔍 Evidence Analysis: Which properties apply to the suspect number 121?</span>
+                        <button class="nav-btn" onclick="nextQuestion(1)">Next →</button>
+                    </h4>
                     <p style="font-style: italic; margin-bottom: 10px;">"Check all evidence that matches your investigation findings:"</p>
                     <div class="checkbox-group">
                         <label class="checkbox-item" onclick="toggleCheckbox(this)">
@@ -827,8 +875,14 @@
                     </div>
                 </div>
 
-                <div class="question">
-                    <h4>🧮 Additional Evidence: Two more numbers found at the scene - 24 and 36</h4>
+                <div class="question" id="station1-q2">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>🧮 Additional Evidence: Two more numbers found at the scene - 24 and 36</span>
+                        <div>
+                            <button class="nav-btn" onclick="previousQuestion(1)">← Previous</button>
+                            <button class="nav-btn" onclick="nextQuestion(1)" style="margin-left: 8px;">Next →</button>
+                        </div>
+                    </h4>
                     <p style="font-style: italic; margin-bottom: 10px;">"What's the greatest common factor linking these accomplice numbers?"</p>
                     <select class="dropdown" id="q1-gcf">
                         <option value="">Choose...</option>
@@ -840,8 +894,14 @@
                     </select>
                 </div>
 
-                <div class="question">
-                    <h4>🔢 Final Clue: The number 456 was scribbled on a note</h4>
+                <div class="question" id="station1-q3">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>🔢 Final Clue: The number 456 was scribbled on a note</span>
+                        <div>
+                            <button class="nav-btn" onclick="previousQuestion(1)">← Previous</button>
+                            <button class="nav-btn submit-case-btn" onclick="submitStation(1)" style="margin-left: 8px;">📝 Submit Case</button>
+                        </div>
+                    </h4>
                     <p style="font-style: italic; margin-bottom: 10px;">"Calculate the digit sum to decode this message:"</p>
                     <select class="dropdown" id="q1-digitsum">
                         <option value="">Choose...</option>
@@ -852,10 +912,6 @@
                         <option value="19">19</option>
                     </select>
                 </div>
-
-                <div class="station-submit">
-                    <button class="btn" onclick="submitStation(1)">📝 File Case Report</button>
-                </div>
             </div>
 
             <!-- Case 2: The Factor Conspiracy -->
@@ -865,8 +921,11 @@
                     <p><strong>🚨 BREAKING:</strong> <em>Intelligence reports indicate a secret network of numbers working together! Our sources suggest the number <strong>12</strong> is the ringleader, and the mysterious <strong>17</strong> might be a lone wolf. Your mission: uncover their connections and classify their behavior patterns!</em></p>
                 </div>
                 
-                <div class="question">
-                    <h4>🕵️ Surveillance Report: Which numbers are accomplices of the ringleader 12?</h4>
+                <div class="question active" id="station2-q1">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>🕵️ Surveillance Report: Which numbers are accomplices of the ringleader 12?</span>
+                        <button class="nav-btn" onclick="nextQuestion(2)">Next →</button>
+                    </h4>
                     <p style="font-style: italic; margin-bottom: 10px;">"Identify all the factors (division partners) working with suspect 12:"</p>
                     <div class="checkbox-group">
                         <label class="checkbox-item" onclick="toggleCheckbox(this)">
@@ -908,8 +967,14 @@
                     </div>
                 </div>
 
-                <div class="question">
-                    <h4>🔍 Lone Wolf Analysis: Profile the suspect 17</h4>
+                <div class="question" id="station2-q2">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>🔍 Lone Wolf Analysis: Profile the suspect 17</span>
+                        <div>
+                            <button class="nav-btn" onclick="previousQuestion(2)">← Previous</button>
+                            <button class="nav-btn submit-case-btn" onclick="submitStation(2)" style="margin-left: 8px;">📝 Submit Case</button>
+                        </div>
+                    </h4>
                     <p style="font-style: italic; margin-bottom: 10px;">"Complete this psychological profile of the elusive number 17:"</p>
                     <p><strong>Square root:</strong> 
                         <select class="dropdown" id="q2-sqrt">
@@ -935,10 +1000,6 @@
                         </select>
                     </p>
                 </div>
-
-                <div class="station-submit">
-                    <button class="btn" onclick="submitStation(2)">📝 Close Investigation</button>
-                </div>
             </div>
 
             <!-- Case 3: The Fraction Forgery -->
@@ -948,8 +1009,11 @@
                     <p><strong>🚨 FRAUD ALERT:</strong> <em>A sophisticated counterfeiting ring has been creating fake mathematical documents! We've intercepted several suspicious fractions and a percentage that needs immediate authentication. Your expertise in fraction classification is needed to separate the legitimate from the fraudulent!</em></p>
                 </div>
                 
-                <div class="question">
-                    <h4>🔍 Document Authentication: Which fractions are legitimate "proper fractions"?</h4>
+                <div class="question active" id="station3-q1">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>🔍 Document Authentication: Which fractions are legitimate "proper fractions"?</span>
+                        <button class="nav-btn" onclick="nextQuestion(3)">Next →</button>
+                    </h4>
                     <p style="font-style: italic; margin-bottom: 10px;">"Remember: proper fractions have numerators smaller than denominators. Mark all authentic documents:"</p>
                     <div class="checkbox-group">
                         <label class="checkbox-item" onclick="toggleCheckbox(this)">
@@ -979,8 +1043,14 @@
                     </div>
                 </div>
 
-                <div class="question">
-                    <h4>🧾 Evidence Conversion: Decode this intercepted percentage</h4>
+                <div class="question" id="station3-q2">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>🧾 Evidence Conversion: Decode this intercepted percentage</span>
+                        <div>
+                            <button class="nav-btn" onclick="previousQuestion(3)">← Previous</button>
+                            <button class="nav-btn submit-case-btn" onclick="submitStation(3)" style="margin-left: 8px;">📝 Submit Case</button>
+                        </div>
+                    </h4>
                     <p style="font-style: italic; margin-bottom: 10px;">"The forgers left behind 45% - convert it to simplest fraction form to crack their code:"</p>
                     <select class="dropdown" id="q3-fraction">
                         <option value="">Choose...</option>
@@ -989,10 +1059,6 @@
                         <option value="18/40">18/40</option>
                         <option value="1/2">1/2</option>
                     </select>
-                </div>
-
-                <div class="station-submit">
-                    <button class="btn" onclick="submitStation(3)">📝 Seal Evidence</button>
                 </div>
             </div>
 
@@ -1003,8 +1069,11 @@
                     <p><strong>🚨 CRITICAL MISSION:</strong> <em>Mathematical criminals have scrambled important vocabulary definitions! They've also hidden crucial measurements of a mysterious rectangular solid. Your final mission: restore order by matching terms to definitions and calculating the hidden object's dimensions. The safety of the Mathematical Universe depends on your success!</em></p>
                 </div>
                 
-                <div class="question">
-                    <h4>🔀 Code Restoration: Drag each stolen term back to its rightful definition</h4>
+                <div class="question active" id="station4-q1">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>🔀 Code Restoration: Drag each stolen term back to its rightful definition</span>
+                        <button class="nav-btn" onclick="nextQuestion(4)">Next →</button>
+                    </h4>
                     <p style="font-style: italic; margin-bottom: 10px;">"The criminals scrambled these mathematical terms. Restore order to the Mathematical Universe:"</p>
                     <div class="drag-container">
                         <div class="drag-source">
@@ -1024,23 +1093,26 @@
                     </div>
                 </div>
 
-                <div class="question">
-                    <h4>📦 Mysterious Object Analysis: Decode the dimensions of this evidence box</h4>
+                <div class="question" id="station4-q2">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>📦 Mysterious Object Analysis: Decode the dimensions of this evidence box</span>
+                        <div>
+                            <button class="nav-btn" onclick="previousQuestion(4)">← Previous</button>
+                            <button class="nav-btn submit-case-btn" onclick="submitStation(4)" style="margin-left: 8px;">📝 Submit Case</button>
+                        </div>
+                    </h4>
                     <p style="font-style: italic; margin-bottom: 10px;">"Intelligence reports this rectangular solid holds the key to solving all cases. Calculate its properties:"</p>
                     <p>
-                        📱 <input type="number" class="text-input" id="q4-faces" placeholder="?" style="width: 60px; display: inline-block;"> faces <em>(flat surfaces)</em>
+                        📱 <input type="number" class="text-input" id="q4-faces" placeholder="?" style="width: 60px; display: inline-block;"> faces
                     </p>
                     <p>
-                        📏 <input type="number" class="text-input" id="q4-edges" placeholder="?" style="width: 60px; display: inline-block;"> edges <em>(where faces meet)</em>
+                        📏 <input type="number" class="text-input" id="q4-edges" placeholder="?" style="width: 60px; display: inline-block;"> edges
                     </p>
                     <p>
-                        📍 <input type="number" class="text-input" id="q4-vertices" placeholder="?" style="width: 60px; display: inline-block;"> vertices <em>(corner points)</em>
+                        📍 <input type="number" class="text-input" id="q4-vertices" placeholder="?" style="width: 60px; display: inline-block;"> vertices
                     </p>
                 </div>
 
-                <div class="station-submit">
-                    <button class="btn" onclick="submitStation(4)">🏆 Complete Mission</button>
-                </div>
             </div>
 
             <!-- Case 5: The Statistics Scandal -->
@@ -1050,8 +1122,11 @@
                     <p><strong>🚨 URGENT INVESTIGATION:</strong> <em>Suspicious test scores have been discovered in a mathematics classroom! The data may have been tampered with. Additionally, strange geometric shapes were found at the scene. Your statistical analysis and geometric identification skills are needed to crack this case!</em></p>
                 </div>
                 
-                <div class="question">
-                    <h4>📊 Statistical Evidence Analysis</h4>
+                <div class="question active" id="station5-q1">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>📊 Statistical Evidence Analysis</span>
+                        <button class="nav-btn" onclick="nextQuestion(5)">Next →</button>
+                    </h4>
                     <p style="font-style: italic; margin-bottom: 15px;">"Test scores found at the scene: <strong>85, 92, 78, 92, 88, 75, 92, 90</strong>"</p>
                     
                     <p><strong>🔍 Calculate the Mean:</strong> 
@@ -1095,8 +1170,14 @@
                     </p>
                 </div>
 
-                <div class="question">
-                    <h4>📐 Geometric Evidence Classification</h4>
+                <div class="question" id="station5-q2">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>📐 Geometric Evidence Classification</span>
+                        <div>
+                            <button class="nav-btn" onclick="previousQuestion(5)">← Previous</button>
+                            <button class="nav-btn" onclick="nextQuestion(5)" style="margin-left: 8px;">Next →</button>
+                        </div>
+                    </h4>
                     <p style="font-style: italic; margin-bottom: 10px;">"These triangle types were sketched on the suspect's notepad. Select ALL valid triangle classifications:"</p>
                     <div class="checkbox-group">
                         <label class="checkbox-item" onclick="toggleCheckbox(this)">
@@ -1126,8 +1207,14 @@
                     </div>
                 </div>
 
-                <div class="question">
-                    <h4>🔲 Quadrilateral Evidence Analysis</h4>
+                <div class="question" id="station5-q3">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>🔲 Quadrilateral Evidence Analysis</span>
+                        <div>
+                            <button class="nav-btn" onclick="previousQuestion(5)">← Previous</button>
+                            <button class="nav-btn submit-case-btn" onclick="submitStation(5)" style="margin-left: 8px;">📝 Submit Case</button>
+                        </div>
+                    </h4>
                     <p style="font-style: italic; margin-bottom: 10px;">"Which of these are legitimate quadrilateral types? Select ALL that apply:"</p>
                     <div class="checkbox-group">
                         <label class="checkbox-item" onclick="toggleCheckbox(this)">
@@ -1153,9 +1240,6 @@
                     </div>
                 </div>
 
-                <div class="station-submit">
-                    <button class="btn" onclick="submitStation(5)">📊 File Statistical Report</button>
-                </div>
             </div>
 
             <!-- Case 6: Operation 1,331 -->
@@ -1165,8 +1249,11 @@
                     <p><strong>🚨 HIGH PRIORITY CASE:</strong> <em>The mysterious number <strong>1,331</strong> has appeared at every crime scene throughout the city. This recurring pattern suggests a deeper mathematical conspiracy. Your mission: analyze this number completely and uncover why it keeps appearing at criminal activities!</em></p>
                 </div>
                 
-                <div class="question">
-                    <h4>🔍 Number Analysis: Complete Profile of 1,331</h4>
+                <div class="question active" id="station6-q1">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>🔍 Number Analysis: Complete Profile of 1,331</span>
+                        <button class="nav-btn" onclick="nextQuestion(6)">Next →</button>
+                    </h4>
                     <p style="font-style: italic; margin-bottom: 15px; text-align: center; font-size: 1.1rem;">"Analyze every mathematical property of this recurring suspect number. Select ALL that apply:"</p>
                     
                     <div style="text-align: center; margin: 20px 0;">
@@ -1217,8 +1304,14 @@
                     </div>
                 </div>
 
-                <div class="question">
-                    <h4>🔢 Mathematical Relationships Investigation</h4>
+                <div class="question" id="station6-q2">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>🔢 Mathematical Relationships Investigation</span>
+                        <div>
+                            <button class="nav-btn" onclick="previousQuestion(6)">← Previous</button>
+                            <button class="nav-btn submit-case-btn" onclick="submitStation(6)" style="margin-left: 8px;">📝 Submit Case</button>
+                        </div>
+                    </h4>
                     <p>Additional evidence found at the scene shows pairs of numbers. Identify their mathematical relationships:</p>
                     
                     <p><strong>🔍 What is the Greatest Common Factor (GCF) of 18 and 24?</strong></p>
@@ -1249,9 +1342,6 @@
                     </select>
                 </div>
 
-                <div class="station-submit">
-                    <button class="btn" onclick="submitStation(6)">📝 File Case Report</button>
-                </div>
             </div>
 
             <!-- Case 7: The Equation Enigma -->
@@ -1261,8 +1351,11 @@
                     <p><strong>🚨 CRYPTOGRAPHIC CASE:</strong> <em>Criminal mathematicians have been leaving coded messages using algebraic expressions and coordinate systems. Intelligence suggests they're planning their next operation at specific coordinates. Decode their mathematical clues to stop them!</em></p>
                 </div>
 
-                <div class="question">
-                    <h4>🔍 Algebraic Expression Decoder</h4>
+                <div class="question active" id="station7-q1">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>🔍 Algebraic Expression Decoder</span>
+                        <button class="nav-btn" onclick="nextQuestion(7)">Next →</button>
+                    </h4>
                     <p>Suspects left this expression: <strong>3x + 7 = 22</strong></p>
                     <p>What is the value of x?</p>
                     <select class="dropdown-select" data-question="algebra-solve">
@@ -1274,8 +1367,14 @@
                     </select>
                 </div>
 
-                <div class="question">
-                    <h4>🗺️ Coordinate Pursuit</h4>
+                <div class="question" id="station7-q2">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>🗺️ Coordinate Pursuit</span>
+                        <div>
+                            <button class="nav-btn" onclick="previousQuestion(7)">← Previous</button>
+                            <button class="nav-btn" onclick="nextQuestion(7)" style="margin-left: 8px;">Next →</button>
+                        </div>
+                    </h4>
                     <p>The criminal's location is at point (4, -2). Which quadrant are they hiding in?</p>
                     <select class="dropdown-select" data-question="quadrant">
                         <option value="">Select quadrant...</option>
@@ -1286,8 +1385,14 @@
                     </select>
                 </div>
 
-                <div class="question">
-                    <h4>📐 Angle Investigation</h4>
+                <div class="question" id="station7-q3">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>📐 Angle Investigation</span>
+                        <div>
+                            <button class="nav-btn" onclick="previousQuestion(7)">← Previous</button>
+                            <button class="nav-btn" onclick="nextQuestion(7)" style="margin-left: 8px;">Next →</button>
+                        </div>
+                    </h4>
                     <p>A witness described seeing an angle that measures exactly 90°. What type of angle is this?</p>
                     <select class="dropdown-select" data-question="angle-type">
                         <option value="">Select angle type...</option>
@@ -1298,15 +1403,18 @@
                     </select>
                 </div>
 
-                <div class="question">
-                    <h4>⚖️ Mathematical Reasoning</h4>
+                <div class="question" id="station7-q4">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>⚖️ Mathematical Reasoning</span>
+                        <div>
+                            <button class="nav-btn" onclick="previousQuestion(7)">← Previous</button>
+                            <button class="nav-btn submit-case-btn" onclick="submitStation(7)" style="margin-left: 8px;">📝 Submit Case</button>
+                        </div>
+                    </h4>
                     <p>The criminals mentioned "a number that when multiplied by itself equals 64." What is this number?</p>
                     <input type="number" class="text-input" data-question="square-root-64" placeholder="Enter the number">
                 </div>
 
-                <div class="station-submit">
-                    <button class="btn" onclick="submitStation(7)">📝 File Case Report</button>
-                </div>
             </div>
 
             <!-- Case 8: The Advanced Numbers Conspiracy -->
@@ -1316,8 +1424,11 @@
                     <p><strong>🚨 ELITE LEVEL THREAT:</strong> <em>A sophisticated criminal network is using advanced mathematical concepts to encrypt their operations. Only the most mathematically skilled detectives can crack this case. Use your expertise in complex number operations and mathematical relationships!</em></p>
                 </div>
 
-                <div class="question">
-                    <h4>🔢 Scientific Notation Surveillance</h4>
+                <div class="question active" id="station8-q1">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>🔢 Scientific Notation Surveillance</span>
+                        <button class="nav-btn" onclick="nextQuestion(8)">Next →</button>
+                    </h4>
                     <p>Intercepted communications show the number 4,560,000. Express this in scientific notation:</p>
                     <select class="dropdown-select" data-question="scientific-notation">
                         <option value="">Select correct notation...</option>
@@ -1328,14 +1439,26 @@
                     </select>
                 </div>
 
-                <div class="question">
-                    <h4>📊 Ratio Analysis</h4>
+                <div class="question" id="station8-q2">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>📊 Ratio Analysis</span>
+                        <div>
+                            <button class="nav-btn" onclick="previousQuestion(8)">← Previous</button>
+                            <button class="nav-btn" onclick="nextQuestion(8)" style="margin-left: 8px;">Next →</button>
+                        </div>
+                    </h4>
                     <p>Evidence shows a ratio of 3:5. If the first quantity is 15, what is the second quantity?</p>
                     <input type="number" class="text-input" data-question="ratio-solve" placeholder="Enter the second quantity">
                 </div>
 
-                <div class="question">
-                    <h4>🏗️ Geometric Evidence</h4>
+                <div class="question" id="station8-q3">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>🏗️ Geometric Evidence</span>
+                        <div>
+                            <button class="nav-btn" onclick="previousQuestion(8)">← Previous</button>
+                            <button class="nav-btn" onclick="nextQuestion(8)" style="margin-left: 8px;">Next →</button>
+                        </div>
+                    </h4>
                     <p>Which properties describe an isosceles triangle? Select ALL that apply:</p>
                     <div class="checkbox-group">
                         <label class="checkbox-item" onclick="toggleCheckbox(this)">
@@ -1361,8 +1484,14 @@
                     </div>
                 </div>
 
-                <div class="question">
-                    <h4>💰 Percentage Investigation</h4>
+                <div class="question" id="station8-q4">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>💰 Percentage Investigation</span>
+                        <div>
+                            <button class="nav-btn" onclick="previousQuestion(8)">← Previous</button>
+                            <button class="nav-btn submit-case-btn" onclick="submitStation(8)" style="margin-left: 8px;">📝 Submit Case</button>
+                        </div>
+                    </h4>
                     <p>Criminal profits increased from $200 to $250. What is the percentage increase?</p>
                     <select class="dropdown-select" data-question="percentage-increase">
                         <option value="">Select percentage increase...</option>
@@ -1373,9 +1502,6 @@
                     </select>
                 </div>
 
-                <div class="station-submit">
-                    <button class="btn" onclick="submitStation(8)">📝 File Case Report</button>
-                </div>
             </div>
 
             <!-- Case 9: The Integer Underground -->
@@ -1385,8 +1511,11 @@
                     <p><strong>🚨 DIVISION M OPERATION:</strong> <em>Criminal mathematicians are using signed numbers and advanced fraction operations to encode their messages. This is a high-level Division M case requiring mastery of negative numbers, complex fractions, and integer operations!</em></p>
                 </div>
 
-                <div class="question">
-                    <h4>🔢 Signed Number Operations</h4>
+                <div class="question active" id="station9-q1">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>🔢 Signed Number Operations</span>
+                        <button class="nav-btn" onclick="nextQuestion(9)">Next →</button>
+                    </h4>
                     <p>Decode this criminal calculation: <strong>-8 + 3 × (-2) - (-5) = ?</strong></p>
                     <select class="dropdown-select" data-question="signed-ops">
                         <option value="">Select the result...</option>
@@ -1397,8 +1526,14 @@
                     </select>
                 </div>
 
-                <div class="question">
-                    <h4>📊 Complex Fraction Analysis</h4>
+                <div class="question" id="station9-q2">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>📊 Complex Fraction Analysis</span>
+                        <div>
+                            <button class="nav-btn" onclick="previousQuestion(9)">← Previous</button>
+                            <button class="nav-btn" onclick="nextQuestion(9)" style="margin-left: 8px;">Next →</button>
+                        </div>
+                    </h4>
                     <p>Criminals left this complex fraction: <strong>2/3 ÷ 1/4</strong>. What is the result?</p>
                     <select class="dropdown-select" data-question="complex-fraction">
                         <option value="">Select the result...</option>
@@ -1409,8 +1544,14 @@
                     </select>
                 </div>
 
-                <div class="question">
-                    <h4>🔍 Number Classification Investigation</h4>
+                <div class="question" id="station9-q3">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>🔍 Number Classification Investigation</span>
+                        <div>
+                            <button class="nav-btn" onclick="previousQuestion(9)">← Previous</button>
+                            <button class="nav-btn" onclick="nextQuestion(9)" style="margin-left: 8px;">Next →</button>
+                        </div>
+                    </h4>
                     <p>Which of these describes the number -15? Select ALL that apply:</p>
                     <div class="checkbox-group">
                         <label class="checkbox-item" onclick="toggleCheckbox(this)">
@@ -1436,8 +1577,14 @@
                     </div>
                 </div>
 
-                <div class="question">
-                    <h4>📐 Percent Conversion Challenge</h4>
+                <div class="question" id="station9-q4">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>📐 Percent Conversion Challenge</span>
+                        <div>
+                            <button class="nav-btn" onclick="previousQuestion(9)">← Previous</button>
+                            <button class="nav-btn submit-case-btn" onclick="submitStation(9)" style="margin-left: 8px;">📝 Submit Case</button>
+                        </div>
+                    </h4>
                     <p>Convert 0.75 to a percent:</p>
                     <select class="dropdown-select" data-question="percent-convert">
                         <option value="">Select percentage...</option>
@@ -1448,9 +1595,6 @@
                     </select>
                 </div>
 
-                <div class="station-submit">
-                    <button class="btn" onclick="submitStation(9)">📝 File Division M Report</button>
-                </div>
             </div>
 
             <!-- Case 10: The Divisibility Code -->
@@ -1460,8 +1604,11 @@
                     <p><strong>🚨 ADVANCED MATHEMATICS REQUIRED:</strong> <em>The criminal organization is using sophisticated divisibility rules, geometric solids, and measurement conversions to hide their operations. Only detectives with complete MOEMS mastery can solve this case!</em></p>
                 </div>
 
-                <div class="question">
-                    <h4>🔍 Divisibility Rules Investigation</h4>
+                <div class="question active" id="station10-q1">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>🔍 Divisibility Rules Investigation</span>
+                        <button class="nav-btn" onclick="nextQuestion(10)">Next →</button>
+                    </h4>
                     <p>The number 4,572 is divisible by which of these? Select ALL that apply:</p>
                     <div class="checkbox-group">
                         <label class="checkbox-item" onclick="toggleCheckbox(this)">
@@ -1487,14 +1634,26 @@
                     </div>
                 </div>
 
-                <div class="question">
-                    <h4>📦 Geometric Solid Analysis</h4>
+                <div class="question" id="station10-q2">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>📦 Geometric Solid Analysis</span>
+                        <div>
+                            <button class="nav-btn" onclick="previousQuestion(10)">← Previous</button>
+                            <button class="nav-btn" onclick="nextQuestion(10)" style="margin-left: 8px;">Next →</button>
+                        </div>
+                    </h4>
                     <p>A rectangular solid (box) has dimensions 4 × 3 × 2. What is its volume?</p>
                     <input type="number" class="text-input" data-question="box-volume" placeholder="Enter volume">
                 </div>
 
-                <div class="question">
-                    <h4>🔢 Prime Factorization Decoder</h4>
+                <div class="question" id="station10-q3">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>🔢 Prime Factorization Decoder</span>
+                        <div>
+                            <button class="nav-btn" onclick="previousQuestion(10)">← Previous</button>
+                            <button class="nav-btn" onclick="nextQuestion(10)" style="margin-left: 8px;">Next →</button>
+                        </div>
+                    </h4>
                     <p>Express 60 as a product of prime numbers (prime factorization):</p>
                     <select class="dropdown-select" data-question="prime-factor">
                         <option value="">Select factorization...</option>
@@ -1505,8 +1664,14 @@
                     </select>
                 </div>
 
-                <div class="question">
-                    <h4>📏 Set Theory Evidence</h4>
+                <div class="question" id="station10-q4">
+                    <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>📏 Set Theory Evidence</span>
+                        <div>
+                            <button class="nav-btn" onclick="previousQuestion(10)">← Previous</button>
+                            <button class="nav-btn submit-case-btn" onclick="submitStation(10)" style="margin-left: 8px;">📝 Submit Case</button>
+                        </div>
+                    </h4>
                     <p>How many elements are in the set of counting numbers less than 5?</p>
                     <select class="dropdown-select" data-question="set-count">
                         <option value="">Select count...</option>
@@ -1517,9 +1682,6 @@
                     </select>
                 </div>
 
-                <div class="station-submit">
-                    <button class="btn" onclick="submitStation(10)">📝 Complete Investigation</button>
-                </div>
             </div>
 
         </div>
@@ -1535,8 +1697,39 @@
             casesCompleted: [false, false, false, false, false, false, false, false, false, false],
             gameStarted: false,
             allCasesComplete: false,
-            currentRank: 'Detective Trainee'
+            currentRank: 'Detective Trainee',
+            currentQuestion: {1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1},
+            totalQuestions: {1: 3, 2: 2, 3: 2, 4: 2, 5: 3, 6: 2, 7: 4, 8: 4, 9: 4, 10: 4}
         };
+
+        // Question Navigation Functions
+        function nextQuestion(caseNumber) {
+            const currentQ = gameState.currentQuestion[caseNumber];
+            const totalQ = gameState.totalQuestions[caseNumber];
+            
+            if (currentQ < totalQ) {
+                // Hide current question
+                document.getElementById(`station${caseNumber}-q${currentQ}`).classList.remove('active');
+                
+                // Show next question
+                gameState.currentQuestion[caseNumber]++;
+                document.getElementById(`station${caseNumber}-q${gameState.currentQuestion[caseNumber]}`).classList.add('active');
+            }
+        }
+
+        function previousQuestion(caseNumber) {
+            const currentQ = gameState.currentQuestion[caseNumber];
+            
+            if (currentQ > 1) {
+                // Hide current question
+                document.getElementById(`station${caseNumber}-q${currentQ}`).classList.remove('active');
+                
+                // Show previous question
+                gameState.currentQuestion[caseNumber]--;
+                document.getElementById(`station${caseNumber}-q${gameState.currentQuestion[caseNumber]}`).classList.add('active');
+            }
+        }
+
 
         // Detective ranking system (recalibrated for 10 cases, ~245 max points)
         const detectiveRanks = [
@@ -1691,6 +1884,7 @@
                     <div class="rank-display">
                         <div class="rank-icon">${currentRankInfo.icon}</div>
                         <div class="rank-info">
+                            <div class="team-name" style="font-weight: bold; color: #dc2626; margin-bottom: 2px;">${gameState.teamName}</div>
                             <div class="rank-title">${currentRankInfo.rank}</div>
                             <div class="rank-score">Evidence Points: ${gameState.totalScore}</div>
                         </div>
@@ -1714,6 +1908,20 @@
             if (currentStationEl) {
                 currentStationEl.classList.add('active');
                 currentStationEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Initialize navigation for this case
+                gameState.currentQuestion[stationNumber] = 1;
+                
+                // Show first question, hide others
+                const questions = currentStationEl.querySelectorAll('.question');
+                questions.forEach((q, index) => {
+                    if (index === 0) {
+                        q.classList.add('active');
+                    } else {
+                        q.classList.remove('active');
+                    }
+                });
+                
             }
         }
 
