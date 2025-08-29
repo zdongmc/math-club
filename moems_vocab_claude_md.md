@@ -128,3 +128,33 @@ Complete, self-contained HTML file optimized for:
 - **Mobile devices** for home practice and review
 
 This implementation provides a comprehensive math competition training tool that engages middle school students through gamification while covering essential MOEMS vocabulary and problem-solving skills.
+
+## Certificate System
+
+### Professional Certificate Template
+- **File**: `detective-certificate.html`
+- **Purpose**: Award certificates for Detective Academy completion
+- **Design**: Professional typography using Google Fonts (Libre Baskerville, Great Vibes, Cormorant Garamond)
+- **Features**: Fillable form with detective rank dropdown, automatic signature, current date insertion
+
+### Certificate Features
+- **Official Watermark Seal**: Centered background seal for authenticity
+- **Detective Rank Dropdown**: All 8 ranks from Detective Trainee to Mathematical Mastermind
+- **Professional Typography**: Traditional certificate fonts matching academic diploma standards
+- **Automatic Elements**: Current date insertion and Prof. Jojo script signature
+- **PDF Generation**: Clean print output with "Generate PDF" button (hidden in print)
+- **Responsive Design**: Optimized for standard 8.5" × 11" printing
+
+### Certificate Usage
+1. **Fill student information**: Name and achieved detective rank
+2. **Review content**: Certificate automatically includes current date and signature
+3. **Generate PDF**: Click button or use Ctrl+P to create printable version
+4. **Print and present**: Professional certificate ready for student recognition
+
+### Integration with Detective Activity
+- **Team Name Badge**: Student names now appear as badges in activity score display
+- **Rank Tracking**: Activity tracks progression through 8 detective ranks
+- **Evidence Points**: Scoring system determines final rank achieved
+- **Certificate Eligibility**: Any completed rank qualifies for certificate award
+
+The certificate system provides professional recognition for student mathematical achievements while maintaining the engaging detective theme throughout the learning experience.
