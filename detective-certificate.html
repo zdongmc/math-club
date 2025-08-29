@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detective Academy Certificate - HWMS Competition Math Club</title>
+    <!-- Google Fonts for Professional Certificate Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        @page {
+            size: 11in 8.5in;
+            margin: 0.5in;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Libre Baskerville', 'Times New Roman', serif;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #ffffff 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+        }
+
+        .certificate {
+            width: 10in;
+            height: 7.5in;
+            background: white;
+            border: 8px solid #dc2626;
+            border-image: linear-gradient(45deg, #dc2626, #991b1b, #dc2626) 1;
+            position: relative;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .certificate::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+            border: 2px solid #dc2626;
+            border-radius: 10px;
+        }
+
+        /* Official Watermark Seal */
+        .certificate::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, transparent 40%, rgba(220, 38, 38, 0.03) 40%, rgba(220, 38, 38, 0.06) 60%, transparent 60%);
+            border: 3px solid rgba(220, 38, 38, 0.1);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .watermark-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Libre Baskerville', serif;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: rgba(220, 38, 38, 0.08);
+            text-align: center;
+            pointer-events: none;
+            z-index: 0;
+            line-height: 1.3;
+            letter-spacing: 1px;
+        }
+
+        .header {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .badge-logo {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+        }
+
+        .school-name {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 3px;
+            font-weight: normal;
+        }
+
+        .program-name {
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.2rem;
+            color: #dc2626;
+            font-weight: normal;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .certificate-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .main-content {
+            text-align: center;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            line-height: 1.6;
+        }
+
+        .award-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .detective-name {
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.4rem;
+            color: #dc2626;
+            font-weight: normal;
+            margin: 15px 0;
+            border-bottom: 2px solid #dc2626;
+            display: inline-block;
+            min-width: 350px;
+            padding-bottom: 5px;
+        }
+
+        .rank-section {
+            margin: 20px 0;
+        }
+
+        .rank-label {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 1rem;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .detective-rank {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            color: #991b1b;
+            font-weight: 600;
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(153, 27, 27, 0.1));
+            padding: 8px 25px;
+            border-radius: 20px;
+            border: 2px solid #dc2626;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .accomplishment-text {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 20px;
+            font-style: italic;
+            max-width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.5;
+        }
+
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-top: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .signature-line {
+            width: 200px;
+            border-bottom: 2px solid #333;
+            margin-bottom: 5px;
+        }
+
+        .signature-label {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+
+        .date-section {
+            text-align: right;
+        }
+
+        .date-label {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .date-line {
+            width: 150px;
+            border-bottom: 2px solid #333;
+            margin-bottom: 5px;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Libre Baskerville', serif;
+            font-size: 0.8rem;
+            color: #999;
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .certificate {
+                box-shadow: none;
+                page-break-inside: avoid;
+            }
+
+            .pdf-button {
+                display: none !important;
+            }
+        }
+
+        /* Fillable form styles for easy completion */
+        .fillable-name {
+            border: none;
+            border-bottom: 2px solid #dc2626;
+            background: transparent;
+            font-size: 1.8rem;
+            color: #dc2626;
+            font-weight: bold;
+            text-align: center;
+            min-width: 350px;
+            padding-bottom: 5px;
+            font-family: inherit;
+        }
+
+        .fillable-rank {
+            border: 2px solid #dc2626;
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(153, 27, 27, 0.1));
+            font-size: 1.4rem;
+            color: #991b1b;
+            font-weight: bold;
+            padding: 8px 25px;
+            border-radius: 20px;
+            text-align: center;
+            min-width: 300px;
+            font-family: inherit;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            cursor: pointer;
+        }
+
+        .fillable-rank:focus {
+            outline: 2px solid #dc2626;
+            outline-offset: 2px;
+        }
+
+        /* Custom dropdown arrow */
+        .rank-section {
+            position: relative;
+        }
+
+        .rank-section::after {
+            content: '▼';
+            position: absolute;
+            right: calc(50% - 135px);
+            top: 50%;
+            transform: translateY(-50%);
+            color: #dc2626;
+            font-size: 0.8rem;
+            pointer-events: none;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="certificate">
+        <!-- Official Watermark Seal -->
+        <div class="watermark-text">
+            OFFICIAL<br>
+            DETECTIVE<br>
+            ACADEMY<br>
+            CERTIFICATE
+        </div>
+
+        <div class="header">
+            <div class="badge-logo">🕵️‍♂️</div>
+            <div class="school-name">Hallie Wells Middle School</div>
+            <div class="program-name">Detective Academy</div>
+            <div class="certificate-title">Certificate of Mathematical Investigation</div>
+        </div>
+
+        <div class="main-content">
+            <div class="award-text">This certifies that</div>
+            
+            <input type="text" class="fillable-name detective-name" placeholder="Detective Name" />
+            
+            <div class="award-text">has successfully completed the MOEMS Detective Academy training program and demonstrated exceptional mathematical investigative skills.</div>
+            
+            <div class="rank-section">
+                <div class="rank-label">Detective Rank Achieved:</div>
+                <select class="fillable-rank detective-rank">
+                    <option value="">Select Detective Rank</option>
+                    <option value="Detective Trainee">🥉 Detective Trainee</option>
+                    <option value="Junior Detective">🔍 Junior Detective</option>
+                    <option value="Street Detective">👮‍♂️ Street Detective</option>
+                    <option value="Private Investigator">🕵️‍♂️ Private Investigator</option>
+                    <option value="Senior Detective">🎖️ Senior Detective</option>
+                    <option value="Master Detective">🏆 Master Detective</option>
+                    <option value="Legendary Sleuth">👑 Legendary Sleuth</option>
+                    <option value="Mathematical Mastermind">🧠 Mathematical Mastermind</option>
+                </select>
+            </div>
+            
+            <div class="accomplishment-text">
+                Through rigorous analysis of mathematical mysteries and successful completion of evidence-based problem solving, 
+                this detective has proven their mastery of competition mathematics and earned their place among 
+                the elite Mathematical Crime-Fighting Unit.
+            </div>
+        </div>
+
+        <div class="signature-section" style="margin-top: -50px;">
+            <div>
+                <div class="signature-name" style="font-family: 'Great Vibes', cursive; font-size: 1.8rem; color: #333; text-align: center; margin-bottom: 5px;">Prof. Jojo</div>
+                <div class="signature-line" style="margin-bottom: 0;"></div>
+                <div class="signature-label">Academy Director</div>
+            </div>
+            
+            <div class="date-section" style="margin-top: -20px;">
+                <div class="date-label" style="margin-bottom: 5px;">Date Awarded:</div>
+                <div class="current-date" id="currentDate" style="font-family: 'Libre Baskerville', serif; font-size: 0.9rem; color: #333; font-weight: bold; margin-bottom: 0;"></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            HWMS Competition Math Club • Detective Academy Certificate
+        </div>
+    </div>
+
+    <script>
+        // Set today's date when page loads
+        function setCurrentDate() {
+            const today = new Date();
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            const formattedDate = today.toLocaleDateString('en-US', options);
+            document.getElementById('currentDate').textContent = formattedDate;
+        }
+
+        // Auto-focus first input when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setCurrentDate();
+            document.querySelector('.fillable-name').focus();
+        });
+        
+        // Allow printing with Ctrl+P
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'p') {
+                window.print();
+                e.preventDefault();
+            }
+        });
+        
+        // Placeholder functionality for easy form completion
+        document.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('focus', function() {
+                this.style.outline = '2px solid #dc2626';
+            });
+            
+            element.addEventListener('blur', function() {
+                this.style.outline = 'none';
+            });
+        });
+
+        // Add PDF generation button
+        function generatePDF() {
+            // Fill in sample data if fields are empty for PDF generation
+            const nameField = document.querySelector('.fillable-name');
+            const rankField = document.querySelector('.fillable-rank');
+            
+            const originalName = nameField.value;
+            const originalRank = rankField.value;
+            
+            if (!nameField.value.trim()) {
+                nameField.value = '_________________';
+            }
+            if (!rankField.value || rankField.value === '') {
+                // Create a temporary text representation for PDF
+                const tempSpan = document.createElement('span');
+                tempSpan.textContent = '_________________';
+                tempSpan.className = 'detective-rank';
+                tempSpan.style.cssText = rankField.style.cssText;
+                rankField.parentNode.replaceChild(tempSpan, rankField);
+                
+                // Print to PDF
+                window.print();
+                
+                // Restore dropdown
+                tempSpan.parentNode.replaceChild(rankField, tempSpan);
+            } else {
+                // Print to PDF with selected rank
+                window.print();
+            }
+            
+            // Restore original values
+            nameField.value = originalName;
+            rankField.value = originalRank;
+        }
+
+        // Add PDF button to page
+        window.addEventListener('load', function() {
+            const pdfButton = document.createElement('button');
+            pdfButton.textContent = 'Generate PDF';
+            pdfButton.className = 'pdf-button';
+            pdfButton.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #dc2626;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-weight: bold;
+                z-index: 1000;
+            `;
+            pdfButton.onclick = generatePDF;
+            document.body.appendChild(pdfButton);
+        });
+    </script>
+</body>
+</html>
