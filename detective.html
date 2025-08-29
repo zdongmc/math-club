@@ -1,0 +1,2370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Detective Academy - HWMS Competition Math Club</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #dc2626;
+            text-shadow: none;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #666;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px auto;
+            max-width: 800px;
+            border: 2px solid rgba(220, 38, 38, 0.3);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Score Display */
+        .score-display {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: 1px solid #e5e7eb;
+            z-index: 1000;
+            font-size: 1.2rem;
+            color: #dc2626;
+            display: none;
+        }
+
+        /* Case Selection Landing Page */
+        .case-selection {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .case-selection.active {
+            display: block;
+        }
+
+        .cases-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .case-card {
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            border-radius: 20px;
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .case-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            border-color: #dc2626;
+        }
+
+        .case-card.completed {
+            border-color: #22c55e;
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.05), rgba(255, 255, 255, 1));
+        }
+
+        .case-card.completed:hover {
+            border-color: #22c55e;
+        }
+
+        .case-stamp {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #22c55e;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            transform: rotate(15deg);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .case-card h3 {
+            color: #dc2626;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            background: none;
+            padding: 0;
+            border: none;
+            text-align: left;
+            font-weight: bold;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .case-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .case-difficulty {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .difficulty-stars {
+            color: #fbbf24;
+        }
+
+        .case-score {
+            background: rgba(220, 38, 38, 0.1);
+            color: #dc2626;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        /* Team Name Input */
+        .team-input {
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid #e5e7eb;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .team-input h2 {
+            margin-bottom: 20px;
+            color: #dc2626;
+        }
+
+        .team-input input {
+            background: #ffffff;
+            border: 2px solid #e5e7eb;
+            border-radius: 15px;
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            color: #333;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 20px;
+        }
+
+        .team-input input::placeholder {
+            color: #9ca3af;
+        }
+
+        .team-input input:focus {
+            outline: none;
+            border-color: #dc2626;
+            box-shadow: 0 0 10px rgba(220, 38, 38, 0.3);
+        }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 38, 38, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.7);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Stations Grid */
+        .stations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        /* Station Visibility */
+        .station {
+            display: none;
+        }
+
+        .station.active {
+            display: block;
+        }
+
+        /* Station Cards */
+        .station {
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease;
+        }
+
+        .station:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .station.completed {
+            border-color: #dc2626;
+            box-shadow: 0 0 15px rgba(220, 38, 38, 0.3);
+        }
+
+        .station h3 {
+            color: #dc2626;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(220, 38, 38, 0.05));
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            text-align: center;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .station-submit {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .station-submit .btn {
+            min-width: 150px;
+        }
+
+        /* Questions */
+        .question {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 15px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .question h4 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        /* Input Types */
+        .text-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            transition: border-color 0.3s ease;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #dc2626;
+            box-shadow: 0 0 5px rgba(220, 38, 38, 0.3);
+        }
+
+        .text-input.correct {
+            border-color: #10b981;
+            background: #ecfdf5;
+        }
+
+        .text-input.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        /* Multi-input groups */
+        .multi-input {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .multi-input input {
+            padding: 8px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .multi-input input:focus {
+            outline: none;
+            border-color: #dc2626;
+        }
+
+        .multi-input input.correct {
+            border-color: #10b981;
+            background: #ecfdf5;
+        }
+
+        .multi-input input.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        /* Dropdown */
+        .dropdown {
+            padding: 12px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .dropdown:focus {
+            outline: none;
+            border-color: #dc2626;
+        }
+
+        .dropdown.correct {
+            border-color: #10b981;
+            background: #ecfdf5;
+        }
+
+        .dropdown.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        /* Checkboxes */
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-item:hover {
+            background: #f3f4f6;
+        }
+
+        .checkbox-item.selected {
+            background: rgba(220, 38, 38, 0.1);
+            border-color: #dc2626;
+        }
+
+        .checkbox-item.correct {
+            background: #ecfdf5;
+            border-color: #10b981;
+        }
+
+        .checkbox-item.incorrect {
+            background: #fef2f2;
+            border-color: #ef4444;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        /* Drag and Drop */
+        .drag-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .drag-source, .drag-target {
+            min-height: 300px;
+            padding: 15px;
+            border: 2px dashed #e5e7eb;
+            border-radius: 10px;
+            background: #f9fafb;
+        }
+
+        .drag-item {
+            padding: 8px 12px;
+            margin: 5px;
+            background: #dc2626;
+            color: white;
+            border-radius: 6px;
+            cursor: move;
+            user-select: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            touch-action: none;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .drag-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .drag-item.correct {
+            background: #10b981;
+        }
+
+        .drag-item.incorrect {
+            background: #ef4444;
+        }
+
+        .drop-zone {
+            min-height: 50px;
+            border: 2px dashed #e5e7eb;
+            border-radius: 8px;
+            margin: 5px;
+            padding: 10px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .drop-zone.drag-over {
+            border-color: #dc2626;
+            background: rgba(220, 38, 38, 0.1);
+        }
+
+        /* Feedback Messages */
+        .feedback {
+            margin-top: 10px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #10b981;
+            display: block;
+        }
+
+        .feedback.incorrect {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #ef4444;
+            display: block;
+        }
+
+        .feedback.partial {
+            background: #fff7ed;
+            color: #ea580c;
+            border: 1px solid #f97316;
+            display: block;
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .timer-score {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .stations-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            .cases-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .case-card {
+                padding: 20px;
+            }
+
+            .case-stamp {
+                top: 10px;
+                right: 10px;
+                padding: 3px 8px;
+                font-size: 0.7rem;
+            }
+
+            .score-display {
+                position: static;
+                margin: 10px;
+                text-align: center;
+            }
+
+            .drag-container {
+                grid-template-columns: 1fr;
+            }
+
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+
+            .drag-item {
+                min-width: 120px;
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
+
+            .drop-zone {
+                min-height: 60px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Detective Ranking System */
+        .rank-display {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(220, 38, 38, 0.05));
+            border-radius: 15px;
+            border: 2px solid rgba(220, 38, 38, 0.3);
+            margin: 10px 0;
+            text-align: left;
+        }
+
+        .rank-icon {
+            font-size: 2.5rem;
+            animation: rankGlow 2s infinite alternate;
+        }
+
+        .rank-info {
+            flex: 1;
+        }
+
+        .rank-title {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #dc2626;
+            margin-bottom: 2px;
+        }
+
+        .rank-famous {
+            font-style: italic;
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .rank-score {
+            font-weight: bold;
+            color: #333;
+        }
+
+        @keyframes rankGlow {
+            0% { text-shadow: 0 0 5px rgba(220, 38, 38, 0.5); }
+            100% { text-shadow: 0 0 15px rgba(220, 38, 38, 0.8), 0 0 25px rgba(220, 38, 38, 0.6); }
+        }
+    </style>
+</head>
+<body>
+    <div class="score-display" id="scoreDisplay">
+        <div style="font-weight: bold; margin-bottom: 5px;">
+            <span id="rankIcon">🥉</span> <span id="currentRank">Detective Trainee</span>
+        </div>
+        <div style="font-size: 0.9rem; font-style: italic; margin-bottom: 5px;">
+            "Like <span id="famousDetective">Watson</span>"
+        </div>
+        <div>Evidence Points: <span id="totalScore">0</span></div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🔍 HWMS Mathematical Detective Academy<br>🕵️‍♂️ Special Investigation Division</h1>
+            <p><em>"Welcome, Detective! You've been called to solve the city's most puzzling mathematical mysteries. Armed only with your knowledge of MOEMS vocabulary, can you crack the codes and close the cases? The Mathematical Crime Unit needs your expertise!"</em></p>
+        </div>
+
+        <!-- Team Name Input -->
+        <div class="team-input" id="teamInput">
+            <h2>🎖️ Detective Badge Assignment</h2>
+            <p style="margin-bottom: 15px; font-style: italic;">"Before you can access the case files, you need your official detective credentials. What should we call your mathematical investigation unit?"</p>
+            <input type="text" id="teamName" placeholder="The Number Crunchers" maxlength="30">
+            <br>
+            <button class="btn" onclick="startGame()">🔍 Report for Duty</button>
+        </div>
+
+        <!-- Case Selection Landing Page -->
+        <div class="case-selection" id="caseSelection">
+            <h2 style="text-align: center; color: #dc2626; margin-bottom: 20px;">📋 Active Case Files</h2>
+            <p style="text-align: center; font-style: italic; margin-bottom: 30px; color: #666;">
+                Select any case to investigate. Collect evidence points to advance in detective rank. Cases can be reworked, but your score may go up or down.
+            </p>
+            
+            <div class="cases-grid">
+                <div class="case-card" id="case1Card" onclick="openCase(1)">
+                    <div class="case-stamp" id="case1Stamp" style="display: none;">CASE CLOSED</div>
+                    <h3>📋 Case File #001: "The Mystery of 121"</h3>
+                    <div class="case-description">
+                        A suspicious number has been found at the crime scene. Analyze its mathematical properties to uncover the truth behind this numerical mystery.
+                    </div>
+                    <div class="case-score" id="case1Score" style="display: none;">Evidence Points: 0</div>
+                </div>
+
+                <div class="case-card" id="case2Card" onclick="openCase(2)">
+                    <div class="case-stamp" id="case2Stamp" style="display: none;">CASE CLOSED</div>
+                    <h3>📋 Case File #002: "The Factor Conspiracy"</h3>
+                    <div class="case-description">
+                        Intelligence reports suggest a secret network of numbers. Investigate the ringleader 12 and the lone wolf 17 to expose their connections.
+                    </div>
+                    <div class="case-score" id="case2Score" style="display: none;">Evidence Points: 0</div>
+                </div>
+
+                <div class="case-card" id="case3Card" onclick="openCase(3)">
+                    <div class="case-stamp" id="case3Stamp" style="display: none;">CASE CLOSED</div>
+                    <h3>📋 Case File #003: "The Fraction Forgery"</h3>
+                    <div class="case-description">
+                        A counterfeiting ring has been creating fake mathematical documents. Use your expertise to authenticate legitimate fractions and decode their schemes.
+                    </div>
+                    <div class="case-score" id="case3Score" style="display: none;">Evidence Points: 0</div>
+                </div>
+
+                <div class="case-card" id="case4Card" onclick="openCase(4)">
+                    <div class="case-stamp" id="case4Stamp" style="display: none;">CASE CLOSED</div>
+                    <h3>📋 Case File #004: "The Vocabulary Heist"</h3>
+                    <div class="case-description">
+                        Mathematical criminals have scrambled important vocabulary definitions and hidden evidence. Restore order and decode the mysterious rectangular solid.
+                    </div>
+                    <div class="case-score" id="case4Score" style="display: none;">Evidence Points: 0</div>
+                </div>
+
+                <div class="case-card" id="case5Card" onclick="openCase(5)">
+                    <div class="case-stamp" id="case5Stamp" style="display: none;">CASE CLOSED</div>
+                    <h3>📋 Case File #005: "The Statistics Scandal"</h3>
+                    <div class="case-description">
+                        Suspicious test scores have been discovered! Analyze the data to uncover statistical evidence and identify geometric shapes found at the crime scene.
+                    </div>
+                    <div class="case-score" id="case5Score" style="display: none;">Evidence Points: 0</div>
+                </div>
+
+                <div class="case-card" id="case6Card" onclick="openCase(6)">
+                    <div class="case-stamp" id="case6Stamp" style="display: none;">CASE CLOSED</div>
+                    <h3>📋 Case File #006: "Operation 1,331"</h3>
+                    <div class="case-description">
+                        The mysterious number 1,331 has appeared at every crime scene throughout the city. Use your mathematical expertise to analyze this recurring number and uncover its secrets.
+                    </div>
+                    <div class="case-score" id="case6Score" style="display: none;">Evidence Points: 0</div>
+                </div>
+
+                <div class="case-card" id="case7Card" onclick="openCase(7)">
+                    <div class="case-stamp" id="case7Stamp" style="display: none;">CASE CLOSED</div>
+                    <h3>📋 Case File #007: "The Equation Enigma"</h3>
+                    <div class="case-description">
+                        Criminal mathematicians have been leaving encrypted messages using algebraic expressions and coordinate systems. Decode their location using mathematical reasoning.
+                    </div>
+                    <div class="case-score" id="case7Score" style="display: none;">Evidence Points: 0</div>
+                </div>
+
+                <div class="case-card" id="case8Card" onclick="openCase(8)">
+                    <div class="case-stamp" id="case8Stamp" style="display: none;">CASE CLOSED</div>
+                    <h3>📋 Case File #008: "The Advanced Numbers Conspiracy"</h3>
+                    <div class="case-description">
+                        Elite mathematical criminals are using complex number properties and operations. Only the most skilled detectives can crack this advanced case.
+                    </div>
+                    <div class="case-score" id="case8Score" style="display: none;">Evidence Points: 0</div>
+                </div>
+
+                <div class="case-card" id="case9Card" onclick="openCase(9)">
+                    <div class="case-stamp" id="case9Stamp" style="display: none;">CASE CLOSED</div>
+                    <h3>📋 Case File #009: "The Integer Underground"</h3>
+                    <div class="case-description">
+                        A criminal network is using negative numbers and signed arithmetic to encode their operations. Master Division M concepts to infiltrate their system.
+                    </div>
+                    <div class="case-score" id="case9Score" style="display: none;">Evidence Points: 0</div>
+                </div>
+
+                <div class="case-card" id="case10Card" onclick="openCase(10)">
+                    <div class="case-stamp" id="case10Stamp" style="display: none;">CASE CLOSED</div>
+                    <h3>📋 Case File #010: "The Divisibility Code"</h3>
+                    <div class="case-description">
+                        Criminals are using secret divisibility rules to encrypt messages. Apply advanced number theory and geometric solid knowledge to crack their code.
+                    </div>
+                    <div class="case-score" id="case10Score" style="display: none;">Evidence Points: 0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stations Grid -->
+        <div class="stations-grid" id="stationsGrid" style="display: none;">
+            
+            <!-- Case 1: The Mystery of 121 -->
+            <div class="station" id="station1">
+                <h3>📋 Case File #001: "The Mystery of 121"</h3>
+                <div style="background: rgba(220, 38, 38, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #dc2626;">
+                    <p><strong>🚨 URGENT CASE BRIEF:</strong> <em>A suspicious number has been found at the scene: <strong>121</strong>. Our forensics team needs you to identify all its mathematical properties. This number may be connected to a larger pattern of numerical crimes. Use your MOEMS training to crack the code!</em></p>
+                </div>
+                
+                <div class="question">
+                    <h4>🔍 Evidence Analysis: Which properties apply to the suspect number 121?</h4>
+                    <p style="font-style: italic; margin-bottom: 10px;">"Check all evidence that matches your investigation findings:"</p>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="palindrome">
+                            <span>Palindrome</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="perfect-square">
+                            <span>Perfect Square</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="composite">
+                            <span>Composite</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="3-digit">
+                            <span>3-digit number</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="prime">
+                            <span>Prime</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="even">
+                            <span>Even</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="odd">
+                            <span>Odd</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="perfect-cube">
+                            <span>Perfect Cube</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h4>🧮 Additional Evidence: Two more numbers found at the scene - 24 and 36</h4>
+                    <p style="font-style: italic; margin-bottom: 10px;">"What's the greatest common factor linking these accomplice numbers?"</p>
+                    <select class="dropdown" id="q1-gcf">
+                        <option value="">Choose...</option>
+                        <option value="6">6</option>
+                        <option value="8">8</option>
+                        <option value="12">12</option>
+                        <option value="18">18</option>
+                        <option value="24">24</option>
+                    </select>
+                </div>
+
+                <div class="question">
+                    <h4>🔢 Final Clue: The number 456 was scribbled on a note</h4>
+                    <p style="font-style: italic; margin-bottom: 10px;">"Calculate the digit sum to decode this message:"</p>
+                    <select class="dropdown" id="q1-digitsum">
+                        <option value="">Choose...</option>
+                        <option value="11">11</option>
+                        <option value="13">13</option>
+                        <option value="15">15</option>
+                        <option value="17">17</option>
+                        <option value="19">19</option>
+                    </select>
+                </div>
+
+                <div class="station-submit">
+                    <button class="btn" onclick="submitStation(1)">📝 File Case Report</button>
+                </div>
+            </div>
+
+            <!-- Case 2: The Factor Conspiracy -->
+            <div class="station" id="station2">
+                <h3>📋 Case File #002: "The Factor Conspiracy"</h3>
+                <div style="background: rgba(220, 38, 38, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #dc2626;">
+                    <p><strong>🚨 BREAKING:</strong> <em>Intelligence reports indicate a secret network of numbers working together! Our sources suggest the number <strong>12</strong> is the ringleader, and the mysterious <strong>17</strong> might be a lone wolf. Your mission: uncover their connections and classify their behavior patterns!</em></p>
+                </div>
+                
+                <div class="question">
+                    <h4>🕵️ Surveillance Report: Which numbers are accomplices of the ringleader 12?</h4>
+                    <p style="font-style: italic; margin-bottom: 10px;">"Identify all the factors (division partners) working with suspect 12:"</p>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="1">
+                            <span>1</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="2">
+                            <span>2</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="3">
+                            <span>3</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="4">
+                            <span>4</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="5">
+                            <span>5</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="6">
+                            <span>6</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="8">
+                            <span>8</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="9">
+                            <span>9</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="12">
+                            <span>12</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h4>🔍 Lone Wolf Analysis: Profile the suspect 17</h4>
+                    <p style="font-style: italic; margin-bottom: 10px;">"Complete this psychological profile of the elusive number 17:"</p>
+                    <p><strong>Square root:</strong> 
+                        <select class="dropdown" id="q2-sqrt">
+                            <option value="">Choose...</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="no-whole">No whole number square root</option>
+                        </select>
+                    </p>
+                    <p><strong>Classification:</strong> 
+                        <select class="dropdown" id="q2-classification">
+                            <option value="">Choose...</option>
+                            <option value="prime">Prime</option>
+                            <option value="composite">Composite</option>
+                            <option value="neither">Neither</option>
+                        </select>
+                    </p>
+                    <p><strong>Even or Odd:</strong> 
+                        <select class="dropdown" id="q2-parity">
+                            <option value="">Choose...</option>
+                            <option value="even">Even</option>
+                            <option value="odd">Odd</option>
+                        </select>
+                    </p>
+                </div>
+
+                <div class="station-submit">
+                    <button class="btn" onclick="submitStation(2)">📝 Close Investigation</button>
+                </div>
+            </div>
+
+            <!-- Case 3: The Fraction Forgery -->
+            <div class="station" id="station3">
+                <h3>📋 Case File #003: "The Fraction Forgery"</h3>
+                <div style="background: rgba(220, 38, 38, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #dc2626;">
+                    <p><strong>🚨 FRAUD ALERT:</strong> <em>A sophisticated counterfeiting ring has been creating fake mathematical documents! We've intercepted several suspicious fractions and a percentage that needs immediate authentication. Your expertise in fraction classification is needed to separate the legitimate from the fraudulent!</em></p>
+                </div>
+                
+                <div class="question">
+                    <h4>🔍 Document Authentication: Which fractions are legitimate "proper fractions"?</h4>
+                    <p style="font-style: italic; margin-bottom: 10px;">"Remember: proper fractions have numerators smaller than denominators. Mark all authentic documents:"</p>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="3/4">
+                            <span>3/4</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="7/3">
+                            <span>7/3</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="1/5">
+                            <span>1/5</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="5/4">
+                            <span>5/4</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="2/3">
+                            <span>2/3</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="9/7">
+                            <span>9/7</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h4>🧾 Evidence Conversion: Decode this intercepted percentage</h4>
+                    <p style="font-style: italic; margin-bottom: 10px;">"The forgers left behind 45% - convert it to simplest fraction form to crack their code:"</p>
+                    <select class="dropdown" id="q3-fraction">
+                        <option value="">Choose...</option>
+                        <option value="45/100">45/100</option>
+                        <option value="9/20">9/20</option>
+                        <option value="18/40">18/40</option>
+                        <option value="1/2">1/2</option>
+                    </select>
+                </div>
+
+                <div class="station-submit">
+                    <button class="btn" onclick="submitStation(3)">📝 Seal Evidence</button>
+                </div>
+            </div>
+
+            <!-- Case 4: The Vocabulary Heist -->
+            <div class="station" id="station4">
+                <h3>📋 Case File #004: "The Vocabulary Heist"</h3>
+                <div style="background: rgba(220, 38, 38, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #dc2626;">
+                    <p><strong>🚨 CRITICAL MISSION:</strong> <em>Mathematical criminals have scrambled important vocabulary definitions! They've also hidden crucial measurements of a mysterious rectangular solid. Your final mission: restore order by matching terms to definitions and calculating the hidden object's dimensions. The safety of the Mathematical Universe depends on your success!</em></p>
+                </div>
+                
+                <div class="question">
+                    <h4>🔀 Code Restoration: Drag each stolen term back to its rightful definition</h4>
+                    <p style="font-style: italic; margin-bottom: 10px;">"The criminals scrambled these mathematical terms. Restore order to the Mathematical Universe:"</p>
+                    <div class="drag-container">
+                        <div class="drag-source">
+                            <h5>📚 Stolen Terms:</h5>
+                            <div class="drag-item" draggable="true" data-term="median">Median</div>
+                            <div class="drag-item" draggable="true" data-term="mode">Mode</div>
+                            <div class="drag-item" draggable="true" data-term="palindrome">Palindrome</div>
+                            <div class="drag-item" draggable="true" data-term="composite">Composite</div>
+                        </div>
+                        <div class="drag-target">
+                            <h5>🎯 Correct Definitions:</h5>
+                            <div class="drop-zone" data-definition="median">📊 Middle value in an ordered data set</div>
+                            <div class="drop-zone" data-definition="mode">📈 Most frequently occurring value</div>
+                            <div class="drop-zone" data-definition="palindrome">🔄 Number that reads the same forwards and backwards</div>
+                            <div class="drop-zone" data-definition="composite">🔢 Number with more than two factors</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h4>📦 Mysterious Object Analysis: Decode the dimensions of this evidence box</h4>
+                    <p style="font-style: italic; margin-bottom: 10px;">"Intelligence reports this rectangular solid holds the key to solving all cases. Calculate its properties:"</p>
+                    <p>
+                        📱 <input type="number" class="text-input" id="q4-faces" placeholder="?" style="width: 60px; display: inline-block;"> faces <em>(flat surfaces)</em>
+                    </p>
+                    <p>
+                        📏 <input type="number" class="text-input" id="q4-edges" placeholder="?" style="width: 60px; display: inline-block;"> edges <em>(where faces meet)</em>
+                    </p>
+                    <p>
+                        📍 <input type="number" class="text-input" id="q4-vertices" placeholder="?" style="width: 60px; display: inline-block;"> vertices <em>(corner points)</em>
+                    </p>
+                </div>
+
+                <div class="station-submit">
+                    <button class="btn" onclick="submitStation(4)">🏆 Complete Mission</button>
+                </div>
+            </div>
+
+            <!-- Case 5: The Statistics Scandal -->
+            <div class="station" id="station5">
+                <h3>📋 Case File #005: "The Statistics Scandal"</h3>
+                <div style="background: rgba(220, 38, 38, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #dc2626;">
+                    <p><strong>🚨 URGENT INVESTIGATION:</strong> <em>Suspicious test scores have been discovered in a mathematics classroom! The data may have been tampered with. Additionally, strange geometric shapes were found at the scene. Your statistical analysis and geometric identification skills are needed to crack this case!</em></p>
+                </div>
+                
+                <div class="question">
+                    <h4>📊 Statistical Evidence Analysis</h4>
+                    <p style="font-style: italic; margin-bottom: 15px;">"Test scores found at the scene: <strong>85, 92, 78, 92, 88, 75, 92, 90</strong>"</p>
+                    
+                    <p><strong>🔍 Calculate the Mean:</strong> 
+                        <select class="dropdown" id="q5-mean">
+                            <option value="">Choose...</option>
+                            <option value="85">85</option>
+                            <option value="87">87</option>
+                            <option value="89">89</option>
+                            <option value="92">92</option>
+                        </select>
+                    </p>
+                    
+                    <p><strong>🔍 Identify the Mode:</strong> 
+                        <select class="dropdown" id="q5-mode">
+                            <option value="">Choose...</option>
+                            <option value="85">85</option>
+                            <option value="88">88</option>
+                            <option value="90">90</option>
+                            <option value="92">92</option>
+                        </select>
+                    </p>
+                    
+                    <p><strong>🔍 Find the Median:</strong> 
+                        <select class="dropdown" id="q5-median">
+                            <option value="">Choose...</option>
+                            <option value="87">87</option>
+                            <option value="88">88</option>
+                            <option value="88.5">88.5</option>
+                            <option value="89">89</option>
+                        </select>
+                    </p>
+                    
+                    <p><strong>🔍 Probability Analysis - What is the probability that a randomly chosen test score from the list is below 90?</strong> 
+                        <select class="dropdown" id="q5-prob">
+                            <option value="">Choose the probability...</option>
+                            <option value="1/2">1/2</option>
+                            <option value="3/4">3/4</option>
+                            <option value="5/8">5/8</option>
+                            <option value="7/8">7/8</option>
+                        </select>
+                    </p>
+                </div>
+
+                <div class="question">
+                    <h4>📐 Geometric Evidence Classification</h4>
+                    <p style="font-style: italic; margin-bottom: 10px;">"These triangle types were sketched on the suspect's notepad. Select ALL valid triangle classifications:"</p>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="irregular">
+                            <span>Irregular</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="scalene">
+                            <span>Scalene</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="quadrilateral">
+                            <span>Quadrilateral</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="isosceles">
+                            <span>Isosceles</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="perpendicular">
+                            <span>Perpendicular</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="equilateral">
+                            <span>Equilateral</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h4>🔲 Quadrilateral Evidence Analysis</h4>
+                    <p style="font-style: italic; margin-bottom: 10px;">"Which of these are legitimate quadrilateral types? Select ALL that apply:"</p>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="triangle">
+                            <span>Triangle</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="rectangle">
+                            <span>Rectangle</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="pentagon">
+                            <span>Pentagon</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="rhombus">
+                            <span>Rhombus</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="parallelogram">
+                            <span>Parallelogram</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="station-submit">
+                    <button class="btn" onclick="submitStation(5)">📊 File Statistical Report</button>
+                </div>
+            </div>
+
+            <!-- Case 6: Operation 1,331 -->
+            <div class="station" id="station6">
+                <h3>📋 Case File #006: "Operation 1,331"</h3>
+                <div style="background: rgba(220, 38, 38, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #dc2626;">
+                    <p><strong>🚨 HIGH PRIORITY CASE:</strong> <em>The mysterious number <strong>1,331</strong> has appeared at every crime scene throughout the city. This recurring pattern suggests a deeper mathematical conspiracy. Your mission: analyze this number completely and uncover why it keeps appearing at criminal activities!</em></p>
+                </div>
+                
+                <div class="question">
+                    <h4>🔍 Number Analysis: Complete Profile of 1,331</h4>
+                    <p style="font-style: italic; margin-bottom: 15px; text-align: center; font-size: 1.1rem;">"Analyze every mathematical property of this recurring suspect number. Select ALL that apply:"</p>
+                    
+                    <div style="text-align: center; margin: 20px 0;">
+                        <div style="font-size: 3rem; color: #dc2626; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">1,331</div>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="palindrome">
+                            <span>📄 It is a palindrome</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="perfect-cube">
+                            <span>📦 It is a perfect cube</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="4-digit">
+                            <span>🔢 It is a 4-digit number</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="composite">
+                            <span>🧮 It is a composite number</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="odd">
+                            <span>⚡ It is an odd number</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="digit-sum-8">
+                            <span>➕ Its digit sum is 8</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="multiple-11">
+                            <span>🎯 It is a multiple of 11</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="perfect-square">
+                            <span>🟫 It is a perfect square</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="prime">
+                            <span>⭐ It is a prime number</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="even">
+                            <span>🎲 It is an even number</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h4>🔢 Mathematical Relationships Investigation</h4>
+                    <p>Additional evidence found at the scene shows pairs of numbers. Identify their mathematical relationships:</p>
+                    
+                    <p><strong>🔍 What is the Greatest Common Factor (GCF) of 18 and 24?</strong></p>
+                    <select class="dropdown-select" data-question="gcf-pair">
+                        <option value="">Select GCF...</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="6">6</option>
+                        <option value="12">12</option>
+                    </select>
+                    
+                    <p><strong>🔍 What is the Least Common Multiple (LCM) of 4 and 6?</strong></p>
+                    <select class="dropdown-select" data-question="lcm-pair">
+                        <option value="">Select LCM...</option>
+                        <option value="10">10</option>
+                        <option value="12">12</option>
+                        <option value="18">18</option>
+                        <option value="24">24</option>
+                    </select>
+                    
+                    <p><strong>🔍 When we divide 17 by 5, what is the remainder?</strong></p>
+                    <select class="dropdown-select" data-question="remainder">
+                        <option value="">Select remainder...</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
+
+                <div class="station-submit">
+                    <button class="btn" onclick="submitStation(6)">📝 File Case Report</button>
+                </div>
+            </div>
+
+            <!-- Case 7: The Equation Enigma -->
+            <div class="station" id="station7">
+                <h3>📋 Case File #007: "The Equation Enigma"</h3>
+                <div style="background: rgba(220, 38, 38, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #dc2626;">
+                    <p><strong>🚨 CRYPTOGRAPHIC CASE:</strong> <em>Criminal mathematicians have been leaving coded messages using algebraic expressions and coordinate systems. Intelligence suggests they're planning their next operation at specific coordinates. Decode their mathematical clues to stop them!</em></p>
+                </div>
+
+                <div class="question">
+                    <h4>🔍 Algebraic Expression Decoder</h4>
+                    <p>Suspects left this expression: <strong>3x + 7 = 22</strong></p>
+                    <p>What is the value of x?</p>
+                    <select class="dropdown-select" data-question="algebra-solve">
+                        <option value="">Select the solution...</option>
+                        <option value="3">x = 3</option>
+                        <option value="5">x = 5</option>
+                        <option value="7">x = 7</option>
+                        <option value="15">x = 15</option>
+                    </select>
+                </div>
+
+                <div class="question">
+                    <h4>🗺️ Coordinate Pursuit</h4>
+                    <p>The criminal's location is at point (4, -2). Which quadrant are they hiding in?</p>
+                    <select class="dropdown-select" data-question="quadrant">
+                        <option value="">Select quadrant...</option>
+                        <option value="I">Quadrant I</option>
+                        <option value="II">Quadrant II</option>
+                        <option value="III">Quadrant III</option>
+                        <option value="IV">Quadrant IV</option>
+                    </select>
+                </div>
+
+                <div class="question">
+                    <h4>📐 Angle Investigation</h4>
+                    <p>A witness described seeing an angle that measures exactly 90°. What type of angle is this?</p>
+                    <select class="dropdown-select" data-question="angle-type">
+                        <option value="">Select angle type...</option>
+                        <option value="acute">Acute angle</option>
+                        <option value="right">Right angle</option>
+                        <option value="obtuse">Obtuse angle</option>
+                        <option value="straight">Straight angle</option>
+                    </select>
+                </div>
+
+                <div class="question">
+                    <h4>⚖️ Mathematical Reasoning</h4>
+                    <p>The criminals mentioned "a number that when multiplied by itself equals 64." What is this number?</p>
+                    <input type="number" class="text-input" data-question="square-root-64" placeholder="Enter the number">
+                </div>
+
+                <div class="station-submit">
+                    <button class="btn" onclick="submitStation(7)">📝 File Case Report</button>
+                </div>
+            </div>
+
+            <!-- Case 8: The Advanced Numbers Conspiracy -->
+            <div class="station" id="station8">
+                <h3>📋 Case File #008: "The Advanced Numbers Conspiracy"</h3>
+                <div style="background: rgba(220, 38, 38, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #dc2626;">
+                    <p><strong>🚨 ELITE LEVEL THREAT:</strong> <em>A sophisticated criminal network is using advanced mathematical concepts to encrypt their operations. Only the most mathematically skilled detectives can crack this case. Use your expertise in complex number operations and mathematical relationships!</em></p>
+                </div>
+
+                <div class="question">
+                    <h4>🔢 Scientific Notation Surveillance</h4>
+                    <p>Intercepted communications show the number 4,560,000. Express this in scientific notation:</p>
+                    <select class="dropdown-select" data-question="scientific-notation">
+                        <option value="">Select correct notation...</option>
+                        <option value="4.56 × 10^6">4.56 × 10^6</option>
+                        <option value="45.6 × 10^5">45.6 × 10^5</option>
+                        <option value="456 × 10^4">456 × 10^4</option>
+                        <option value="4560 × 10^3">4560 × 10^3</option>
+                    </select>
+                </div>
+
+                <div class="question">
+                    <h4>📊 Ratio Analysis</h4>
+                    <p>Evidence shows a ratio of 3:5. If the first quantity is 15, what is the second quantity?</p>
+                    <input type="number" class="text-input" data-question="ratio-solve" placeholder="Enter the second quantity">
+                </div>
+
+                <div class="question">
+                    <h4>🏗️ Geometric Evidence</h4>
+                    <p>Which properties describe an isosceles triangle? Select ALL that apply:</p>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="two-equal-sides">
+                            <span>🔺 Has two equal sides</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="three-equal-sides">
+                            <span>🔻 Has three equal sides</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="two-equal-angles">
+                            <span>📐 Has two equal angles</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="right-angle">
+                            <span>⚡ Always has a right angle</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="obtuse-angle">
+                            <span>📏 Always has an obtuse angle</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h4>💰 Percentage Investigation</h4>
+                    <p>Criminal profits increased from $200 to $250. What is the percentage increase?</p>
+                    <select class="dropdown-select" data-question="percentage-increase">
+                        <option value="">Select percentage increase...</option>
+                        <option value="20%">20%</option>
+                        <option value="25%">25%</option>
+                        <option value="50%">50%</option>
+                        <option value="125%">125%</option>
+                    </select>
+                </div>
+
+                <div class="station-submit">
+                    <button class="btn" onclick="submitStation(8)">📝 File Case Report</button>
+                </div>
+            </div>
+
+            <!-- Case 9: The Integer Underground -->
+            <div class="station" id="station9">
+                <h3>📋 Case File #009: "The Integer Underground"</h3>
+                <div style="background: rgba(220, 38, 38, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #dc2626;">
+                    <p><strong>🚨 DIVISION M OPERATION:</strong> <em>Criminal mathematicians are using signed numbers and advanced fraction operations to encode their messages. This is a high-level Division M case requiring mastery of negative numbers, complex fractions, and integer operations!</em></p>
+                </div>
+
+                <div class="question">
+                    <h4>🔢 Signed Number Operations</h4>
+                    <p>Decode this criminal calculation: <strong>-8 + 3 × (-2) - (-5) = ?</strong></p>
+                    <select class="dropdown-select" data-question="signed-ops">
+                        <option value="">Select the result...</option>
+                        <option value="-9">-9</option>
+                        <option value="-1">-1</option>
+                        <option value="3">3</option>
+                        <option value="11">11</option>
+                    </select>
+                </div>
+
+                <div class="question">
+                    <h4>📊 Complex Fraction Analysis</h4>
+                    <p>Criminals left this complex fraction: <strong>2/3 ÷ 1/4</strong>. What is the result?</p>
+                    <select class="dropdown-select" data-question="complex-fraction">
+                        <option value="">Select the result...</option>
+                        <option value="2/12">2/12</option>
+                        <option value="8/3">8/3</option>
+                        <option value="3/8">3/8</option>
+                        <option value="1/6">1/6</option>
+                    </select>
+                </div>
+
+                <div class="question">
+                    <h4>🔍 Number Classification Investigation</h4>
+                    <p>Which of these describes the number -15? Select ALL that apply:</p>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="integer">
+                            <span>🔢 Integer</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="negative">
+                            <span>➖ Negative number</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="nonpositive">
+                            <span>📉 Nonpositive number</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="whole">
+                            <span>🔄 Whole number</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="counting">
+                            <span>📊 Counting number</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h4>📐 Percent Conversion Challenge</h4>
+                    <p>Convert 0.75 to a percent:</p>
+                    <select class="dropdown-select" data-question="percent-convert">
+                        <option value="">Select percentage...</option>
+                        <option value="0.75%">0.75%</option>
+                        <option value="7.5%">7.5%</option>
+                        <option value="75%">75%</option>
+                        <option value="750%">750%</option>
+                    </select>
+                </div>
+
+                <div class="station-submit">
+                    <button class="btn" onclick="submitStation(9)">📝 File Division M Report</button>
+                </div>
+            </div>
+
+            <!-- Case 10: The Divisibility Code -->
+            <div class="station" id="station10">
+                <h3>📋 Case File #010: "The Divisibility Code"</h3>
+                <div style="background: rgba(220, 38, 38, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #dc2626;">
+                    <p><strong>🚨 ADVANCED MATHEMATICS REQUIRED:</strong> <em>The criminal organization is using sophisticated divisibility rules, geometric solids, and measurement conversions to hide their operations. Only detectives with complete MOEMS mastery can solve this case!</em></p>
+                </div>
+
+                <div class="question">
+                    <h4>🔍 Divisibility Rules Investigation</h4>
+                    <p>The number 4,572 is divisible by which of these? Select ALL that apply:</p>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="div-2">
+                            <span>🎲 Divisible by 2</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="div-3">
+                            <span>🎯 Divisible by 3</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="div-5">
+                            <span>⭐ Divisible by 5</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="div-9">
+                            <span>🎪 Divisible by 9</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" data-value="div-11">
+                            <span>🎨 Divisible by 11</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h4>📦 Geometric Solid Analysis</h4>
+                    <p>A rectangular solid (box) has dimensions 4 × 3 × 2. What is its volume?</p>
+                    <input type="number" class="text-input" data-question="box-volume" placeholder="Enter volume">
+                </div>
+
+                <div class="question">
+                    <h4>🔢 Prime Factorization Decoder</h4>
+                    <p>Express 60 as a product of prime numbers (prime factorization):</p>
+                    <select class="dropdown-select" data-question="prime-factor">
+                        <option value="">Select factorization...</option>
+                        <option value="2² × 3 × 5">2² × 3 × 5</option>
+                        <option value="2 × 3 × 10">2 × 3 × 10</option>
+                        <option value="4 × 15">4 × 15</option>
+                        <option value="2³ × 3² × 5">2³ × 3² × 5</option>
+                    </select>
+                </div>
+
+                <div class="question">
+                    <h4>📏 Set Theory Evidence</h4>
+                    <p>How many elements are in the set of counting numbers less than 5?</p>
+                    <select class="dropdown-select" data-question="set-count">
+                        <option value="">Select count...</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                    </select>
+                </div>
+
+                <div class="station-submit">
+                    <button class="btn" onclick="submitStation(10)">📝 Complete Investigation</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <script>
+        let gameState = {
+            teamName: '',
+            totalScore: 0,
+            currentStation: 1,
+            caseScores: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            casesCompleted: [false, false, false, false, false, false, false, false, false, false],
+            gameStarted: false,
+            allCasesComplete: false,
+            currentRank: 'Detective Trainee'
+        };
+
+        // Detective ranking system (recalibrated for 10 cases, ~245 max points)
+        const detectiveRanks = [
+            { minScore: 0, rank: 'Detective Trainee', icon: '🥉', famous: 'Watson' },
+            { minScore: 25, rank: 'Junior Detective', icon: '🔍', famous: 'Nancy Drew' },
+            { minScore: 50, rank: 'Street Detective', icon: '👮‍♂️', famous: 'Columbo' },
+            { minScore: 85, rank: 'Private Investigator', icon: '🕵️‍♂️', famous: 'Magnum P.I.' },
+            { minScore: 125, rank: 'Senior Detective', icon: '🎖️', famous: 'Hercule Poirot' },
+            { minScore: 170, rank: 'Master Detective', icon: '🏆', famous: 'Sherlock Holmes' },
+            { minScore: 210, rank: 'Legendary Sleuth', icon: '👑', famous: 'Miss Marple' },
+            { minScore: 235, rank: 'Mathematical Mastermind', icon: '🧠', famous: 'Professor Moriarty' }
+        ];
+
+        // Answer keys for automatic checking
+        const answerKeys = {
+            station1: {
+                properties121: ['palindrome', 'perfect-square', 'composite', '3-digit', 'odd'],
+                gcf: 12,
+                digitsum: 15
+            },
+            station2: {
+                factors12: ['1', '2', '3', '4', '6', '12'],
+                sqrt: 'no-whole',
+                classification: 'prime',
+                parity: 'odd'
+            },
+            station3: {
+                properFractions: ['3/4', '1/5', '2/3'],
+                fraction45: '9/20'
+            },
+            station4: {
+                matching: {
+                    'median': 'median',
+                    'mode': 'mode', 
+                    'palindrome': 'palindrome',
+                    'composite': 'composite'
+                },
+                faces: '6',
+                edges: '12',
+                vertices: '8'
+            },
+            station5: {
+                mean: '87',
+                mode: '92',
+                median: '88.5',
+                prob: '5/8',
+                triangleTypes: ['scalene', 'isosceles', 'equilateral'],
+                quadrilaterals: ['rectangle', 'rhombus', 'parallelogram']
+            },
+            station6: {
+                properties1331: ['palindrome', 'perfect-cube', '4-digit', 'composite', 'odd', 'digit-sum-8', 'multiple-11'],
+                'gcf-pair': '6',
+                'lcm-pair': '12', 
+                'remainder': '2'
+            },
+            station7: {
+                'algebra-solve': '5',
+                'quadrant': 'IV',
+                'angle-type': 'right',
+                'square-root-64': '8'
+            },
+            station8: {
+                'scientific-notation': '4.56 × 10^6',
+                'ratio-solve': '25',
+                isoscelesProperties: ['two-equal-sides', 'two-equal-angles'],
+                'percentage-increase': '25%'
+            },
+            station9: {
+                'signed-ops': '-1',
+                'complex-fraction': '8/3',
+                numberClassification: ['integer', 'negative', 'nonpositive'],
+                'percent-convert': '75%'
+            },
+            station10: {
+                divisibilityRules: ['div-2', 'div-3'],
+                'box-volume': '24',
+                'prime-factor': '2² × 3 × 5',
+                'set-count': '4'
+            }
+        };
+
+        function startGame() {
+            const teamNameInput = document.getElementById('teamName');
+            if (!teamNameInput.value.trim()) {
+                alert('Please enter your detective team name!');
+                return;
+            }
+
+            gameState.teamName = teamNameInput.value.trim();
+            gameState.gameStarted = true;
+
+            document.getElementById('teamInput').style.display = 'none';
+            document.getElementById('caseSelection').classList.add('active');
+            document.getElementById('scoreDisplay').style.display = 'block';
+            
+            updateTotalScore();
+        }
+
+        function openCase(caseNumber) {
+            gameState.currentStation = caseNumber;
+            
+            document.getElementById('caseSelection').classList.remove('active');
+            document.getElementById('stationsGrid').style.display = 'grid';
+            
+            showStation(caseNumber);
+        }
+
+        function returnToCaseSelection() {
+            document.getElementById('stationsGrid').style.display = 'none';
+            document.getElementById('caseSelection').classList.add('active');
+            
+            // Update case selection display
+            updateCaseSelectionDisplay();
+        }
+
+        function updateCaseSelectionDisplay() {
+            // Update completed cases with stamps and scores
+            for (let i = 0; i < 10; i++) {
+                const caseNum = i + 1;
+                const caseCard = document.getElementById(`case${caseNum}Card`);
+                const caseStamp = document.getElementById(`case${caseNum}Stamp`);
+                const caseScore = document.getElementById(`case${caseNum}Score`);
+                
+                if (gameState.casesCompleted[i]) {
+                    caseCard.classList.add('completed');
+                    caseStamp.style.display = 'block';
+                    caseScore.style.display = 'block';
+                    caseScore.textContent = `Evidence Points: ${gameState.caseScores[i]}`;
+                }
+            }
+        }
+
+        function updateTotalScore() {
+            gameState.totalScore = gameState.caseScores.reduce((sum, score) => sum + score, 0);
+            
+            // Update detective rank based on total score
+            let currentRankIndex = 0;
+            for (let i = detectiveRanks.length - 1; i >= 0; i--) {
+                if (gameState.totalScore >= detectiveRanks[i].minScore) {
+                    currentRankIndex = i;
+                    gameState.currentRank = detectiveRanks[i].rank;
+                    break;
+                }
+            }
+            
+            const currentRankInfo = detectiveRanks[currentRankIndex];
+            
+            // Update score display with rank information
+            const scoreElement = document.getElementById('scoreDisplay');
+            if (scoreElement) {
+                scoreElement.innerHTML = `
+                    <div class="rank-display">
+                        <div class="rank-icon">${currentRankInfo.icon}</div>
+                        <div class="rank-info">
+                            <div class="rank-title">${currentRankInfo.rank}</div>
+                            <div class="rank-score">Evidence Points: ${gameState.totalScore}</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Also update basic total score if the rank display isn't available
+            const basicScoreElement = document.getElementById('totalScore');
+            if (basicScoreElement) {
+                basicScoreElement.textContent = gameState.totalScore;
+            }
+        }
+
+        function showStation(stationNumber) {
+            document.querySelectorAll('.station').forEach(station => {
+                station.classList.remove('active');
+            });
+            
+            const currentStationEl = document.getElementById(`station${stationNumber}`);
+            if (currentStationEl) {
+                currentStationEl.classList.add('active');
+                currentStationEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+
+        function toggleCheckbox(element) {
+            element.classList.toggle('selected');
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+        }
+
+        function submitStation(stationNumber) {
+            // Allow reworking cases - scores can go up or down
+            let stationScore = 0;
+
+            
+            switch(stationNumber) {
+                case 1:
+                    const props = checkPropertiesQuestion();
+                    const gcf = checkGCFQuestion();
+                    const digit = checkDigitSumQuestion();
+                    stationScore += props + gcf + digit;
+                    break;
+                case 2:
+                    const factors = checkFactorsQuestion();
+                    const analysis = checkAnalysisQuestion();
+                    stationScore += factors + analysis;
+                    break;
+                case 3:
+                    const proper = checkProperFractionsQuestion();
+                    const convert = checkConvertQuestion();
+                    stationScore += proper + convert;
+                    break;
+                case 4:
+                    const matching = checkMatchingQuestion();
+                    const solid = checkSolidQuestion();
+                    stationScore += matching + solid;
+                    break;
+                case 5:
+                    const statistics = checkStatisticsQuestion();
+                    const triangles = checkTrianglesQuestion();
+                    const quads = checkQuadrilateralsQuestion();
+                    stationScore += statistics + triangles + quads;
+                    break;
+                case 6:
+                    const finalChallenge = checkFinalChallengeQuestion();
+                    stationScore += finalChallenge;
+                    break;
+                case 7:
+                    const algebraEquation = checkStation7Question();
+                    stationScore += algebraEquation;
+                    break;
+                case 8:
+                    const advancedMath = checkStation8Question();
+                    stationScore += advancedMath;
+                    break;
+                case 9:
+                    const integerWork = checkStation9Question();
+                    stationScore += integerWork;
+                    break;
+                case 10:
+                    const divisibilityWork = checkStation10Question();
+                    stationScore += divisibilityWork;
+                    break;
+            }
+            
+
+            // Save case score and mark as completed
+            gameState.caseScores[stationNumber - 1] = stationScore;
+            gameState.casesCompleted[stationNumber - 1] = true;
+            
+            updateTotalScore();
+            document.getElementById(`station${stationNumber}`).classList.add('completed');
+
+            // Show case completion message
+            alert(`🏆 Case File #${stationNumber.toString().padStart(3, '0')} CLOSED!\n\nEvidence Points Earned: ${stationScore}\n\nReturning to case selection...`);
+
+            setTimeout(() => {
+                returnToCaseSelection();
+            }, 1000);
+        }
+
+        function checkPropertiesQuestion() {
+            // Find all checkboxes in the properties question (first question in station 1)
+            const allCheckboxItems = document.querySelectorAll('#station1 .checkbox-item');
+            const correct = answerKeys.station1.properties121;
+            
+            
+            let score = 0;
+            let selectedValues = [];
+            
+            allCheckboxItems.forEach(item => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                const value = checkbox.getAttribute('data-value');
+                const isSelected = checkbox.checked;
+                const shouldBeSelected = correct.includes(value);
+                
+                if (isSelected) {
+                    selectedValues.push(value);
+                }
+                
+
+                if (isSelected === shouldBeSelected) {
+                    score += 1;
+                }
+            });
+            
+            
+            const finalScore = allCheckboxItems.length > 0 ? Math.floor((score / allCheckboxItems.length) * 10) : 0;
+            return finalScore;
+        }
+
+        function checkGCFQuestion() {
+            const selected = document.getElementById('q1-gcf').value;
+            const correct = answerKeys.station1.gcf.toString();
+            
+
+            if (selected === correct) {
+                return 10;
+            } else {
+                return 0;
+            }
+        }
+
+        function checkDigitSumQuestion() {
+            const selected = document.getElementById('q1-digitsum').value;
+            const correct = answerKeys.station1.digitsum.toString();
+            
+
+            if (selected === correct) {
+                return 10;
+            } else {
+                return 0;
+            }
+        }
+
+        function checkFactorsQuestion() {
+            const allCheckboxItems = document.querySelectorAll('#station2 .checkbox-item');
+            const correct = answerKeys.station2.factors12;
+            
+
+            let score = 0;
+            let selectedValues = [];
+            
+            allCheckboxItems.forEach(item => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                const value = checkbox.getAttribute('data-value');
+                const isSelected = checkbox.checked;
+                const shouldBeSelected = correct.includes(value);
+                
+                if (isSelected) {
+                    selectedValues.push(value);
+                }
+                
+
+                if (isSelected === shouldBeSelected) {
+                    score += 1;
+                }
+            });
+            
+
+            const finalScore = allCheckboxItems.length > 0 ? Math.floor((score / allCheckboxItems.length) * 10) : 0;
+            return finalScore;
+        }
+
+        function checkAnalysisQuestion() {
+            const sqrt = document.getElementById('q2-sqrt').value;
+            const classification = document.getElementById('q2-classification').value;
+            const parity = document.getElementById('q2-parity').value;
+
+            let score = 0;
+
+            // Check square root
+            if (sqrt === answerKeys.station2.sqrt) {
+                score += 3;
+            }
+
+            // Check classification
+            if (classification === answerKeys.station2.classification) {
+                score += 4;
+            }
+
+            // Check parity
+            if (parity === answerKeys.station2.parity) {
+                score += 3;
+            }
+
+            return score;
+        }
+
+        function checkProperFractionsQuestion() {
+            const allCheckboxItems = document.querySelectorAll('#station3 .checkbox-item');
+            const correct = answerKeys.station3.properFractions;
+            
+
+            let score = 0;
+            let selectedValues = [];
+            
+            allCheckboxItems.forEach(item => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                const value = checkbox.getAttribute('data-value');
+                const isSelected = checkbox.checked;
+                const shouldBeSelected = correct.includes(value);
+                
+                if (isSelected) {
+                    selectedValues.push(value);
+                }
+                
+
+                if (isSelected === shouldBeSelected) {
+                    score += 1;
+                }
+            });
+            
+
+            const finalScore = allCheckboxItems.length > 0 ? Math.floor((score / allCheckboxItems.length) * 10) : 0;
+            return finalScore;
+        }
+
+        function checkConvertQuestion() {
+            const selected = document.getElementById('q3-fraction').value;
+            const correct = answerKeys.station3.fraction45;
+
+            if (selected === correct) {
+                return 10;
+            } else {
+                return 0;
+            }
+        }
+
+        function checkMatchingQuestion() {
+            // Simplified matching - just award points for drag and drop completion
+            return 10;
+        }
+
+        function checkSolidQuestion() {
+            const faces = parseInt(document.getElementById('q4-faces').value);
+            const edges = parseInt(document.getElementById('q4-edges').value);
+            const vertices = parseInt(document.getElementById('q4-vertices').value);
+
+            let score = 0;
+
+            if (faces === parseInt(answerKeys.station4.faces)) {
+                score += 3;
+            }
+
+            if (edges === parseInt(answerKeys.station4.edges)) {
+                score += 4;
+            }
+
+            if (vertices === parseInt(answerKeys.station4.vertices)) {
+                score += 3;
+            }
+
+            return score;
+        }
+
+        function checkStatisticsQuestion() {
+            const mean = document.getElementById('q5-mean').value;
+            const mode = document.getElementById('q5-mode').value;
+            const median = document.getElementById('q5-median').value;
+            const prob = document.getElementById('q5-prob').value;
+
+            let score = 0;
+            if (mean === answerKeys.station5.mean) score += 5;
+            if (mode === answerKeys.station5.mode) score += 5;
+            if (median === answerKeys.station5.median) score += 5;
+            if (prob === answerKeys.station5.prob) score += 5;
+
+            return score;
+        }
+
+        function checkTrianglesQuestion() {
+            const checkboxItems = document.querySelectorAll('#station5 .question:nth-child(3) .checkbox-item');
+            const correct = answerKeys.station5.triangleTypes;
+            
+            let score = 0;
+            let selectedValues = [];
+            
+            checkboxItems.forEach(item => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                const value = checkbox.getAttribute('data-value');
+                const isSelected = checkbox.checked;
+                const shouldBeSelected = correct.includes(value);
+                
+                if (isSelected) selectedValues.push(value);
+                if (isSelected === shouldBeSelected) score += 1;
+            });
+            
+            return checkboxItems.length > 0 ? Math.floor((score / checkboxItems.length) * 10) : 0;
+        }
+
+        function checkQuadrilateralsQuestion() {
+            const checkboxItems = document.querySelectorAll('#station5 .question:nth-child(4) .checkbox-item');
+            const correct = answerKeys.station5.quadrilaterals;
+            
+            let score = 0;
+            let selectedValues = [];
+            
+            checkboxItems.forEach(item => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                const value = checkbox.getAttribute('data-value');
+                const isSelected = checkbox.checked;
+                const shouldBeSelected = correct.includes(value);
+                
+                if (isSelected) selectedValues.push(value);
+                if (isSelected === shouldBeSelected) score += 1;
+            });
+            
+            return checkboxItems.length > 0 ? Math.floor((score / checkboxItems.length) * 10) : 0;
+        }
+
+        function checkFinalChallengeQuestion() {
+            // Check the 1,331 properties question
+            const checkboxItems = document.querySelectorAll('#station6 .checkbox-item');
+            const correct = answerKeys.station6.properties1331;
+            
+            let propertiesScore = 0;
+            let selectedValues = [];
+            
+            checkboxItems.forEach(item => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                const value = checkbox.getAttribute('data-value');
+                const isSelected = checkbox.checked;
+                const shouldBeSelected = correct.includes(value);
+                
+                if (isSelected) selectedValues.push(value);
+                if (isSelected === shouldBeSelected) propertiesScore += 1;
+            });
+            
+            // Score for properties (15 points max)
+            const propertiesPoints = checkboxItems.length > 0 ? Math.floor((propertiesScore / checkboxItems.length) * 15) : 0;
+            
+            // Check the mathematical relationships questions
+            let relationshipsScore = 0;
+            
+            const gcfValue = document.querySelector('#station6 [data-question="gcf-pair"]')?.value;
+            if (gcfValue === answerKeys.station6['gcf-pair']) {
+                relationshipsScore += 5;
+            }
+            
+            const lcmValue = document.querySelector('#station6 [data-question="lcm-pair"]')?.value;
+            if (lcmValue === answerKeys.station6['lcm-pair']) {
+                relationshipsScore += 5;
+            }
+            
+            const remainderValue = document.querySelector('#station6 [data-question="remainder"]')?.value;
+            if (remainderValue === answerKeys.station6['remainder']) {
+                relationshipsScore += 5;
+            }
+            
+            return propertiesPoints + relationshipsScore;
+        }
+
+        function checkStation7Question() {
+            let totalScore = 0;
+            
+            // Check algebra solve
+            const algebraValue = document.querySelector('#station7 [data-question="algebra-solve"]')?.value;
+            if (algebraValue === answerKeys.station7['algebra-solve']) {
+                totalScore += 5;
+            }
+            
+            // Check quadrant
+            const quadrantValue = document.querySelector('#station7 [data-question="quadrant"]')?.value;
+            if (quadrantValue === answerKeys.station7['quadrant']) {
+                totalScore += 5;
+            }
+            
+            // Check angle type
+            const angleValue = document.querySelector('#station7 [data-question="angle-type"]')?.value;
+            if (angleValue === answerKeys.station7['angle-type']) {
+                totalScore += 5;
+            }
+            
+            // Check square root
+            const sqrtValue = document.querySelector('#station7 [data-question="square-root-64"]')?.value;
+            if (sqrtValue === answerKeys.station7['square-root-64']) {
+                totalScore += 5;
+            }
+            
+            return totalScore;
+        }
+
+        function checkStation8Question() {
+            let totalScore = 0;
+            
+            // Check scientific notation
+            const scientificValue = document.querySelector('#station8 [data-question="scientific-notation"]')?.value;
+            if (scientificValue === answerKeys.station8['scientific-notation']) {
+                totalScore += 5;
+            }
+            
+            // Check ratio solve
+            const ratioValue = document.querySelector('#station8 [data-question="ratio-solve"]')?.value;
+            if (ratioValue === answerKeys.station8['ratio-solve']) {
+                totalScore += 5;
+            }
+            
+            // Check isosceles triangle properties
+            const checkboxItems = document.querySelectorAll('#station8 .checkbox-item');
+            const correct = answerKeys.station8.isoscelesProperties;
+            
+            let score = 0;
+            checkboxItems.forEach(item => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                const value = checkbox.getAttribute('data-value');
+                const isSelected = checkbox.checked;
+                const shouldBeSelected = correct.includes(value);
+                
+                if (isSelected === shouldBeSelected) score += 1;
+            });
+            
+            if (checkboxItems.length > 0) {
+                totalScore += Math.floor((score / checkboxItems.length) * 5);
+            }
+            
+            // Check percentage increase
+            const percentValue = document.querySelector('#station8 [data-question="percentage-increase"]')?.value;
+            if (percentValue === answerKeys.station8['percentage-increase']) {
+                totalScore += 5;
+            }
+            
+            return totalScore;
+        }
+
+        function checkStation9Question() {
+            let totalScore = 0;
+            
+            // Check signed operations
+            const signedValue = document.querySelector('#station9 [data-question="signed-ops"]')?.value;
+            if (signedValue === answerKeys.station9['signed-ops']) {
+                totalScore += 5;
+            }
+            
+            // Check complex fraction
+            const fractionValue = document.querySelector('#station9 [data-question="complex-fraction"]')?.value;
+            if (fractionValue === answerKeys.station9['complex-fraction']) {
+                totalScore += 5;
+            }
+            
+            // Check number classification checkboxes
+            const checkboxItems = document.querySelectorAll('#station9 .checkbox-item');
+            const correct = answerKeys.station9.numberClassification;
+            
+            let score = 0;
+            checkboxItems.forEach(item => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                const value = checkbox.getAttribute('data-value');
+                const isSelected = checkbox.checked;
+                const shouldBeSelected = correct.includes(value);
+                
+                if (isSelected === shouldBeSelected) score += 1;
+            });
+            
+            if (checkboxItems.length > 0) {
+                totalScore += Math.floor((score / checkboxItems.length) * 10);
+            }
+            
+            // Check percent conversion
+            const percentValue = document.querySelector('#station9 [data-question="percent-convert"]')?.value;
+            if (percentValue === answerKeys.station9['percent-convert']) {
+                totalScore += 5;
+            }
+            
+            return totalScore;
+        }
+
+        function checkStation10Question() {
+            let totalScore = 0;
+            
+            // Check divisibility rules checkboxes
+            const checkboxItems = document.querySelectorAll('#station10 .checkbox-item');
+            const correct = answerKeys.station10.divisibilityRules;
+            
+            let score = 0;
+            checkboxItems.forEach(item => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                const value = checkbox.getAttribute('data-value');
+                const isSelected = checkbox.checked;
+                const shouldBeSelected = correct.includes(value);
+                
+                if (isSelected === shouldBeSelected) score += 1;
+            });
+            
+            if (checkboxItems.length > 0) {
+                totalScore += Math.floor((score / checkboxItems.length) * 10);
+            }
+            
+            // Check box volume
+            const volumeValue = document.querySelector('#station10 [data-question="box-volume"]')?.value;
+            if (volumeValue === answerKeys.station10['box-volume']) {
+                totalScore += 5;
+            }
+            
+            // Check prime factorization
+            const primeValue = document.querySelector('#station10 [data-question="prime-factor"]')?.value;
+            if (primeValue === answerKeys.station10['prime-factor']) {
+                totalScore += 5;
+            }
+            
+            // Check set count
+            const setValue = document.querySelector('#station10 [data-question="set-count"]')?.value;
+            if (setValue === answerKeys.station10['set-count']) {
+                totalScore += 5;
+            }
+            
+            return totalScore;
+        }
+
+        // Initialize
+        updateTotalScore();
+
+        // Drag and Drop functionality with touch support
+        let draggedElement = null;
+        let touchStartPos = { x: 0, y: 0 };
+        let isDragging = false;
+        let dragClone = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const dragItems = document.querySelectorAll('.drag-item');
+            const dropZones = document.querySelectorAll('.drop-zone');
+
+            dragItems.forEach(item => {
+                // Desktop drag events
+                item.addEventListener('dragstart', function(e) {
+                    draggedElement = this;
+                    this.style.opacity = '0.5';
+                });
+
+                item.addEventListener('dragend', function(e) {
+                    this.style.opacity = '1';
+                });
+
+                // Touch events for mobile
+                item.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    touchStartPos = { x: touch.clientX, y: touch.clientY };
+                    draggedElement = this;
+                    isDragging = false;
+                    
+                    // Create visual feedback
+                    this.style.transform = 'scale(1.1)';
+                    this.style.zIndex = '1000';
+                }, { passive: false });
+
+                item.addEventListener('touchmove', function(e) {
+                    if (!draggedElement) return;
+                    e.preventDefault();
+                    
+                    const touch = e.touches[0];
+                    const deltaX = Math.abs(touch.clientX - touchStartPos.x);
+                    const deltaY = Math.abs(touch.clientY - touchStartPos.y);
+                    
+                    // Start dragging if moved enough
+                    if (!isDragging && (deltaX > 10 || deltaY > 10)) {
+                        isDragging = true;
+                        
+                        // Create a clone for visual dragging
+                        if (!dragClone) {
+                            dragClone = this.cloneNode(true);
+                            dragClone.style.position = 'fixed';
+                            dragClone.style.pointerEvents = 'none';
+                            dragClone.style.opacity = '0.8';
+                            dragClone.style.transform = 'scale(1.1)';
+                            dragClone.style.zIndex = '9999';
+                            document.body.appendChild(dragClone);
+                        }
+                        
+                        this.style.opacity = '0.3';
+                    }
+                    
+                    if (isDragging && dragClone) {
+                        // Move the clone with the finger
+                        dragClone.style.left = (touch.clientX - 50) + 'px';
+                        dragClone.style.top = (touch.clientY - 25) + 'px';
+                        
+                        // Highlight drop zones
+                        const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+                        dropZones.forEach(zone => {
+                            if (zone.contains(elementBelow) || zone === elementBelow) {
+                                zone.classList.add('drag-over');
+                            } else {
+                                zone.classList.remove('drag-over');
+                            }
+                        });
+                    }
+                }, { passive: false });
+
+                item.addEventListener('touchend', function(e) {
+                    if (!draggedElement) return;
+                    e.preventDefault();
+                    
+                    // Reset styles
+                    this.style.transform = '';
+                    this.style.zIndex = '';
+                    this.style.opacity = '1';
+                    
+                    if (isDragging) {
+                        const touch = e.changedTouches[0];
+                        const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+                        
+                        // Find the drop zone
+                        let targetZone = null;
+                        dropZones.forEach(zone => {
+                            if (zone.contains(elementBelow) || zone === elementBelow) {
+                                targetZone = zone;
+                            }
+                            zone.classList.remove('drag-over');
+                        });
+                        
+                        // Drop the item
+                        if (targetZone) {
+                            targetZone.appendChild(this);
+                        }
+                    }
+                    
+                    // Clean up
+                    if (dragClone) {
+                        document.body.removeChild(dragClone);
+                        dragClone = null;
+                    }
+                    
+                    draggedElement = null;
+                    isDragging = false;
+                }, { passive: false });
+            });
+
+            dropZones.forEach(zone => {
+                // Desktop drop events
+                zone.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.classList.add('drag-over');
+                });
+
+                zone.addEventListener('dragleave', function(e) {
+                    this.classList.remove('drag-over');
+                });
+
+                zone.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('drag-over');
+                    
+                    if (draggedElement) {
+                        // Always allow the drop, don't give immediate feedback
+                        this.appendChild(draggedElement);
+                        draggedElement = null;
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

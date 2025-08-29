@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Detective Challenge - HWMS Competition Math Club</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #dc2626;
+            text-shadow: none;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        /* Fixed UI Elements */
+        .fixed-ui {
+            position: fixed;
+            top: 20px;
+            width: 100%;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .timer-score {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .timer, .score {
+            background: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: 1px solid #e5e7eb;
+            pointer-events: auto;
+        }
+
+        .timer {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #dc2626;
+        }
+
+        .score {
+            font-size: 1.2rem;
+            color: #dc2626;
+        }
+
+        /* Challenge Card */
+        .challenge-card {
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid #dc2626;
+            margin-top: 80px;
+            animation: slideIn 0.5s ease;
+        }
+
+        .challenge-card h2 {
+            color: #dc2626;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .challenge-card .number {
+            font-size: 3rem;
+            color: #dc2626;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            text-shadow: none;
+        }
+
+        .challenge-card .instruction {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+            text-align: center;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        /* Multi-select Options */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 15px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option:hover {
+            background: #f3f4f6;
+            transform: scale(1.02);
+        }
+
+        .option.selected {
+            background: rgba(220, 38, 38, 0.1) !important;
+            border-color: #dc2626 !important;
+            color: #333 !important;
+            transform: scale(1.02) !important;
+            box-shadow: 0 0 15px rgba(220, 38, 38, 0.3) !important;
+        }
+
+        .option.correct {
+            background: rgba(0, 255, 0, 0.3);
+            border-color: #00ff00;
+        }
+
+        .option.incorrect {
+            background: rgba(255, 0, 0, 0.3);
+            border-color: #ff0000;
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #9ca3af;
+            border-radius: 4px;
+            position: relative;
+            background: transparent;
+            flex-shrink: 0;
+        }
+
+        .option.selected .checkbox {
+            background: #dc2626;
+            border-color: #dc2626;
+        }
+
+        .option.selected .checkbox::after {
+            content: '✓';
+            position: absolute;
+            top: -2px;
+            left: 3px;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            display: block;
+            margin: 30px auto;
+            min-width: 200px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 38, 38, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.7);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Results */
+        .results {
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid #dc2626;
+            text-align: center;
+            display: none;
+            margin-top: 20px;
+        }
+
+        .results.active {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        .results h3 {
+            color: #dc2626;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .results .score-details {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .results .final-score {
+            font-size: 2rem;
+            color: #dc2626;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        /* Results Buttons */
+        .results-buttons {
+            text-align: center;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .results-buttons .btn {
+            display: inline-block;
+            margin: 5px 0;
+            min-width: 200px;
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .challenge-card .number {
+                font-size: 2.5rem;
+            }
+
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .timer-score {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            .challenge-card {
+                margin-top: 100px;
+                padding: 20px;
+            }
+
+            .results-buttons {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .results-buttons .btn {
+                min-width: auto;
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="fixed-ui">
+        <div class="timer-score">
+            <div class="timer" id="timer">Time Remaining</div>
+            <div class="score">Total Score: <span id="totalScore">0</span></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🎯 The Ultimate Case: "Operation 1,331"</h1>
+            <p><em>"Detective, this is it - the final case that will determine if you're ready for the Mathematical Elite Unit. A mysterious number has appeared at every crime scene: <strong>1,331</strong>. Use every tool in your MOEMS vocabulary arsenal to crack this ultimate code!"</em></p>
+        </div>
+
+        <div class="challenge-card">
+            <h2>🔍 Final Evidence Analysis</h2>
+            <div class="number">1,331</div>
+            <div class="instruction">
+                <em>"This number holds the key to everything. Select ALL mathematical properties that describe the suspect number 1,331. Your detective badge depends on it!"</em>
+            </div>
+
+            <div class="options-grid">
+                <div class="option" onclick="toggleOption(this, 'palindrome', true)">
+                    <div class="checkbox"></div>
+                    <span>It is a palindrome</span>
+                </div>
+
+                <div class="option" onclick="toggleOption(this, 'perfect-cube', true)">
+                    <div class="checkbox"></div>
+                    <span>It is a perfect cube</span>
+                </div>
+
+                <div class="option" onclick="toggleOption(this, '4-digit', true)">
+                    <div class="checkbox"></div>
+                    <span>It is a 4-digit number</span>
+                </div>
+
+                <div class="option" onclick="toggleOption(this, 'composite', true)">
+                    <div class="checkbox"></div>
+                    <span>It is a composite number</span>
+                </div>
+
+                <div class="option" onclick="toggleOption(this, 'odd', true)">
+                    <div class="checkbox"></div>
+                    <span>It is an odd number</span>
+                </div>
+
+                <div class="option" onclick="toggleOption(this, 'digit-sum', true)">
+                    <div class="checkbox"></div>
+                    <span>Its digit sum is 8</span>
+                </div>
+
+                <div class="option" onclick="toggleOption(this, 'multiple-11', true)">
+                    <div class="checkbox"></div>
+                    <span>It is a multiple of 11</span>
+                </div>
+
+                <div class="option" onclick="toggleOption(this, 'perfect-square', false)">
+                    <div class="checkbox"></div>
+                    <span>It is a perfect square</span>
+                </div>
+
+                <div class="option" onclick="toggleOption(this, 'prime', false)">
+                    <div class="checkbox"></div>
+                    <span>It is a prime number</span>
+                </div>
+
+                <div class="option" onclick="toggleOption(this, 'even', false)">
+                    <div class="checkbox"></div>
+                    <span>It is an even number</span>
+                </div>
+            </div>
+
+            <button class="btn" onclick="submitFinalChallenge()">🏆 Submit Final Case Report</button>
+        </div>
+
+        <!-- Results -->
+        <div class="results" id="results">
+            <h3>🏆 Case Closed - Detective Badge Earned!</h3>
+            <div class="score-details" id="scoreDetails"></div>
+            <div class="final-score" id="finalScore"></div>
+            <p id="teamResult"></p>
+            <div class="results-buttons">
+                <button class="btn" onclick="viewAnswerKey()">📚 View Answer Key</button>
+                <button class="btn" onclick="goBackToMain()">Return to Main Game</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get data from URL parameters or localStorage
+        const urlParams = new URLSearchParams(window.location.search);
+        const teamName = urlParams.get('team') || 'Detective Team';
+        const currentScore = parseInt(urlParams.get('score')) || 0;
+        const timeRemaining = parseInt(urlParams.get('time')) || 300; // 5 minutes default
+
+        let selectedOptions = new Set();
+        let challengeSubmitted = false;
+        let timerInterval;
+
+        // Initialize the page
+        document.getElementById('totalScore').textContent = currentScore;
+        
+        // Hide timer for final challenge
+        document.getElementById('timer').style.display = 'none';
+
+        function toggleOption(element, optionKey, isCorrect) {
+            if (challengeSubmitted) return;
+
+            const isSelected = element.classList.contains('selected');
+            
+            if (isSelected) {
+                element.classList.remove('selected');
+                selectedOptions.delete(optionKey);
+            } else {
+                element.classList.add('selected');
+                selectedOptions.add(optionKey);
+            }
+        }
+
+        function submitFinalChallenge() {
+            if (challengeSubmitted) return;
+            challengeSubmitted = true;
+            clearInterval(timerInterval);
+
+            // Define correct answers
+            const correctAnswers = new Set([
+                'palindrome', 'perfect-cube', '4-digit', 'composite', 
+                'odd', 'digit-sum', 'multiple-11'
+            ]);
+
+            // Calculate score
+            let correctCount = 0;
+            let incorrectCount = 0;
+
+            // Check all options and provide visual feedback
+            document.querySelectorAll('.option').forEach((option, index) => {
+                const optionKey = option.onclick.toString().match(/'([^']+)'/)[1];
+                const isCorrect = correctAnswers.has(optionKey);
+                const wasSelected = selectedOptions.has(optionKey);
+
+                if (isCorrect && wasSelected) {
+                    correctCount++;
+                    option.classList.add('correct');
+                } else if (!isCorrect && wasSelected) {
+                    incorrectCount++;
+                    option.classList.add('incorrect');
+                } else if (isCorrect && !wasSelected) {
+                    // Correct answer not selected - show as correct but dimmed
+                    option.style.opacity = '0.7';
+                    option.classList.add('correct');
+                }
+            });
+
+            // Calculate bonus points (5 points per correct selection, -2 points per incorrect selection)
+            const bonusPoints = Math.max(0, (correctCount * 5) - (incorrectCount * 2));
+            const finalScore = currentScore + bonusPoints;
+
+            // Show results
+            showResults(correctCount, incorrectCount, bonusPoints, finalScore);
+        }
+
+        function showResults(correct, incorrect, bonus, finalScore) {
+            const resultsEl = document.getElementById('results');
+            const scoreDetailsEl = document.getElementById('scoreDetails');
+            const finalScoreEl = document.getElementById('finalScore');
+            const teamResultEl = document.getElementById('teamResult');
+
+            scoreDetailsEl.innerHTML = `
+                <div>Previous Score: ${currentScore} points</div>
+                <div>Correct Properties: ${correct} / 7 (+${correct * 5} points)</div>
+                <div>Incorrect Selections: ${incorrect} (-${incorrect * 2} points)</div>
+                <div>Final Challenge Bonus: ${bonus} points</div>
+            `;
+
+            finalScoreEl.textContent = `Final Score: ${finalScore} points`;
+            teamResultEl.innerHTML = `Excellent detective work, <strong>${teamName}</strong>! 🔍`;
+
+            resultsEl.classList.add('active');
+            resultsEl.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function viewAnswerKey() {
+            window.location.href = 'answer-key.html';
+        }
+
+        function goBackToMain() {
+            window.location.href = 'detective.html';
+        }
+    </script>
+</body>
+</html>
