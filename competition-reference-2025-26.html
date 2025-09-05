@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HWMS Math Club Competition Reference 2025-2026</title>
+    <style>
+        @page {
+            size: letter;
+            margin: 0.5in;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 10px;
+            line-height: 1.3;
+            color: #333;
+            background: white;
+            padding: 15px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #dc2626;
+            padding-bottom: 5px;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            color: #dc2626;
+            margin-bottom: 3px;
+        }
+
+        .header h2 {
+            font-size: 12px;
+            color: #666;
+            font-weight: normal;
+        }
+
+        .competitions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .competition-card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 6px;
+            background: #f9f9fa;
+            border-left-width: 6px;
+            border-left-style: solid;
+        }
+
+        .competition-title {
+            font-weight: bold;
+            font-size: 11px;
+            margin-bottom: 3px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 2px;
+        }
+
+        /* Competition Color Classes */
+        .mathcounts-card {
+            border-left-color: #059669;
+            background: linear-gradient(135deg, rgba(5,150,105,0.12), rgba(5,150,105,0.06));
+        }
+        .mathcounts-title { color: #059669; }
+
+        .mcps-card {
+            border-left-color: #0891b2;
+            background: linear-gradient(135deg, rgba(8,145,178,0.12), rgba(8,145,178,0.06));
+        }
+        .mcps-title { color: #0891b2; }
+
+        .moems-card {
+            border-left-color: #1e40af;
+            background: linear-gradient(135deg, rgba(30,64,175,0.12), rgba(30,64,175,0.06));
+        }
+        .moems-title { color: #1e40af; }
+
+        .amc-card {
+            border-left-color: #dc2626;
+            background: linear-gradient(135deg, rgba(220,38,38,0.12), rgba(220,38,38,0.06));
+        }
+        .amc-title { color: #dc2626; }
+
+        .kangaroo-card {
+            border-left-color: #f59e0b;
+            background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(245,158,11,0.06));
+        }
+        .kangaroo-title { color: #f59e0b; }
+
+        .noetic-card {
+            border-left-color: #6b7280;
+            background: linear-gradient(135deg, rgba(107,114,128,0.12), rgba(107,114,128,0.06));
+        }
+        .noetic-title { color: #6b7280; }
+
+        .purple-card {
+            border-left-color: #7c3aed;
+            background: linear-gradient(135deg, rgba(124,58,237,0.12), rgba(124,58,237,0.06));
+        }
+        .purple-title { color: #7c3aed; }
+
+        .competition-info {
+            font-size: 9px;
+        }
+
+        .competition-info strong {
+            color: #333;
+        }
+
+        .date-highlight {
+            background: #ffe4e1;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .cost-free {
+            color: #059669;
+            font-weight: bold;
+        }
+
+        .cost-paid {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        .calendar-section {
+            margin-top: 8px;
+            border-top: 2px solid #dc2626;
+            padding-top: 5px;
+        }
+
+        .calendar-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #dc2626;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .month-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .month-card {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 4px;
+            background: #f8f9fa;
+        }
+
+        .month-header {
+            font-weight: bold;
+            font-size: 9px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 3px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 1px;
+        }
+
+        .month-events {
+            font-size: 8px;
+        }
+
+        .event-item {
+            margin-bottom: 1px;
+            padding: 1px 0;
+        }
+
+        .event-date {
+            font-weight: bold;
+            color: #dc2626;
+        }
+
+        /* Calendar Event Colors */
+        .event-mathcounts { color: #059669; font-weight: bold; }
+        .event-mcps { color: #0891b2; font-weight: bold; }
+        .event-moems { color: #1e40af; font-weight: bold; }
+        .event-amc { color: #dc2626; font-weight: bold; }
+        .event-kangaroo { color: #f59e0b; font-weight: bold; }
+        .event-noetic { color: #6b7280; font-weight: bold; }
+        .event-purple { color: #7c3aed; font-weight: bold; }
+
+        .not-participating {
+            text-decoration: line-through;
+            color: #999;
+            font-style: italic;
+        }
+
+        .awards-highlight {
+            background: #e0f2fe;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-size: 10px;
+            color: #0277bd;
+            font-weight: bold;
+        }
+
+        .grade-division {
+            background: #f3e5f5;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-size: 9px;
+            color: #7b1fa2;
+            font-weight: bold;
+        }
+
+        .footer {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+            border-top: 1px solid #ddd;
+            padding-top: 8px;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏆 HWMS Math Club Competition Reference</h1>
+        <h2>2025-2026 Academic Year</h2>
+    </div>
+
+    <div class="competitions-grid">
+        <!-- MOEMS -->
+        <div class="competition-card moems-card">
+            <div class="competition-title moems-title">MOEMS (Math Olympiads for Elementary & Middle Schools)</div>
+            <div class="competition-info">
+                <strong>Eligibility:</strong> Grades 6-8, through schools<br>
+                <strong>Format:</strong> Individual, 5 problems, 30 minutes each<br>
+                <strong>Cost:</strong> <span class="cost-paid">$175-$300</span> per team (up to 35 students)<br>
+                <strong>Registration:</strong> Early Bird Jul 31 ($175), Standard Oct 15 ($200)<br>
+                <strong>Dates:</strong><br>
+                • Contest #1: <span class="date-highlight">Nov 21, 3:15-4:00 PM</span><br>
+                • Contest #2: <span class="date-highlight">Dec 19, 3:15-4:00 PM</span><br>
+                • Contest #3: <span class="date-highlight">Jan 9, 3:15-4:00 PM</span><br>
+                • Contest #4: <span class="date-highlight">Feb 6, 3:14-4:00 PM</span><br>
+                • Contest #5: <span class="date-highlight">Mar 6, 3:15-4:00 PM</span><br>
+                <strong>Key:</strong> No calculator, 5 monthly contests<br>
+                <strong>Awards:</strong> <span class="awards-highlight">Individual & Team Awards, Patches, Trophies</span>
+            </div>
+        </div>
+
+        <!-- MATHCOUNTS -->
+        <div class="competition-card mathcounts-card">
+            <div class="competition-title mathcounts-title">MATHCOUNTS</div>
+            <div class="competition-info">
+                <strong>Eligibility:</strong> Grades 6-8, through schools only<br>
+                <strong>Format:</strong> Individual & Team, 4 rounds<br>
+                <strong>Cost:</strong> <span class="cost-paid">$40-$50</span> per student<br>
+                <strong>Registration:</strong> Early Bird Nov 1 ($40), Regular Dec 16 ($45)<br>
+                <strong>Dates:</strong><br>
+                • School: <span class="date-highlight">Nov 8, 9:00 AM-12:00 PM</span><br>
+                • Chapter: Feb 1-28 (Date TBA)<br>
+                • State: Mar 1-31 (Date TBA)<br>
+                • National: May 10-11, Washington DC<br>
+                <strong>Key:</strong> 4-level progression, up to 14 students per school<br>
+                <strong>Awards:</strong> <span class="awards-highlight">Medals, Trophies, National Recognition, Scholarships</span>
+            </div>
+        </div>
+
+        <!-- AMC 8 -->
+        <div class="competition-card amc-card">
+            <div class="competition-title amc-title">AMC 8 (American Mathematics Contest)</div>
+            <div class="competition-info">
+                <strong>Eligibility:</strong> Grade 8 & below, under 14.5 years<br>
+                <strong>Format:</strong> Individual, 25 questions, 40 minutes<br>
+                <strong>Cost:</strong> <span class="cost-paid">$53-$113</span> registration + $25/bundle (10 students)<br>
+                <strong>Registration:</strong> Early Bird Oct 30 ($53), Regular Dec 23 ($73)<br>
+                <strong>Date:</strong> <span class="date-highlight">Jan 23, 3:15-4:00 PM</span><br>
+                <strong>Key:</strong> Multiple choice, no calculator, gateway to AMC 10/12<br>
+                <strong>Awards:</strong> <span class="awards-highlight">Honor Roll, Distinguished Honor Roll, Achievement Roll (Grade 6 & below by grade)</span>
+            </div>
+        </div>
+
+        <!-- Math League -->
+        <div class="competition-card mcps-card">
+            <div class="competition-title mcps-title">MCPS Middle School Mathematics League</div>
+            <div class="competition-info">
+                <strong>Eligibility:</strong> Middle School, up to 3 teams (18 students) per school<br>
+                <strong>Format:</strong> 3 rounds per meet: Team Round (6 questions, 20 min) + Relay Round (2 rounds of 8 min each) + Individual Round (6 problems, 24 min)<br>
+                <strong>Cost:</strong> <span class="cost-free">FREE</span><br>
+                <strong>Details:</strong> Hosted at individual schools during meet weeks, calculators allowed in Team Round only<br>
+                <strong>Dates:</strong><br>
+                • Meet 1: <span class="date-highlight">Nov 14, 3:15-4:30 PM</span><br>
+                • Meet 2: <span class="date-highlight">Dec 12, 3:15-4:30 PM</span><br>
+                • Meet 3: <span class="date-highlight">Jan 16, 3:15-4:30 PM</span><br>
+                • Meet 4: <span class="date-highlight">Feb 13, 3:15-4:30 PM</span><br>
+                <strong>Key:</strong> Teams of 6, total 64 points possible per meet<br>
+                <strong>Awards:</strong> <span class="awards-highlight">Individual scores will be tracked for <a href="https://www.arml.com/" target="_blank" style="color: #0277bd; text-decoration: none;">American Regions Mathematics League (ARML)</a> standings</span>
+            </div>
+        </div>
+
+        <!-- Math Kangaroo -->
+        <div class="competition-card kangaroo-card">
+            <div class="competition-title kangaroo-title">Math Kangaroo (International Competition)</div>
+            <div class="competition-info">
+                <strong>Eligibility:</strong> Grades K-12, individual or school registration<br>
+                <strong>Format:</strong> Individual, 24-30 questions, 75 minutes<br>
+                <strong>Cost:</strong> <span class="cost-paid">$18-$35</span> per student<br>
+                <strong>Registration:</strong> Regular Sep 15-Dec 31 ($18), Late Jan 1-Feb 1 ($35)<br>
+                <strong>Date:</strong> <span class="date-highlight">Mar 19, 3:15-4:45 PM</span><br>
+                <strong>Key:</strong> Multiple choice, word and logic problems, global participation<br>
+                <strong>Awards:</strong> <span class="awards-highlight">Gold, Silver, Bronze Medals, Certificates (ranked by grade)</span>
+            </div>
+        </div>
+
+        <!-- Noetic Learning -->
+        <div class="competition-card noetic-card">
+            <div class="competition-title noetic-title">Noetic Learning Math Contest (NLMC)</div>
+            <div class="competition-info">
+                <strong>Eligibility:</strong> Grades 2-8, through schools<br>
+                <strong>Format:</strong> Individual, 20 problems, 45-50 minutes<br>
+                <strong>Cost:</strong> <span class="cost-paid">$99</span> per team (up to 30 students)<br>
+                <strong>Registration:</strong> <span class="not-participating">Fall Oct 23 (Not participating)</span>, Spring Mar 12<br>
+                <strong>Date:</strong> <span class="date-highlight">Apr 10, 3:15-4:00 PM</span> (Spring only)<br>
+                <strong>Key:</strong> No calculator, top 10% get Honor Roll medals<br>
+                <strong>Awards:</strong> <span class="awards-highlight">National Honor Roll Medals (Top 10%), Honorable Mention Ribbons (Top 50%) - by grade level</span>
+            </div>
+        </div>
+
+        <!-- Purple Comet -->
+        <div class="competition-card purple-card">
+            <div class="competition-title purple-title">Purple Comet Math Meet</div>
+            <div class="competition-info">
+                <strong>Eligibility:</strong> Middle School, under 16, not completed 8th grade<br>
+                <strong>Format:</strong> Team (1-6 students), 20 problems, 60 minutes<br>
+                <strong>Cost:</strong> <span class="cost-free">FREE</span><br>
+                <strong>Registration:</strong> Opens Feb 1, 2026<br>
+                <strong>Date:</strong> <span class="date-highlight">Apr 17, 3:15-4:30 PM</span><br>
+                <strong>Key:</strong> Online competition, teams work collaboratively<br>
+                <strong>Awards:</strong> <span class="awards-highlight">Certificates for Top Teams, International Recognition</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="calendar-section">
+        <div class="calendar-title">📅 Competition Calendar at a Glance</div>
+        
+        <div class="month-row">
+            <div class="month-card">
+                <div class="month-header">NOV 2025</div>
+                <div class="month-events">
+                    <div class="event-item"><span class="event-date">8:</span> <span class="event-mathcounts">MATHCOUNTS</span> (9:00 AM-12:00 PM)</div>
+                    <div class="event-item"><span class="event-date">14:</span> <span class="event-mcps">Math League 1</span> (3:15-4:30 PM)</div>
+                    <div class="event-item"><span class="event-date">21:</span> <span class="event-moems">MOEMS #1</span> (3:15-4:00 PM)</div>
+                </div>
+            </div>
+            
+            <div class="month-card">
+                <div class="month-header">DEC 2025</div>
+                <div class="month-events">
+                    <div class="event-item"><span class="event-date">12:</span> <span class="event-mcps">Math League 2</span> (3:15-4:30 PM)</div>
+                    <div class="event-item"><span class="event-date">19:</span> <span class="event-moems">MOEMS #2</span> (3:15-4:00 PM)</div>
+                </div>
+            </div>
+            
+            <div class="month-card">
+                <div class="month-header">JAN 2026</div>
+                <div class="month-events">
+                    <div class="event-item"><span class="event-date">9:</span> <span class="event-moems">MOEMS #3</span> (3:15-4:00 PM)</div>
+                    <div class="event-item"><span class="event-date">16:</span> <span class="event-mcps">Math League 3</span> (3:15-4:30 PM)</div>
+                    <div class="event-item"><span class="event-date">23:</span> <span class="event-amc">AMC 8</span> (3:15-4:00 PM)</div>
+                </div>
+            </div>
+            
+            <div class="month-card">
+                <div class="month-header">FEB 2026</div>
+                <div class="month-events">
+                    <div class="event-item"><span class="event-date">6:</span> <span class="event-moems">MOEMS #4</span> (3:14-4:00 PM)</div>
+                    <div class="event-item"><span class="event-date">13:</span> <span class="event-mcps">Math League 4</span> (3:15-4:30 PM)</div>
+                    <div class="event-item"><span class="event-date">TBA:</span> <span class="event-mathcounts">MATHCOUNTS Chapter</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="month-row">
+            <div class="month-card">
+                <div class="month-header">MAR 2026</div>
+                <div class="month-events">
+                    <div class="event-item"><span class="event-date">6:</span> <span class="event-moems">MOEMS #5</span> (3:15-4:00 PM)</div>
+                    <div class="event-item"><span class="event-date">19:</span> <span class="event-kangaroo">Math Kangaroo</span> (3:15-4:45 PM)</div>
+                    <div class="event-item"><span class="event-date">TBA:</span> <span class="event-mathcounts">MATHCOUNTS State</span></div>
+                </div>
+            </div>
+            
+            <div class="month-card">
+                <div class="month-header">APR 2026</div>
+                <div class="month-events">
+                    <div class="event-item"><span class="event-date">10:</span> <span class="event-noetic">Noetic Spring</span> (3:15-4:00 PM)</div>
+                    <div class="event-item"><span class="event-date">17:</span> <span class="event-purple">Purple Comet</span> (3:15-4:30 PM)</div>
+                </div>
+            </div>
+            
+            <div class="month-card">
+                <div class="month-header">MAY 2026</div>
+                <div class="month-events">
+                    <div class="event-item"><span class="event-date">10-11:</span> <span class="event-mathcounts">MATHCOUNTS Nat'l</span> (Washington DC)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <strong>Hallie Wells Middle School Competition Math Club</strong> | Coach: Prof. Jojo Dong | Contact: zdongmc@gmail.com<br>
+        📍 11701 Little Seneca Pkwy, Clarksburg, MD | Generated: January 2025
+    </div>
+</body>
+</html>
