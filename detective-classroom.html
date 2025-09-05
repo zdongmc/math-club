@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detective Academy - HWMS Competition Math Club</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #dc2626;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #dc2626;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .case {
+            background: #ffffff;
+            border: 2px solid #e5e7eb;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .case h2 {
+            color: #dc2626;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .case-content {
+            margin: 15px 0;
+        }
+
+        .problem {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #dc2626;
+        }
+
+        .answer-box {
+            margin: 15px 0;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+
+        .answer-box label {
+            font-weight: bold;
+            color: #dc2626;
+        }
+
+        .answer-box input[type="text"], .answer-box textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .instructions {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .instructions h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Detective Academy</h1>
+            <p>Welcome to the HWMS Competition Math Club Detective Academy! Solve these mathematical mysteries using your detective skills.</p>
+        </div>
+
+        <div class="instructions">
+            <h3>📋 Instructions</h3>
+            <p><strong>Detective Mission:</strong> You are a mathematical detective! Each case below contains clues that require mathematical analysis to solve. Read each case carefully, analyze the evidence, and provide your findings in the answer boxes.</p>
+            <p><strong>How to Submit:</strong> Complete all cases and submit your work through Google Classroom as directed by your teacher.</p>
+        </div>
+
+        <div class="case">
+            <h2>🔍 Case 1: The Missing Test Scores</h2>
+            <div class="case-content">
+                <p><strong>🚨 CASE BRIEFING:</strong> A teacher's grade book shows that 5 students took a test, but one score is missing from the computer records.</p>
+                
+                <div class="problem">
+                    <p><strong>Evidence:</strong></p>
+                    <ul>
+                        <li>Four recorded scores: 85, 92, 78, 88</li>
+                        <li>The class average was exactly 84</li>
+                        <li>All scores are whole numbers</li>
+                    </ul>
+                    <p><strong>Question:</strong> What was the missing student's test score?</p>
+                </div>
+                
+                <div class="answer-box">
+                    <label>Your Detective Work (show calculations):</label>
+                    <textarea rows="4" placeholder="Show your mathematical reasoning here..."></textarea>
+                </div>
+                
+                <div class="answer-box">
+                    <label>Final Answer:</label>
+                    <input type="text" placeholder="Missing test score">
+                </div>
+            </div>
+        </div>
+
+        <div class="case">
+            <h2>🔍 Case 2: The Suspicious Pattern</h2>
+            <div class="case-content">
+                <p><strong>🚨 CASE BRIEFING:</strong> Someone has been leaving mysterious number sequences around the school. We need to crack the pattern!</p>
+                
+                <div class="problem">
+                    <p><strong>Evidence Found:</strong></p>
+                    <p>Sequence discovered: 3, 7, 15, 31, ?, 127</p>
+                    <p><strong>Question:</strong> What number should replace the question mark?</p>
+                </div>
+                
+                <div class="answer-box">
+                    <label>Pattern Analysis:</label>
+                    <textarea rows="4" placeholder="Describe the pattern you discovered..."></textarea>
+                </div>
+                
+                <div class="answer-box">
+                    <label>Missing Number:</label>
+                    <input type="text" placeholder="What number goes in place of ?">
+                </div>
+            </div>
+        </div>
+
+        <div class="case">
+            <h2>🔍 Case 3: The Geometry Thief</h2>
+            <div class="case-content">
+                <p><strong>🚨 CASE BRIEFING:</strong> Someone broke into the math classroom and stole part of a geometric diagram. We need to figure out what's missing!</p>
+                
+                <div class="problem">
+                    <p><strong>Evidence:</strong></p>
+                    <ul>
+                        <li>A triangle was drawn on the board</li>
+                        <li>Two angles were labeled: 65° and 45°</li>
+                        <li>The third angle was erased by the thief</li>
+                    </ul>
+                    <p><strong>Question:</strong> What was the measure of the missing angle?</p>
+                </div>
+                
+                <div class="answer-box">
+                    <label>Your Investigation:</label>
+                    <textarea rows="3" placeholder="Explain your reasoning using triangle angle properties..."></textarea>
+                </div>
+                
+                <div class="answer-box">
+                    <label>Missing Angle:</label>
+                    <input type="text" placeholder="Angle measurement">
+                </div>
+            </div>
+        </div>
+
+        <div class="case">
+            <h2>🔍 Case 4: The Fraction Mystery</h2>
+            <div class="case-content">
+                <p><strong>🚨 CASE BRIEFING:</strong> A baker's recipe has been tampered with! Some fractions were changed, and we need to restore the original recipe.</p>
+                
+                <div class="problem">
+                    <p><strong>Evidence:</strong></p>
+                    <p>The recipe calls for mixing ingredients in this ratio: 2/3 cup flour to 1/4 cup sugar</p>
+                    <p><strong>Question:</strong> If the baker uses 1 full cup of flour, how much sugar should they use to maintain the same ratio?</p>
+                </div>
+                
+                <div class="answer-box">
+                    <label>Ratio Calculation:</label>
+                    <textarea rows="4" placeholder="Show how you calculated the proportional amount..."></textarea>
+                </div>
+                
+                <div class="answer-box">
+                    <label>Amount of Sugar:</label>
+                    <input type="text" placeholder="Cups of sugar needed">
+                </div>
+            </div>
+        </div>
+
+        <div class="case">
+            <h2>🔍 Case 5: The Percentage Puzzle</h2>
+            <div class="case-content">
+                <p><strong>🚨 CASE BRIEFING:</strong> The school store's sales records show suspicious activity. We need to verify the percentage calculations!</p>
+                
+                <div class="problem">
+                    <p><strong>Evidence:</strong></p>
+                    <ul>
+                        <li>A calculator was marked down from $20 to $15</li>
+                        <li>The store claims this is a 25% discount</li>
+                    </ul>
+                    <p><strong>Questions:</strong></p>
+                    <p>1. Is the store's claim correct? What is the actual percentage discount?</p>
+                    <p>2. If you wanted to give a true 30% discount, what should the sale price be?</p>
+                </div>
+                
+                <div class="answer-box">
+                    <label>Percentage Investigation:</label>
+                    <textarea rows="5" placeholder="Calculate the actual discount percentage and the correct 30% sale price..."></textarea>
+                </div>
+                
+                <div class="answer-box">
+                    <label>Final Answers:</label>
+                    <input type="text" placeholder="1. Actual discount percentage: ">
+                    <input type="text" placeholder="2. Correct 30% sale price: " style="margin-top: 5px;">
+                </div>
+            </div>
+        </div>
+
+        <div class="case">
+            <h2>🔍 Case 6: The Algebraic Evidence</h2>
+            <div class="case-content">
+                <p><strong>🚨 CASE BRIEFING:</strong> A coded message was found at the crime scene. The numbers seem to follow an algebraic pattern!</p>
+                
+                <div class="problem">
+                    <p><strong>Evidence:</strong></p>
+                    <p>The coded equation: 3x + 7 = 22</p>
+                    <p><strong>Question:</strong> Solve for x to decode the message!</p>
+                </div>
+                
+                <div class="answer-box">
+                    <label>Step-by-Step Solution:</label>
+                    <textarea rows="4" placeholder="Show each step of solving the equation..."></textarea>
+                </div>
+                
+                <div class="answer-box">
+                    <label>Value of x:</label>
+                    <input type="text" placeholder="x = ">
+                </div>
+            </div>
+        </div>
+
+        <div class="case">
+            <h2>🔍 Case 7: The Data Detective</h2>
+            <div class="case-content">
+                <p><strong>🚨 CASE BRIEFING:</strong> Someone has been manipulating the school lunch survey data. We need to find the median and mode!</p>
+                
+                <div class="problem">
+                    <p><strong>Evidence - Students' favorite lunch choices (number of votes):</strong></p>
+                    <p>Pizza: 12, Burgers: 8, Salad: 5, Tacos: 15, Sandwiches: 8, Pasta: 10</p>
+                    <p><strong>Questions:</strong></p>
+                    <p>1. What is the mode of this data?</p>
+                    <p>2. What is the median number of votes?</p>
+                </div>
+                
+                <div class="answer-box">
+                    <label>Data Analysis:</label>
+                    <textarea rows="4" placeholder="Show how you found the mode and median..."></textarea>
+                </div>
+                
+                <div class="answer-box">
+                    <label>Final Answers:</label>
+                    <input type="text" placeholder="Mode: ">
+                    <input type="text" placeholder="Median: " style="margin-top: 5px;">
+                </div>
+            </div>
+        </div>
+
+        <div class="case">
+            <h2>🔍 Case 8: The Probability Problem</h2>
+            <div class="case-content">
+                <p><strong>🚨 CASE BRIEFING:</strong> A suspect claims their lottery win was just luck, but we need to calculate the probability to verify their story!</p>
+                
+                <div class="problem">
+                    <p><strong>Evidence:</strong></p>
+                    <ul>
+                        <li>A bag contains 5 red balls, 3 blue balls, and 2 green balls</li>
+                        <li>The suspect claims they randomly drew a blue ball on their first try</li>
+                    </ul>
+                    <p><strong>Question:</strong> What was the probability of drawing a blue ball?</p>
+                </div>
+                
+                <div class="answer-box">
+                    <label>Probability Calculation:</label>
+                    <textarea rows="3" placeholder="Show your probability calculation..."></textarea>
+                </div>
+                
+                <div class="answer-box">
+                    <label>Probability (as a fraction and percentage):</label>
+                    <input type="text" placeholder="Fraction: ">
+                    <input type="text" placeholder="Percentage: " style="margin-top: 5px;">
+                </div>
+            </div>
+        </div>
+
+        <div class="case">
+            <h2>🔍 Case 9: The Area Investigation</h2>
+            <div class="case-content">
+                <p><strong>🚨 CASE BRIEFING:</strong> A rectangular garden was vandalized, and we need to calculate how much area was damaged!</p>
+                
+                <div class="problem">
+                    <p><strong>Evidence:</strong></p>
+                    <ul>
+                        <li>The garden is rectangular: length = 12 feet, width = 8 feet</li>
+                        <li>A circular section was destroyed (radius = 3 feet)</li>
+                    </ul>
+                    <p><strong>Question:</strong> What area of the garden is still intact? (Use π ≈ 3.14)</p>
+                </div>
+                
+                <div class="answer-box">
+                    <label>Area Calculations:</label>
+                    <textarea rows="4" placeholder="Calculate the total garden area and subtract the damaged circular area..."></textarea>
+                </div>
+                
+                <div class="answer-box">
+                    <label>Remaining Garden Area:</label>
+                    <input type="text" placeholder="Square feet">
+                </div>
+            </div>
+        </div>
+
+        <div class="case">
+            <h2>🔍 Case 10: The Final Mystery</h2>
+            <div class="case-content">
+                <p><strong>🚨 CASE BRIEFING:</strong> This is the master case! A combination lock was found with a mathematical clue to crack the code.</p>
+                
+                <div class="problem">
+                    <p><strong>Evidence - The lock requires a 3-digit code:</strong></p>
+                    <ul>
+                        <li>First digit: The number of sides in a hexagon</li>
+                        <li>Second digit: The square root of 49</li>
+                        <li>Third digit: Half of 18</li>
+                    </ul>
+                    <p><strong>Question:</strong> What is the 3-digit combination?</p>
+                </div>
+                
+                <div class="answer-box">
+                    <label>Code Breaking Work:</label>
+                    <textarea rows="4" placeholder="Calculate each digit of the combination..."></textarea>
+                </div>
+                
+                <div class="answer-box">
+                    <label>Final Combination:</label>
+                    <input type="text" placeholder="3-digit code">
+                </div>
+            </div>
+        </div>
+
+        <div style="background: #dc2626; color: white; padding: 20px; border-radius: 10px; text-align: center; margin-top: 30px;">
+            <h3>🎓 Congratulations, Detective!</h3>
+            <p>You've completed all cases in the Detective Academy. Submit your work through Google Classroom for your official Detective Certificate!</p>
+        </div>
+    </div>
+</body>
+</html>

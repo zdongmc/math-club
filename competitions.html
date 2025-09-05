@@ -227,7 +227,7 @@
         }
 
 
-        .timeline-visual {
+        .calendar-visual {
             background: white;
             margin: 20px 0;
             padding: 25px;
@@ -236,7 +236,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
-        .timeline-visual h3 {
+        .calendar-visual h3 {
             color: #dc2626;
             margin-bottom: 25px;
             font-size: 1.4rem;
@@ -244,7 +244,7 @@
             position: relative;
         }
 
-        .timeline-visual h3::after {
+        .calendar-visual h3::after {
             content: '';
             position: absolute;
             bottom: -8px;
@@ -256,39 +256,81 @@
             border-radius: 2px;
         }
 
-        .competition-list {
-            max-width: 600px;
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
             margin: 0 auto;
         }
 
-        .timeline-event {
-            margin-bottom: 12px;
+        .month-block {
+            background: #f8f9fa;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .month-header {
+            background: linear-gradient(135deg, #374151 0%, #111827 100%);
+            color: white;
             padding: 15px;
-            border-radius: 10px;
-            border-left: 5px solid;
-            background: white;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .month-events {
+            padding: 15px;
+        }
+
+        .calendar-event {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
         }
 
-        .event-month {
-            font-weight: 600;
+        .calendar-event:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .calendar-event:last-child {
+            margin-bottom: 0;
+        }
+
+        .event-date {
+            font-weight: 700;
             font-size: 0.9rem;
             color: #374151;
-            min-width: 120px;
-            flex-shrink: 0;
+            min-width: 40px;
+            text-align: center;
+            background: rgba(0,0,0,0.05);
+            padding: 4px 8px;
+            border-radius: 6px;
         }
 
-        .event-name {
-            font-weight: 600;
-            font-size: 1rem;
+        .event-info {
             flex-grow: 1;
         }
 
-        .event-detail {
-            font-size: 0.85rem;
+        .event-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #111827;
+            margin-bottom: 2px;
+        }
+
+        .event-time {
+            font-size: 0.8rem;
             color: #6b7280;
             font-style: italic;
         }
@@ -372,23 +414,30 @@
                 text-align: center;
             }
 
-            .timeline-event {
+            .calendar-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .calendar-event {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 8px;
+                padding: 10px;
             }
             
-            .event-month {
+            .event-date {
                 min-width: auto;
-                font-size: 0.85rem;
-            }
-            
-            .event-name {
-                font-size: 0.95rem;
-            }
-            
-            .event-detail {
                 font-size: 0.8rem;
+                align-self: flex-start;
+            }
+            
+            .event-title {
+                font-size: 0.9rem;
+            }
+            
+            .event-time {
+                font-size: 0.75rem;
             }
         }
     </style>
@@ -445,12 +494,12 @@
                                     <div class="notes">Per team (up to 35 students)</div>
                                 </td>
                                 <td>
-                                    <strong>Contest 1:</strong> November 2025<br>
-                                    <strong>Contest 2:</strong> December 2025<br>
-                                    <strong>Contest 3:</strong> January 2026<br>
-                                    <strong>Contest 4:</strong> February 2026<br>
-                                    <strong>Contest 5:</strong> March 2026
-                                    <div class="notes">(Flexible timing within each month)</div>
+                                    <strong>Contest 1:</strong> November 21, 2025<br>
+                                    <strong>Contest 2:</strong> December 19, 2025<br>
+                                    <strong>Contest 3:</strong> January 9, 2026<br>
+                                    <strong>Contest 4:</strong> February 6, 2026<br>
+                                    <strong>Contest 5:</strong> March 6, 2026
+                                    <div class="notes">All contests 3:15-4:00 PM</div>
                                 </td>
                                 <td>
                                     • 5 monthly contests<br>
@@ -486,7 +535,7 @@
                                     <div class="notes">Per student</div>
                                 </td>
                                 <td>
-                                    <strong>School:</strong> Nov 6, 2025 available<br>
+                                    <strong>School:</strong> November 8, 2025 (9:00 AM-12:00 PM)<br>
                                     <strong>Chapter:</strong> Feb 1-28, 2026<br>
                                     <strong>State:</strong> Mar 1-31, 2026<br>
                                     <strong>National:</strong> May 10-11, 2026
@@ -527,8 +576,8 @@
                                     <div class="notes">10 students per bundle</div>
                                 </td>
                                 <td>
-                                    <strong>Jan 22-28, 2026</strong>
-                                    <div class="notes">(competition window)</div>
+                                    <strong>January 23, 2026</strong>
+                                    <div class="notes">3:15-4:00 PM</div>
                                 </td>
                                 <td>
                                     • Multiple choice<br>
@@ -555,24 +604,23 @@
                                     <div class="notes">20 problems, 45-50 minutes</div>
                                 </td>
                                 <td>
-                                    <div class="deadline coming">Fall: Oct 23, 2025</div>
+                                    <div class="deadline" style="text-decoration: line-through; color: #999;">Fall: Oct 23, 2025 (Not participating)</div>
                                     <div class="deadline coming">Spring: Mar 12, 2026</div>
-                                    <div class="notes">Separate registrations required</div>
+                                    <div class="notes">Spring registration only</div>
                                 </td>
                                 <td>
                                     <div class="cost paid">$99 per team</div>
                                     <div class="notes">Team = up to 30 students, same grade & school</div>
                                 </td>
                                 <td>
-                                    <strong>Fall Contest:</strong> Nov 13-26, 2025<br>
-                                    <strong>Spring Contest:</strong> Apr 2-16, 2026
-                                    <div class="notes">(14-day windows)</div>
+                                    <div style="text-decoration: line-through; color: #999;"><strong>Fall Contest:</strong> Nov 13-26, 2025 (Not participating)</div>
+                                    <strong>Spring Contest:</strong> April 10, 2026 (3:15-4:00 PM)
                                 </td>
                                 <td>
-                                    • Semiannual competition<br>
+                                    • Spring competition only<br>
                                     • No calculator allowed<br>
                                     • Top 10% get Honor Roll medals<br>
-                                    • Separate fall & spring registrations
+                                    • Single spring registration
                                 </td>
                             </tr>
                             <tr>
@@ -602,7 +650,7 @@
                                 </td>
                                 <td>
                                     <strong>March 19, 2026</strong>
-                                    <div class="notes">(3rd Thursday of March)</div>
+                                    <div class="notes">3:15 - 4:45 PM</div>
                                 </td>
                                 <td>
                                     • Multiple choice<br>
@@ -636,9 +684,8 @@
                                     <div class="cost free">FREE</div>
                                 </td>
                                 <td>
-                                    <strong>April 14-23, 2026</strong>
-                                    <div class="notes">10-day window</div>
-                                    <div class="notes">Teams choose start time</div>
+                                    <strong>April 17, 2026</strong>
+                                    <div class="notes">3:15 - 4:30 PM</div>
                                 </td>
                                 <td>
                                     • Online competition<br>
@@ -677,15 +724,11 @@
                                     <div class="notes">Per school (unlimited students)</div>
                                 </td>
                                 <td>
-                                    <strong>Qualifying Release 1:</strong> October 2025<br>
-                                    <strong>Qualifying Release 2:</strong> November 2025<br>
-                                    <strong>Qualifying Release 3:</strong> December 2025<br>
-                                    <strong>Qualifying Release 4:</strong> January 2026<br>
-                                    <strong>Qualifying Release 5:</strong> February 2026<br>
-                                    <strong>Qualifying Release 6:</strong> March 2026
-                                    <div class="notes">(Flexible timing within each month)</div>
-                                    <strong>National Championship:</strong> April 11, 2026
-                                    <div class="notes">Houston, Texas</div>
+                                    <strong>Meet 1:</strong> November 14, 2025 (3:15-4:30 PM)<br>
+                                    <strong>Meet 2:</strong> December 12, 2025 (3:15-4:30 PM)<br>
+                                    <strong>Meet 3:</strong> January 16, 2026 (3:15-4:30 PM)<br>
+                                    <strong>Meet 4:</strong> February 13, 2026 (3:15-4:30 PM)<br>
+                                    <div class="notes">75-minute competitions</div>
                                 </td>
                                 <td>
                                     • 6 monthly contests<br>
@@ -698,120 +741,175 @@
                     </table>
                 </div>
 
-                <div class="timeline-visual">
+                <div class="calendar-visual">
                     <h3>📅 Competition Schedule 2025-2026</h3>
-                    <div class="competition-list">
-                        <div class="timeline-event math-league-color">
-                            <div class="event-month">October 2025</div>
-                            <div class="event-name">Math League Qualifying Round #1</div>
+                    <div class="calendar-grid">
+                        <!-- November 2025 -->
+                        <div class="month-block">
+                            <div class="month-header">November 2025</div>
+                            <div class="month-events">
+                                <div class="calendar-event mathcounts-color">
+                                    <span class="event-date">8th</span>
+                                    <div class="event-info">
+                                        <div class="event-title">MATHCOUNTS School</div>
+                                        <div class="event-time">9:00 AM - 12:00 PM</div>
+                                    </div>
+                                </div>
+                                <div class="calendar-event math-league-color">
+                                    <span class="event-date">14th</span>
+                                    <div class="event-info">
+                                        <div class="event-title">Math League Meet 1</div>
+                                        <div class="event-time">3:15 - 4:30 PM</div>
+                                    </div>
+                                </div>
+                                <div class="calendar-event moems-color">
+                                    <span class="event-date">21st</span>
+                                    <div class="event-info">
+                                        <div class="event-title">MOEMS Contest #1</div>
+                                        <div class="event-time">3:15 - 4:00 PM</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="timeline-event moems-color">
-                            <div class="event-month">November 2025</div>
-                            <div class="event-name">MOEMS Contest #1</div>
+                        <!-- December 2025 -->
+                        <div class="month-block">
+                            <div class="month-header">December 2025</div>
+                            <div class="month-events">
+                                <div class="calendar-event math-league-color">
+                                    <span class="event-date">12th</span>
+                                    <div class="event-info">
+                                        <div class="event-title">Math League Meet 2</div>
+                                        <div class="event-time">3:15 - 4:30 PM</div>
+                                    </div>
+                                </div>
+                                <div class="calendar-event moems-color">
+                                    <span class="event-date">19th</span>
+                                    <div class="event-info">
+                                        <div class="event-title">MOEMS Contest #2</div>
+                                        <div class="event-time">3:15 - 4:00 PM</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="timeline-event math-league-color">
-                            <div class="event-month">November 2025</div>
-                            <div class="event-name">Math League Qualifying Round #2</div>
+                        <!-- January 2026 -->
+                        <div class="month-block">
+                            <div class="month-header">January 2026</div>
+                            <div class="month-events">
+                                <div class="calendar-event moems-color">
+                                    <span class="event-date">9th</span>
+                                    <div class="event-info">
+                                        <div class="event-title">MOEMS Contest #3</div>
+                                        <div class="event-time">3:15 - 4:00 PM</div>
+                                    </div>
+                                </div>
+                                <div class="calendar-event math-league-color">
+                                    <span class="event-date">16th</span>
+                                    <div class="event-info">
+                                        <div class="event-title">Math League Meet 3</div>
+                                        <div class="event-time">3:15 - 4:30 PM</div>
+                                    </div>
+                                </div>
+                                <div class="calendar-event amc-color">
+                                    <span class="event-date">23rd</span>
+                                    <div class="event-info">
+                                        <div class="event-title">AMC 8</div>
+                                        <div class="event-time">3:15 - 4:00 PM</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="timeline-event mathcounts-color">
-                            <div class="event-month">November 2025</div>
-                            <div class="event-name">MATHCOUNTS School Competition</div>
-                            <div class="event-detail">November 6 available</div>
+                        <!-- February 2026 -->
+                        <div class="month-block">
+                            <div class="month-header">February 2026</div>
+                            <div class="month-events">
+                                <div class="calendar-event moems-color">
+                                    <span class="event-date">6th</span>
+                                    <div class="event-info">
+                                        <div class="event-title">MOEMS Contest #4</div>
+                                        <div class="event-time">3:14 - 4:00 PM</div>
+                                    </div>
+                                </div>
+                                <div class="calendar-event math-league-color">
+                                    <span class="event-date">13th</span>
+                                    <div class="event-info">
+                                        <div class="event-title">Math League Meet 4</div>
+                                        <div class="event-time">3:15 - 4:30 PM</div>
+                                    </div>
+                                </div>
+                                <div class="calendar-event mathcounts-color">
+                                    <span class="event-date">TBA</span>
+                                    <div class="event-info">
+                                        <div class="event-title">MATHCOUNTS Chapter</div>
+                                        <div class="event-time">Date TBA</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="timeline-event noetic-color">
-                            <div class="event-month">November 2025</div>
-                            <div class="event-name">Noetic Learning Math Contest (Fall)</div>
-                            <div class="event-detail">November 13-26</div>
+                        <!-- March 2026 -->
+                        <div class="month-block">
+                            <div class="month-header">March 2026</div>
+                            <div class="month-events">
+                                <div class="calendar-event moems-color">
+                                    <span class="event-date">6th</span>
+                                    <div class="event-info">
+                                        <div class="event-title">MOEMS Contest #5</div>
+                                        <div class="event-time">3:15 - 4:00 PM</div>
+                                    </div>
+                                </div>
+                                <div class="calendar-event kangaroo-color">
+                                    <span class="event-date">19th</span>
+                                    <div class="event-info">
+                                        <div class="event-title">Math Kangaroo</div>
+                                        <div class="event-time">3:15 - 4:45 PM</div>
+                                    </div>
+                                </div>
+                                <div class="calendar-event mathcounts-color">
+                                    <span class="event-date">TBA</span>
+                                    <div class="event-info">
+                                        <div class="event-title">MATHCOUNTS State</div>
+                                        <div class="event-time">Date TBA</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="timeline-event moems-color">
-                            <div class="event-month">December 2025</div>
-                            <div class="event-name">MOEMS Contest #2</div>
+                        <!-- April 2026 -->
+                        <div class="month-block">
+                            <div class="month-header">April 2026</div>
+                            <div class="month-events">
+                                <div class="calendar-event noetic-color">
+                                    <span class="event-date">10th</span>
+                                    <div class="event-info">
+                                        <div class="event-title">Noetic Spring</div>
+                                        <div class="event-time">3:15 - 4:00 PM</div>
+                                    </div>
+                                </div>
+                                <div class="calendar-event purple-color">
+                                    <span class="event-date">17th</span>
+                                    <div class="event-info">
+                                        <div class="event-title">Purple Comet</div>
+                                        <div class="event-time">3:15 - 4:30 PM</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="timeline-event math-league-color">
-                            <div class="event-month">December 2025</div>
-                            <div class="event-name">Math League Qualifying Round #3</div>
-                        </div>
-
-                        <div class="timeline-event moems-color">
-                            <div class="event-month">January 2026</div>
-                            <div class="event-name">MOEMS Contest #3</div>
-                        </div>
-
-                        <div class="timeline-event math-league-color">
-                            <div class="event-month">January 2026</div>
-                            <div class="event-name">Math League Qualifying Round #4</div>
-                        </div>
-
-                        <div class="timeline-event amc-color">
-                            <div class="event-month">January 2026</div>
-                            <div class="event-name">AMC 8</div>
-                            <div class="event-detail">January 22-28</div>
-                        </div>
-
-                        <div class="timeline-event moems-color">
-                            <div class="event-month">February 2026</div>
-                            <div class="event-name">MOEMS Contest #4</div>
-                        </div>
-
-                        <div class="timeline-event math-league-color">
-                            <div class="event-month">February 2026</div>
-                            <div class="event-name">Math League Qualifying Round #5</div>
-                        </div>
-
-                        <div class="timeline-event mathcounts-color">
-                            <div class="event-month">February 2026</div>
-                            <div class="event-name">MATHCOUNTS Chapter Competitions</div>
-                        </div>
-
-                        <div class="timeline-event moems-color">
-                            <div class="event-month">March 2026</div>
-                            <div class="event-name">MOEMS Contest #5 (Final)</div>
-                        </div>
-
-                        <div class="timeline-event math-league-color">
-                            <div class="event-month">March 2026</div>
-                            <div class="event-name">Math League Qualifying Round #6 (Final)</div>
-                        </div>
-
-                        <div class="timeline-event mathcounts-color">
-                            <div class="event-month">March 2026</div>
-                            <div class="event-name">MATHCOUNTS State Competitions</div>
-                        </div>
-
-                        <div class="timeline-event kangaroo-color">
-                            <div class="event-month">March 2026</div>
-                            <div class="event-name">Math Kangaroo</div>
-                            <div class="event-detail">March 19</div>
-                        </div>
-
-                        <div class="timeline-event noetic-color">
-                            <div class="event-month">April 2026</div>
-                            <div class="event-name">Noetic Learning Math Contest (Spring)</div>
-                            <div class="event-detail">April 2-16</div>
-                        </div>
-
-                        <div class="timeline-event math-league-color">
-                            <div class="event-month">April 2026</div>
-                            <div class="event-name">Math League National Championship</div>
-                            <div class="event-detail">April 11, Houston, Texas</div>
-                        </div>
-
-                        <div class="timeline-event purple-color">
-                            <div class="event-month">April 2026</div>
-                            <div class="event-name">Purple Comet Math Meet</div>
-                            <div class="event-detail">April 14-23 (10-day window)</div>
-                        </div>
-
-                        <div class="timeline-event mathcounts-color">
-                            <div class="event-month">May 2026</div>
-                            <div class="event-name">MATHCOUNTS National Competition</div>
-                            <div class="event-detail">May 10-11, Washington DC</div>
+                        <!-- May 2026 -->
+                        <div class="month-block">
+                            <div class="month-header">May 2026</div>
+                            <div class="month-events">
+                                <div class="calendar-event mathcounts-color">
+                                    <span class="event-date">10-11</span>
+                                    <div class="event-info">
+                                        <div class="event-title">MATHCOUNTS National</div>
+                                        <div class="event-time">Washington DC</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
