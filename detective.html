@@ -2195,42 +2195,42 @@
         }
 
         function checkTrianglesQuestion() {
-            const checkboxItems = document.querySelectorAll('#station5 .question:nth-child(3) .checkbox-item');
+            const checkboxItems = document.querySelectorAll('#station5 .question:nth-child(4) .checkbox-item');
             const correct = answerKeys.station5.triangleTypes;
-            
+
             let score = 0;
             let selectedValues = [];
-            
+
             checkboxItems.forEach(item => {
                 const checkbox = item.querySelector('input[type="checkbox"]');
                 const value = checkbox.getAttribute('data-value');
                 const isSelected = checkbox.checked;
                 const shouldBeSelected = correct.includes(value);
-                
+
                 if (isSelected) selectedValues.push(value);
                 if (isSelected === shouldBeSelected) score += 1;
             });
-            
+
             return checkboxItems.length > 0 ? Math.floor((score / checkboxItems.length) * 10) : 0;
         }
 
         function checkQuadrilateralsQuestion() {
-            const checkboxItems = document.querySelectorAll('#station5 .question:nth-child(4) .checkbox-item');
+            const checkboxItems = document.querySelectorAll('#station5 .question:nth-child(5) .checkbox-item');
             const correct = answerKeys.station5.quadrilaterals;
-            
+
             let score = 0;
             let selectedValues = [];
-            
+
             checkboxItems.forEach(item => {
                 const checkbox = item.querySelector('input[type="checkbox"]');
                 const value = checkbox.getAttribute('data-value');
                 const isSelected = checkbox.checked;
                 const shouldBeSelected = correct.includes(value);
-                
+
                 if (isSelected) selectedValues.push(value);
                 if (isSelected === shouldBeSelected) score += 1;
             });
-            
+
             return checkboxItems.length > 0 ? Math.floor((score / checkboxItems.length) * 10) : 0;
         }
 
