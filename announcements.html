@@ -142,11 +142,41 @@
             opacity: 0.9;
         }
 
+        .archive-toggle {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .archive-button {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(220,38,38,0.3);
+        }
+
+        .archive-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220,38,38,0.4);
+        }
+
+        .archived {
+            display: none;
+        }
+
+        .archived.show {
+            display: block;
+        }
+
         @media (max-width: 768px) {
             .main-content {
                 padding: 20px 15px;
             }
-            
+
             .announcements-grid {
                 grid-template-columns: 1fr;
                 gap: 20px;
@@ -163,6 +193,11 @@
         <main class="main-content">
             <!-- Announcements Section -->
             <section id="announcements" class="section">
+                <div class="archive-toggle">
+                    <button class="archive-button" onclick="toggleArchive()">
+                        <span id="archive-toggle-text">Show Archived Announcements</span>
+                    </button>
+                </div>
                 <div class="announcements-grid">
                     <div class="announcement info">
                         <div class="announcement-header">
@@ -216,7 +251,7 @@
                         </div>
                     </div>
 
-                    <div class="announcement info">
+                    <div class="announcement info archived">
                         <div class="announcement-header">
                             <div class="announcement-icon">📅</div>
                             <div class="announcement-title">Meeting Schedule</div>
@@ -231,7 +266,7 @@
                         </div>
                     </div>
 
-                    <div class="announcement success">
+                    <div class="announcement success archived">
                         <div class="announcement-header">
                             <div class="announcement-icon">🎉</div>
                             <div class="announcement-title">Amazing Response - Over 20 Students Interested!</div>
@@ -242,7 +277,7 @@
                         </div>
                     </div>
 
-                    <div class="announcement info">
+                    <div class="announcement info archived">
                         <div class="announcement-header">
                             <div class="announcement-icon">🎓</div>
                             <div class="announcement-title">Come Meet Prof. Jojo at Back to School Night</div>
@@ -253,7 +288,7 @@
                         </div>
                     </div>
 
-                    <div class="announcement success">
+                    <div class="announcement success archived">
                         <div class="announcement-header">
                             <div class="announcement-icon">🎉</div>
                             <div class="announcement-title">Welcome to Our Math Club!</div>
@@ -264,7 +299,7 @@
                         </div>
                     </div>
 
-                    <div class="announcement urgent">
+                    <div class="announcement urgent archived">
                         <div class="announcement-header">
                             <div class="announcement-icon">⏰</div>
                             <div class="announcement-title">Registration Deadlines</div>
@@ -299,6 +334,23 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadHeader();
         });
+
+        // Toggle archive visibility
+        function toggleArchive() {
+            const archivedAnnouncements = document.querySelectorAll('.archived');
+            const toggleText = document.getElementById('archive-toggle-text');
+            const isShowing = archivedAnnouncements[0].classList.contains('show');
+
+            archivedAnnouncements.forEach(announcement => {
+                if (isShowing) {
+                    announcement.classList.remove('show');
+                } else {
+                    announcement.classList.add('show');
+                }
+            });
+
+            toggleText.textContent = isShowing ? 'Show Archived Announcements' : 'Hide Archived Announcements';
+        }
     </script>
 </body>
 </html>
