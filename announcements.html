@@ -251,7 +251,7 @@
                         </div>
                     </div>
 
-                    <div class="announcement info archived">
+                    <div class="announcement info">
                         <div class="announcement-header">
                             <div class="announcement-icon">📅</div>
                             <div class="announcement-title">Meeting Schedule</div>
@@ -266,7 +266,7 @@
                         </div>
                     </div>
 
-                    <div class="announcement success archived">
+                    <div class="announcement success">
                         <div class="announcement-header">
                             <div class="announcement-icon">🎉</div>
                             <div class="announcement-title">Amazing Response - Over 20 Students Interested!</div>
@@ -277,7 +277,7 @@
                         </div>
                     </div>
 
-                    <div class="announcement info archived">
+                    <div class="announcement info">
                         <div class="announcement-header">
                             <div class="announcement-icon">🎓</div>
                             <div class="announcement-title">Come Meet Prof. Jojo at Back to School Night</div>
@@ -288,7 +288,7 @@
                         </div>
                     </div>
 
-                    <div class="announcement success archived">
+                    <div class="announcement success">
                         <div class="announcement-header">
                             <div class="announcement-icon">🎉</div>
                             <div class="announcement-title">Welcome to Our Math Club!</div>
@@ -299,7 +299,7 @@
                         </div>
                     </div>
 
-                    <div class="announcement urgent archived">
+                    <div class="announcement urgent">
                         <div class="announcement-header">
                             <div class="announcement-icon">⏰</div>
                             <div class="announcement-title">Registration Deadlines</div>
@@ -330,16 +330,32 @@
 
     <script src="header-template.js"></script>
     <script>
-        // Load shared header component
+        // Load shared header component and initialize archive
         document.addEventListener('DOMContentLoaded', function() {
             loadHeader();
+            initializeArchive();
         });
+
+        // Automatically archive announcements beyond the first 3
+        function initializeArchive() {
+            const allAnnouncements = document.querySelectorAll('.announcement');
+
+            // Archive all announcements after the first 3
+            allAnnouncements.forEach((announcement, index) => {
+                if (index >= 3) {
+                    announcement.classList.add('archived');
+                }
+            });
+
+            // Update button visibility
+            updateArchiveButton();
+        }
 
         // Toggle archive visibility
         function toggleArchive() {
             const archivedAnnouncements = document.querySelectorAll('.archived');
             const toggleText = document.getElementById('archive-toggle-text');
-            const isShowing = archivedAnnouncements[0].classList.contains('show');
+            const isShowing = archivedAnnouncements.length > 0 && archivedAnnouncements[0].classList.contains('show');
 
             archivedAnnouncements.forEach(announcement => {
                 if (isShowing) {
@@ -350,6 +366,18 @@
             });
 
             toggleText.textContent = isShowing ? 'Show Archived Announcements' : 'Hide Archived Announcements';
+        }
+
+        // Update archive button visibility
+        function updateArchiveButton() {
+            const archivedCount = document.querySelectorAll('.archived').length;
+            const archiveToggle = document.querySelector('.archive-toggle');
+
+            if (archivedCount === 0) {
+                archiveToggle.style.display = 'none';
+            } else {
+                archiveToggle.style.display = 'block';
+            }
         }
     </script>
 </body>
