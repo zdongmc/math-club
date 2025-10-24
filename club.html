@@ -319,6 +319,51 @@
             font-weight: 600;
         }
 
+        .collapsible-category {
+            transition: all 0.3s ease;
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            margin-bottom: 15px;
+        }
+
+        .category-header:hover h3 {
+            color: #dc2626;
+        }
+
+        .category-header h3 {
+            margin-bottom: 0;
+            transition: color 0.3s ease;
+        }
+
+        .toggle-icon {
+            font-size: 1.2rem;
+            color: #dc2626;
+            transition: transform 0.3s ease;
+            font-weight: bold;
+        }
+
+        .collapsible-category.collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .category-content {
+            max-height: 2000px;
+            overflow: hidden;
+            transition: max-height 0.4s ease, opacity 0.3s ease;
+            opacity: 1;
+        }
+
+        .collapsible-category.collapsed .category-content {
+            max-height: 0;
+            opacity: 0;
+        }
+
         .materials-list {
             display: flex;
             flex-direction: column;
@@ -516,36 +561,18 @@
                         </div>
                         
                         <div class="materials-grid">
-                            <!-- Club Documents -->
-                            <div class="materials-category">
-                                <h3>📋 Club Documents</h3>
-                                <div class="materials-list">
+                            <!-- General Club Information -->
+                            <div class="materials-category collapsible-category collapsed">
+                                <div class="category-header" onclick="toggleCategory(this)">
+                                    <h3>📋 General Club Information</h3>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="materials-list category-content">
                                     <a href="https://drive.google.com/file/d/1xLw2ZKH3ZeXx0Asrb6nxFDR1zOFt9MQv/view?usp=drive_link" class="material-link" target="_blank">
                                         <div class="material-icon">📄</div>
                                         <div class="material-info">
                                             <div class="material-title">Math Club Flyer</div>
                                             <div class="material-desc">Club information and overview</div>
-                                        </div>
-                                    </a>
-                                    <a href="https://drive.google.com/file/d/1SZ4xkDLQ5XZrwuuD011zhc9PtN-WGzMR/view?usp=drive_link" class="material-link" target="_blank">
-                                        <div class="material-icon">📄</div>
-                                        <div class="material-info">
-                                            <div class="material-title">MOEMS Message to Parents</div>
-                                            <div class="material-desc">MOEMS competition information for parents</div>
-                                        </div>
-                                    </a>
-                                    <a href="https://drive.google.com/open?id=1cY-cnbCR4f4VnYQ4f5Xd-2D6iqpq0Ixw&usp=drive_fs" class="material-link" target="_blank">
-                                        <div class="material-icon">📄</div>
-                                        <div class="material-info">
-                                            <div class="material-title">MATHCOUNTS Message to Parents</div>
-                                            <div class="material-desc">MATHCOUNTS competition information for parents</div>
-                                        </div>
-                                    </a>
-                                    <a href="https://drive.google.com/open?id=1jANo9mbhoCvgOPOIXQYjdGGXzM6vLomD&usp=drive_fs" class="material-link" target="_blank">
-                                        <div class="material-icon">📄</div>
-                                        <div class="material-info">
-                                            <div class="material-title">AMC 8 Message to Parents</div>
-                                            <div class="material-desc">AMC 8 competition information for parents</div>
                                         </div>
                                     </a>
                                     <a href="https://drive.google.com/file/d/16d-Bubb8pWW_qb7e6YRuukzgjUjyBUJ7/view?usp=drive_link" class="material-link" target="_blank">
@@ -555,6 +582,40 @@
                                             <div class="material-desc">Comprehensive competition information and schedule</div>
                                         </div>
                                     </a>
+                                </div>
+                            </div>
+
+                            <!-- MOEMS Resources -->
+                            <div class="materials-category collapsible-category collapsed">
+                                <div class="category-header" onclick="toggleCategory(this)">
+                                    <h3>🏆 MOEMS Resources</h3>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="materials-list category-content">
+                                    <a href="https://drive.google.com/file/d/1SZ4xkDLQ5XZrwuuD011zhc9PtN-WGzMR/view?usp=drive_link" class="material-link" target="_blank">
+                                        <div class="material-icon">📄</div>
+                                        <div class="material-info">
+                                            <div class="material-title">MOEMS Message to Parents</div>
+                                            <div class="material-desc">MOEMS competition information for parents</div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- MATHCOUNTS Resources -->
+                            <div class="materials-category collapsible-category collapsed">
+                                <div class="category-header" onclick="toggleCategory(this)">
+                                    <h3>🏆 MATHCOUNTS Resources</h3>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="materials-list category-content">
+                                    <a href="https://drive.google.com/open?id=1cY-cnbCR4f4VnYQ4f5Xd-2D6iqpq0Ixw&usp=drive_fs" class="material-link" target="_blank">
+                                        <div class="material-icon">📄</div>
+                                        <div class="material-info">
+                                            <div class="material-title">MATHCOUNTS Message to Parents</div>
+                                            <div class="material-desc">MATHCOUNTS competition information for parents</div>
+                                        </div>
+                                    </a>
                                     <a href="https://drive.google.com/open?id=1KayzG5KZb7yIpxl76FPdaaKfr7Px70RN&usp=drive_fs" class="material-link" target="_blank">
                                         <div class="material-icon">📊</div>
                                         <div class="material-info">
@@ -562,6 +623,61 @@
                                             <div class="material-desc">MATHCOUNTS competition overview and preparation guide</div>
                                         </div>
                                     </a>
+                                    <a href="https://drive.google.com/file/d/1bpwptQOdLMQuk6c6a3Ge1Xq3aFS2yDE_/view?usp=drive_link" class="material-link" target="_blank">
+                                        <div class="material-icon">📝</div>
+                                        <div class="material-info">
+                                            <div class="material-title">MATHCOUNTS Sample Sprint Round</div>
+                                            <div class="material-desc">Practice problems for Sprint Round format</div>
+                                        </div>
+                                    </a>
+                                    <a href="https://drive.google.com/file/d/1f0OVU4c-w0iar94k4MVivkP40Oc3Ei4Y/view?usp=drive_link" class="material-link" target="_blank">
+                                        <div class="material-icon">📝</div>
+                                        <div class="material-info">
+                                            <div class="material-title">MATHCOUNTS Sample Target Round</div>
+                                            <div class="material-desc">Practice problems for Target Round format</div>
+                                        </div>
+                                    </a>
+                                    <a href="https://drive.google.com/file/d/1fuv5VKxzSM_PPYBkq-JDZnAyGQGSYFKg/view?usp=drive_link" class="material-link" target="_blank">
+                                        <div class="material-icon">📝</div>
+                                        <div class="material-info">
+                                            <div class="material-title">MATHCOUNTS Sample Team Round</div>
+                                            <div class="material-desc">Practice problems for Team Round format</div>
+                                        </div>
+                                    </a>
+                                    <a href="https://drive.google.com/file/d/1bVhXjpEkJyETERuSkk3Cob_6-EOrFw17/view?usp=drive_link" class="material-link" target="_blank">
+                                        <div class="material-icon">✅</div>
+                                        <div class="material-info">
+                                            <div class="material-title">MATHCOUNTS Sample Answer Key</div>
+                                            <div class="material-desc">Answer key for sample practice rounds</div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- AMC 8 Resources -->
+                            <div class="materials-category collapsible-category collapsed">
+                                <div class="category-header" onclick="toggleCategory(this)">
+                                    <h3>🏆 AMC 8 Resources</h3>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="materials-list category-content">
+                                    <a href="https://drive.google.com/open?id=1jANo9mbhoCvgOPOIXQYjdGGXzM6vLomD&usp=drive_fs" class="material-link" target="_blank">
+                                        <div class="material-icon">📄</div>
+                                        <div class="material-info">
+                                            <div class="material-title">AMC 8 Message to Parents</div>
+                                            <div class="material-desc">AMC 8 competition information for parents</div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- MCPS Math League Resources -->
+                            <div class="materials-category collapsible-category collapsed">
+                                <div class="category-header" onclick="toggleCategory(this)">
+                                    <h3>🏆 MCPS Math League Resources</h3>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="materials-list category-content">
                                     <a href="https://docs.google.com/document/d/15gUeBNrU4TpxdXrT4CMJOerN1swkYMK0mWUldaNjDO0/edit?tab=t.0" class="material-link" target="_blank">
                                         <div class="material-icon">📝</div>
                                         <div class="material-info">
@@ -587,7 +703,7 @@
             <section class="section">
                 <div class="quote-section">
                     <div class="quote-content">
-                        "When I entered middle school I was exposed to the first math competition called 'Mathcounts'. I thought this was actually kind of fun. I thought that creativeness, that thinking out of the box was fun. I got addicted to it. Then I decided that I like this. I fell in love with thinking."
+                        "When I entered middle school I was exposed to the first math competition called 'MATHCOUNTS'. I thought this was actually kind of fun. I thought that creativeness, that thinking out of the box was fun. I got addicted to it. Then I decided that I like this. I fell in love with thinking."
                         <div class="quote-author">~ Po-Shen Loh, 4-time Gold Medal Math Olympiad USA Coach</div>
                     </div>
                 </div>
@@ -615,6 +731,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadHeader();
         });
+
+        // Toggle category collapse/expand
+        function toggleCategory(header) {
+            const category = header.parentElement;
+            category.classList.toggle('collapsed');
+        }
     </script>
 </body>
 </html>
