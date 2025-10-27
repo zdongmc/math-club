@@ -15,7 +15,7 @@ const HEADER_HTML = `
                 <a class="nav-item" href="announcements.html" data-page="announcements">📢 Announcements</a>
                 <a class="nav-item" href="club.html" data-page="club">ℹ️ Club Info</a>
                 <a class="nav-item" href="competitions.html" data-page="competitions">📅 Competition Info</a>
-                <a class="nav-item" href="registration.html" data-page="registration">📝 Join the Club</a>
+                <a class="nav-item" href="registration.html" data-page="registration">📝 Registration & Records</a>
             </nav>
         </div>
     </header>

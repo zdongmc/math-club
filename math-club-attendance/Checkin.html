@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Club Parent Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        h1 {
+            color: #dc2626;
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 0;
+        }
+
+        .lookup-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .lookup-form {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #dc2626;
+        }
+
+        .btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: #991b1b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
+        }
+
+        .results-section.show {
+            display: block;
+        }
+
+        .student-header {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .student-name {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .student-id {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            color: #dc2626;
+            margin: 25px 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #dc2626;
+        }
+
+        .info-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .info-value {
+            color: #333;
+        }
+
+        .stat-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .attendance-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            max-height: 150px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .attendance-date {
+            background: #059669;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .competition-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .competition-card {
+            background: #f0f9ff;
+            border: 2px solid #bfdbfe;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .competition-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #dc2626;
+            margin-bottom: 8px;
+        }
+
+        .competition-details {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .competition-dates {
+            display: grid;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .competition-date-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            gap: 10px;
+        }
+
+        .competition-date-item.signed-up {
+            background: #d1fae5;
+        }
+
+        .competition-date-item.not-signed-up {
+            background: #fee;
+        }
+
+        .date-status {
+            font-weight: bold;
+            min-width: 40px;
+        }
+
+        .date-status.yes {
+            color: #059669;
+        }
+
+        .date-status.no {
+            color: #dc2626;
+        }
+
+        .date-label {
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .competition-status {
+            display: inline-block;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        .competition-status.signed-up {
+            background: #059669;
+        }
+
+        .competition-status.not-signed-up {
+            background: #dc2626;
+        }
+
+        .message {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .error-message {
+            background: #fef2f2;
+            border: 2px solid #dc2626;
+            color: #dc2626;
+        }
+
+        .info-message {
+            background: #f0f9ff;
+            border: 2px solid #3b82f6;
+            color: #1e40af;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #dc2626;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            .lookup-form {
+                flex-direction: column;
+            }
+
+            .form-group {
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .stat-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Math Club Parent Portal</h1>
+            <p class="subtitle">View your student's attendance and competition records</p>
+        </div>
+
+        <!-- Lookup Section -->
+        <div class="lookup-section">
+            <div class="lookup-form">
+                <div class="form-group">
+                    <label for="mcpsId">Student's MCPS ID Number</label>
+                    <input type="text"
+                           id="mcpsId"
+                           placeholder="Enter MCPS ID"
+                           pattern="[0-9]+">
+                </div>
+                <button class="btn" onclick="lookupStudent()" id="lookupBtn">
+                    View Records
+                </button>
+            </div>
+            <div id="lookupMessage"></div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection">
+            <div id="studentResults"></div>
+        </div>
+    </div>
+
+    <script>
+        // Allow Enter key to submit
+        document.getElementById('mcpsId').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                lookupStudent();
+            }
+        });
+
+        function showMessage(message, isError = false) {
+            const messageDiv = document.getElementById('lookupMessage');
+            messageDiv.innerHTML = `
+                <div class="message ${isError ? 'error-message' : 'info-message'}">
+                    ${message}
+                </div>
+            `;
+
+            if (!isError) {
+                setTimeout(() => {
+                    messageDiv.innerHTML = '';
+                }, 5000);
+            }
+        }
+
+        function showLoading(show) {
+            const btn = document.getElementById('lookupBtn');
+            if (show) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner"></span> Loading...';
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = 'View Records';
+            }
+        }
+
+        function lookupStudent() {
+            const mcpsId = document.getElementById('mcpsId').value.trim();
+
+            if (!mcpsId) {
+                showMessage('Please enter your student\'s MCPS ID number', true);
+                return;
+            }
+
+            if (!/^\d+$/.test(mcpsId)) {
+                showMessage('MCPS ID must contain only digits', true);
+                return;
+            }
+
+            showLoading(true);
+            document.getElementById('lookupMessage').innerHTML = '';
+            document.getElementById('resultsSection').classList.remove('show');
+
+            google.script.run
+                .withSuccessHandler(displayResults)
+                .withFailureHandler(function(error) {
+                    showLoading(false);
+                    showMessage('Error: ' + error.message, true);
+                })
+                .lookupStudentByMcpsId(mcpsId);
+        }
+
+        function displayResults(result) {
+            showLoading(false);
+
+            if (!result || !result.success) {
+                const message = result && result.message ? result.message : 'An error occurred. Please try again.';
+                showMessage(message, true);
+                document.getElementById('resultsSection').classList.remove('show');
+                return;
+            }
+
+            const student = result.student;
+            const attendance = result.attendance;
+            const competitions = result.competitions;
+
+            let html = `
+                <div class="student-header">
+                    <div class="student-name">${escapeHtml(student.name)}</div>
+                    <div class="student-id">MCPS ID: ${escapeHtml(student.mcpsId)}</div>
+                </div>
+
+                <!-- Stats Overview -->
+                <div class="stat-cards">
+                    <div class="stat-card">
+                        <div class="stat-number">${attendance.totalMeetings}</div>
+                        <div class="stat-label">Club Meetings Attended</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${competitions.filter(c => c.signedUp).length}</div>
+                        <div class="stat-label">Competitions Signed Up</div>
+                    </div>
+                </div>
+
+                <!-- Attendance History -->
+                <h2 class="section-title">📅 Attendance History</h2>
+            `;
+
+            if (attendance.dates.length === 0) {
+                html += `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📅</div>
+                        <p>No attendance records yet</p>
+                    </div>
+                `;
+            } else {
+                html += '<div class="attendance-list">';
+                // Sort by date (most recent first)
+                attendance.dates.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                attendance.dates.forEach(record => {
+                    html += `<div class="attendance-date">${escapeHtml(record.date)}</div>`;
+                });
+                html += '</div>';
+            }
+
+            // Competition Sign-ups
+            html += '<h2 class="section-title">🏆 Competition Sign-ups</h2>';
+            html += '<div class="competition-list">';
+
+            competitions.forEach(comp => {
+                html += `<div class="competition-card"><div class="competition-name">${escapeHtml(comp.name)}</div>`;
+
+                // Special handling for MOEMS and Math League - parse individual dates
+                if ((comp.name === 'MOEMS' || comp.name === 'MCPS Math League') && comp.signedUp) {
+                    html += parseCompetitionDates(comp.name, comp.details);
+                } else if (comp.signedUp) {
+                    // For other signed-up competitions, show details
+                    html += `<div class="competition-details">${escapeHtml(comp.details)}</div>`;
+                    html += `<span class="competition-status signed-up">${escapeHtml(comp.status)}</span>`;
+                } else {
+                    // Not signed up - show red button
+                    html += `<span class="competition-status not-signed-up">${escapeHtml(comp.status)}</span>`;
+                }
+
+                html += `</div>`;
+            });
+            html += '</div>';
+
+            document.getElementById('studentResults').innerHTML = html;
+            document.getElementById('resultsSection').classList.add('show');
+        }
+
+        function parseCompetitionDates(competitionName, details) {
+            let html = '<div class="competition-dates">';
+
+            if (competitionName === 'MOEMS') {
+                // All possible MOEMS contests
+                const allContests = [
+                    { num: 1, name: 'Contest #1', date: 'November 21, 2025' },
+                    { num: 2, name: 'Contest #2', date: 'December 19, 2025' },
+                    { num: 3, name: 'Contest #3', date: 'January 9, 2026' },
+                    { num: 4, name: 'Contest #4', date: 'February 6, 2026' },
+                    { num: 5, name: 'Contest #5', date: 'March 6, 2026' }
+                ];
+
+                allContests.forEach(contest => {
+                    const signedUp = details.includes(contest.name);
+                    const status = signedUp ? 'Yes' : 'No';
+                    const statusClass = signedUp ? 'yes' : 'no';
+                    const itemClass = signedUp ? 'signed-up' : 'not-signed-up';
+
+                    html += `
+                        <div class="competition-date-item ${itemClass}">
+                            <div class="date-status ${statusClass}">${status}</div>
+                            <div class="date-label">${escapeHtml(contest.name)} - ${escapeHtml(contest.date)}</div>
+                        </div>
+                    `;
+                });
+            } else if (competitionName === 'MCPS Math League') {
+                // All possible Math League meets
+                const allMeets = [
+                    { num: 1, name: 'Meet #1', date: 'November 14, 2025' },
+                    { num: 2, name: 'Meet #2', date: 'December 12, 2025' },
+                    { num: 3, name: 'Meet #3', date: 'January 16, 2026' },
+                    { num: 4, name: 'Meet #4', date: 'February 13, 2026' }
+                ];
+
+                allMeets.forEach(meet => {
+                    const signedUp = details.includes(meet.name);
+                    const status = signedUp ? 'Yes' : 'No';
+                    const statusClass = signedUp ? 'yes' : 'no';
+                    const itemClass = signedUp ? 'signed-up' : 'not-signed-up';
+
+                    html += `
+                        <div class="competition-date-item ${itemClass}">
+                            <div class="date-status ${statusClass}">${status}</div>
+                            <div class="date-label">${escapeHtml(meet.name)} - ${escapeHtml(meet.date)}</div>
+                        </div>
+                    `;
+                });
+            }
+
+            html += '</div>';
+            return html;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
