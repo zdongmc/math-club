@@ -273,9 +273,13 @@
             background: #fee;
         }
 
+        .competition-date-item.waitlisted {
+            background: #fef3c7;
+        }
+
         .date-status {
             font-weight: bold;
-            min-width: 40px;
+            min-width: 70px;
         }
 
         .date-status.yes {
@@ -284,6 +288,10 @@
 
         .date-status.no {
             color: #dc2626;
+        }
+
+        .date-status.waitlisted {
+            color: #d97706;
         }
 
         .date-label {
@@ -307,6 +315,78 @@
 
         .competition-status.not-signed-up {
             background: #dc2626;
+        }
+
+        .competition-status.waitlisted {
+            background: #f59e0b;
+        }
+
+        .forms-section {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .forms-section.all-complete {
+            background: #d1fae5;
+            border-color: #059669;
+        }
+
+        .forms-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .form-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .form-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-complete {
+            color: #059669;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .form-incomplete {
+            display: inline-block;
+            background: #dc2626;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-incomplete:hover {
+            background: #991b1b;
+            transform: translateY(-2px);
         }
 
         .message {
@@ -490,13 +570,63 @@
             const student = result.student;
             const attendance = result.attendance;
             const competitions = result.competitions;
+            const forms = result.forms || null;
 
             let html = `
                 <div class="student-header">
                     <div class="student-name">${escapeHtml(student.name)}</div>
                     <div class="student-id">MCPS ID: ${escapeHtml(student.mcpsId)}</div>
                 </div>
+            `;
 
+            // Forms Section
+            if (forms) {
+                const allComplete = forms.clubRegistration.completed && forms.extracurricularActivities.completed;
+                const sectionClass = allComplete ? 'forms-section all-complete' : 'forms-section';
+
+                html += `
+                    <div class="${sectionClass}">
+                        <div class="forms-title">📋 Required Forms</div>
+                `;
+
+                // Club Registration Form
+                html += `
+                    <div class="form-item">
+                        <div class="form-name">${escapeHtml(forms.clubRegistration.name)}</div>
+                        <div class="form-status">
+                `;
+                if (forms.clubRegistration.completed) {
+                    html += `<span class="form-complete">✓ Completed</span>`;
+                } else {
+                    html += `<a href="${forms.clubRegistration.url}" target="_blank" class="form-incomplete">Complete Form</a>`;
+                }
+                html += `
+                        </div>
+                    </div>
+                `;
+
+                // Extracurricular Activities Form
+                html += `
+                    <div class="form-item">
+                        <div class="form-name">${escapeHtml(forms.extracurricularActivities.name)}</div>
+                        <div class="form-status">
+                `;
+                if (forms.extracurricularActivities.completed) {
+                    html += `<span class="form-complete">✓ Completed</span>`;
+                } else {
+                    html += `<a href="${forms.extracurricularActivities.url}" target="_blank" class="form-incomplete">Complete Form</a>`;
+                }
+                html += `
+                        </div>
+                    </div>
+                `;
+
+                html += `
+                    </div>
+                `;
+            }
+
+            html += `
                 <!-- Stats Overview -->
                 <div class="stat-cards">
                     <div class="stat-card">
@@ -540,11 +670,12 @@
 
                 // Special handling for MOEMS and Math League - parse individual dates
                 if ((comp.name === 'MOEMS' || comp.name === 'MCPS Math League') && comp.signedUp) {
-                    html += parseCompetitionDates(comp.name, comp.details);
+                    html += parseCompetitionDates(comp.name, comp.details, comp.waitlisted);
                 } else if (comp.signedUp) {
                     // For other signed-up competitions, show details
                     html += `<div class="competition-details">${escapeHtml(comp.details)}</div>`;
-                    html += `<span class="competition-status signed-up">${escapeHtml(comp.status)}</span>`;
+                    const statusClass = comp.waitlisted ? 'waitlisted' : 'signed-up';
+                    html += `<span class="competition-status ${statusClass}">${escapeHtml(comp.status)}</span>`;
                 } else {
                     // Not signed up - show red button
                     html += `<span class="competition-status not-signed-up">${escapeHtml(comp.status)}</span>`;
@@ -558,7 +689,7 @@
             document.getElementById('resultsSection').classList.add('show');
         }
 
-        function parseCompetitionDates(competitionName, details) {
+        function parseCompetitionDates(competitionName, details, isWaitlisted) {
             let html = '<div class="competition-dates">';
 
             if (competitionName === 'MOEMS') {
@@ -572,17 +703,27 @@
                 ];
 
                 allContests.forEach(contest => {
-                    const signedUp = details.includes(contest.name);
-                    const status = signedUp ? 'Yes' : 'No';
-                    const statusClass = signedUp ? 'yes' : 'no';
-                    const itemClass = signedUp ? 'signed-up' : 'not-signed-up';
+                    if (isWaitlisted) {
+                        // If waitlisted for entire competition, all contests are waitlisted
+                        html += `
+                            <div class="competition-date-item waitlisted">
+                                <div class="date-status waitlisted">Waitlisted</div>
+                                <div class="date-label">${escapeHtml(contest.name)} - ${escapeHtml(contest.date)}</div>
+                            </div>
+                        `;
+                    } else {
+                        const signedUp = details.includes(contest.name);
+                        const status = signedUp ? 'Yes' : 'No';
+                        const statusClass = signedUp ? 'yes' : 'no';
+                        const itemClass = signedUp ? 'signed-up' : 'not-signed-up';
 
-                    html += `
-                        <div class="competition-date-item ${itemClass}">
-                            <div class="date-status ${statusClass}">${status}</div>
-                            <div class="date-label">${escapeHtml(contest.name)} - ${escapeHtml(contest.date)}</div>
-                        </div>
-                    `;
+                        html += `
+                            <div class="competition-date-item ${itemClass}">
+                                <div class="date-status ${statusClass}">${status}</div>
+                                <div class="date-label">${escapeHtml(contest.name)} - ${escapeHtml(contest.date)}</div>
+                            </div>
+                        `;
+                    }
                 });
             } else if (competitionName === 'MCPS Math League') {
                 // All possible Math League meets
@@ -594,17 +735,27 @@
                 ];
 
                 allMeets.forEach(meet => {
-                    const signedUp = details.includes(meet.name);
-                    const status = signedUp ? 'Yes' : 'No';
-                    const statusClass = signedUp ? 'yes' : 'no';
-                    const itemClass = signedUp ? 'signed-up' : 'not-signed-up';
+                    if (isWaitlisted) {
+                        // If waitlisted for entire competition, all meets are waitlisted
+                        html += `
+                            <div class="competition-date-item waitlisted">
+                                <div class="date-status waitlisted">Waitlisted</div>
+                                <div class="date-label">${escapeHtml(meet.name)} - ${escapeHtml(meet.date)}</div>
+                            </div>
+                        `;
+                    } else {
+                        const signedUp = details.includes(meet.name);
+                        const status = signedUp ? 'Yes' : 'No';
+                        const statusClass = signedUp ? 'yes' : 'no';
+                        const itemClass = signedUp ? 'signed-up' : 'not-signed-up';
 
-                    html += `
-                        <div class="competition-date-item ${itemClass}">
-                            <div class="date-status ${statusClass}">${status}</div>
-                            <div class="date-label">${escapeHtml(meet.name)} - ${escapeHtml(meet.date)}</div>
-                        </div>
-                    `;
+                        html += `
+                            <div class="competition-date-item ${itemClass}">
+                                <div class="date-status ${statusClass}">${status}</div>
+                                <div class="date-label">${escapeHtml(meet.name)} - ${escapeHtml(meet.date)}</div>
+                            </div>
+                        `;
+                    }
                 });
             }
 

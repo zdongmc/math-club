@@ -2,6 +2,7 @@
 const REGISTRATION_SHEET_NAME = 'Form Responses 1';
 const COMPETITION_SIGNUP_SHEET_NAME = 'Form Responses 2';
 const ATTENDANCE_SHEET_NAME = 'Attendance Records';
+const SCHOOL_LIST_SHEET_NAME = 'School List';
 
 function doGet() {
   return HtmlService.createTemplateFromFile('Checkin')
@@ -397,6 +398,86 @@ function getCompetitionSignupSheet() {
   return getSpreadsheet().getSheetByName(COMPETITION_SIGNUP_SHEET_NAME);
 }
 
+function getSchoolListSheet() {
+  return getSpreadsheet().getSheetByName(SCHOOL_LIST_SHEET_NAME);
+}
+
+function checkFormCompletion(mcpsId, studentName) {
+  try {
+    const forms = {
+      clubRegistration: {
+        completed: false,
+        name: 'Club Registration Form',
+        url: 'https://forms.gle/PMdmzV79ZZd5jBso6'
+      },
+      extracurricularActivities: {
+        completed: false,
+        name: 'Extracurricular Activities Form',
+        url: 'https://docs.google.com/forms/d/e/1FAIpQLSfublOE3YoXop_RTQn0IykEI1EOZZgPlx_Fn2Or0xD-ucSYZw/viewform'
+      }
+    };
+
+    const cleanStudentName = (studentName || '').toString().trim().toLowerCase();
+
+    // Check Club Registration Form (Form Responses 1)
+    // Look for student by name (columns B=First Name, C=Last Name)
+    const registrationSheet = getRegistrationSheet();
+    if (registrationSheet && registrationSheet.getLastRow() > 1) {
+      const registrationData = registrationSheet.getDataRange().getValues();
+
+      for (let i = 1; i < registrationData.length; i++) {
+        const row = registrationData[i];
+        const firstName = (row[1] || '').toString().trim();
+        const lastName = (row[2] || '').toString().trim();
+        const fullName = `${firstName} ${lastName}`.trim().toLowerCase();
+
+        if (fullName === cleanStudentName) {
+          forms.clubRegistration.completed = true;
+          break;
+        }
+      }
+    }
+
+    // Check Extracurricular Activities Form (School List)
+    // Look for student by name (columns C=Last Name, D=First Name) or ID (column B)
+    const schoolListSheet = getSchoolListSheet();
+    if (schoolListSheet && schoolListSheet.getLastRow() > 1) {
+      const schoolListData = schoolListSheet.getDataRange().getValues();
+
+      for (let i = 1; i < schoolListData.length; i++) {
+        const row = schoolListData[i];
+        const studentId = (row[1] || '').toString().trim();
+        const lastName = (row[2] || '').toString().trim();
+        const firstName = (row[3] || '').toString().trim();
+        const fullName = `${firstName} ${lastName}`.trim().toLowerCase();
+
+        // Match by either name or student ID
+        if (fullName === cleanStudentName || studentId === mcpsId.toString().trim()) {
+          forms.extracurricularActivities.completed = true;
+          break;
+        }
+      }
+    }
+
+    return forms;
+
+  } catch (error) {
+    Logger.log('Error checking form completion: ' + error.toString());
+    return {
+      clubRegistration: {
+        completed: false,
+        name: 'Club Registration Form',
+        url: 'https://forms.gle/PMdmzV79ZZd5jBso6'
+      },
+      extracurricularActivities: {
+        completed: false,
+        name: 'Extracurricular Activities Form',
+        url: 'https://docs.google.com/forms/d/e/1FAIpQLSfublOE3YoXop_RTQn0IykEI1EOZZgPlx_Fn2Or0xD-ucSYZw/viewform'
+      }
+    };
+  }
+}
+
 // TEST FUNCTION - Run this directly in Apps Script editor
 function testLookup190949() {
   Logger.log('=== Starting test for MCPS ID 190949 ===');
@@ -468,6 +549,33 @@ function lookupStudentByMcpsId(mcpsId) {
       }
     }
 
+    // If still not found, try School List
+    if (!studentInfo) {
+      Logger.log('Checking School List...');
+      const schoolListSheet = getSchoolListSheet();
+      if (schoolListSheet && schoolListSheet.getLastRow() > 1) {
+        const schoolListData = schoolListSheet.getDataRange().getValues();
+
+        for (let i = 1; i < schoolListData.length; i++) {
+          const row = schoolListData[i];
+          // Column B is Student ID
+          const studentId = row[1] ? row[1].toString().trim() : '';
+
+          if (studentId === mcpsIdStr) {
+            const firstName = (row[2] || '').toString().trim();
+            const lastName = (row[3] || '').toString().trim();
+            studentInfo = {
+              name: `${firstName} ${lastName}`.trim(),
+              mcpsId: mcpsIdStr,
+              email: `${mcpsIdStr}@mcpsmd.net`
+            };
+            Logger.log('Found in School List: ' + studentInfo.name);
+            break;
+          }
+        }
+      }
+    }
+
     // If still not found, try competition signup
     if (!studentInfo) {
       Logger.log('Checking Form Responses 2...');
@@ -522,11 +630,22 @@ function lookupStudentByMcpsId(mcpsId) {
       Logger.log('Error getting competition signups: ' + err.toString());
     }
 
+    // Check form completion status
+    let formCompletion = null;
+    try {
+      Logger.log('Checking form completion for: ' + mcpsIdStr);
+      formCompletion = checkFormCompletion(mcpsIdStr, studentInfo.name);
+      Logger.log('Form completion status retrieved');
+    } catch (err) {
+      Logger.log('Error checking form completion: ' + err.toString());
+    }
+
     const result = {
       success: true,
       student: studentInfo,
       attendance: attendanceHistory,
-      competitions: competitionSignups
+      competitions: competitionSignups,
+      forms: formCompletion
     };
 
     Logger.log('Returning result: ' + JSON.stringify(result));
@@ -628,10 +747,10 @@ function getStudentCompetitionSignups(mcpsId) {
 
     // Initialize all competitions as not signed up
     const competitions = [
-      { name: 'MATHCOUNTS', details: '', status: 'Not Signed Up', signedUp: false },
-      { name: 'MCPS Math League', details: '', status: 'Not Signed Up', signedUp: false },
-      { name: 'MOEMS', details: '', status: 'Not Signed Up', signedUp: false },
-      { name: 'AMC 8', details: '', status: 'Not Signed Up', signedUp: false }
+      { name: 'MATHCOUNTS', details: '', status: 'Not Signed Up', signedUp: false, waitlisted: false },
+      { name: 'MCPS Math League', details: '', status: 'Not Signed Up', signedUp: false, waitlisted: false },
+      { name: 'MOEMS', details: '', status: 'Not Signed Up', signedUp: false, waitlisted: false },
+      { name: 'AMC 8', details: '', status: 'Not Signed Up', signedUp: false, waitlisted: false }
     ];
 
     if (!sheet || sheet.getLastRow() <= 1) {
@@ -648,47 +767,68 @@ function getStudentCompetitionSignups(mcpsId) {
       const studentId = (row[2] || '').toString().trim();
 
       if (studentId === mcpsId.toString().trim()) {
+        // Helper function to check if value indicates waitlist status
+        // Checks for "(Waitlisted)" or "waitlist" anywhere in the string
+        function isOnWaitlist(value) {
+          if (!value) return false;
+          const lowerValue = value.toString().toLowerCase();
+          return lowerValue.includes('waitlist') || /\(waitlist(ed)?\)/i.test(value.toString());
+        }
+
         // Parse MATHCOUNTS
         const mathcounts = (row[6] || '').toString();
-        if (mathcounts && !mathcounts.toLowerCase().includes('no')) {
+        const mathcountsLower = mathcounts.toLowerCase();
+        if (mathcounts && !mathcountsLower.includes('no') && !mathcountsLower.includes('will not attend')) {
+          const isWaitlisted = isOnWaitlist(mathcounts);
+          Logger.log('MATHCOUNTS value: "' + mathcounts + '", isWaitlisted: ' + isWaitlisted);
           competitions[0] = {
             name: 'MATHCOUNTS',
-            details: mathcounts,
-            status: 'Signed Up',
-            signedUp: true
+            details: 'Yes - I will attend the School Competition on November 8th and if selected, pay the $40 fee to attend the Chapter Competition',
+            status: isWaitlisted ? 'Waitlisted' : 'Signed Up',
+            signedUp: true,
+            waitlisted: isWaitlisted
           };
         }
 
         // Parse Math League
         const mathLeague = (row[10] || '').toString();
         if (mathLeague && !mathLeague.toLowerCase().includes('will not attend')) {
+          const isWaitlisted = isOnWaitlist(mathLeague);
+          Logger.log('Math League value: "' + mathLeague + '", isWaitlisted: ' + isWaitlisted);
           competitions[1] = {
             name: 'MCPS Math League',
             details: mathLeague,
-            status: 'Signed Up',
-            signedUp: true
+            status: isWaitlisted ? 'Waitlisted' : 'Signed Up',
+            signedUp: true,
+            waitlisted: isWaitlisted
           };
         }
 
         // Parse MOEMS
         const moems = (row[8] || '').toString();
         if (moems && !moems.toLowerCase().includes('will not attend')) {
+          const isWaitlisted = isOnWaitlist(moems);
+          Logger.log('MOEMS value: "' + moems + '", isWaitlisted: ' + isWaitlisted);
           competitions[2] = {
             name: 'MOEMS',
             details: moems,
-            status: 'Signed Up',
-            signedUp: true
+            status: isWaitlisted ? 'Waitlisted' : 'Signed Up',
+            signedUp: true,
+            waitlisted: isWaitlisted
           };
         }
 
         // Parse AMC 8
         const amc8 = (row[9] || '').toString();
         if (amc8 && amc8.toLowerCase().includes('yes')) {
+          const isWaitlisted = isOnWaitlist(amc8);
+          Logger.log('AMC 8 value: "' + amc8 + '", isWaitlisted: ' + isWaitlisted);
           competitions[3] = {
             name: 'AMC 8',
-            details: 'January 23, 2025',
-            status: 'Signed Up',
-            signedUp: true
+            details: 'January 23, 2026',
+            status: isWaitlisted ? 'Waitlisted' : 'Signed Up',
+            signedUp: true,
+            waitlisted: isWaitlisted
           };
         }
 
@@ -702,10 +842,10 @@ function getStudentCompetitionSignups(mcpsId) {
   } catch (error) {
     console.error('Error getting competition signups:', error);
     return [
-      { name: 'MATHCOUNTS', details: '', status: 'Not Signed Up', signedUp: false },
-      { name: 'MCPS Math League', details: '', status: 'Not Signed Up', signedUp: false },
-      { name: 'MOEMS', details: '', status: 'Not Signed Up', signedUp: false },
-      { name: 'AMC 8', details: '', status: 'Not Signed Up', signedUp: false }
+      { name: 'MATHCOUNTS', details: '', status: 'Not Signed Up', signedUp: false, waitlisted: false },
+      { name: 'MCPS Math League', details: '', status: 'Not Signed Up', signedUp: false, waitlisted: false },
+      { name: 'MOEMS', details: '', status: 'Not Signed Up', signedUp: false, waitlisted: false },
+      { name: 'AMC 8', details: '', status: 'Not Signed Up', signedUp: false, waitlisted: false }
     ];
   }
 }
