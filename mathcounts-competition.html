@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MATHCOUNTS School Competition - November 8, 2025</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            padding: 60px 40px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .hero-info {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .hero-location {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        /* Quick Facts Box */
+        .quick-facts {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #dc2626;
+        }
+
+        .quick-facts h2 {
+            color: #dc2626;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .facts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .fact-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .fact-label {
+            font-weight: bold;
+            color: #dc2626;
+            margin-bottom: 5px;
+        }
+
+        .fact-value {
+            color: #333;
+        }
+
+        /* Section Styling */
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .section h2 {
+            color: #dc2626;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #dc2626;
+        }
+
+        .section h3 {
+            color: #991b1b;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 25px;
+            padding-left: 25px;
+            border-left: 3px solid #dc2626;
+        }
+
+        .timeline-item:last-child {
+            border-left: none;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 0;
+            width: 13px;
+            height: 13px;
+            background: #dc2626;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #dc2626;
+        }
+
+        .timeline-time {
+            font-weight: bold;
+            color: #dc2626;
+            margin-bottom: 5px;
+        }
+
+        .timeline-desc {
+            color: #555;
+        }
+
+        /* Round Cards */
+        .rounds-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .rounds-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .round-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border-top: 4px solid #dc2626;
+        }
+
+        .round-card h4 {
+            color: #dc2626;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .round-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .round-card li {
+            padding: 5px 0;
+            color: #555;
+        }
+
+        .round-card li::before {
+            content: '• ';
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        /* Checklist */
+        .checklist {
+            background: #f0f9ff;
+            border: 2px solid #3b82f6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .checklist h3 {
+            color: #1e40af;
+            margin-top: 0;
+        }
+
+        .checklist ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .checklist li {
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .checklist li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #059669;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* Alert Boxes */
+        .alert {
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid;
+        }
+
+        .alert-important {
+            background: #fef2f2;
+            border-color: #dc2626;
+            color: #991b1b;
+        }
+
+        .alert-info {
+            background: #eff6ff;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            border-color: #059669;
+            color: #047857;
+        }
+
+        .alert strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        /* Prohibited Items */
+        .prohibited-list {
+            background: #fef2f2;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .prohibited-list h4 {
+            color: #dc2626;
+            margin-bottom: 10px;
+        }
+
+        .prohibited-list ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .prohibited-list li {
+            padding: 5px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #991b1b;
+        }
+
+        .prohibited-list li::before {
+            content: '✗';
+            position: absolute;
+            left: 0;
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        /* Scoring Box */
+        .scoring-box {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .scoring-box h3 {
+            color: white;
+            margin-top: 0;
+        }
+
+        .scoring-formula {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+        }
+
+        .scoring-note {
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        /* Contact Box */
+        .contact-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .contact-box h3 {
+            color: #dc2626;
+            margin-top: 0;
+        }
+
+        .contact-item {
+            padding: 8px 0;
+        }
+
+        .contact-label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+            .section, .quick-facts {
+                box-shadow: none;
+                page-break-inside: avoid;
+            }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+            .hero-info {
+                font-size: 1.1rem;
+            }
+            .rounds-grid {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1>🏆 MATHCOUNTS School Competition</h1>
+            <div class="hero-info">Saturday, November 8, 2025 | 8:30 AM - 2:00 PM</div>
+            <div class="hero-location">Hallie Wells Middle School<br>11701 Little Seneca Pkwy, Clarksburg, MD 20871</div>
+        </div>
+
+        <!-- Inaugural Competition Note -->
+        <div style="background: white; border-radius: 10px; padding: 15px 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 4px solid #059669; font-size: 0.95rem;">
+            <strong style="color: #059669;">🎉 Inaugural Competition!</strong> This is the first-ever MATHCOUNTS School Competition at HWMS. Special thanks to <strong>Dr. Carla McNeal</strong> (Principal) and <strong>Mr. Christopher Paskvan</strong> (Vice Principal) for their support.
+        </div>
+
+        <!-- Quick Facts -->
+        <div class="quick-facts">
+            <h2>📋 Quick Facts</h2>
+            <div class="facts-grid">
+                <div class="fact-item">
+                    <div class="fact-label">Total Time</div>
+                    <div class="fact-value">5.5 hours</div>
+                </div>
+                <div class="fact-item">
+                    <div class="fact-label">Participants</div>
+                    <div class="fact-value">35 students</div>
+                </div>
+                <div class="fact-item">
+                    <div class="fact-label">Lunch</div>
+                    <div class="fact-value">Pizza ($5) or pack own</div>
+                </div>
+                <div class="fact-item">
+                    <div class="fact-label">Advancement</div>
+                    <div class="fact-value">Top 14 to Chapter</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 25px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                <h3 style="color: #dc2626; margin-bottom: 15px; font-size: 1.2rem;">Participants by Grade Level</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                    <div style="text-align: center; padding: 15px; background: white; border-radius: 8px; border-top: 3px solid #dc2626;">
+                        <div style="font-size: 2rem; font-weight: bold; color: #dc2626;">11</div>
+                        <div style="color: #555; font-size: 0.95rem;">6th Graders</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: white; border-radius: 8px; border-top: 3px solid #dc2626;">
+                        <div style="font-size: 2rem; font-weight: bold; color: #dc2626;">12</div>
+                        <div style="color: #555; font-size: 0.95rem;">7th Graders</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: white; border-radius: 8px; border-top: 3px solid #dc2626;">
+                        <div style="font-size: 2rem; font-weight: bold; color: #dc2626;">12</div>
+                        <div style="color: #555; font-size: 0.95rem;">8th Graders</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Parent Attendance -->
+        <div class="section" style="border: 3px solid #3b82f6;">
+            <h2>👨‍👩‍👧‍👦 For Parents & Families</h2>
+
+            <div class="alert alert-info">
+                <strong>Recommended Attendance Schedule for Parents:</strong>
+            </div>
+
+            <div style="background: #f8f9fa; padding: 25px; border-radius: 10px; margin-top: 20px;">
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                        <div style="background: #059669; color: white; padding: 8px 15px; border-radius: 8px; font-weight: bold; min-width: 150px; text-align: center;">8:30 - 9:00 AM</div>
+                        <div style="flex: 1;">
+                            <strong>Check-In:</strong> Please accompany your student to check-in and help them get settled.
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                        <div style="background: #dc2626; color: white; padding: 8px 15px; border-radius: 8px; font-weight: bold; min-width: 150px; text-align: center;">9:00 - 11:30 AM</div>
+                        <div style="flex: 1;">
+                            <strong>Parents Please Leave:</strong> To help students focus during Sprint and Target Rounds, we ask that parents leave the building during the competition rounds.
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                        <div style="background: #059669; color: white; padding: 8px 15px; border-radius: 8px; font-weight: bold; min-width: 150px; text-align: center;">11:30 AM - 1:30 PM</div>
+                        <div style="flex: 1;">
+                            <strong>Families Encouraged to Return:</strong> Please join us for the exciting Countdown Round and Awards Ceremony! This is a great time to celebrate your student's achievements.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-success" style="margin-top: 20px;">
+                <strong>Why we ask parents to step out:</strong> Competition rounds require intense concentration. A quiet, focused environment helps all students perform their best. Thank you for your understanding and support!
+            </div>
+
+            <h3 style="margin-top: 30px; color: #dc2626;">Early Departure Policy</h3>
+            <div class="alert alert-important" style="margin-top: 15px;">
+                <strong>⚠️ Important Information About Leaving Early</strong><br><br>
+                Students may leave after the Target Round ends at 10:45 AM. However, please be aware of the following consequences:
+                <ul style="margin-left: 20px; margin-top: 10px; line-height: 1.8;">
+                    <li>Students who leave early give up their chance to compete in the Countdown Round, even if their individual score places them in the top 12</li>
+                    <li>Students who leave early will NOT be considered for the 4-person School Team that advances to Chapter Competition</li>
+                    <li>Students who leave early may still attend Chapter Competition as individual competitors if they place 13th or 14th</li>
+                </ul>
+                <p style="margin-top: 15px;">We strongly encourage all students to stay for the entire day to fully enjoy the competition experience and cheer on their fellow mathletes in the exciting Countdown Round!</p>
+            </div>
+        </div>
+
+        <!-- What to Bring -->
+        <div class="section">
+            <h2>📦 What to Bring</h2>
+            <div class="checklist">
+                <ul>
+                    <li><strong>Pencils</strong> (required for all rounds)</li>
+                    <li><strong>Approved calculator</strong> (see requirements below)</li>
+                    <li><strong>Water bottle</strong> (optional)</li>
+                    <li><strong>Lunch</strong> (optional - if not ordering pizza)</li>
+                </ul>
+            </div>
+
+            <h3>Calculator Requirements</h3>
+            <p>Approved calculators must NOT have:</p>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>QWERTY keyboards</li>
+                <li>Wi-Fi connectivity (internal or external)</li>
+            </ul>
+            <p style="margin-top: 10px;"><strong>Prohibited devices:</strong> smartphones, laptops, tablets, iPods</p>
+
+            <div class="alert alert-important" style="margin-top: 20px;">
+                <strong>📍 Check-In Process (8:30-9:00 AM)</strong>
+                Upon arrival, students will:
+                <ol style="margin-left: 20px; margin-top: 10px;">
+                    <li>Sign in and receive name tags</li>
+                    <li><strong>Store ALL belongings</strong> (bags, phones, calculator, etc.) <strong>on the stage</strong></li>
+                    <li>Keep only pencils and take assigned seats</li>
+                    <li>Blank scratch paper will be provided</li>
+                </ol>
+                <p style="margin-top: 10px;"><em>Note: Students will retrieve their calculators from the stage during the 10:00 AM break for use in Target and Team Rounds.</em></p>
+            </div>
+        </div>
+
+        <!-- Schedule -->
+        <div class="section">
+            <h2>⏰ Competition Day Schedule</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-time">8:30 - 9:00 AM</div>
+                    <div class="timeline-desc">Student Arrival & Check-In</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">9:00 - 9:15 AM</div>
+                    <div class="timeline-desc">Welcome & Instructions</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">9:15 - 10:00 AM</div>
+                    <div class="timeline-desc"><strong>Sprint Round</strong> (no calculator)</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">10:00 - 10:15 AM</div>
+                    <div class="timeline-desc">Break - Retrieve calculators from stage</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">10:15 - 10:45 AM</div>
+                    <div class="timeline-desc"><strong>Target Round</strong> (calculator allowed)</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">10:45 - 11:00 AM</div>
+                    <div class="timeline-desc">Break</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">11:00 - 11:25 AM</div>
+                    <div class="timeline-desc"><strong>Team Round</strong> - For Fun! (unofficial)</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">11:30 AM - 12:00 PM</div>
+                    <div class="timeline-desc">Lunch - Team Round answers displayed</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">12:00 - 1:30 PM</div>
+                    <div class="timeline-desc"><strong>Countdown Round</strong> & Awards Ceremony</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">1:30 - 2:00 PM</div>
+                    <div class="timeline-desc">Clean-up & Departure</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Competition Rounds -->
+        <div class="section">
+            <h2>🎯 Competition Rounds Explained</h2>
+            <div class="rounds-grid">
+                <div class="round-card">
+                    <h4>Sprint Round</h4>
+                    <ul>
+                        <li>30 questions</li>
+                        <li>40 minutes</li>
+                        <li>Individual work</li>
+                        <li>NO calculator</li>
+                        <li>Tests speed & accuracy</li>
+                    </ul>
+                </div>
+                <div class="round-card">
+                    <h4>Target Round</h4>
+                    <ul>
+                        <li>8 questions (4 pairs)</li>
+                        <li>6 minutes per pair</li>
+                        <li>Individual work</li>
+                        <li>Calculator allowed</li>
+                        <li>Tests problem-solving</li>
+                    </ul>
+                </div>
+                <div class="round-card">
+                    <h4>Team Round</h4>
+                    <ul>
+                        <li>10 questions</li>
+                        <li>20 minutes</li>
+                        <li>Groups of 4</li>
+                        <li>Calculator allowed</li>
+                        <li><strong>UNOFFICIAL - For Fun!</strong></li>
+                    </ul>
+                </div>
+                <div class="round-card">
+                    <h4>Countdown Round</h4>
+                    <ul>
+                        <li>Top 12 students only</li>
+                        <li>Head-to-head matches</li>
+                        <li>45 seconds per problem</li>
+                        <li>NO calculator</li>
+                        <li>Determines School Team</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="alert alert-info" style="margin-top: 20px;">
+                <strong>Note about Team Round:</strong> The Team Round is unofficial and for practice only. It does not count toward individual rankings for Chapter Competition selection. Students will work collaboratively in groups of 4 at their tables.
+            </div>
+        </div>
+
+        <!-- Scoring -->
+        <div class="section">
+            <h2>📊 Individual Scoring</h2>
+
+            <h3>How Your Score is Calculated</h3>
+            <div style="background: #f8f9fa; padding: 30px; border-radius: 10px; margin: 20px 0;">
+                <div style="display: grid; grid-template-columns: auto auto auto; gap: 15px; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 20px;">
+                    <div style="text-align: center;">
+                        <div style="font-weight: bold; color: #dc2626; margin-bottom: 5px;">Sprint Round</div>
+                        <div style="background: white; padding: 15px; border-radius: 8px; border: 2px solid #dc2626;">
+                            Correct Answers
+                        </div>
+                    </div>
+                    <div style="text-align: center; font-size: 2rem; color: #dc2626;">+</div>
+                    <div style="text-align: center;">
+                        <div style="font-weight: bold; color: #dc2626; margin-bottom: 5px;">Target Round</div>
+                        <div style="background: white; padding: 15px; border-radius: 8px; border: 2px solid #dc2626;">
+                            2 × Correct Answers
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; font-size: 1.5rem; color: #dc2626; margin: 20px 0;">
+                    <strong>= Your Individual Score</strong>
+                </div>
+
+                <div style="background: white; padding: 20px; border-radius: 8px; border: 3px solid #059669; margin-top: 20px;">
+                    <div style="text-align: center; font-size: 1.1rem; color: #555; margin-bottom: 10px;">
+                        Maximum Possible Score
+                    </div>
+                    <div style="text-align: center; font-size: 2.5rem; font-weight: bold; color: #059669;">
+                        46 points
+                    </div>
+                    <div style="text-align: center; font-size: 0.95rem; color: #666; margin-top: 5px;">
+                        (30 from Sprint + 16 from Target)
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-success">
+                <strong>💡 Good to Know:</strong> A score of 23 out of 46 (50%) is considered highly commendable! You don't need a perfect score to do well in MATHCOUNTS.
+            </div>
+        </div>
+
+        <!-- Important Rules -->
+        <div class="section">
+            <h2>⚠️ Important Rules & Reminders</h2>
+
+            <h3>Communication Rules</h3>
+            <div class="alert alert-important">
+                <strong>During Sprint & Target Rounds:</strong> No communication allowed - individual work only<br>
+                <strong>During Team Round:</strong> Communication among team members is ALLOWED<br>
+                <strong>During Breaks:</strong> Communication is ALLOWED
+            </div>
+
+            <h3>Answer Requirements</h3>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>All answers must be <strong>legible and written clearly</strong></li>
+                <li>Follow specific instructions in each problem</li>
+                <li>Answer sheets will be collected immediately when time is called</li>
+            </ul>
+
+            <div class="prohibited-list" style="margin-top: 20px;">
+                <h4>Prohibited on Competition Tables (off the stage):</h4>
+                <ul>
+                    <li>Reference materials, dictionaries, formula sheets</li>
+                    <li>Personal scratch paper or graph paper</li>
+                    <li>Cell phones, tablets, pagers, or MP3 players</li>
+                    <li>Bags, backpacks, or other belongings</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- After Competition -->
+        <div class="section">
+            <h2>🎉 After the Competition</h2>
+
+            <h3>Chapter Competition Advancement</h3>
+            <p>The <strong>top 14 students</strong> from Sprint and Target Rounds will advance to the Chapter Competition:</p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
+                <div class="alert alert-success">
+                    <strong>School Team (Top 4)</strong><br>
+                    Determined by Countdown Round results. These 4 students will compete in ALL rounds at Chapter Competition.
+                </div>
+                <div class="alert alert-success">
+                    <strong>Individual Competitors (10 students)</strong><br>
+                    Remaining students from top 14 will compete in Sprint and Target Rounds only at Chapter Competition.
+                </div>
+            </div>
+
+            <h3 style="margin-top: 30px;">Awards</h3>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>🥇 <strong>1st Place:</strong> School Champion ribbon</li>
+                <li>🥈 <strong>2nd Place:</strong> Runner-up ribbon</li>
+                <li>🏅 <strong>Places 3-14:</strong> Certificates</li>
+            </ul>
+
+            <p style="margin-top: 20px;"><strong>What's Next:</strong> Chapter Competition practice sessions will be announced for students who advance!</p>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="section">
+            <h2>📞 Contact Information</h2>
+            <div class="contact-box">
+                <div class="contact-item">
+                    <span class="contact-label">Math Coach:</span> Prof. Jojo
+                </div>
+                <div class="contact-item">
+                    <span class="contact-label">Email:</span> <a href="mailto:zdongmc@gmail.com" style="color: #dc2626;">zdongmc@gmail.com</a>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-label">School:</span> Hallie Wells Middle School
+                </div>
+            </div>
+
+            <div class="alert alert-info" style="margin-top: 20px;">
+                <strong>Questions?</strong> Please email Prof. Jojo before the competition if you have any questions or concerns.
+            </div>
+        </div>
+
+        <!-- Good Luck Message -->
+        <div class="hero" style="padding: 40px;">
+            <h2 style="margin-bottom: 15px;">Good Luck to All Participants! 🍀</h2>
+            <p style="font-size: 1.1rem;">Remember: Do your best, have fun, and enjoy the challenge!</p>
+        </div>
+    </div>
+</body>
+</html>
