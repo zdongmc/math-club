@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MATHCOUNTS Countdown Round Bracket - November 8, 2025</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: white;
+            padding: 40px;
+        }
+
+        @media print {
+            body {
+                padding: 20px;
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #dc2626;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header h2 {
+            color: #1a1a1a;
+            font-size: 1.5rem;
+            font-weight: normal;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .bracket {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .match-container {
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .match {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            background: white;
+        }
+
+        .match.final {
+            border: 3px solid #ffd700;
+            background: #fffbeb;
+        }
+
+        .match-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #dc2626;
+            min-width: 120px;
+        }
+
+        .match.final .match-number {
+            color: #991b1b;
+        }
+
+        .participants {
+            display: flex;
+            align-items: flex-start;
+            flex: 1;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .participant-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .participant {
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            min-width: 220px;
+            text-align: center;
+            background: #f3f4f6;
+            color: #6b7280;
+            border: 2px solid #e5e7eb;
+        }
+
+        .participant.winner {
+            background: #d1fae5;
+            color: #065f46;
+            font-weight: bold;
+            border: 3px solid #10b981;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .match.final .participant.winner {
+            background: #ffd700;
+            color: #991b1b;
+            border-color: #991b1b;
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.5);
+        }
+
+        .vs {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #dc2626;
+            margin-top: 15px;
+        }
+
+        .match.final .vs {
+            color: #991b1b;
+        }
+
+        .winner-arrow {
+            font-size: 2rem;
+            color: #10b981;
+            margin-top: 5px;
+        }
+
+        .match.final .winner-arrow {
+            color: #ffd700;
+        }
+
+        .seed-label {
+            font-size: 0.9rem;
+            color: #991b1b;
+            font-weight: normal;
+        }
+
+        .champion {
+            text-align: center;
+            margin-top: 50px;
+            padding: 30px;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            border-radius: 15px;
+            color: white;
+        }
+
+        .champion h2 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #ffd700;
+        }
+
+        .champion .name {
+            font-size: 3rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .trophy {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .seed-label {
+            font-size: 0.9rem;
+            color: #991b1b;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Hallie Wells Middle School</h1>
+        <h2>MATHCOUNTS School Competition</h2>
+        <p>Countdown Round Results - November 8, 2025</p>
+    </div>
+
+    <div class="bracket">
+        <!-- Match 1 -->
+        <div class="match-container">
+            <div class="match">
+                <div class="match-number">Match 1</div>
+                <div class="participants">
+                    <div class="participant-wrapper">
+                        <div class="participant winner">
+                            <div class="seed-label">#10 Seed</div>
+                            Fariq M.
+                        </div>
+                        <div class="winner-arrow">↓</div>
+                    </div>
+                    <div class="vs">VS</div>
+                    <div class="participant-wrapper">
+                        <div class="participant">
+                            <div class="seed-label">#9 Seed</div>
+                            Navraj K.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Match 2 -->
+        <div class="match-container">
+            <div class="match">
+                <div class="match-number">Match 2</div>
+                <div class="participants">
+                    <div class="participant-wrapper">
+                        <div class="participant winner">Fariq M.</div>
+                        <div class="winner-arrow">↓</div>
+                    </div>
+                    <div class="vs">VS</div>
+                    <div class="participant-wrapper">
+                        <div class="participant">
+                            <div class="seed-label">#8 Seed</div>
+                            Joyce S.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Match 3 -->
+        <div class="match-container">
+            <div class="match">
+                <div class="match-number">Match 3</div>
+                <div class="participants">
+                    <div class="participant-wrapper">
+                        <div class="participant winner">Fariq M.</div>
+                        <div class="winner-arrow">↓</div>
+                    </div>
+                    <div class="vs">VS</div>
+                    <div class="participant-wrapper">
+                        <div class="participant">
+                            <div class="seed-label">#7 Seed</div>
+                            Mohammad B.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Match 4 -->
+        <div class="match-container">
+            <div class="match">
+                <div class="match-number">Match 4</div>
+                <div class="participants">
+                    <div class="participant-wrapper">
+                        <div class="participant">Fariq M.</div>
+                    </div>
+                    <div class="vs">VS</div>
+                    <div class="participant-wrapper">
+                        <div class="participant winner">
+                            <div class="seed-label">#6 Seed</div>
+                            Ella S.
+                        </div>
+                        <div class="winner-arrow">↓</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Match 5 -->
+        <div class="match-container">
+            <div class="match">
+                <div class="match-number">Match 5</div>
+                <div class="participants">
+                    <div class="participant-wrapper">
+                        <div class="participant winner">
+                            <div class="seed-label">#5 Seed</div>
+                            Anish M.
+                        </div>
+                        <div class="winner-arrow">↓</div>
+                    </div>
+                    <div class="vs">VS</div>
+                    <div class="participant-wrapper">
+                        <div class="participant">Ella S.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Match 6 -->
+        <div class="match-container">
+            <div class="match">
+                <div class="match-number">Match 6</div>
+                <div class="participants">
+                    <div class="participant-wrapper">
+                        <div class="participant">Anish M.</div>
+                    </div>
+                    <div class="vs">VS</div>
+                    <div class="participant-wrapper">
+                        <div class="participant winner">
+                            <div class="seed-label">#4 Seed</div>
+                            Ayush P.
+                        </div>
+                        <div class="winner-arrow">↓</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Match 7 -->
+        <div class="match-container">
+            <div class="match">
+                <div class="match-number">Match 7</div>
+                <div class="participants">
+                    <div class="participant-wrapper">
+                        <div class="participant">
+                            <div class="seed-label">#3 Seed</div>
+                            Krish J.
+                        </div>
+                    </div>
+                    <div class="vs">VS</div>
+                    <div class="participant-wrapper">
+                        <div class="participant winner">Ayush P.</div>
+                        <div class="winner-arrow">↓</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Match 8 -->
+        <div class="match-container">
+            <div class="match">
+                <div class="match-number">Match 8</div>
+                <div class="participants">
+                    <div class="participant-wrapper">
+                        <div class="participant winner">
+                            <div class="seed-label">#2 Seed</div>
+                            Arjun L.
+                        </div>
+                        <div class="winner-arrow">↓</div>
+                    </div>
+                    <div class="vs">VS</div>
+                    <div class="participant-wrapper">
+                        <div class="participant">Ayush P.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Match 9 - Final -->
+        <div class="match-container">
+            <div class="match final">
+                <div class="match-number">Final Match</div>
+                <div class="participants">
+                    <div class="participant-wrapper">
+                        <div class="participant">Arjun L.</div>
+                    </div>
+                    <div class="vs">VS</div>
+                    <div class="participant-wrapper">
+                        <div class="participant winner">
+                            <div class="seed-label">#1 Seed</div>
+                            Vihaan S.
+                        </div>
+                        <div class="winner-arrow">↓</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Champion -->
+        <div class="champion">
+            <div class="trophy">🏆</div>
+            <h2>2025 Hallie Wells MATHCOUNTS School Competition</h2>
+            <div class="name">Vihaan S.</div>
+            <p style="margin-top: 20px; font-size: 1.3rem; opacity: 0.9;">Countdown Round Champion</p>
+        </div>
+
+        <!-- Final Rankings -->
+        <div style="margin-top: 50px; padding: 30px; background: #f9fafb; border-radius: 15px; border: 2px solid #e5e7eb;">
+            <h2 style="text-align: center; font-size: 2rem; color: #dc2626; margin-bottom: 30px;">Final Countdown Round Rankings</h2>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 900px; margin: 0 auto;">
+                <div style="display: flex; align-items: center; padding: 15px 20px; background: white; border-radius: 8px; border: 2px solid #ffd700;">
+                    <span style="font-size: 1.8rem; font-weight: bold; color: #ffd700; min-width: 60px;">1st</span>
+                    <span style="font-size: 1.3rem; color: #1a1a1a; flex: 1; margin-left: 15px;">Vihaan S.</span>
+                    <span style="font-size: 1.1rem; color: #991b1b; font-weight: bold;">#1 Seed</span>
+                </div>
+                <div style="display: flex; align-items: center; padding: 15px 20px; background: white; border-radius: 8px; border: 2px solid #d1d5db;">
+                    <span style="font-size: 1.8rem; font-weight: bold; color: #9ca3af; min-width: 60px;">2nd</span>
+                    <span style="font-size: 1.3rem; color: #1a1a1a; flex: 1; margin-left: 15px;">Arjun L.</span>
+                    <span style="font-size: 1.1rem; color: #991b1b; font-weight: bold;">#2 Seed</span>
+                </div>
+                <div style="display: flex; align-items: center; padding: 15px 20px; background: white; border-radius: 8px; border: 2px solid #d1d5db;">
+                    <span style="font-size: 1.8rem; font-weight: bold; color: #cd7f32; min-width: 60px;">3rd</span>
+                    <span style="font-size: 1.3rem; color: #1a1a1a; flex: 1; margin-left: 15px;">Ayush P.</span>
+                    <span style="font-size: 1.1rem; color: #991b1b; font-weight: bold;">#4 Seed</span>
+                </div>
+                <div style="display: flex; align-items: center; padding: 15px 20px; background: white; border-radius: 8px; border: 2px solid #d1d5db;">
+                    <span style="font-size: 1.5rem; font-weight: bold; color: #6b7280; min-width: 60px;">4th</span>
+                    <span style="font-size: 1.3rem; color: #1a1a1a; flex: 1; margin-left: 15px;">Krish J.</span>
+                    <span style="font-size: 1.1rem; color: #991b1b; font-weight: bold;">#3 Seed</span>
+                </div>
+                <div style="display: flex; align-items: center; padding: 15px 20px; background: white; border-radius: 8px; border: 2px solid #d1d5db;">
+                    <span style="font-size: 1.5rem; font-weight: bold; color: #6b7280; min-width: 60px;">5th</span>
+                    <span style="font-size: 1.3rem; color: #1a1a1a; flex: 1; margin-left: 15px;">Anish M.</span>
+                    <span style="font-size: 1.1rem; color: #991b1b; font-weight: bold;">#5 Seed</span>
+                </div>
+                <div style="display: flex; align-items: center; padding: 15px 20px; background: white; border-radius: 8px; border: 2px solid #d1d5db;">
+                    <span style="font-size: 1.5rem; font-weight: bold; color: #6b7280; min-width: 60px;">6th</span>
+                    <span style="font-size: 1.3rem; color: #1a1a1a; flex: 1; margin-left: 15px;">Ella S.</span>
+                    <span style="font-size: 1.1rem; color: #991b1b; font-weight: bold;">#6 Seed</span>
+                </div>
+                <div style="display: flex; align-items: center; padding: 15px 20px; background: white; border-radius: 8px; border: 2px solid #d1d5db;">
+                    <span style="font-size: 1.5rem; font-weight: bold; color: #6b7280; min-width: 60px;">7th</span>
+                    <span style="font-size: 1.3rem; color: #1a1a1a; flex: 1; margin-left: 15px;">Fariq M.</span>
+                    <span style="font-size: 1.1rem; color: #991b1b; font-weight: bold;">#10 Seed</span>
+                </div>
+                <div style="display: flex; align-items: center; padding: 15px 20px; background: white; border-radius: 8px; border: 2px solid #d1d5db;">
+                    <span style="font-size: 1.5rem; font-weight: bold; color: #6b7280; min-width: 60px;">8th</span>
+                    <span style="font-size: 1.3rem; color: #1a1a1a; flex: 1; margin-left: 15px;">Mohammad B.</span>
+                    <span style="font-size: 1.1rem; color: #991b1b; font-weight: bold;">#7 Seed</span>
+                </div>
+                <div style="display: flex; align-items: center; padding: 15px 20px; background: white; border-radius: 8px; border: 2px solid #d1d5db;">
+                    <span style="font-size: 1.5rem; font-weight: bold; color: #6b7280; min-width: 60px;">9th</span>
+                    <span style="font-size: 1.3rem; color: #1a1a1a; flex: 1; margin-left: 15px;">Joyce S.</span>
+                    <span style="font-size: 1.1rem; color: #991b1b; font-weight: bold;">#8 Seed</span>
+                </div>
+                <div style="display: flex; align-items: center; padding: 15px 20px; background: white; border-radius: 8px; border: 2px solid #d1d5db;">
+                    <span style="font-size: 1.5rem; font-weight: bold; color: #6b7280; min-width: 60px;">10th</span>
+                    <span style="font-size: 1.3rem; color: #1a1a1a; flex: 1; margin-left: 15px;">Navraj K.</span>
+                    <span style="font-size: 1.1rem; color: #991b1b; font-weight: bold;">#9 Seed</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
