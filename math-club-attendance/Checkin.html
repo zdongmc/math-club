@@ -571,6 +571,7 @@
             const attendance = result.attendance;
             const competitions = result.competitions;
             const forms = result.forms || null;
+            const mathcounts = result.mathcounts || null;
 
             let html = `
                 <div class="student-header">
@@ -668,9 +669,58 @@
             competitions.forEach(comp => {
                 html += `<div class="competition-card"><div class="competition-name">${escapeHtml(comp.name)}</div>`;
 
+                // Special handling for MATHCOUNTS - show scores if signed up
+                if (comp.name === 'MATHCOUNTS' && comp.signedUp) {
+                    html += `<div class="competition-details">${escapeHtml(comp.details)}</div>`;
+                    const statusClass = comp.waitlisted ? 'waitlisted' : 'signed-up';
+                    html += `<span class="competition-status ${statusClass}">${escapeHtml(comp.status)}</span>`;
+
+                    // Add scores if available
+                    if (mathcounts && mathcounts.sprintScore !== null) {
+                        html += '<div style="margin-top: 15px; background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 15px;">';
+                        html += '<div style="font-weight: bold; color: #1e40af; margin-bottom: 10px; font-size: 1.1rem;">📊 Competition Results</div>';
+                        html += '<div style="display: grid; gap: 8px;">';
+                        html += '<div class="info-row" style="border: none; padding: 5px 0;">';
+                        html += '<span class="info-label">Sprint Round</span>';
+                        html += `<span class="info-value"><strong>${mathcounts.sprintScore}</strong> / ${mathcounts.maxSprint}</span>`;
+                        html += '</div>';
+                        html += '<div class="info-row" style="border: none; padding: 5px 0;">';
+                        html += '<span class="info-label">Target Round</span>';
+                        html += `<span class="info-value"><strong>${mathcounts.targetScore}</strong> / ${mathcounts.maxTarget}</span>`;
+                        html += '</div>';
+                        html += '<div class="info-row" style="border: none; padding: 5px 0;">';
+                        html += '<span class="info-label">Individual Score</span>';
+                        html += `<span class="info-value"><strong>${mathcounts.individualScore}</strong> / ${mathcounts.maxIndividual}</span>`;
+                        html += '</div>';
+                        html += '<div class="info-row" style="border: none; padding: 5px 0;">';
+                        html += '<span class="info-label">School Rank</span>';
+                        html += `<span class="info-value"><strong>#${mathcounts.rank}</strong> of 38</span>`;
+                        html += '</div>';
+
+                        // Chapter Competition Status
+                        if (mathcounts.chapterStatus) {
+                            html += '<div style="margin-top: 10px; padding: 12px; background: #d1fae5; border: 2px solid #059669; border-radius: 8px; text-align: center;">';
+                            html += `<div style="color: #047857; font-weight: bold; font-size: 1.1rem;">🎉 Advancing to Chapter Competition</div>`;
+                            html += `<div style="color: #065f46; margin-top: 5px; font-size: 1rem;">as ${escapeHtml(mathcounts.chapterStatus)}</div>`;
+                            html += '</div>';
+                        } else {
+                            html += '<div style="margin-top: 10px; padding: 10px; background: #f3f4f6; border: 2px solid #d1d5db; border-radius: 8px; text-align: center;">';
+                            html += `<div style="color: #6b7280; font-size: 0.95rem;">Not advancing to Chapter Competition</div>`;
+                            html += '</div>';
+                        }
+
+                        html += '</div>';
+                        html += '</div>';
+                    } else if (mathcounts === null || mathcounts.sprintScore === null) {
+                        // Student is signed up but no scores recorded
+                        html += '<div style="margin-top: 15px; background: #fef2f2; border: 2px solid #dc2626; border-radius: 8px; padding: 15px; text-align: center;">';
+                        html += '<span style="color: #dc2626; font-weight: bold; font-size: 1.1rem;">Missed Competition</span>';
+                        html += '</div>';
+                    }
+                }
                 // Special handling for MOEMS and Math League - parse individual dates
-                if ((comp.name === 'MOEMS' || comp.name === 'MCPS Math League') && comp.signedUp) {
-                    html += parseCompetitionDates(comp.name, comp.details, comp.waitlisted);
+                else if ((comp.name === 'MOEMS' || comp.name === 'MCPS Math League') && comp.signedUp) {
+                    html += parseCompetitionDates(comp.name, comp.details, comp.waitlisted, comp.team);
                 } else if (comp.signedUp) {
                     // For other signed-up competitions, show details
                     html += `<div class="competition-details">${escapeHtml(comp.details)}</div>`;
@@ -689,8 +739,17 @@
             document.getElementById('resultsSection').classList.add('show');
         }
 
-        function parseCompetitionDates(competitionName, details, isWaitlisted) {
+        function parseCompetitionDates(competitionName, details, isWaitlisted, team) {
             let html = '<div class="competition-dates">';
+
+            // Display team assignment for Math League
+            if (competitionName === 'MCPS Math League' && team) {
+                html += `
+                    <div style="background: #fef3c7; border: 2px solid #fbbf24; border-radius: 8px; padding: 12px; margin-bottom: 12px; text-align: center;">
+                        <div style="font-weight: bold; color: #92400e; font-size: 1.1rem;">Team: ${escapeHtml(team)}</div>
+                    </div>
+                `;
+            }
 
             if (competitionName === 'MOEMS') {
                 // All possible MOEMS contests

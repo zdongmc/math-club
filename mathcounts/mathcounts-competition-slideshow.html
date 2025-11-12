@@ -553,7 +553,7 @@
                     <li>Print your name in the allotted space on each pair</li>
                     <li>Read instructions on the cover of each pair silently while I read them aloud</li>
                     <li>Begin when instructed - 6 minutes per pair</li>
-                    <li>30-second warning will be given at 5 minutes 30 seconds</li>
+                    <li>30-second warning will be given when 30 seconds remain</li>
                     <li>After 6 minutes: "Stop, pencils down"</li>
                     <li>Papers will be collected before the next pair is distributed</li>
                 </ul>
@@ -570,7 +570,7 @@
                 <button class="btn" onclick="pauseTimer()">Pause</button>
                 <button class="btn" onclick="resetTimer('target', 6)">Reset</button>
             </div>
-            <p style="margin-top: 30px; font-size: 1.3rem; opacity: 0.8;">30-second warning at 5:30</p>
+            <p style="margin-top: 30px; font-size: 1.3rem; opacity: 0.8;">30-second warning at 0:30</p>
         </div>
 
         <!-- Slide 13: Break -->
@@ -619,7 +619,6 @@
         <div class="slide">
             <div class="large-icon">🍕</div>
             <h2>Lunch Time!</h2>
-            <p class="subtitle">30 minutes</p>
             <div class="info-box" style="max-width: 900px; margin-top: 40px;">
                 <h3 style="color: #ffd700; margin-bottom: 30px; font-size: 1.8rem;">Team Round Answers</h3>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px 40px; font-size: 1.6rem;">
@@ -634,6 +633,9 @@
                     <div>5. 63</div>
                     <div>10. 84 in²</div>
                 </div>
+                <p style="font-size: 1.5rem; margin-top: 35px; color: #ffd700; font-style: italic; text-align: center;">
+                    Turn in your Team Round papers before Countdown Round.
+                </p>
             </div>
             <p style="font-size: 2rem; margin-top: 50px; color: #ffd700; font-weight: bold;">Countdown Round begins at 12:00 PM</p>
         </div>
@@ -756,7 +758,7 @@
                         setTimeout(() => timerElement.classList.remove('warning'), 3000);
                     }
                 } else if (timerType === 'target') {
-                    if (timeRemaining === 330) { // 5:30 = 5*60 + 30 = 330 seconds
+                    if (timeRemaining === 30) { // 30 seconds remaining
                         speak("30 seconds remaining");
                         timerElement.classList.add('warning');
                         setTimeout(() => timerElement.classList.remove('warning'), 3000);

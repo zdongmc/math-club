@@ -75,6 +75,41 @@ Once found, uses student **name** to:
 - URL: https://script.google.com/macros/s/AKfycbye0EfX9YL0Gg4Ih4OeN6sLcGAN57nPzVtk88rQYMrA8gyEE9Zlu-aLY9udIEskvIMJ/exec
 - Script ID: 1fif0wIdKDZQUjJgFaf-SOEDj60OqNz2pKXWezwpZlGlmJrqubXTBIZ2i
 
+### MATHCOUNTS Competition Materials
+Located in `mathcounts/` directory:
+
+**countdown-round-questions.html** - Interactive question display with timer
+- 60 MATHCOUNTS countdown round questions with MathJax rendering
+- 60-second countdown timer for each question with visual/audio warnings
+- Timer controls: Start (Space bar), Pause (Escape), Reset
+- Show/hide answer functionality
+- Keyboard navigation: Arrow keys to move between questions
+- SVG diagrams embedded for questions 44, 53, and 57
+- Red gradient theme matching main site design
+
+**countdown-round-slideshow.html** - Competition day presentation (19 slides)
+- Slide 1: Welcome slide for families
+- Slide 2: Individual score calculation explanation
+- Slide 3: Top 14 scorers with editable names/scores and reveal functionality
+- Slides 4-7: Countdown round instructions (rules, answering, winning, final four)
+- Slides 8-12: Match slides 1-5 (editable participant names)
+- Slide 13: Final Four Rounds special rules (positioned before Match 6)
+- Slides 14-17: Match slides 6-9 (editable participant names)
+- Slide 18: Awards slide with three sections:
+  - Hallie Wells Middle School MATHCOUNTS Champion (trophy SVG)
+  - Top 4 Hallie Wells MATHCOUNTS School Team (badge SVG)
+  - 14 Students advancing to Chapter Competition (star SVG)
+- Slide 19: Sudden Victory tie-breaking rules with return buttons to all matches
+
+**Key Features:**
+- All match slides have editable name fields (contenteditable) with semi-transparent backgrounds
+- "Sudden Victory" button on each match slide jumps to slide 19
+- Sudden Victory slide has return buttons for all 9 matches
+- Keyboard navigation works except when editing fields
+- MathJax integration for math rendering
+- Red gradient theme (#dc2626 to #991b1b) with gold accents (#ffd700)
+- Responsive design with mobile support
+
 ### Navigation System
 The `header-template.js` provides a shared navigation component for all pages:
 - Navigation items: Announcements, Club Info, Competition Info, Registration & Records

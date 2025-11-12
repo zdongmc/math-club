@@ -402,6 +402,83 @@ function getSchoolListSheet() {
   return getSpreadsheet().getSheetByName(SCHOOL_LIST_SHEET_NAME);
 }
 
+function getMathLeagueSheet() {
+  return getSpreadsheet().getSheetByName('Math League');
+}
+
+function getMathcountsSheet() {
+  return getSpreadsheet().getSheetByName('MATHCOUNTS');
+}
+
+function getMathLeagueTeam(mcpsId) {
+  try {
+    const sheet = getMathLeagueSheet();
+    if (!sheet || sheet.getLastRow() <= 1) {
+      return null;
+    }
+
+    const data = sheet.getDataRange().getValues();
+
+    // Columns: A=Team, B=Name, C=ID, D=Grade, E-H=Scores, I=Total
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const studentId = (row[2] || '').toString().trim();
+
+      if (studentId === mcpsId.toString().trim()) {
+        return (row[0] || '').toString().trim(); // Return team assignment
+      }
+    }
+
+    return null;
+  } catch (error) {
+    Logger.log('Error getting Math League team: ' + error.toString());
+    return null;
+  }
+}
+
+function getMathcountsResults(mcpsId) {
+  try {
+    const sheet = getMathcountsSheet();
+    if (!sheet || sheet.getLastRow() <= 1) {
+      return null;
+    }
+
+    const data = sheet.getDataRange().getValues();
+
+    // Look for student by MCPS ID in column B
+    // Columns: A=Name, B=ID, G=Sprint Round, H=Target Round, I=Individual Score, J=Rank
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const studentId = (row[1] || '').toString().trim(); // Column B (index 1)
+
+      if (studentId === mcpsId.toString().trim()) {
+        // Columns: G=Sprint Round, H=Target Round, I=Individual Score, J=Rank, K=Chapter Advancement
+        const sprintScore = row[6] !== undefined && row[6] !== '' ? parseFloat(row[6]) : null;
+        const targetScore = row[7] !== undefined && row[7] !== '' ? parseFloat(row[7]) : null;
+        const individualScore = row[8] !== undefined && row[8] !== '' ? parseFloat(row[8]) : null;
+        const rank = row[9] !== undefined && row[9] !== '' ? parseInt(row[9]) : null;
+        const chapterStatus = row[10] !== undefined && row[10] !== '' ? row[10].toString().trim() : null;
+
+        return {
+          sprintScore: sprintScore,
+          targetScore: targetScore,
+          individualScore: individualScore,
+          rank: rank,
+          chapterStatus: chapterStatus,
+          maxSprint: 30,
+          maxTarget: 16,
+          maxIndividual: 46
+        };
+      }
+    }
+
+    return null;
+  } catch (error) {
+    Logger.log('Error getting MATHCOUNTS results: ' + error.toString());
+    return null;
+  }
+}
+
 function checkFormCompletion(mcpsId, studentName) {
   try {
     const forms = {
@@ -640,12 +717,27 @@ function lookupStudentByMcpsId(mcpsId) {
       Logger.log('Error checking form completion: ' + err.toString());
     }
 
+    // Get MATHCOUNTS results
+    let mathcountsResults = null;
+    try {
+      Logger.log('Getting MATHCOUNTS results for: ' + mcpsIdStr);
+      mathcountsResults = getMathcountsResults(mcpsIdStr);
+      if (mathcountsResults) {
+        Logger.log('MATHCOUNTS results retrieved: Sprint=' + mathcountsResults.sprintScore + ', Target=' + mathcountsResults.targetScore + ', Individual=' + mathcountsResults.individualScore + ', Rank=' + mathcountsResults.rank);
+      } else {
+        Logger.log('No MATHCOUNTS results found for this student');
+      }
+    } catch (err) {
+      Logger.log('Error getting MATHCOUNTS results: ' + err.toString());
+    }
+
     const result = {
       success: true,
       student: studentInfo,
       attendance: attendanceHistory,
       competitions: competitionSignups,
-      forms: formCompletion
+      forms: formCompletion,
+      mathcounts: mathcountsResults
     };
 
     Logger.log('Returning result: ' + JSON.stringify(result));
@@ -794,13 +886,15 @@ function getStudentCompetitionSignups(mcpsId) {
         const mathLeague = (row[10] || '').toString();
         if (mathLeague && !mathLeague.toLowerCase().includes('will not attend')) {
           const isWaitlisted = isOnWaitlist(mathLeague);
-          Logger.log('Math League value: "' + mathLeague + '", isWaitlisted: ' + isWaitlisted);
+          const team = getMathLeagueTeam(mcpsId);
+          Logger.log('Math League value: "' + mathLeague + '", isWaitlisted: ' + isWaitlisted + ', team: ' + team);
           competitions[1] = {
             name: 'MCPS Math League',
             details: mathLeague,
             status: isWaitlisted ? 'Waitlisted' : 'Signed Up',
             signedUp: true,
-            waitlisted: isWaitlisted
+            waitlisted: isWaitlisted,
+            team: team
           };
         }
 
