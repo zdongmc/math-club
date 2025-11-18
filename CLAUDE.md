@@ -21,20 +21,32 @@ This is a static HTML website for the Hallie Wells Middle School Competition Mat
 ### Parent Portal System (Google Apps Script)
 Located in `math-club-attendance/` directory:
 - `Code.js` - Backend Google Apps Script functions
-  - `lookupStudentByMcpsId()` - Main lookup function that searches 4 sheets for student by MCPS ID
+  - `lookupStudentByMcpsId()` - Main lookup function that searches 4 sheets for student by MCPS ID, returns student info, attendance, competitions, forms, and results
   - `getStudentAttendanceHistory()` - Retrieves attendance data by student name
   - `getStudentCompetitionSignups()` - Retrieves competition sign-ups by MCPS ID
   - `checkFormCompletion()` - Checks which required forms student has completed
+  - `getMathcountsResults()` - Retrieves MATHCOUNTS competition results by MCPS ID
+  - `getMoemsResults()` - Retrieves MOEMS contest results by MCPS ID (hidden in UI)
+  - `getMathLeagueResults()` - Retrieves Math League team, ARML tracking, and meet scores by MCPS ID
+  - `getMathKangarooResults()` - Retrieves Math Kangaroo registration status by student name (case-insensitive)
   - Connects to Google Sheets with student data
 - `Checkin.html` - Parent-facing web interface
   - MCPS ID lookup form (accepts variable-length numeric IDs)
   - Shows required forms completion status with links to complete missing forms
-  - Displays attendance history (dates only as compact badges)
-  - Shows all 4 competitions (MATHCOUNTS, MCPS Math League, MOEMS, AMC 8)
-  - MOEMS displays 5 individual contests with Yes/No status
-  - Math League displays 4 individual meets with Yes/No status
-  - MATHCOUNTS shows School Competition date (November 8, 2025)
-  - AMC 8 shows competition date (January 23, 2026)
+  - **Club Meetings** section: Displays attendance dates with total meeting count summary (e.g., "5 meetings attended")
+  - **Competitions** section: Shows all competition sign-ups and results
+  - **MATHCOUNTS**: Shows School Competition date, displays competition results (Sprint/Target/Individual scores, rank, chapter advancement status). For students advancing to Chapter Competition, displays $40 fee payment status: green checkmark if paid, or yellow alert with payment link if not paid (only shown if column M is not "NA")
+  - **MOEMS**: Displays 5 individual contests with Yes/No status. Shows fee payment status: green checkmark if paid, or yellow alert with payment link ($5 or $25 based on fee amount) if not paid (results built but hidden in UI)
+  - **Math League**: Organized by meets (Meet #1-4). Each meet shows:
+    - Sign-up status (Signed Up/Not Signed Up)
+    - Individual results (score out of 6 or "Did Not Attend")
+    - Team results (Team Score/12, Relay 1/8, Relay 2/8, Team Individual Score, Team Total/64)
+    - Team assignment displayed at top (separate from ARML tracking)
+    - ARML tracking status shown as smaller note below team assignment
+  - **AMC 8**: Shows competition date (January 23, 2026)
+  - **Math Kangaroo**: Always displayed for all students. Shows either:
+    - If registered: Green checkmark with "Registered for Math Kangaroo", competition date (March 19, 2026), and Math Kangaroo ID
+    - If not registered: Yellow alert with complete registration instructions including invitation code (MDCLARK0003001@2026math), fees ($18 by Dec 31, $35 late), and competition date
 - `appsscript.json` - Apps Script configuration
 - `.clasp.json` - Clasp CLI configuration for deployment
 
@@ -51,6 +63,26 @@ Located in `math-club-attendance/` directory:
 - **Attendance Records** - Manual attendance tracking
   - Columns: A=Student Name, B=Student ID, C+=Date headers with TRUE values or timestamps
   - Used for: Student lookup by ID, retrieving attendance history
+- **MOEMS** - MOEMS contest results
+  - Columns: A=Name, B=ID, C=Grade, D-H=Contest 1-5 scores, I=Total, J=Fee, K=Paid
+  - Contest scores: "NA" = not attending, blank = attending but score pending, number = score
+  - Fee (Column J): Fee amount (e.g., 5, 25)
+  - Paid (Column K): TRUE/true/Yes/Y/Paid = paid, FALSE/false/blank = not paid
+  - Used for: Retrieving MOEMS contest results and fee payment status by MCPS ID (results currently hidden in UI)
+- **Math League** - Math League meet results and ARML tracking
+  - Student data columns: A=Team, B=Name, C=ID, D=Grade, E=ARML Tracking (Yes/No), F=Placeholder, G=Meet #1 individual score (out of 6), H-J=Meet #2-4 (future)
+  - Team results rows (2-8): Team A (row 2), Team B (row 3), Team C (row 4), Team JV A (row 5), Team JV B (row 6), Team JV C (row 7), Team JV Mixed (row 8)
+  - Team score columns (for each meet): N=Team Score (out of 12), O=Relay 1 (out of 8), P=Relay 2 (out of 8), Q=Team Individual Score (sum), R=Team Total (out of 64)
+  - Individual scores: "NA" = did not attend, number = score, blank = will attend but score pending
+  - Used for: Retrieving team assignment, ARML tracking status, individual meet scores, and team meet scores by MCPS ID
+- **MATHCOUNTS** - MATHCOUNTS competition results
+  - Columns: A=Name, B=ID, G=Sprint Round, H=Target Round, I=Individual Score, J=Rank, K=Chapter Advancement, M=Fee Required, N=Fee Paid
+  - Fee Required (Column M): "$40" or "NA" (if NA, fee info not displayed)
+  - Fee Paid (Column N): "Yes"/"Y"/"Paid"/TRUE = paid, anything else = not paid
+  - Used for: Retrieving MATHCOUNTS results and fee payment status by MCPS ID
+- **Math Kangaroo** - Math Kangaroo registration
+  - Columns: A=Name, B=MK ID (Math Kangaroo assigned ID, not MCPS ID)
+  - Used for: Retrieving Math Kangaroo registration status by student name (case-insensitive)
 
 **Student Lookup Process:**
 When an MCPS ID is entered, the system searches in this order:
@@ -168,10 +200,13 @@ Each content page follows a consistent pattern:
 - Date columns contain `true` values or timestamp strings like "time - meeting type"
 - Competition sign-ups parsed from "Form Responses 2" sheet by MCPS ID
 - Always displays all 4 competitions (signed up or not)
-- MOEMS shows 5 individual contests (Nov 21, Dec 19, Jan 9, Feb 6, Mar 6) with Yes/No
-- Math League shows 4 individual meets (Nov 14, Dec 12, Jan 16, Feb 13) with Yes/No
-- MATHCOUNTS displays: "Yes - I will attend the School Competition on November 8th and if selected, pay the $40 fee to attend the Chapter Competition"
-- AMC 8 displays: "January 23, 2026"
+- **MOEMS**: Shows 5 individual contests (Nov 21, Dec 19, Jan 9, Feb 6, Mar 6) with Yes/No. Results section built with contest scores and totals but hidden with `display: none`
+- **Math League**: Organized by meets in gray containers. Shows team assignment and ARML tracking at top. Each meet (Nov 14, Dec 12, Jan 16, Feb 13) displays:
+  - Sign-up status badge (Signed Up/Not Signed Up)
+  - Individual results in blue box if available (score out of 6 or "Did Not Attend")
+  - Team results in gold box if available (Team Score/12, Relay 1/8, Relay 2/8, Team Individual Score, Team Total/64)
+- **MATHCOUNTS**: Displays signup details and competition results if available (Sprint/Target/Individual scores out of 30/16/46, rank, chapter advancement status)
+- **AMC 8**: Displays "January 23, 2026"
 
 **Data Quality Requirements:**
 - **Student names must match exactly** across all sheets (case-insensitive, but spelling must be identical)
