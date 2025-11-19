@@ -12,8 +12,15 @@ This is a static HTML website for the Hallie Wells Middle School Competition Mat
 - `index.html` - Redirects to announcements.html
 - `header-template.js` - Shared header/navigation component loaded by all pages
 - `announcements.html` - Announcements page content
-- `club.html` - Club information page content
-- `competitions.html` - Competition details and schedule
+- `club.html` - Club information page with collapsible Club Materials & Resources section
+  - **MOEMS Resources**: Message to Parents, Sample Test (PDF), What Every Young Mathlete Should Know
+  - **MATHCOUNTS Resources**: Message to Parents, Info Slides, various practice materials
+  - **AMC 8 Resources**: Message to Parents, Past AMC 8 Problems, AMC 8 Mock Tests
+  - **Math Kangaroo Resources**: Sample Questions, Math Kangaroo Scoring, Math Kangaroo Awards
+  - **MCPS Math League Resources**: FAQ and meet information
+- `competitions.html` - Competition details, schedules, and external resource links
+  - Competition table with official sites and practice resources
+  - Calendar view of all competition dates
 - `registration.html` - Registration & Records page with links to Google Form and Parent Portal
 - `HWMS.jpeg` - School logo image
 - `README.md` - Basic project description
