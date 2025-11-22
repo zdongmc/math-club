@@ -418,6 +418,10 @@ function getMathKangarooSheet() {
   return getSpreadsheet().getSheetByName('Math Kangaroo');
 }
 
+function getAmc8Sheet() {
+  return getSpreadsheet().getSheetByName('AMC 8');
+}
+
 function getMathLeagueTeam(mcpsId) {
   try {
     const sheet = getMathLeagueSheet();
@@ -760,6 +764,38 @@ function getMathKangarooResults(studentName) {
   }
 }
 
+function getAmc8Results(mcpsId) {
+  try {
+    const sheet = getAmc8Sheet();
+    if (!sheet || sheet.getLastRow() <= 1) {
+      return null;
+    }
+
+    const data = sheet.getDataRange().getValues();
+
+    // Look for student by MCPS ID in column B
+    // Columns: A=Name, B=ID, C=Grade, D=?, E=Registered (has value if registered)
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const studentId = (row[1] || '').toString().trim(); // Column B (index 1)
+
+      if (studentId === mcpsId.toString().trim()) {
+        const registered = row[4] !== undefined && row[4] !== null && row[4].toString().trim() !== '';
+
+        return {
+          registered: registered,
+          registrationLink: 'https://maa.edvistas.com/datamate/testRegister.aspx?id=1c11c106-b611-4250-a1ba-a59a0430df62'
+        };
+      }
+    }
+
+    return null;
+  } catch (error) {
+    Logger.log('Error getting AMC 8 results: ' + error.toString());
+    return null;
+  }
+}
+
 function checkFormCompletion(mcpsId, studentName) {
   try {
     const forms = {
@@ -1051,7 +1087,21 @@ function lookupStudentByMcpsId(mcpsId) {
         Logger.log('No Math Kangaroo results found for this student');
       }
     } catch (err) {
-      Logger.log('Error getting Math League results: ' + err.toString());
+      Logger.log('Error getting Math Kangaroo results: ' + err.toString());
+    }
+
+    // Get AMC 8 results
+    let amc8Results = null;
+    try {
+      Logger.log('Getting AMC 8 results for: ' + mcpsIdStr);
+      amc8Results = getAmc8Results(mcpsIdStr);
+      if (amc8Results) {
+        Logger.log('AMC 8 results retrieved: Registered=' + amc8Results.registered);
+      } else {
+        Logger.log('No AMC 8 results found for this student');
+      }
+    } catch (err) {
+      Logger.log('Error getting AMC 8 results: ' + err.toString());
     }
 
     const result = {
@@ -1063,7 +1113,8 @@ function lookupStudentByMcpsId(mcpsId) {
       mathcounts: mathcountsResults,
       moems: moemsResults,
       mathLeague: mathLeagueResults,
-      mathKangaroo: mathKangarooResults
+      mathKangaroo: mathKangarooResults,
+      amc8: amc8Results
     };
 
     Logger.log('Returning result: ' + JSON.stringify(result));
