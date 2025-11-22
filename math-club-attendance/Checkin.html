@@ -750,15 +750,15 @@
             });
             html += '</div>';
 
-            // AMC 8 section - only show if signed up
+            // AMC 8 section - always show
             const amc8Competition = competitions.find(comp => comp.name === 'AMC 8');
+            html += '<h2 class="section-title">&#x1F4D0; AMC 8</h2>';
+            html += '<div class="info-card">';
+            html += '<div style="padding: 15px;">';
+            html += '<div style="color: #666; font-size: 0.95rem; margin-bottom: 12px;">Competition Date: <strong>January 23, 2026</strong></div>';
 
             if (amc8Competition && amc8Competition.signedUp) {
-                html += '<h2 class="section-title">&#x1F4D0; AMC 8</h2>';
-                html += '<div class="info-card">';
-                html += '<div style="padding: 15px;">';
-                html += '<div style="color: #666; font-size: 0.95rem; margin-bottom: 12px;">Competition Date: <strong>January 23, 2026</strong></div>';
-
+                // Student is signed up for AMC 8
                 if (amc8 && amc8.registered) {
                     // Registered - show confirmation with green checkmark
                     html += '<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">';
@@ -766,7 +766,7 @@
                     html += '<span style="font-weight: bold; color: #059669; font-size: 1.05rem;">Registered for AMC 8</span>';
                     html += '</div>';
                 } else {
-                    // Not registered or not in AMC 8 sheet - show registration link
+                    // Signed up but not registered - show registration link
                     html += '<div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 15px; margin-bottom: 10px;">';
                     html += '<div style="font-weight: bold; color: #92400e; font-size: 1.05rem; margin-bottom: 10px;">&#9888; Please Complete Registration</div>';
                     html += '<div style="color: #78350f; margin-bottom: 12px;">You are signed up for the AMC 8, but you need to complete your registration with the AMC.</div>';
@@ -776,10 +776,15 @@
                     }
                     html += '</div>';
                 }
-
-                html += '</div>';
+            } else {
+                // Not signed up for AMC 8
+                html += '<div style="text-align: center; padding: 10px;">';
+                html += '<span style="color: #6b7280; font-size: 0.95rem;">Not Signed Up</span>';
                 html += '</div>';
             }
+
+            html += '</div>';
+            html += '</div>';
 
             // Math Kangaroo section - always show
             html += '<h2 class="section-title">&#129432; Math Kangaroo</h2>';
