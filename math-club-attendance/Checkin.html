@@ -660,6 +660,11 @@
             html += '<div class="competition-list">';
 
             competitions.forEach(comp => {
+                // Skip AMC 8 - it has its own dedicated section below
+                if (comp.name === 'AMC 8') {
+                    return;
+                }
+
                 html += `<div class="competition-card"><div class="competition-name">${escapeHtml(comp.name)}</div>`;
 
                 // Special handling for MATHCOUNTS - show scores if signed up
