@@ -410,6 +410,14 @@ function getMathcountsSheet() {
   return getSpreadsheet().getSheetByName('MATHCOUNTS');
 }
 
+function getMoemsSheet() {
+  return getSpreadsheet().getSheetByName('MOEMS');
+}
+
+function getMathKangarooSheet() {
+  return getSpreadsheet().getSheetByName('Math Kangaroo');
+}
+
 function getMathLeagueTeam(mcpsId) {
   try {
     const sheet = getMathLeagueSheet();
@@ -419,7 +427,7 @@ function getMathLeagueTeam(mcpsId) {
 
     const data = sheet.getDataRange().getValues();
 
-    // Columns: A=Team, B=Name, C=ID, D=Grade, E-H=Scores, I=Total
+    // Columns: A=Team, B=Name, C=ID, D=Grade, E=ARML Tracking, F-I=Scores (Meet 1-4), J=Total
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
       const studentId = (row[2] || '').toString().trim();
@@ -436,6 +444,118 @@ function getMathLeagueTeam(mcpsId) {
   }
 }
 
+function getMathLeagueResults(mcpsId) {
+  try {
+    const sheet = getMathLeagueSheet();
+    if (!sheet || sheet.getLastRow() <= 1) {
+      return null;
+    }
+
+    const data = sheet.getDataRange().getValues();
+
+    // Columns: A=Team, B=Name, C=ID, D=Grade, E=ARML Tracking, F-I=Individual scores (Meet 1-4), J=Total
+    // Team scores in rows 2-8: N=Team score, O=Relay 1, P=Relay 2, Q=Team individual, R=Team total
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const studentId = (row[2] || '').toString().trim();
+
+      if (studentId === mcpsId.toString().trim()) {
+        const team = (row[0] || '').toString().trim();
+        const armlTracking = (row[4] || '').toString().trim(); // Column E (index 4)
+
+        // Parse ARML tracking - check for "Yes", "Y", "TRUE", or true
+        const isArmlTracked = armlTracking &&
+          (armlTracking.toLowerCase() === 'yes' ||
+           armlTracking.toLowerCase() === 'y' ||
+           armlTracking.toLowerCase() === 'true' ||
+           armlTracking === true);
+
+        // Helper function to parse meet score
+        function parseMeetScore(val) {
+          if (val === undefined || val === '') {
+            return null; // Score not entered yet
+          }
+          const valStr = val.toString().toUpperCase().trim();
+          if (valStr === 'NA') {
+            return 'NA'; // Student did not attend
+          }
+          const score = parseFloat(valStr);
+          if (!isNaN(score)) {
+            return score;
+          }
+          return null;
+        }
+
+        // Parse individual meet scores from columns G-J (indices 6-9)
+        const meet1Individual = parseMeetScore(row[6]); // Column G
+        const meet2Individual = parseMeetScore(row[7]); // Column H
+        const meet3Individual = parseMeetScore(row[8]); // Column I
+        const meet4Individual = parseMeetScore(row[9]); // Column J
+
+        const meetScores = [
+          meet1Individual,
+          meet2Individual,
+          meet3Individual,
+          meet4Individual
+        ];
+
+        // Get team scores from the appropriate row (2-8)
+        // Team A=row 2, Team B=row 3, Team C=row 4, JV A=row 5, JV B=row 6, JV C=row 7, JV Mixed=row 8
+        let teamResults = null;
+        if (team) {
+          const teamRowMap = {
+            'A': 1,
+            'B': 2,
+            'C': 3,
+            'JV A': 4,
+            'JV B': 5,
+            'JV C': 6,
+            'JV Mixed': 7
+          };
+
+          const teamRowIndex = teamRowMap[team];
+          if (teamRowIndex !== undefined && data.length > teamRowIndex) {
+            const teamRow = data[teamRowIndex];
+
+            // Team results for each meet:
+            // Meet 1: N-R (indices 13-17)
+            // Meet 2: S-W (indices 18-22)
+            // Meet 3: X-AB (indices 23-27)
+            // Meet 4: AC-AG (indices 28-32)
+            teamResults = [];
+
+            for (let meetIndex = 0; meetIndex < 4; meetIndex++) {
+              const baseCol = 13 + (meetIndex * 5); // N=13, S=18, X=23, AC=28
+              teamResults.push({
+                teamScore: teamRow[baseCol] !== undefined && teamRow[baseCol] !== '' ? parseFloat(teamRow[baseCol]) : null,
+                relay1Score: teamRow[baseCol + 1] !== undefined && teamRow[baseCol + 1] !== '' ? parseFloat(teamRow[baseCol + 1]) : null,
+                relay2Score: teamRow[baseCol + 2] !== undefined && teamRow[baseCol + 2] !== '' ? parseFloat(teamRow[baseCol + 2]) : null,
+                teamIndividualScore: teamRow[baseCol + 3] !== undefined && teamRow[baseCol + 3] !== '' ? parseFloat(teamRow[baseCol + 3]) : null,
+                teamTotalScore: teamRow[baseCol + 4] !== undefined && teamRow[baseCol + 4] !== '' ? parseFloat(teamRow[baseCol + 4]) : null,
+                maxTeamScore: 12,
+                maxRelayScore: 8,
+                maxTeamTotal: 64
+              });
+            }
+          }
+        }
+
+        return {
+          team: team,
+          armlTracked: isArmlTracked,
+          meetScores: meetScores,
+          teamResults: teamResults
+        };
+      }
+    }
+
+    return null;
+  } catch (error) {
+    Logger.log('Error getting Math League results: ' + error.toString());
+    return null;
+  }
+}
+
 function getMathcountsResults(mcpsId) {
   try {
     const sheet = getMathcountsSheet();
@@ -446,7 +566,7 @@ function getMathcountsResults(mcpsId) {
     const data = sheet.getDataRange().getValues();
 
     // Look for student by MCPS ID in column B
-    // Columns: A=Name, B=ID, G=Sprint Round, H=Target Round, I=Individual Score, J=Rank
+    // Columns: A=Name, B=ID, G=Sprint Round, H=Target Round, I=Individual Score, J=Rank, K=Chapter Advancement, M=Fee Required, N=Fee Paid
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
       const studentId = (row[1] || '').toString().trim(); // Column B (index 1)
@@ -459,12 +579,34 @@ function getMathcountsResults(mcpsId) {
         const rank = row[9] !== undefined && row[9] !== '' ? parseInt(row[9]) : null;
         const chapterStatus = row[10] !== undefined && row[10] !== '' ? row[10].toString().trim() : null;
 
+        // Column M (index 12) = Fee Required, Column N (index 13) = Fee Paid
+        const feeRequired = row[12] !== undefined && row[12] !== '' ? row[12].toString().trim().toUpperCase() : null;
+        const feePaid = row[13] !== undefined && row[13] !== '' ? row[13].toString().trim() : null;
+
+        // Only include fee info if it's not "NA"
+        let feeInfo = null;
+        if (feeRequired && feeRequired !== 'NA') {
+          // Parse fee paid status - check for "Yes", "Y", "Paid", or TRUE
+          const isPaid = feePaid &&
+            (feePaid.toLowerCase() === 'yes' ||
+             feePaid.toLowerCase() === 'y' ||
+             feePaid.toLowerCase() === 'paid' ||
+             feePaid.toLowerCase() === 'true' ||
+             feePaid === true);
+
+          feeInfo = {
+            required: true,
+            paid: isPaid
+          };
+        }
+
         return {
           sprintScore: sprintScore,
           targetScore: targetScore,
           individualScore: individualScore,
           rank: rank,
           chapterStatus: chapterStatus,
+          feeInfo: feeInfo,
           maxSprint: 30,
           maxTarget: 16,
           maxIndividual: 46
@@ -475,6 +617,145 @@ function getMathcountsResults(mcpsId) {
     return null;
   } catch (error) {
     Logger.log('Error getting MATHCOUNTS results: ' + error.toString());
+    return null;
+  }
+}
+
+function getMoemsResults(mcpsId) {
+  try {
+    const sheet = getMoemsSheet();
+    if (!sheet || sheet.getLastRow() <= 1) {
+      return null;
+    }
+
+    const data = sheet.getDataRange().getValues();
+
+    // Look for student by MCPS ID in column B
+    // Columns: A=Name, B=ID, C=Grade, D-H=Contest 1-5 scores, I=Total, J=Fee, K=Paid
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const studentId = (row[1] || '').toString().trim(); // Column B (index 1)
+
+      if (studentId === mcpsId.toString().trim()) {
+        // Parse contest scores
+        const contest1 = row[3]; // Column D (index 3)
+        const contest2 = row[4]; // Column E (index 4)
+        const contest3 = row[5]; // Column F (index 5)
+        const contest4 = row[6]; // Column G (index 6)
+        const contest5 = row[7]; // Column H (index 7)
+        const total = row[8]; // Column I (index 8)
+        const fee = row[9]; // Column J (index 9)
+        const feePaid = row[10]; // Column K (index 10)
+
+        // Helper function to parse contest value
+        // Returns: { attended: boolean, score: number|null }
+        function parseContestValue(val) {
+          if (val === undefined || val === '') {
+            return { attended: true, score: null }; // Blank = will attend, score not entered yet
+          }
+          const valStr = val.toString().toUpperCase().trim();
+          if (valStr === 'NA') {
+            return { attended: false, score: null }; // NA = will not attend
+          }
+          // Try to parse as number
+          const score = parseFloat(valStr);
+          if (!isNaN(score)) {
+            return { attended: true, score: score };
+          }
+          // Unknown value, treat as attending with no score
+          return { attended: true, score: null };
+        }
+
+        const contests = [
+          parseContestValue(contest1),
+          parseContestValue(contest2),
+          parseContestValue(contest3),
+          parseContestValue(contest4),
+          parseContestValue(contest5)
+        ];
+
+        // Parse total score
+        let totalScore = null;
+        if (total !== undefined && total !== '') {
+          const parsedTotal = parseFloat(total.toString());
+          if (!isNaN(parsedTotal)) {
+            totalScore = parsedTotal;
+          }
+        }
+
+        // Parse fee amount
+        let feeAmount = null;
+        if (fee !== undefined && fee !== '') {
+          const feeStr = fee.toString().trim();
+          // Extract number from string like "$5" or "5" or "$25" or "25"
+          const feeMatch = feeStr.match(/\d+/);
+          if (feeMatch) {
+            feeAmount = parseFloat(feeMatch[0]);
+          }
+        }
+
+        // Parse fee paid status - check for TRUE, "true", "Yes", "Y", etc.
+        Logger.log('MOEMS Fee Paid raw value: ' + feePaid + ' (type: ' + typeof feePaid + ')');
+
+        let isPaid = false;
+        if (feePaid !== undefined && feePaid !== null && feePaid !== '') {
+          if (feePaid === true || feePaid === 'TRUE') {
+            isPaid = true;
+          } else if (typeof feePaid === 'string') {
+            const feeStr = feePaid.toString().toLowerCase().trim();
+            isPaid = feeStr === 'true' || feeStr === 'yes' || feeStr === 'y' || feeStr === 'paid';
+          }
+        }
+
+        Logger.log('MOEMS Fee Paid parsed value: ' + isPaid);
+
+        return {
+          contests: contests,
+          totalScore: totalScore,
+          maxContestScore: 5,
+          maxTotalScore: 25,
+          fee: feeAmount,
+          feePaid: isPaid
+        };
+      }
+    }
+
+    return null;
+  } catch (error) {
+    Logger.log('Error getting MOEMS results: ' + error.toString());
+    return null;
+  }
+}
+
+function getMathKangarooResults(studentName) {
+  try {
+    const sheet = getMathKangarooSheet();
+    if (!sheet || sheet.getLastRow() <= 1) {
+      return null;
+    }
+
+    const data = sheet.getDataRange().getValues();
+    const cleanStudentName = (studentName || '').toString().trim().toLowerCase();
+
+    // Look for student by name in column A
+    // Columns: A=Name, B=MK ID
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const name = (row[0] || '').toString().trim().toLowerCase();
+
+      if (name === cleanStudentName) {
+        const mkId = row[1] !== undefined && row[1] !== '' ? row[1].toString().trim() : null;
+
+        return {
+          registered: true,
+          mkId: mkId
+        };
+      }
+    }
+
+    return null;
+  } catch (error) {
+    Logger.log('Error getting Math Kangaroo results: ' + error.toString());
     return null;
   }
 }
@@ -731,13 +1012,58 @@ function lookupStudentByMcpsId(mcpsId) {
       Logger.log('Error getting MATHCOUNTS results: ' + err.toString());
     }
 
+    // Get MOEMS results
+    let moemsResults = null;
+    try {
+      Logger.log('Getting MOEMS results for: ' + mcpsIdStr);
+      moemsResults = getMoemsResults(mcpsIdStr);
+      if (moemsResults) {
+        Logger.log('MOEMS results retrieved: Total=' + moemsResults.totalScore);
+      } else {
+        Logger.log('No MOEMS results found for this student');
+      }
+    } catch (err) {
+      Logger.log('Error getting MOEMS results: ' + err.toString());
+    }
+
+    // Get Math League results
+    let mathLeagueResults = null;
+    try {
+      Logger.log('Getting Math League results for: ' + mcpsIdStr);
+      mathLeagueResults = getMathLeagueResults(mcpsIdStr);
+      if (mathLeagueResults) {
+        Logger.log('Math League results retrieved: Team=' + mathLeagueResults.team + ', ARML Tracked=' + mathLeagueResults.armlTracked);
+      } else {
+        Logger.log('No Math League results found for this student');
+      }
+    } catch (err) {
+      Logger.log('Error getting Math League results: ' + err.toString());
+    }
+
+    // Get Math Kangaroo results (lookup by name)
+    let mathKangarooResults = null;
+    try {
+      Logger.log('Getting Math Kangaroo results for: ' + studentInfo.name);
+      mathKangarooResults = getMathKangarooResults(studentInfo.name);
+      if (mathKangarooResults) {
+        Logger.log('Math Kangaroo results retrieved: MK ID=' + mathKangarooResults.mkId);
+      } else {
+        Logger.log('No Math Kangaroo results found for this student');
+      }
+    } catch (err) {
+      Logger.log('Error getting Math League results: ' + err.toString());
+    }
+
     const result = {
       success: true,
       student: studentInfo,
       attendance: attendanceHistory,
       competitions: competitionSignups,
       forms: formCompletion,
-      mathcounts: mathcountsResults
+      mathcounts: mathcountsResults,
+      moems: moemsResults,
+      mathLeague: mathLeagueResults,
+      mathKangaroo: mathKangarooResults
     };
 
     Logger.log('Returning result: ' + JSON.stringify(result));

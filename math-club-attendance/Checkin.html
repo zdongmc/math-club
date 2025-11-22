@@ -572,6 +572,9 @@
             const competitions = result.competitions;
             const forms = result.forms || null;
             const mathcounts = result.mathcounts || null;
+            const moems = result.moems || null;
+            const mathLeague = result.mathLeague || null;
+            const mathKangaroo = result.mathKangaroo || null;
 
             let html = `
                 <div class="student-header">
@@ -628,20 +631,8 @@
             }
 
             html += `
-                <!-- Stats Overview -->
-                <div class="stat-cards">
-                    <div class="stat-card">
-                        <div class="stat-number">${attendance.totalMeetings}</div>
-                        <div class="stat-label">Club Meetings Attended</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">${competitions.filter(c => c.signedUp).length}</div>
-                        <div class="stat-label">Competitions Signed Up</div>
-                    </div>
-                </div>
-
-                <!-- Attendance History -->
-                <h2 class="section-title">📅 Attendance History</h2>
+                <!-- Club Meetings -->
+                <h2 class="section-title">📅 Club Meetings</h2>
             `;
 
             if (attendance.dates.length === 0) {
@@ -652,6 +643,7 @@
                     </div>
                 `;
             } else {
+                html += '<div style="margin-bottom: 10px; color: #666; font-size: 0.95rem;"><strong>' + attendance.totalMeetings + '</strong> meetings attended</div>';
                 html += '<div class="attendance-list">';
                 // Sort by date (most recent first)
                 attendance.dates.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -662,8 +654,8 @@
                 html += '</div>';
             }
 
-            // Competition Sign-ups
-            html += '<h2 class="section-title">🏆 Competition Sign-ups</h2>';
+            // Competitions
+            html += '<h2 class="section-title">🏆 Competitions</h2>';
             html += '<div class="competition-list">';
 
             competitions.forEach(comp => {
@@ -700,12 +692,29 @@
                         // Chapter Competition Status
                         if (mathcounts.chapterStatus) {
                             html += '<div style="margin-top: 10px; padding: 12px; background: #d1fae5; border: 2px solid #059669; border-radius: 8px; text-align: center;">';
-                            html += `<div style="color: #047857; font-weight: bold; font-size: 1.1rem;">🎉 Advancing to Chapter Competition</div>`;
-                            html += `<div style="color: #065f46; margin-top: 5px; font-size: 1rem;">as ${escapeHtml(mathcounts.chapterStatus)}</div>`;
+                            html += '<div style="color: #047857; font-weight: bold; font-size: 1.1rem;">&#127881; Advancing to Chapter Competition</div>';
+                            html += '<div style="color: #065f46; margin-top: 5px; font-size: 1rem;">as ' + escapeHtml(mathcounts.chapterStatus) + '</div>';
                             html += '</div>';
+
+                            // Fee payment status (only show if advancing to chapter)
+                            if (mathcounts.feeInfo && mathcounts.feeInfo.required) {
+                                if (mathcounts.feeInfo.paid) {
+                                    // Fee has been paid
+                                    html += '<div style="margin-top: 10px; padding: 12px; background: #d1fae5; border: 2px solid #059669; border-radius: 8px; text-align: center;">';
+                                    html += '<div style="color: #047857; font-weight: bold; font-size: 1rem;">&#10003; $40 Chapter Fee Paid</div>';
+                                    html += '</div>';
+                                } else {
+                                    // Fee not paid yet - show payment link
+                                    html += '<div style="margin-top: 10px; padding: 12px; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; text-align: center;">';
+                                    html += '<div style="font-weight: bold; color: #92400e; margin-bottom: 10px; font-size: 1.1rem;">Chapter Competition Fee Required</div>';
+                                    html += '<div style="color: #78350f; margin-bottom: 10px;">$40 fee is required to attend the Chapter Competition</div>';
+                                    html += '<a href="https://halliewellsms.givebacks.com/shop/items/d7bed37c9071" target="_blank" style="display: inline-block; background: #dc2626; color: white; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: all 0.3s ease;">Pay $40 Fee</a>';
+                                    html += '</div>';
+                                }
+                            }
                         } else {
                             html += '<div style="margin-top: 10px; padding: 10px; background: #f3f4f6; border: 2px solid #d1d5db; border-radius: 8px; text-align: center;">';
-                            html += `<div style="color: #6b7280; font-size: 0.95rem;">Not advancing to Chapter Competition</div>`;
+                            html += '<div style="color: #6b7280; font-size: 0.95rem;">Not advancing to Chapter Competition</div>';
                             html += '</div>';
                         }
 
@@ -720,7 +729,7 @@
                 }
                 // Special handling for MOEMS and Math League - parse individual dates
                 else if ((comp.name === 'MOEMS' || comp.name === 'MCPS Math League') && comp.signedUp) {
-                    html += parseCompetitionDates(comp.name, comp.details, comp.waitlisted, comp.team);
+                    html += parseCompetitionDates(comp.name, comp.details, comp.waitlisted, comp.team, moems, mathLeague);
                 } else if (comp.signedUp) {
                     // For other signed-up competitions, show details
                     html += `<div class="competition-details">${escapeHtml(comp.details)}</div>`;
@@ -735,20 +744,93 @@
             });
             html += '</div>';
 
+            // Math Kangaroo section - always show
+            html += '<h2 class="section-title">&#129432; Math Kangaroo</h2>';
+
+            if (mathKangaroo && mathKangaroo.registered) {
+                // Registered - show confirmation
+                html += '<div class="info-card">';
+                html += '<div style="text-align: center; padding: 15px;">';
+                html += '<div style="font-weight: bold; color: #059669; font-size: 1.1rem; margin-bottom: 8px;">&#10003; Registered for Math Kangaroo</div>';
+                html += '<div style="color: #666; font-size: 0.95rem; margin-bottom: 8px;">Competition Date: <strong>March 19, 2026</strong></div>';
+                if (mathKangaroo.mkId) {
+                    html += '<div style="color: #666; font-size: 0.95rem;">Math Kangaroo ID: <strong>' + escapeHtml(mathKangaroo.mkId) + '</strong></div>';
+                }
+                html += '</div>';
+                html += '</div>';
+            } else {
+                // Not registered - show registration instructions
+                html += '<div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 10px; padding: 20px; margin-bottom: 15px;">';
+                html += '<div style="font-weight: bold; color: #92400e; font-size: 1.1rem; margin-bottom: 15px; text-align: center;">Not Yet Registered</div>';
+                html += '<div style="color: #78350f; margin-bottom: 15px;">';
+                html += '<div style="font-weight: bold; margin-bottom: 10px;">Steps to register:</div>';
+                html += '<ol style="margin-left: 20px; line-height: 1.8;">';
+                html += '<li>Go to: <a href="https://mathkangaroo.oasis-lms.com/Users/Catalog.aspx" target="_blank" style="color: #dc2626; text-decoration: underline;">https://mathkangaroo.oasis-lms.com/Users/Catalog.aspx</a></li>';
+                html += '<li>Log in with your login and password or establish your user account if you are new.</li>';
+                html += '<li>Click on the tab <strong>By Invitation</strong>.</li>';
+                html += '<li>Copy and paste this code in the field <strong>Invitation Code</strong>: <code style="background: #fff; padding: 2px 6px; border-radius: 3px; font-family: monospace;">MDCLARK0003001@2026math</code></li>';
+                html += '<li>Do not share the code with anyone</li>';
+                html += '<li>You are ready to register.</li>';
+                html += '</ol>';
+                html += '</div>';
+                html += '<div style="background: #fff; padding: 12px; border-radius: 8px; margin-bottom: 10px;">';
+                html += '<div style="color: #92400e; font-weight: bold; margin-bottom: 5px;">Registration Fees:</div>';
+                html += '<div style="color: #78350f;">$18 if you register by December 31</div>';
+                html += '<div style="color: #78350f;">$35 late registration (January 1 - February 1)</div>';
+                html += '</div>';
+                html += '<div style="text-align: center; color: #78350f; font-weight: bold;">Competition Date: Thursday, March 19, 2026</div>';
+                html += '</div>';
+            }
+
             document.getElementById('studentResults').innerHTML = html;
             document.getElementById('resultsSection').classList.add('show');
         }
 
-        function parseCompetitionDates(competitionName, details, isWaitlisted, team) {
+        function parseCompetitionDates(competitionName, details, isWaitlisted, team, moemsData, mathLeagueData) {
             let html = '<div class="competition-dates">';
 
-            // Display team assignment for Math League
-            if (competitionName === 'MCPS Math League' && team) {
-                html += `
-                    <div style="background: #fef3c7; border: 2px solid #fbbf24; border-radius: 8px; padding: 12px; margin-bottom: 12px; text-align: center;">
-                        <div style="font-weight: bold; color: #92400e; font-size: 1.1rem;">Team: ${escapeHtml(team)}</div>
-                    </div>
-                `;
+            // Display team assignment and ARML tracking for Math League
+            if (competitionName === 'MCPS Math League' && (team || mathLeagueData)) {
+                const teamText = team || 'Not Assigned';
+                html += '<div style="background: #fef3c7; border: 2px solid #fbbf24; border-radius: 8px; padding: 12px; margin-bottom: 8px; text-align: center;">';
+                html += '<div style="font-weight: bold; color: #92400e; font-size: 1.1rem;">Team ' + escapeHtml(teamText) + '</div>';
+                html += '</div>';
+
+                // Display ARML tracking separately and smaller
+                if (mathLeagueData) {
+                    const armlStatus = mathLeagueData.armlTracked ? 'on' : 'off';
+                    html += '<div style="margin-bottom: 12px; text-align: center;">';
+                    html += '<span style="color: #666; font-size: 0.85rem;">ARML Tracking: ' + armlStatus + '</span>';
+                    html += '</div>';
+                }
+            }
+
+            // Display MOEMS fee payment status if available
+            if (competitionName === 'MOEMS' && moemsData && moemsData.fee !== null && moemsData.fee !== undefined) {
+                const feeAmount = moemsData.fee;
+
+                if (moemsData.feePaid) {
+                    // Fee has been paid - show green confirmation
+                    html += '<div style="background: #d1fae5; border: 2px solid #059669; border-radius: 8px; padding: 15px; margin-bottom: 15px; text-align: center;">';
+                    html += '<div style="color: #047857; font-weight: bold; font-size: 1.1rem;">&#10003; MOEMS $' + feeAmount + ' Fee Paid</div>';
+                    html += '</div>';
+                } else {
+                    // Fee not paid - show payment link
+                    let paymentUrl = '';
+
+                    if (feeAmount === 5) {
+                        paymentUrl = 'https://halliewellsms.givebacks.com/shop/items/c533ff346cf879';
+                    } else if (feeAmount === 25) {
+                        paymentUrl = 'https://halliewellsms.givebacks.com/shop/items/c529ba95f8bd';
+                    }
+
+                    if (paymentUrl) {
+                        html += '<div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 15px; margin-bottom: 15px; text-align: center;">';
+                        html += '<div style="font-weight: bold; color: #92400e; margin-bottom: 8px; font-size: 1.1rem;">MOEMS Fee: $' + feeAmount + '</div>';
+                        html += '<a href="' + paymentUrl + '" target="_blank" style="display: inline-block; background: #dc2626; color: white; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: all 0.3s ease;">Pay $' + feeAmount + ' Fee</a>';
+                        html += '</div>';
+                    }
+                }
             }
 
             if (competitionName === 'MOEMS') {
@@ -761,31 +843,76 @@
                     { num: 5, name: 'Contest #5', date: 'March 6, 2026' }
                 ];
 
-                allContests.forEach(contest => {
+                // Group results by contest (similar to Math League format)
+                allContests.forEach((contest, contestIndex) => {
+                    html += '<div style="margin-top: 15px; background: #f8f9fa; border: 2px solid #d1d5db; border-radius: 10px; padding: 15px;">';
+                    html += '<div style="font-weight: bold; color: #333; margin-bottom: 12px; font-size: 1.15rem;">' + escapeHtml(contest.name) + ' - ' + escapeHtml(contest.date) + '</div>';
+
+                    // Sign-up status
+                    let signedUp = false;
                     if (isWaitlisted) {
-                        // If waitlisted for entire competition, all contests are waitlisted
-                        html += `
-                            <div class="competition-date-item waitlisted">
-                                <div class="date-status waitlisted">Waitlisted</div>
-                                <div class="date-label">${escapeHtml(contest.name)} - ${escapeHtml(contest.date)}</div>
-                            </div>
-                        `;
+                        html += '<div class="competition-date-item waitlisted" style="margin-bottom: 10px;">';
+                        html += '<div class="date-status waitlisted">Waitlisted</div>';
+                        html += '</div>';
                     } else {
-                        const signedUp = details.includes(contest.name);
-                        const status = signedUp ? 'Yes' : 'No';
+                        signedUp = details.includes(contest.name);
+                        const status = signedUp ? 'Signed Up' : 'Not Signed Up';
                         const statusClass = signedUp ? 'yes' : 'no';
                         const itemClass = signedUp ? 'signed-up' : 'not-signed-up';
 
-                        html += `
-                            <div class="competition-date-item ${itemClass}">
-                                <div class="date-status ${statusClass}">${status}</div>
-                                <div class="date-label">${escapeHtml(contest.name)} - ${escapeHtml(contest.date)}</div>
-                            </div>
-                        `;
+                        html += '<div class="competition-date-item ' + itemClass + '" style="margin-bottom: 10px;">';
+                        html += '<div class="date-status ' + statusClass + '">' + status + '</div>';
+                        html += '</div>';
                     }
+
+                    // ONLY show results for Contest #1 (contestIndex === 0)
+                    if (signedUp && contestIndex === 0) {
+                        // Contest results (if available)
+                        if (moemsData && moemsData.contests && moemsData.contests[contestIndex]) {
+                            const contestResult = moemsData.contests[contestIndex];
+
+                            if (contestResult.attended) {
+                                html += '<div style="margin-top: 10px; background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px;">';
+                                html += '<div style="font-weight: bold; color: #1e40af; margin-bottom: 8px; font-size: 1rem;">Contest Results</div>';
+
+                                if (contestResult.score !== null && contestResult.score !== undefined) {
+                                    // Score has been entered
+                                    html += '<div class="info-row" style="border: none; padding: 5px 0;">';
+                                    html += '<span class="info-label">Score</span>';
+                                    html += '<span class="info-value"><strong>' + contestResult.score + '</strong> / ' + moemsData.maxContestScore + '</span>';
+                                    html += '</div>';
+                                } else {
+                                    // Score pending
+                                    html += '<div style="padding: 8px; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; text-align: center;">';
+                                    html += '<span style="color: #92400e; font-weight: bold;">Score Pending</span>';
+                                    html += '</div>';
+                                }
+
+                                html += '</div>';
+                            } else if (!contestResult.attended && contestResult.score === null) {
+                                // Did not attend (marked as "NA" in sheet)
+                                html += '<div style="margin-top: 10px; background: #fee; border: 2px solid #dc2626; border-radius: 8px; padding: 12px;">';
+                                html += '<div style="font-weight: bold; color: #dc2626; text-align: center;">Did Not Attend</div>';
+                                html += '</div>';
+                            }
+                        }
+                    }
+
+                    html += '</div>'; // Close contest container
                 });
+
+                // Display total score if available and student is signed up for any contest
+                if (!isWaitlisted && moemsData && moemsData.totalScore !== null && moemsData.totalScore !== undefined) {
+                    html += '<div style="margin-top: 20px; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 10px; padding: 15px;">';
+                    html += '<div style="font-weight: bold; color: #92400e; margin-bottom: 8px; font-size: 1.1rem;">Total Score</div>';
+                    html += '<div class="info-row" style="border: none; padding: 5px 0;">';
+                    html += '<span class="info-label">Combined Score</span>';
+                    html += '<span class="info-value"><strong style="font-size: 1.2rem;">' + moemsData.totalScore + '</strong> / ' + moemsData.maxTotalScore + '</span>';
+                    html += '</div>';
+                    html += '</div>';
+                }
             } else if (competitionName === 'MCPS Math League') {
-                // All possible Math League meets
+                // Math League meet dates and data
                 const allMeets = [
                     { num: 1, name: 'Meet #1', date: 'November 14, 2025' },
                     { num: 2, name: 'Meet #2', date: 'December 12, 2025' },
@@ -793,28 +920,122 @@
                     { num: 4, name: 'Meet #4', date: 'February 13, 2026' }
                 ];
 
-                allMeets.forEach(meet => {
+                // Group results by meet
+                allMeets.forEach(function(meet, meetIndex) {
+                    html += '<div style="margin-top: 15px; background: #f8f9fa; border: 2px solid #d1d5db; border-radius: 10px; padding: 15px;">';
+                    html += '<div style="font-weight: bold; color: #333; margin-bottom: 12px; font-size: 1.15rem;">' + escapeHtml(meet.name) + ' - ' + escapeHtml(meet.date) + '</div>';
+
+                    // Sign-up status
+                    let signedUp = false;
                     if (isWaitlisted) {
-                        // If waitlisted for entire competition, all meets are waitlisted
-                        html += `
-                            <div class="competition-date-item waitlisted">
-                                <div class="date-status waitlisted">Waitlisted</div>
-                                <div class="date-label">${escapeHtml(meet.name)} - ${escapeHtml(meet.date)}</div>
-                            </div>
-                        `;
+                        html += '<div class="competition-date-item waitlisted" style="margin-bottom: 10px;">';
+                        html += '<div class="date-status waitlisted">Waitlisted</div>';
+                        html += '</div>';
                     } else {
-                        const signedUp = details.includes(meet.name);
-                        const status = signedUp ? 'Yes' : 'No';
+                        signedUp = details.includes(meet.name);
+                        const status = signedUp ? 'Signed Up' : 'Not Signed Up';
                         const statusClass = signedUp ? 'yes' : 'no';
                         const itemClass = signedUp ? 'signed-up' : 'not-signed-up';
 
-                        html += `
-                            <div class="competition-date-item ${itemClass}">
-                                <div class="date-status ${statusClass}">${status}</div>
-                                <div class="date-label">${escapeHtml(meet.name)} - ${escapeHtml(meet.date)}</div>
-                            </div>
-                        `;
+                        html += '<div class="competition-date-item ' + itemClass + '" style="margin-bottom: 10px;">';
+                        html += '<div class="date-status ' + statusClass + '">' + status + '</div>';
+                        html += '</div>';
                     }
+
+                    // ONLY show results for Meet #1 (meetIndex === 0)
+                    if (signedUp && !isWaitlisted && meetIndex === 0) {
+                        // Individual results (if available)
+                        if (mathLeagueData && mathLeagueData.meetScores && mathLeagueData.meetScores[meetIndex] !== undefined) {
+                            const meetScore = mathLeagueData.meetScores[meetIndex];
+
+                            html += '<div style="margin-top: 10px; background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px;">';
+                            html += '<div style="font-weight: bold; color: #1e40af; margin-bottom: 8px; font-size: 1rem;">Individual Results</div>';
+
+                            if (meetScore === null) {
+                                // Score pending
+                                html += '<div style="padding: 8px; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; text-align: center;">';
+                                html += '<span style="color: #92400e; font-weight: bold;">Score Pending</span>';
+                                html += '</div>';
+                            } else if (meetScore === 'NA') {
+                                html += '<div style="padding: 8px; background: #fee; border: 1px solid #dc2626; border-radius: 6px; text-align: center;">';
+                                html += '<span style="color: #dc2626; font-weight: bold;">Did Not Attend</span>';
+                                html += '</div>';
+                            } else {
+                                html += '<div class="info-row" style="border: none; padding: 5px 0;">';
+                                html += '<span class="info-label">Individual Score</span>';
+                                html += '<span class="info-value"><strong>' + meetScore + '</strong> / 6</span>';
+                                html += '</div>';
+                            }
+
+                            html += '</div>';
+                        }
+
+                        // Team results (if available and student actually has a team assignment)
+                        if (mathLeagueData && mathLeagueData.team && mathLeagueData.teamResults && mathLeagueData.teamResults[meetIndex] !== null) {
+                            const teamData = mathLeagueData.teamResults[meetIndex];
+
+                            // Only display team results if at least one score is entered
+                            const hasTeamScores = teamData.teamScore !== null ||
+                                                  teamData.relay1Score !== null ||
+                                                  teamData.relay2Score !== null ||
+                                                  teamData.teamIndividualScore !== null ||
+                                                  teamData.teamTotalScore !== null;
+
+                            if (hasTeamScores) {
+                                html += '<div style="margin-top: 10px; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 12px;">';
+                                html += '<div style="font-weight: bold; color: #92400e; margin-bottom: 8px; font-size: 1rem;">Team Results</div>';
+                                html += '<div style="display: grid; gap: 6px;">';
+
+                                if (teamData.teamScore !== null) {
+                                    html += '<div class="info-row" style="border: none; padding: 4px 0;">';
+                                    html += '<span class="info-label">Team Score</span>';
+                                    html += '<span class="info-value"><strong>' + teamData.teamScore + '</strong> / ' + teamData.maxTeamScore + '</span>';
+                                    html += '</div>';
+                                }
+
+                                if (teamData.relay1Score !== null) {
+                                    html += '<div class="info-row" style="border: none; padding: 4px 0;">';
+                                    html += '<span class="info-label">Relay 1</span>';
+                                    html += '<span class="info-value"><strong>' + teamData.relay1Score + '</strong> / ' + teamData.maxRelayScore + '</span>';
+                                    html += '</div>';
+                                }
+
+                                if (teamData.relay2Score !== null) {
+                                    html += '<div class="info-row" style="border: none; padding: 4px 0;">';
+                                    html += '<span class="info-label">Relay 2</span>';
+                                    html += '<span class="info-value"><strong>' + teamData.relay2Score + '</strong> / ' + teamData.maxRelayScore + '</span>';
+                                    html += '</div>';
+                                }
+
+                                if (teamData.teamIndividualScore !== null) {
+                                    html += '<div class="info-row" style="border: none; padding: 4px 0;">';
+                                    html += '<span class="info-label">Team Individual Score</span>';
+                                    html += '<span class="info-value"><strong>' + teamData.teamIndividualScore + '</strong></span>';
+                                    html += '</div>';
+                                }
+
+                                if (teamData.teamTotalScore !== null) {
+                                    html += '<div class="info-row" style="border-top: 2px solid #f59e0b; padding: 6px 0; margin-top: 4px;">';
+                                    html += '<span class="info-label" style="font-weight: bold;">Team Total</span>';
+                                    html += '<span class="info-value" style="font-weight: bold;"><strong>' + teamData.teamTotalScore + '</strong> / ' + teamData.maxTeamTotal + '</span>';
+                                    html += '</div>';
+                                }
+
+                                html += '</div>';
+                                html += '</div>';
+                            } else {
+                                // Team scores pending
+                                html += '<div style="margin-top: 10px; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 12px;">';
+                                html += '<div style="font-weight: bold; color: #92400e; margin-bottom: 8px; font-size: 1rem;">Team Results</div>';
+                                html += '<div style="padding: 8px; background: #fff; border: 1px solid #f59e0b; border-radius: 6px; text-align: center;">';
+                                html += '<span style="color: #92400e; font-weight: bold;">Pending</span>';
+                                html += '</div>';
+                                html += '</div>';
+                            }
+                        }
+                    }
+
+                    html += '</div>'; // Close meet container
                 });
             }
 

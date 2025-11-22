@@ -8,7 +8,18 @@ This is a static HTML website for the Hallie Wells Middle School Competition Mat
 
 ## Architecture
 
+### Directory Structure Overview
+The repository is organized into focused directories:
+- **`mathclubwebsite/`** - Public-facing club website
+- **`math-club-attendance/`** - Parent portal (Google Apps Script)
+- **`mathcounts/`** - MATHCOUNTS competition tools and materials
+- **`MathLeague/`** - Math League meet timer and documentation
+- **`MOEMS/`** - MOEMS teaching materials and vocabulary activities
+- **`mathdetective/`** - Interactive math detective game and certificates
+- **Root directory** - Configuration files (`.gitignore`, `CLAUDE.md`, `README.md`)
+
 ### Main Website Structure
+Located in `mathclubwebsite/` directory:
 - `index.html` - Redirects to announcements.html
 - `header-template.js` - Shared header/navigation component loaded by all pages
 - `announcements.html` - Announcements page content
@@ -21,9 +32,10 @@ This is a static HTML website for the Hallie Wells Middle School Competition Mat
 - `competitions.html` - Competition details, schedules, and external resource links
   - Competition table with official sites and practice resources
   - Calendar view of all competition dates
+- `competition-reference-2025-26.html` - Competition reference guide
 - `registration.html` - Registration & Records page with links to Google Form and Parent Portal
 - `HWMS.jpeg` - School logo image
-- `README.md` - Basic project description
+- `header.html` - Header component template
 
 ### Parent Portal System (Google Apps Script)
 Located in `math-club-attendance/` directory:
@@ -43,7 +55,7 @@ Located in `math-club-attendance/` directory:
   - **Club Meetings** section: Displays attendance dates with total meeting count summary (e.g., "5 meetings attended")
   - **Competitions** section: Shows all competition sign-ups and results
   - **MATHCOUNTS**: Shows School Competition date, displays competition results (Sprint/Target/Individual scores, rank, chapter advancement status). For students advancing to Chapter Competition, displays $40 fee payment status: green checkmark if paid, or yellow alert with payment link if not paid (only shown if column M is not "NA")
-  - **MOEMS**: Displays 5 individual contests with Yes/No status. Shows fee payment status: green checkmark if paid, or yellow alert with payment link ($5 or $25 based on fee amount) if not paid (results built but hidden in UI)
+  - **MOEMS**: Displays 5 individual contests with Yes/No status. For signed-up contests, shows contest results (score out of 5 or "Did Not Attend" or "Score Pending"). Displays total score (out of 25) if available. Shows fee payment status: green checkmark if paid, or yellow alert with payment link ($5 or $25 based on fee amount) if not paid
   - **Math League**: Organized by meets (Meet #1-4). Each meet shows:
     - Sign-up status (Signed Up/Not Signed Up)
     - Individual results (score out of 6 or "Did Not Attend")
@@ -75,7 +87,7 @@ Located in `math-club-attendance/` directory:
   - Contest scores: "NA" = not attending, blank = attending but score pending, number = score
   - Fee (Column J): Fee amount (e.g., 5, 25)
   - Paid (Column K): TRUE/true/Yes/Y/Paid = paid, FALSE/false/blank = not paid
-  - Used for: Retrieving MOEMS contest results and fee payment status by MCPS ID (results currently hidden in UI)
+  - Used for: Retrieving MOEMS contest results and fee payment status by MCPS ID. Results displayed for students signed up for each contest.
 - **Math League** - Math League meet results and ARML tracking
   - Student data columns: A=Team, B=Name, C=ID, D=Grade, E=ARML Tracking (Yes/No), F=Placeholder, G=Meet #1 individual score (out of 6), H-J=Meet #2-4 (future)
   - Team results rows (2-8): Team A (row 2), Team B (row 3), Team C (row 4), Team JV A (row 5), Team JV B (row 6), Team JV C (row 7), Team JV Mixed (row 8)
@@ -125,6 +137,7 @@ Located in `mathcounts/` directory:
 - Keyboard navigation: Arrow keys to move between questions
 - SVG diagrams embedded for questions 44, 53, and 57
 - Red gradient theme matching main site design
+- **IMPORTANT**: Contains competition questions - protected by .gitignore, local-only file
 
 **countdown-round-slideshow.html** - Competition day presentation (19 slides)
 - Slide 1: Welcome slide for families
@@ -140,6 +153,21 @@ Located in `mathcounts/` directory:
   - 14 Students advancing to Chapter Competition (star SVG)
 - Slide 19: Sudden Victory tie-breaking rules with return buttons to all matches
 
+**mathcounts-competition.html** - School competition day information page
+- Competition date, time, location details
+- Pre-competition requirements and schedule
+- Competition format and rules
+- Results and awards information
+
+**countdown-bracket-2025.html** - Visual bracket display for countdown round
+- Tournament-style bracket visualization
+- Tracks participants through matches
+
+**Additional Resources:**
+- PDFs: Competition schedules, volunteer guides, practice problems (Q1-60)
+- `mathcounts group preferences.txt` - Team grouping preferences
+- `README.md` - Documentation about local-only files and GitHub safety
+
 **Key Features:**
 - All match slides have editable name fields (contenteditable) with semi-transparent backgrounds
 - "Sudden Victory" button on each match slide jumps to slide 19
@@ -149,8 +177,82 @@ Located in `mathcounts/` directory:
 - Red gradient theme (#dc2626 to #991b1b) with gold accents (#ffd700)
 - Responsive design with mobile support
 
+### Math League Materials
+Located in `MathLeague/` directory:
+
+**math-league-meet-slides.html** - Interactive meet timer presentation
+- Complete standalone HTML with embedded timers and voice announcements
+- Guides students through all three rounds with automatic timing
+- **Meet Structure**: ~60 minutes total, 64 points possible
+  - Team Round: 20 minutes, 6 questions, calculators allowed (12 points)
+  - Relay Rounds: Two 8-minute relays, no calculators (16 points)
+  - Individual Round: 24 minutes, 6 problems, no communication (36 points)
+- **Timer Features**:
+  - Voice announcements at start, halfway, 5min, 2min, 1min, 10sec countdown, time's up
+  - Visual indicators: normal (white/blue), warning (yellow), critical (red pulse)
+  - Controls: Start/Pause/Reset buttons, keyboard shortcuts (Space to start, arrows to navigate)
+  - Relay special: "4 minutes remaining - bonus window ended" announcement
+- **Slides**: Welcome, instructions for each round, timer for each round, completion summary
+- **Meet Dates 2025-2026**: Nov 14, Dec 12, Jan 16, Feb 13
+
+**Additional Resources:**
+- `Math League Meet Information 2025-2026.pdf` - Meet logistics and schedule
+- `Middle School Mathematics League FAQ 2025-26.pdf` - Frequently asked questions
+- `README.md` - Complete documentation of timer slides features and usage
+
+### MOEMS Materials
+Located in `MOEMS/` directory:
+
+**moems-contest-slides.html** - Contest day presentation slides
+- Slide 1: Introduction with contest format and rules (5 problems, 30 minutes, no calculators)
+- Slide 2: 30-minute timer with voice announcements
+  - Announcements at 15, 10, and 5 minutes remaining
+  - Final 10-second countdown with voice
+  - Timer controls: Start/Pause/Reset
+  - Visual indicators: normal (white), warning (yellow), critical (red pulse)
+  - Keyboard shortcuts: Space to start, arrows to navigate
+
+**moems_vocabulary_activity.md** - MOEMS vocabulary teaching activity
+- Interactive vocabulary lesson plan
+- Mathematical terms and definitions relevant to MOEMS contests
+
+**moems_vocab_claude_md.md** - Extended vocabulary reference
+- Comprehensive mathematical vocabulary guide
+- Organized reference material for students
+
+**Additional Resources:**
+- `What Every Young Mathlete Should Know.pdf` - MOEMS preparatory guide
+
+### Math Detective Activity
+Located in `mathdetective/` directory:
+
+**detective.html** - Main interactive math detective game
+- Multi-case math problem-solving adventure
+- Student-facing activity with case progression
+- Interactive problem-solving with immediate feedback
+
+**detective-classroom.html** - Classroom presentation version
+- Teacher-facing interface for group activities
+- Projected version for whole-class instruction
+
+**detective-certificate.html** - Achievement certificate generator
+- Generates completion certificates for students
+- Customizable with student names and achievements
+
+**answer-key.html** - Solution guide for instructors
+- Complete solutions to all detective cases
+- Reference for teachers and volunteers
+
+**final-challenge.html** - Culminating activity
+- Advanced challenge problems
+- Final assessment of detective skills
+
+**generate-certificate-pdf.py** - Certificate automation script
+- Python script to batch generate certificates
+- PDF output for printing
+
 ### Navigation System
-The `header-template.js` provides a shared navigation component for all pages:
+The `header-template.js` (in `mathclubwebsite/` directory) provides a shared navigation component for all pages:
 - Navigation items: Announcements, Club Info, Competition Info, Registration & Records
 - Active page highlighting based on current URL
 - Responsive design with mobile-friendly layout
@@ -173,16 +275,56 @@ Each content page follows a consistent pattern:
 ## Development Workflow
 
 ### File Organization
+The repository is organized into the following directories:
+
+- **`mathclubwebsite/`** - Main public website files (HTML, CSS, JS, images)
+  - All main website HTML files with embedded CSS and JavaScript
+  - `header-template.js` - Shared navigation component
+  - `HWMS.jpeg` - School logo
+
+- **`math-club-attendance/`** - Parent Portal Google Apps Script
+  - `Code.js` - Backend functions
+  - `Checkin.html` - Parent-facing web interface
+  - `appsscript.json` - Apps Script configuration
+  - `.clasp.json` - Deployment configuration
+
+- **`mathcounts/`** - MATHCOUNTS competition materials
+  - Interactive countdown round tools (questions, slideshows, bracket)
+  - Competition day information pages
+  - PDFs: schedules, guides, practice problems
+  - `README.md` - Documentation about local-only files
+
+- **`MathLeague/`** - Math League meet materials
+  - `math-league-meet-slides.html` - Interactive timer presentation
+  - Meet information and FAQ PDFs
+  - `README.md` - Timer slides documentation
+
+- **`MOEMS/`** - MOEMS teaching materials
+  - Vocabulary activities and reference documents
+  - Preparatory guide PDF
+
+- **`mathdetective/`** - Math Detective game files
+  - Interactive game, classroom version, certificates
+  - Answer keys and final challenges
+  - Python certificate generator
+
+**General Principles:**
 - All HTML files are self-contained with embedded CSS and JavaScript
 - No external dependencies or build process required
-- Images stored in root directory
 - Simple file serving - can be opened directly in browser or served via any static web server
+- PDFs and supporting materials organized by competition/activity
 
 ### Making Changes to Main Website
-1. **Navigation Updates**: Modify the navigation in `header-template.js` - all pages load this shared component
-2. **Content Updates**: Edit the individual HTML files (announcements.html, club.html, etc.)
+1. **Navigation Updates**: Modify the navigation in `mathclubwebsite/header-template.js` - all pages load this shared component
+2. **Content Updates**: Edit the individual HTML files in `mathclubwebsite/` directory (announcements.html, club.html, etc.)
 3. **Styling**: Each page has its own embedded styles, but maintain consistency with the established design system
-4. **New Pages**: Create new HTML file and add navigation item to `header-template.js`
+4. **New Pages**: Create new HTML file in `mathclubwebsite/` and add navigation item to `header-template.js`
+
+### Working with Competition Materials
+- **MATHCOUNTS**: Files in `mathcounts/` - Note that `countdown-round-questions.html` contains actual competition questions and should never be pushed to GitHub (protected by .gitignore)
+- **Math League**: Interactive timer slides in `MathLeague/math-league-meet-slides.html` - fully standalone, no external dependencies
+- **MOEMS**: Teaching materials in `MOEMS/` directory
+- **Math Detective**: Game files in `mathdetective/` directory - all self-contained HTML files
 
 ### Working with Parent Portal (Apps Script)
 **Deployment Process:**
@@ -207,7 +349,7 @@ Each content page follows a consistent pattern:
 - Date columns contain `true` values or timestamp strings like "time - meeting type"
 - Competition sign-ups parsed from "Form Responses 2" sheet by MCPS ID
 - Always displays all 4 competitions (signed up or not)
-- **MOEMS**: Shows 5 individual contests (Nov 21, Dec 19, Jan 9, Feb 6, Mar 6) with Yes/No. Results section built with contest scores and totals but hidden with `display: none`
+- **MOEMS**: Shows 5 individual contests (Nov 21, Dec 19, Jan 9, Feb 6, Mar 6) with Yes/No. For signed-up contests, displays results in blue box (score out of 5, "Score Pending", or "Did Not Attend"). Shows total score in gold box if available.
 - **Math League**: Organized by meets in gray containers. Shows team assignment and ARML tracking at top. Each meet (Nov 14, Dec 12, Jan 16, Feb 13) displays:
   - Sign-up status badge (Signed Up/Not Signed Up)
   - Individual results in blue box if available (score out of 6 or "Did Not Attend")
