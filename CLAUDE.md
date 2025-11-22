@@ -10,7 +10,7 @@ This is a static HTML website for the Hallie Wells Middle School Competition Mat
 
 ### Directory Structure Overview
 The repository is organized into focused directories:
-- **`mathclubwebsite/`** - Public-facing club website
+- **`docs/`** - Public-facing club website (served via GitHub Pages)
 - **`math-club-attendance/`** - Parent portal (Google Apps Script)
 - **`mathcounts/`** - MATHCOUNTS competition tools and materials
 - **`MathLeague/`** - Math League meet timer and documentation
@@ -19,7 +19,7 @@ The repository is organized into focused directories:
 - **Root directory** - Configuration files (`.gitignore`, `CLAUDE.md`, `README.md`)
 
 ### Main Website Structure
-Located in `mathclubwebsite/` directory:
+Located in `docs/` directory (GitHub Pages source):
 - `index.html` - Redirects to announcements.html
 - `header-template.js` - Shared header/navigation component loaded by all pages
 - `announcements.html` - Announcements page content
@@ -252,7 +252,7 @@ Located in `mathdetective/` directory:
 - PDF output for printing
 
 ### Navigation System
-The `header-template.js` (in `mathclubwebsite/` directory) provides a shared navigation component for all pages:
+The `header-template.js` (in `docs/` directory) provides a shared navigation component for all pages:
 - Navigation items: Announcements, Club Info, Competition Info, Registration & Records
 - Active page highlighting based on current URL
 - Responsive design with mobile-friendly layout
@@ -277,10 +277,11 @@ Each content page follows a consistent pattern:
 ### File Organization
 The repository is organized into the following directories:
 
-- **`mathclubwebsite/`** - Main public website files (HTML, CSS, JS, images)
+- **`docs/`** - Main public website files (HTML, CSS, JS, images) - GitHub Pages source
   - All main website HTML files with embedded CSS and JavaScript
   - `header-template.js` - Shared navigation component
   - `HWMS.jpeg` - School logo
+  - Deployed via GitHub Pages from /docs folder
 
 - **`math-club-attendance/`** - Parent Portal Google Apps Script
   - `Code.js` - Backend functions
@@ -315,10 +316,11 @@ The repository is organized into the following directories:
 - PDFs and supporting materials organized by competition/activity
 
 ### Making Changes to Main Website
-1. **Navigation Updates**: Modify the navigation in `mathclubwebsite/header-template.js` - all pages load this shared component
-2. **Content Updates**: Edit the individual HTML files in `mathclubwebsite/` directory (announcements.html, club.html, etc.)
+1. **Navigation Updates**: Modify the navigation in `docs/header-template.js` - all pages load this shared component
+2. **Content Updates**: Edit the individual HTML files in `docs/` directory (announcements.html, club.html, etc.)
 3. **Styling**: Each page has its own embedded styles, but maintain consistency with the established design system
-4. **New Pages**: Create new HTML file in `mathclubwebsite/` and add navigation item to `header-template.js`
+4. **New Pages**: Create new HTML file in `docs/` and add navigation item to `header-template.js`
+5. **Deployment**: Changes pushed to the `main` branch in the `/docs` folder are automatically deployed via GitHub Pages
 
 ### Working with Competition Materials
 - **MATHCOUNTS**: Files in `mathcounts/` - Note that `countdown-round-questions.html` contains actual competition questions and should never be pushed to GitHub (protected by .gitignore)
