@@ -170,6 +170,82 @@
             font-style: italic;
         }
 
+        /* Range Selector */
+        .range-selector {
+            background: #f9fafb;
+            border-radius: 15px;
+            border: 2px solid #e5e7eb;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .range-selector h3 {
+            color: #dc2626;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.3rem;
+        }
+
+        .range-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .input-group input {
+            padding: 10px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #dc2626;
+            box-shadow: 0 0 5px rgba(220, 38, 38, 0.3);
+        }
+
+        .quick-ranges {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .quick-range-btn {
+            background: white;
+            border: 2px solid #e5e7eb;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .quick-range-btn:hover {
+            border-color: #dc2626;
+            color: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        .load-btn-container {
+            text-align: center;
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -184,6 +260,12 @@
         .container {
             animation: fadeIn 0.5s ease;
         }
+
+        @media (max-width: 600px) {
+            .range-inputs {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -191,6 +273,34 @@
         <div class="header">
             <h1>Prime or Not Leaderboard</h1>
             <p>Top scores for prime number recognition</p>
+        </div>
+
+        <div class="range-selector">
+            <h3>Select Number Range</h3>
+
+            <div class="range-inputs">
+                <div class="input-group">
+                    <label for="minNumber">Minimum Number:</label>
+                    <input type="number" id="minNumber" value="1" min="1">
+                </div>
+                <div class="input-group">
+                    <label for="maxNumber">Maximum Number:</label>
+                    <input type="number" id="maxNumber" value="20" min="2">
+                </div>
+            </div>
+
+            <div class="quick-ranges">
+                <button class="quick-range-btn" onclick="setRange(1, 20)">1-20</button>
+                <button class="quick-range-btn" onclick="setRange(1, 50)">1-50</button>
+                <button class="quick-range-btn" onclick="setRange(1, 100)">1-100</button>
+                <button class="quick-range-btn" onclick="setRange(1, 200)">1-200</button>
+                <button class="quick-range-btn" onclick="setRange(50, 150)">50-150</button>
+                <button class="quick-range-btn" onclick="setRange(100, 300)">100-300</button>
+            </div>
+
+            <div class="load-btn-container">
+                <button class="btn" onclick="updateLeaderboard()">Load Leaderboard</button>
+            </div>
         </div>
 
         <div class="leaderboard-range" id="leaderboardRange">
@@ -203,10 +313,6 @@
 
         <div class="actions">
             <a href="prime-or-not.html" class="btn">Play Game</a>
-        </div>
-
-        <div class="refresh-note">
-            Refresh the page to update scores
         </div>
     </div>
 
@@ -222,9 +328,39 @@
             return { min, max };
         }
 
-        // Load and display leaderboard
-        async function loadLeaderboard() {
+        // Initialize input fields from URL params
+        function initializeInputs() {
             const { min, max } = getUrlParams();
+            document.getElementById('minNumber').value = min;
+            document.getElementById('maxNumber').value = max;
+        }
+
+        // Set range from quick preset
+        function setRange(min, max) {
+            document.getElementById('minNumber').value = min;
+            document.getElementById('maxNumber').value = max;
+        }
+
+        // Update leaderboard with new range
+        function updateLeaderboard() {
+            const min = parseInt(document.getElementById('minNumber').value);
+            const max = parseInt(document.getElementById('maxNumber').value);
+
+            if (min < 1 || max < 2 || min >= max) {
+                alert('Please enter a valid range. Minimum must be at least 1, maximum must be at least 2, and minimum must be less than maximum.');
+                return;
+            }
+
+            // Update URL without reloading page
+            const newUrl = `${window.location.pathname}?min=${min}&max=${max}`;
+            window.history.pushState({}, '', newUrl);
+
+            // Load new leaderboard data
+            loadLeaderboard(min, max);
+        }
+
+        // Load and display leaderboard
+        async function loadLeaderboard(min, max) {
             const contentDiv = document.getElementById('leaderboardContent');
             const rangeSpan = document.getElementById('currentRange');
 
@@ -327,8 +463,22 @@
             return div.innerHTML;
         }
 
-        // Load leaderboard on page load
-        window.addEventListener('DOMContentLoaded', loadLeaderboard);
+        // Initialize page on load
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeInputs();
+            const { min, max } = getUrlParams();
+            loadLeaderboard(min, max);
+        });
+
+        // Handle Enter key in input fields
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('minNumber').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') updateLeaderboard();
+            });
+            document.getElementById('maxNumber').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') updateLeaderboard();
+            });
+        });
     </script>
 </body>
 </html>
