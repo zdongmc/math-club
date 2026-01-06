@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prime or Not - HWMS Competition Math Club</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #dc2626;
+            text-shadow: none;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #666;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px auto;
+            max-width: 800px;
+            border: 2px solid rgba(220, 38, 38, 0.3);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 38, 38, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: #9ca3af;
+            color: white;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Settings Screen */
+        .settings-screen {
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid #e5e7eb;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .settings-screen h2 {
+            color: #dc2626;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2rem;
+        }
+
+        .setting-group {
+            margin-bottom: 30px;
+        }
+
+        .setting-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .setting-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .setting-group input:focus {
+            outline: none;
+            border-color: #dc2626;
+            box-shadow: 0 0 5px rgba(220, 38, 38, 0.3);
+        }
+
+        .quick-ranges {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .quick-range-btn {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .quick-range-btn:hover {
+            border-color: #dc2626;
+            color: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        .start-button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        /* Game Screen */
+        .game-screen {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .timer-display {
+            background: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 15px 30px;
+            border-radius: 25px;
+            border: 2px solid #e5e7eb;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #dc2626;
+        }
+
+        .progress-display {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid #e5e7eb;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .number-display {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(220, 38, 38, 0.05));
+            border: 3px solid #dc2626;
+            border-radius: 20px;
+            padding: 60px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .number-display .number {
+            font-size: 5rem;
+            font-weight: bold;
+            color: #dc2626;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .answer-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .answer-btn {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            color: white;
+            padding: 40px 30px;
+            border: none;
+            border-radius: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .answer-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(220, 38, 38, 0.4);
+        }
+
+        .answer-btn:active {
+            transform: scale(0.98);
+        }
+
+        .answer-btn.correct {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            animation: correctPulse 0.5s ease;
+        }
+
+        .answer-btn.incorrect {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            animation: incorrectShake 0.5s ease;
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes incorrectShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .feedback-message {
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            min-height: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .feedback-message.correct {
+            color: #22c55e;
+        }
+
+        .feedback-message.incorrect {
+            color: #ef4444;
+        }
+
+        .continue-hint {
+            text-align: center;
+            font-size: 1rem;
+            color: #666;
+            margin-top: 15px;
+            font-weight: bold;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Results Screen */
+        .results-screen {
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid #e5e7eb;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .results-screen h2 {
+            color: #dc2626;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5rem;
+        }
+
+        .results-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #f9fafb;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #e5e7eb;
+            text-align: center;
+        }
+
+        .stat-card .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #dc2626;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 1rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .performance-message {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(220, 38, 38, 0.05));
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid rgba(220, 38, 38, 0.3);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .performance-message h3 {
+            color: #dc2626;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .performance-message p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .leaderboard-submission {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 15px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .submission-status {
+            margin-top: 15px;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .submission-status.success {
+            color: #22c55e;
+        }
+
+        .submission-status.error {
+            color: #ef4444;
+        }
+
+        .results-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Leaderboard */
+        .leaderboard-range {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .leaderboard-range strong {
+            color: #dc2626;
+        }
+
+        .leaderboard-content {
+            background: #f9fafb;
+            border-radius: 15px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 30px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .loading-message {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaderboard-table th {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .leaderboard-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .leaderboard-table tr:hover {
+            background: #f3f4f6;
+        }
+
+        .leaderboard-table tr:nth-child(1) td {
+            background: rgba(255, 215, 0, 0.1);
+            font-weight: bold;
+        }
+
+        .leaderboard-table tr:nth-child(2) td {
+            background: rgba(192, 192, 192, 0.1);
+        }
+
+        .leaderboard-table tr:nth-child(3) td {
+            background: rgba(205, 127, 50, 0.1);
+        }
+
+        .rank-badge {
+            display: inline-block;
+            min-width: 30px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .rank-badge.gold {
+            color: #ffd700;
+        }
+
+        .rank-badge.silver {
+            color: #c0c0c0;
+        }
+
+        .rank-badge.bronze {
+            color: #cd7f32;
+        }
+
+        /* Keyboard Shortcuts */
+        .shortcuts-hint {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .shortcuts-hint strong {
+            color: #dc2626;
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .screen.active {
+            animation: slideIn 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Prime or Not</h1>
+            <p>Test your prime number recognition skills! Determine whether each number is prime or composite as quickly as possible.</p>
+        </div>
+
+        <!-- Settings Screen -->
+        <div id="settingsScreen" class="screen active">
+            <div class="settings-screen">
+                <h2>Game Settings</h2>
+
+                <div class="setting-group">
+                    <label for="playerName">Your Name:</label>
+                    <input type="text" id="playerName" placeholder="Enter your name" maxlength="50">
+                </div>
+
+                <div class="setting-group">
+                    <label for="minNumber">Minimum Number:</label>
+                    <input type="number" id="minNumber" value="1" min="1">
+                </div>
+
+                <div class="setting-group">
+                    <label for="maxNumber">Maximum Number:</label>
+                    <input type="number" id="maxNumber" value="100" min="2">
+                </div>
+
+                <div class="setting-group">
+                    <label>Quick Range Presets:</label>
+                    <div class="quick-ranges">
+                        <button class="quick-range-btn" onclick="setRange(1, 50)">1-50</button>
+                        <button class="quick-range-btn" onclick="setRange(1, 100)">1-100</button>
+                        <button class="quick-range-btn" onclick="setRange(1, 200)">1-200</button>
+                        <button class="quick-range-btn" onclick="setRange(50, 150)">50-150</button>
+                        <button class="quick-range-btn" onclick="setRange(100, 300)">100-300</button>
+                        <button class="quick-range-btn" onclick="setRange(1, 1000)">1-1000</button>
+                    </div>
+                </div>
+
+                <div class="start-button-container">
+                    <button class="btn" onclick="startGame()">Start Game</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="screen">
+            <div class="game-screen">
+                <div class="timer-display">
+                    <span id="timer">00:00.0</span>
+                </div>
+
+                <div class="progress-display">
+                    <span id="progress">Question 1 of 100</span>
+                </div>
+
+                <div class="feedback-message" id="feedback"></div>
+                <div class="continue-hint" id="continueHint" style="display: none;">Press ENTER to continue</div>
+
+                <div class="number-display">
+                    <div class="number" id="currentNumber">42</div>
+                </div>
+
+                <div class="answer-buttons">
+                    <button class="answer-btn" id="primeBtn" onclick="checkAnswer(true)">Prime</button>
+                    <button class="answer-btn" id="notPrimeBtn" onclick="checkAnswer(false)">Not Prime</button>
+                </div>
+
+                <div class="shortcuts-hint">
+                    <strong>Keyboard Shortcuts:</strong> Press <strong>←</strong> (Left Arrow) for Prime or <strong>→</strong> (Right Arrow) for Not Prime
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="resultsScreen" class="screen">
+            <div class="results-screen">
+                <h2>Game Complete!</h2>
+
+                <div class="results-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalTime">0:00</div>
+                        <div class="stat-label">Total Time</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="correctAnswers">0</div>
+                        <div class="stat-label">Correct</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="incorrectAnswers">0</div>
+                        <div class="stat-label">Incorrect</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="accuracy">0%</div>
+                        <div class="stat-label">Accuracy</div>
+                    </div>
+                </div>
+
+                <div class="performance-message">
+                    <h3 id="performanceTitle">Great Job!</h3>
+                    <p id="performanceMessage">You've completed the challenge!</p>
+                </div>
+
+                <div id="leaderboardSubmission" class="leaderboard-submission">
+                    <button class="btn" id="submitScoreBtn" onclick="submitToLeaderboard()">Submit to Leaderboard</button>
+                    <div id="submissionStatus" class="submission-status"></div>
+                </div>
+
+                <div class="results-actions">
+                    <button class="btn" onclick="viewLeaderboard()">View Leaderboard</button>
+                    <button class="btn" onclick="playAgain()">Play Again</button>
+                    <button class="btn" onclick="changeSettings()">Change Settings</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboard Screen -->
+        <div id="leaderboardScreen" class="screen">
+            <div class="results-screen">
+                <h2>Leaderboard</h2>
+
+                <div class="leaderboard-range" id="leaderboardRange">
+                    Range: <strong id="currentRange">1-100</strong>
+                </div>
+
+                <div id="leaderboardContent" class="leaderboard-content">
+                    <div class="loading-message">Loading leaderboard...</div>
+                </div>
+
+                <div class="results-actions">
+                    <button class="btn" onclick="showScreen('resultsScreen')">Back to Results</button>
+                    <button class="btn" onclick="changeSettings()">New Game</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Google Apps Script deployment URL for leaderboard
+        const LEADERBOARD_API_URL = 'https://script.google.com/macros/s/AKfycbxIXnDBGLM28hDo4GWfWoRukimW-kEFPuP1bT_B2wnGACrITG2fLuEmaIWmOkQjJgQJ/exec';
+    </script>
+    <script>
+        // Game State
+        let gameState = {
+            min: 1,
+            max: 100,
+            numbers: [],
+            currentIndex: 0,
+            startTime: null,
+            timerInterval: null,
+            correct: 0,
+            incorrect: 0,
+            awaitingNext: false
+        };
+
+        // Prime checking function
+        function isPrime(num) {
+            if (num < 2) return false;
+            if (num === 2) return true;
+            if (num % 2 === 0) return false;
+
+            for (let i = 3; i <= Math.sqrt(num); i += 2) {
+                if (num % i === 0) return false;
+            }
+            return true;
+        }
+
+        // Prime factorization function
+        function primeFactorization(num) {
+            const factors = {};
+            let n = num;
+
+            // Handle 2s
+            while (n % 2 === 0) {
+                factors[2] = (factors[2] || 0) + 1;
+                n = n / 2;
+            }
+
+            // Handle odd factors
+            for (let i = 3; i <= Math.sqrt(n); i += 2) {
+                while (n % i === 0) {
+                    factors[i] = (factors[i] || 0) + 1;
+                    n = n / i;
+                }
+            }
+
+            // If n is still greater than 1, it's a prime factor
+            if (n > 1) {
+                factors[n] = 1;
+            }
+
+            return factors;
+        }
+
+        // Format factorization as string
+        function formatFactorization(num) {
+            const factors = primeFactorization(num);
+            const parts = [];
+
+            for (const [prime, count] of Object.entries(factors)) {
+                if (count === 1) {
+                    parts.push(prime);
+                } else {
+                    parts.push(`${prime}^${count}`);
+                }
+            }
+
+            return parts.join(' × ');
+        }
+
+        // Generate shuffled array of numbers in range
+        function generateNumbers(min, max) {
+            const numbers = [];
+            for (let i = min; i <= max; i++) {
+                numbers.push(i);
+            }
+            // Fisher-Yates shuffle
+            for (let i = numbers.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+            }
+            return numbers;
+        }
+
+        // Set range from quick preset
+        function setRange(min, max) {
+            document.getElementById('minNumber').value = min;
+            document.getElementById('maxNumber').value = max;
+        }
+
+        // Start game
+        function startGame() {
+            const min = parseInt(document.getElementById('minNumber').value);
+            const max = parseInt(document.getElementById('maxNumber').value);
+
+            if (min < 1 || max < 2 || min >= max) {
+                alert('Please enter a valid range. Minimum must be at least 1, maximum must be at least 2, and minimum must be less than maximum.');
+                return;
+            }
+
+            gameState.min = min;
+            gameState.max = max;
+            gameState.numbers = generateNumbers(min, max);
+            gameState.currentIndex = 0;
+            gameState.correct = 0;
+            gameState.incorrect = 0;
+            gameState.awaitingNext = false;
+            gameState.startTime = Date.now();
+
+            showScreen('gameScreen');
+            startTimer();
+            displayCurrentNumber();
+        }
+
+        // Timer
+        function startTimer() {
+            gameState.timerInterval = setInterval(() => {
+                const elapsed = Date.now() - gameState.startTime;
+                const seconds = Math.floor(elapsed / 1000);
+                const tenths = Math.floor((elapsed % 1000) / 100);
+                const minutes = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+
+                document.getElementById('timer').textContent =
+                    `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}.${tenths}`;
+            }, 100);
+        }
+
+        function stopTimer() {
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+                gameState.timerInterval = null;
+            }
+        }
+
+        // Display current number
+        function displayCurrentNumber() {
+            const currentNum = gameState.numbers[gameState.currentIndex];
+            document.getElementById('currentNumber').textContent = currentNum;
+            document.getElementById('progress').textContent =
+                `Question ${gameState.currentIndex + 1} of ${gameState.numbers.length}`;
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback-message';
+            document.getElementById('continueHint').style.display = 'none';
+
+            // Reset button styles
+            document.getElementById('primeBtn').className = 'answer-btn';
+            document.getElementById('notPrimeBtn').className = 'answer-btn';
+        }
+
+        // Move to next question
+        function moveToNext() {
+            gameState.currentIndex++;
+            gameState.awaitingNext = false;
+
+            if (gameState.currentIndex >= gameState.numbers.length) {
+                endGame();
+            } else {
+                displayCurrentNumber();
+            }
+        }
+
+        // Check answer
+        function checkAnswer(userSaysPrime) {
+            if (gameState.awaitingNext) return;
+
+            const currentNum = gameState.numbers[gameState.currentIndex];
+            const actuallyPrime = isPrime(currentNum);
+            const correct = userSaysPrime === actuallyPrime;
+
+            gameState.awaitingNext = true;
+
+            // Show feedback
+            const feedback = document.getElementById('feedback');
+            const continueHint = document.getElementById('continueHint');
+            const primeBtn = document.getElementById('primeBtn');
+            const notPrimeBtn = document.getElementById('notPrimeBtn');
+
+            if (correct) {
+                gameState.correct++;
+                feedback.textContent = '✓ Correct!';
+                feedback.className = 'feedback-message correct';
+
+                if (userSaysPrime) {
+                    primeBtn.className = 'answer-btn correct';
+                } else {
+                    notPrimeBtn.className = 'answer-btn correct';
+                }
+
+                // Move immediately to next question for correct answers
+                setTimeout(moveToNext, 500);
+
+            } else {
+                gameState.incorrect++;
+
+                // Special message if user said prime but it's composite
+                if (userSaysPrime && !actuallyPrime) {
+                    const factorization = formatFactorization(currentNum);
+                    feedback.textContent = `✗ Incorrect - ${currentNum} is NOT PRIME (${currentNum} = ${factorization})`;
+                } else {
+                    feedback.textContent = `✗ Incorrect - ${currentNum} is ${actuallyPrime ? 'PRIME' : 'NOT PRIME'}`;
+                }
+
+                feedback.className = 'feedback-message incorrect';
+
+                if (userSaysPrime) {
+                    primeBtn.className = 'answer-btn incorrect';
+                } else {
+                    notPrimeBtn.className = 'answer-btn incorrect';
+                }
+
+                // Show continue hint - user must press Enter
+                continueHint.style.display = 'block';
+            }
+        }
+
+        // End game
+        function endGame() {
+            stopTimer();
+
+            const elapsed = Date.now() - gameState.startTime;
+            const totalSeconds = Math.floor(elapsed / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+
+            const total = gameState.correct + gameState.incorrect;
+            const accuracy = total > 0 ? Math.round((gameState.correct / total) * 100) : 0;
+
+            document.getElementById('totalTime').textContent =
+                `${minutes}:${String(seconds).padStart(2, '0')}`;
+            document.getElementById('correctAnswers').textContent = gameState.correct;
+            document.getElementById('incorrectAnswers').textContent = gameState.incorrect;
+            document.getElementById('accuracy').textContent = `${accuracy}%`;
+
+            // Performance message
+            let title, message;
+            if (accuracy === 100) {
+                title = 'Perfect Score!';
+                message = 'You got every single number correct! Outstanding!';
+            } else if (accuracy >= 90) {
+                title = 'Excellent Work!';
+                message = 'You have a strong understanding of prime numbers!';
+            } else if (accuracy >= 75) {
+                title = 'Great Job!';
+                message = 'You\'re doing well! Keep practicing to improve further.';
+            } else if (accuracy >= 60) {
+                title = 'Good Effort!';
+                message = 'You\'re on the right track. Try again to improve your score!';
+            } else {
+                title = 'Keep Practicing!';
+                message = 'Prime numbers can be tricky. Keep practicing and you\'ll improve!';
+            }
+
+            document.getElementById('performanceTitle').textContent = title;
+            document.getElementById('performanceMessage').textContent = message;
+
+            showScreen('resultsScreen');
+        }
+
+        // Show screen
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // Play again
+        function playAgain() {
+            startGame();
+        }
+
+        // Change settings
+        function changeSettings() {
+            stopTimer();
+            showScreen('settingsScreen');
+        }
+
+        // Submit score to leaderboard
+        async function submitToLeaderboard() {
+            const playerName = document.getElementById('playerName').value.trim();
+            const submitBtn = document.getElementById('submitScoreBtn');
+            const statusDiv = document.getElementById('submissionStatus');
+
+            // Validate player name
+            if (!playerName) {
+                statusDiv.textContent = 'Please enter your name in the settings before submitting!';
+                statusDiv.className = 'submission-status error';
+                return;
+            }
+
+            // Check if API URL is configured
+            if (!LEADERBOARD_API_URL || LEADERBOARD_API_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+                statusDiv.textContent = 'Leaderboard not configured. Please contact the administrator.';
+                statusDiv.className = 'submission-status error';
+                return;
+            }
+
+            // Disable button during submission
+            submitBtn.disabled = true;
+            statusDiv.textContent = 'Submitting...';
+            statusDiv.className = 'submission-status';
+
+            try {
+                const elapsed = Date.now() - gameState.startTime;
+                const totalSeconds = Math.floor(elapsed / 1000);
+
+                const response = await fetch(LEADERBOARD_API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'submitScore',
+                        playerName: playerName,
+                        minRange: gameState.min,
+                        maxRange: gameState.max,
+                        correct: gameState.correct,
+                        incorrect: gameState.incorrect,
+                        totalSeconds: totalSeconds
+                    })
+                });
+
+                // Note: Due to no-cors mode, we can't read the response
+                // We'll assume success if no error was thrown
+                statusDiv.textContent = '✓ Score submitted successfully!';
+                statusDiv.className = 'submission-status success';
+                submitBtn.textContent = 'Submitted!';
+
+            } catch (error) {
+                console.error('Error submitting score:', error);
+                statusDiv.textContent = '✗ Error submitting score. Please try again.';
+                statusDiv.className = 'submission-status error';
+                submitBtn.disabled = false;
+            }
+        }
+
+        // View leaderboard
+        async function viewLeaderboard() {
+            showScreen('leaderboardScreen');
+
+            const contentDiv = document.getElementById('leaderboardContent');
+            const rangeSpan = document.getElementById('currentRange');
+
+            rangeSpan.textContent = `${gameState.min}-${gameState.max}`;
+            contentDiv.innerHTML = '<div class="loading-message">Loading leaderboard...</div>';
+
+            // Check if API URL is configured
+            if (!LEADERBOARD_API_URL || LEADERBOARD_API_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+                contentDiv.innerHTML = '<div class="loading-message">Leaderboard not configured. Please contact the administrator.</div>';
+                return;
+            }
+
+            try {
+                const url = `${LEADERBOARD_API_URL}?action=getLeaderboard&min=${gameState.min}&max=${gameState.max}&limit=50`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.success && data.scores && data.scores.length > 0) {
+                    displayLeaderboardTable(data.scores);
+                } else {
+                    contentDiv.innerHTML = '<div class="loading-message">No scores yet for this range. Be the first!</div>';
+                }
+
+            } catch (error) {
+                console.error('Error loading leaderboard:', error);
+                contentDiv.innerHTML = '<div class="loading-message">Error loading leaderboard. Please try again.</div>';
+            }
+        }
+
+        // Display leaderboard table
+        function displayLeaderboardTable(scores) {
+            const contentDiv = document.getElementById('leaderboardContent');
+
+            let tableHTML = `
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Player</th>
+                            <th>Accuracy</th>
+                            <th>Time</th>
+                            <th>Correct</th>
+                            <th>Incorrect</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            scores.forEach((score, index) => {
+                const rank = index + 1;
+                let rankClass = '';
+                let rankDisplay = rank;
+
+                if (rank === 1) {
+                    rankClass = 'gold';
+                    rankDisplay = '🥇 ' + rank;
+                } else if (rank === 2) {
+                    rankClass = 'silver';
+                    rankDisplay = '🥈 ' + rank;
+                } else if (rank === 3) {
+                    rankClass = 'bronze';
+                    rankDisplay = '🥉 ' + rank;
+                }
+
+                tableHTML += `
+                    <tr>
+                        <td><span class="rank-badge ${rankClass}">${rankDisplay}</span></td>
+                        <td>${escapeHtml(score.playerName)}</td>
+                        <td>${score.accuracy}%</td>
+                        <td>${score.timeDisplay}</td>
+                        <td>${score.correct}</td>
+                        <td>${score.incorrect}</td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+
+            contentDiv.innerHTML = tableHTML;
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            const gameScreen = document.getElementById('gameScreen');
+            if (!gameScreen.classList.contains('active')) return;
+
+            // If awaiting next (after incorrect answer), only accept Enter
+            if (gameState.awaitingNext) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    moveToNext();
+                }
+                return;
+            }
+
+            // Normal game play - arrow keys
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                checkAnswer(true);
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                checkAnswer(false);
+            }
+        });
+
+        // Enter key to start from settings
+        document.getElementById('playerName').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') startGame();
+        });
+        document.getElementById('minNumber').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') startGame();
+        });
+        document.getElementById('maxNumber').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') startGame();
+        });
+    </script>
+</body>
+</html>
