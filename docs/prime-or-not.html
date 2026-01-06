@@ -1064,18 +1064,30 @@
 
             try {
                 const url = `${LEADERBOARD_API_URL}?action=getLeaderboard&min=${min}&max=${max}&limit=50`;
+                console.log('Fetching leaderboard from:', url);
+
                 const response = await fetch(url);
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const data = await response.json();
+                console.log('Leaderboard data:', data);
 
                 if (data.success && data.scores && data.scores.length > 0) {
                     displayLeaderboardTable(data.scores);
-                } else {
+                } else if (data.success) {
                     contentDiv.innerHTML = '<div class="loading-message">No scores yet for this range. Be the first!</div>';
+                } else {
+                    contentDiv.innerHTML = `<div class="loading-message">Error: ${data.error || 'Unknown error'}</div>`;
                 }
 
             } catch (error) {
                 console.error('Error loading leaderboard:', error);
-                contentDiv.innerHTML = '<div class="loading-message">Error loading leaderboard. Please try again.</div>';
+                contentDiv.innerHTML = `<div class="loading-message">Error loading leaderboard: ${error.message}<br><br>Please check the browser console for details.</div>`;
             }
         }
 
