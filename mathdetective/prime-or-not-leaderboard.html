@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prime or Not - Leaderboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #dc2626;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .leaderboard-range {
+            text-align: center;
+            font-size: 1.3rem;
+            color: #666;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 10px;
+            border: 2px solid #e5e7eb;
+        }
+
+        .leaderboard-range strong {
+            color: #dc2626;
+            font-size: 1.5rem;
+        }
+
+        .leaderboard-content {
+            background: #f9fafb;
+            border-radius: 15px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 30px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .loading-message {
+            text-align: center;
+            padding: 60px 40px;
+            color: #666;
+            font-size: 1.2rem;
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaderboard-table th {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .leaderboard-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .leaderboard-table tr:hover {
+            background: #f3f4f6;
+        }
+
+        .leaderboard-table tbody tr:nth-child(1) td {
+            background: rgba(255, 215, 0, 0.2);
+            font-weight: bold;
+        }
+
+        .leaderboard-table tbody tr:nth-child(2) td {
+            background: rgba(192, 192, 192, 0.2);
+        }
+
+        .leaderboard-table tbody tr:nth-child(3) td {
+            background: rgba(205, 127, 50, 0.2);
+        }
+
+        .rank-badge {
+            display: inline-block;
+            min-width: 30px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .rank-badge.gold {
+            color: #ffd700;
+        }
+
+        .rank-badge.silver {
+            color: #c0c0c0;
+        }
+
+        .rank-badge.bronze {
+            color: #cd7f32;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 38, 38, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .actions {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .refresh-note {
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 15px;
+            font-style: italic;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            animation: fadeIn 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Prime or Not Leaderboard</h1>
+            <p>Top scores for prime number recognition</p>
+        </div>
+
+        <div class="leaderboard-range" id="leaderboardRange">
+            Range: <strong id="currentRange">Loading...</strong>
+        </div>
+
+        <div id="leaderboardContent" class="leaderboard-content">
+            <div class="loading-message">Loading leaderboard...</div>
+        </div>
+
+        <div class="actions">
+            <a href="prime-or-not.html" class="btn">Play Game</a>
+        </div>
+
+        <div class="refresh-note">
+            Refresh the page to update scores
+        </div>
+    </div>
+
+    <script>
+        // Google Apps Script deployment URL for leaderboard
+        const LEADERBOARD_API_URL = 'https://script.google.com/macros/s/AKfycbxIXnDBGLM28hDo4GWfWoRukimW-kEFPuP1bT_B2wnGACrITG2fLuEmaIWmOkQjJgQJ/exec';
+
+        // Get range from URL parameters
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            const min = parseInt(params.get('min')) || 1;
+            const max = parseInt(params.get('max')) || 20;
+            return { min, max };
+        }
+
+        // Load and display leaderboard
+        async function loadLeaderboard() {
+            const { min, max } = getUrlParams();
+            const contentDiv = document.getElementById('leaderboardContent');
+            const rangeSpan = document.getElementById('currentRange');
+
+            rangeSpan.textContent = `${min}-${max}`;
+            contentDiv.innerHTML = '<div class="loading-message">Loading leaderboard...</div>';
+
+            // Check if API URL is configured
+            if (!LEADERBOARD_API_URL || LEADERBOARD_API_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+                contentDiv.innerHTML = '<div class="loading-message">Leaderboard not configured. Please contact the administrator.</div>';
+                return;
+            }
+
+            try {
+                const url = `${LEADERBOARD_API_URL}?action=getLeaderboard&min=${min}&max=${max}&limit=50`;
+                console.log('Fetching leaderboard from:', url);
+
+                const response = await fetch(url);
+                console.log('Response status:', response.status);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Leaderboard data:', data);
+
+                if (data.success && data.scores && data.scores.length > 0) {
+                    displayLeaderboardTable(data.scores);
+                } else if (data.success) {
+                    contentDiv.innerHTML = '<div class="loading-message">No scores yet for this range.<br><br>Be the first to play!</div>';
+                } else {
+                    contentDiv.innerHTML = `<div class="loading-message">Error: ${data.error || 'Unknown error'}</div>`;
+                }
+
+            } catch (error) {
+                console.error('Error loading leaderboard:', error);
+                contentDiv.innerHTML = `<div class="loading-message">Error loading leaderboard: ${error.message}<br><br>Please check the browser console for details.</div>`;
+            }
+        }
+
+        // Display leaderboard table
+        function displayLeaderboardTable(scores) {
+            const contentDiv = document.getElementById('leaderboardContent');
+
+            let tableHTML = `
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Player</th>
+                            <th>Accuracy</th>
+                            <th>Time</th>
+                            <th>Correct</th>
+                            <th>Incorrect</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            scores.forEach((score, index) => {
+                const rank = index + 1;
+                let rankClass = '';
+                let rankDisplay = rank;
+
+                if (rank === 1) {
+                    rankClass = 'gold';
+                    rankDisplay = '🥇 ' + rank;
+                } else if (rank === 2) {
+                    rankClass = 'silver';
+                    rankDisplay = '🥈 ' + rank;
+                } else if (rank === 3) {
+                    rankClass = 'bronze';
+                    rankDisplay = '🥉 ' + rank;
+                }
+
+                tableHTML += `
+                    <tr>
+                        <td><span class="rank-badge ${rankClass}">${rankDisplay}</span></td>
+                        <td>${escapeHtml(score.playerName)}</td>
+                        <td>${score.accuracy}%</td>
+                        <td>${score.timeDisplay}</td>
+                        <td>${score.correct}</td>
+                        <td>${score.incorrect}</td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+
+            contentDiv.innerHTML = tableHTML;
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Load leaderboard on page load
+        window.addEventListener('DOMContentLoaded', loadLeaderboard);
+    </script>
+</body>
+</html>

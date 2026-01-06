@@ -1034,16 +1034,15 @@
         }
 
         // View leaderboard from settings page
-        async function viewLeaderboardFromSettings() {
+        function viewLeaderboardFromSettings() {
             const min = parseInt(document.getElementById('minNumber').value) || 1;
             const max = parseInt(document.getElementById('maxNumber').value) || 20;
-
-            await loadLeaderboard(min, max);
+            window.open(`prime-or-not-leaderboard.html?min=${min}&max=${max}`, '_blank');
         }
 
         // View leaderboard from results page
-        async function viewLeaderboard() {
-            await loadLeaderboard(gameState.min, gameState.max);
+        function viewLeaderboard() {
+            window.open(`prime-or-not-leaderboard.html?min=${gameState.min}&max=${gameState.max}`, '_blank');
         }
 
         // Load and display leaderboard for a given range
