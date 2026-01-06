@@ -554,6 +554,7 @@
 
                 <div class="start-button-container">
                     <button class="btn" onclick="startGame()">Start Game</button>
+                    <button class="btn" onclick="viewLeaderboardFromSettings()" style="margin-top: 15px; background: linear-gradient(135deg, #059669, #047857);">View Leaderboard</button>
                 </div>
             </div>
         </div>
@@ -643,7 +644,7 @@
                 </div>
 
                 <div class="results-actions">
-                    <button class="btn" onclick="showScreen('resultsScreen')">Back to Results</button>
+                    <button class="btn" onclick="backFromLeaderboard()">Back</button>
                     <button class="btn" onclick="changeSettings()">New Game</button>
                 </div>
             </div>
@@ -665,7 +666,8 @@
             timerInterval: null,
             correct: 0,
             incorrect: 0,
-            awaitingNext: false
+            awaitingNext: false,
+            hasPlayedGame: false
         };
 
         // Prime checking function
@@ -926,6 +928,9 @@
             // Reset leaderboard submission button
             resetLeaderboardButton();
 
+            // Mark that a game has been played
+            gameState.hasPlayedGame = true;
+
             showScreen('resultsScreen');
         }
 
@@ -957,6 +962,15 @@
         function changeSettings() {
             stopTimer();
             showScreen('settingsScreen');
+        }
+
+        // Go back from leaderboard
+        function backFromLeaderboard() {
+            if (gameState.hasPlayedGame) {
+                showScreen('resultsScreen');
+            } else {
+                showScreen('settingsScreen');
+            }
         }
 
         // Submit score to leaderboard
@@ -1019,14 +1033,27 @@
             }
         }
 
-        // View leaderboard
+        // View leaderboard from settings page
+        async function viewLeaderboardFromSettings() {
+            const min = parseInt(document.getElementById('minNumber').value) || 1;
+            const max = parseInt(document.getElementById('maxNumber').value) || 20;
+
+            await loadLeaderboard(min, max);
+        }
+
+        // View leaderboard from results page
         async function viewLeaderboard() {
+            await loadLeaderboard(gameState.min, gameState.max);
+        }
+
+        // Load and display leaderboard for a given range
+        async function loadLeaderboard(min, max) {
             showScreen('leaderboardScreen');
 
             const contentDiv = document.getElementById('leaderboardContent');
             const rangeSpan = document.getElementById('currentRange');
 
-            rangeSpan.textContent = `${gameState.min}-${gameState.max}`;
+            rangeSpan.textContent = `${min}-${max}`;
             contentDiv.innerHTML = '<div class="loading-message">Loading leaderboard...</div>';
 
             // Check if API URL is configured
@@ -1036,7 +1063,7 @@
             }
 
             try {
-                const url = `${LEADERBOARD_API_URL}?action=getLeaderboard&min=${gameState.min}&max=${gameState.max}&limit=50`;
+                const url = `${LEADERBOARD_API_URL}?action=getLeaderboard&min=${min}&max=${max}&limit=50`;
                 const response = await fetch(url);
                 const data = await response.json();
 
