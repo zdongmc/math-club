@@ -923,7 +923,21 @@
             document.getElementById('performanceTitle').textContent = title;
             document.getElementById('performanceMessage').textContent = message;
 
+            // Reset leaderboard submission button
+            resetLeaderboardButton();
+
             showScreen('resultsScreen');
+        }
+
+        // Reset leaderboard button state
+        function resetLeaderboardButton() {
+            const submitBtn = document.getElementById('submitScoreBtn');
+            const statusDiv = document.getElementById('submissionStatus');
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit to Leaderboard';
+            statusDiv.textContent = '';
+            statusDiv.className = 'submission-status';
         }
 
         // Show screen
