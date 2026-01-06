@@ -46,6 +46,12 @@ function submitScore(playerName, minRange, maxRange, correct, incorrect, totalSe
       timeDisplay
     ]);
 
+    // Force the time display cell (column J) to be plain text to prevent auto-conversion
+    const lastRow = sheet.getLastRow();
+    const timeCell = sheet.getRange(lastRow, 10); // Column J is the 10th column
+    timeCell.setNumberFormat('@STRING@');
+    timeCell.setValue(timeDisplay); // Re-set the value to ensure it's stored as text
+
     return { success: true, message: 'Score submitted successfully!' };
 
   } catch (error) {
