@@ -304,7 +304,8 @@
         </div>
 
         <div class="leaderboard-range" id="leaderboardRange">
-            Range: <strong id="currentRange">Loading...</strong>
+            Range: <strong id="currentRange">Loading...</strong><br>
+            <span id="totalQuestionsDisplay" style="font-size: 1rem; color: #999;"></span>
         </div>
 
         <div id="leaderboardContent" class="leaderboard-content">
@@ -325,7 +326,8 @@
             const params = new URLSearchParams(window.location.search);
             const min = parseInt(params.get('min')) || 1;
             const max = parseInt(params.get('max')) || 20;
-            return { min, max };
+            const total = params.get('total') ? parseInt(params.get('total')) : (max - min + 1);
+            return { min, max, total };
         }
 
         // Initialize input fields from URL params
@@ -351,20 +353,25 @@
                 return;
             }
 
+            // Default to all numbers in range if not specified
+            const total = max - min + 1;
+
             // Update URL without reloading page
-            const newUrl = `${window.location.pathname}?min=${min}&max=${max}`;
+            const newUrl = `${window.location.pathname}?min=${min}&max=${max}&total=${total}`;
             window.history.pushState({}, '', newUrl);
 
             // Load new leaderboard data
-            loadLeaderboard(min, max);
+            loadLeaderboard(min, max, total);
         }
 
         // Load and display leaderboard
-        async function loadLeaderboard(min, max) {
+        async function loadLeaderboard(min, max, total) {
             const contentDiv = document.getElementById('leaderboardContent');
             const rangeSpan = document.getElementById('currentRange');
+            const totalDisplay = document.getElementById('totalQuestionsDisplay');
 
             rangeSpan.textContent = `${min}-${max}`;
+            totalDisplay.textContent = `(${total} questions)`;
             contentDiv.innerHTML = '<div class="loading-message">Loading leaderboard...</div>';
 
             // Check if API URL is configured
@@ -374,7 +381,7 @@
             }
 
             try {
-                const url = `${LEADERBOARD_API_URL}?action=getLeaderboard&min=${min}&max=${max}&limit=50`;
+                const url = `${LEADERBOARD_API_URL}?action=getLeaderboard&min=${min}&max=${max}&total=${total}&limit=50`;
                 console.log('Fetching leaderboard from:', url);
 
                 const response = await fetch(url);
@@ -390,7 +397,7 @@
                 if (data.success && data.scores && data.scores.length > 0) {
                     displayLeaderboardTable(data.scores);
                 } else if (data.success) {
-                    contentDiv.innerHTML = '<div class="loading-message">No scores yet for this range.<br><br>Be the first to play!</div>';
+                    contentDiv.innerHTML = '<div class="loading-message">No scores yet for this range and question count.<br><br>Be the first to play!</div>';
                 } else {
                     contentDiv.innerHTML = `<div class="loading-message">Error: ${data.error || 'Unknown error'}</div>`;
                 }
@@ -466,8 +473,8 @@
         // Initialize page on load
         window.addEventListener('DOMContentLoaded', () => {
             initializeInputs();
-            const { min, max } = getUrlParams();
-            loadLeaderboard(min, max);
+            const { min, max, total } = getUrlParams();
+            loadLeaderboard(min, max, total);
         });
 
         // Handle Enter key in input fields

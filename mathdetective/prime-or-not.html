@@ -1037,12 +1037,15 @@
         function viewLeaderboardFromSettings() {
             const min = parseInt(document.getElementById('minNumber').value) || 1;
             const max = parseInt(document.getElementById('maxNumber').value) || 20;
-            window.open(`prime-or-not-leaderboard.html?min=${min}&max=${max}`, '_blank');
+            const numQuestionsInput = document.getElementById('numQuestions').value;
+            const totalQuestions = numQuestionsInput ? parseInt(numQuestionsInput) : (max - min + 1);
+            window.open(`prime-or-not-leaderboard.html?min=${min}&max=${max}&total=${totalQuestions}`, '_blank');
         }
 
         // View leaderboard from results page
         function viewLeaderboard() {
-            window.open(`prime-or-not-leaderboard.html?min=${gameState.min}&max=${gameState.max}`, '_blank');
+            const totalQuestions = gameState.numbers.length;
+            window.open(`prime-or-not-leaderboard.html?min=${gameState.min}&max=${gameState.max}&total=${totalQuestions}`, '_blank');
         }
 
         // Load and display leaderboard for a given range
