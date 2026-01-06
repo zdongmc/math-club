@@ -431,13 +431,19 @@ function getMathLeagueTeam(mcpsId) {
 
     const data = sheet.getDataRange().getValues();
 
-    // Columns: A=Team, B=Name, C=ID, D=Grade, E=ARML Tracking, F-I=Scores (Meet 1-4), J=Total
+    // Columns: A=Name, B=ID, C=Grade, D=ARML Tracking, E=Meet 1 Team, G=Meet 2 Team, I=Meet 3 Team, K=Meet 4 Team
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
-      const studentId = (row[2] || '').toString().trim();
+      const studentId = (row[1] || '').toString().trim(); // Column B (index 1)
 
       if (studentId === mcpsId.toString().trim()) {
-        return (row[0] || '').toString().trim(); // Return team assignment
+        // Return most recent non-empty team assignment (check Meet 4, 3, 2, 1 in order)
+        const meet4Team = (row[10] || '').toString().trim(); // Column K (index 10)
+        const meet3Team = (row[8] || '').toString().trim();  // Column I (index 8)
+        const meet2Team = (row[6] || '').toString().trim();  // Column G (index 6)
+        const meet1Team = (row[4] || '').toString().trim();  // Column E (index 4)
+
+        return meet4Team || meet3Team || meet2Team || meet1Team || null;
       }
     }
 
@@ -457,15 +463,16 @@ function getMathLeagueResults(mcpsId) {
 
     const data = sheet.getDataRange().getValues();
 
-    // Columns: A=Team, B=Name, C=ID, D=Grade, E=ARML Tracking, F-I=Individual scores (Meet 1-4), J=Total
-    // Team scores in rows 2-8: N=Team score, O=Relay 1, P=Relay 2, Q=Team individual, R=Team total
+    // Columns: A=Name, B=ID, C=Grade, D=ARML Tracking
+    // E=Meet 1 Team, F=Meet 1 score, G=Meet 2 Team, H=Meet 2 score
+    // I=Meet 3 Team, J=Meet 3 score, K=Meet 4 Team, L=Meet 4 score, M=Total score
+    // Team scores start at Column O (index 14): O=Team, P-T=Meet 1 scores, U-Y=Meet 2, Z-AD=Meet 3, AE-AI=Meet 4
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
-      const studentId = (row[2] || '').toString().trim();
+      const studentId = (row[1] || '').toString().trim(); // Column B (index 1)
 
       if (studentId === mcpsId.toString().trim()) {
-        const team = (row[0] || '').toString().trim();
-        const armlTracking = (row[4] || '').toString().trim(); // Column E (index 4)
+        const armlTracking = (row[3] || '').toString().trim(); // Column D (index 3)
 
         // Parse ARML tracking - check for "Yes", "Y", "TRUE", or true
         const isArmlTracked = armlTracking &&
@@ -490,47 +497,49 @@ function getMathLeagueResults(mcpsId) {
           return null;
         }
 
-        // Parse individual meet scores from columns G-J (indices 6-9)
-        const meet1Individual = parseMeetScore(row[6]); // Column G
-        const meet2Individual = parseMeetScore(row[7]); // Column H
-        const meet3Individual = parseMeetScore(row[8]); // Column I
-        const meet4Individual = parseMeetScore(row[9]); // Column J
+        // Parse team assignments and individual scores per meet
+        const meet1Team = (row[4] || '').toString().trim();  // Column E (index 4)
+        const meet1Individual = parseMeetScore(row[5]);      // Column F (index 5)
+        const meet2Team = (row[6] || '').toString().trim();  // Column G (index 6)
+        const meet2Individual = parseMeetScore(row[7]);      // Column H (index 7)
+        const meet3Team = (row[8] || '').toString().trim();  // Column I (index 8)
+        const meet3Individual = parseMeetScore(row[9]);      // Column J (index 9)
+        const meet4Team = (row[10] || '').toString().trim(); // Column K (index 10)
+        const meet4Individual = parseMeetScore(row[11]);     // Column L (index 11)
 
-        const meetScores = [
-          meet1Individual,
-          meet2Individual,
-          meet3Individual,
-          meet4Individual
-        ];
+        const meetTeams = [meet1Team, meet2Team, meet3Team, meet4Team];
+        const meetScores = [meet1Individual, meet2Individual, meet3Individual, meet4Individual];
 
-        // Get team scores from the appropriate row (2-8)
+        // Get team scores for each meet
         // Team A=row 2, Team B=row 3, Team C=row 4, JV A=row 5, JV B=row 6, JV C=row 7, JV Mixed=row 8
-        let teamResults = null;
-        if (team) {
-          const teamRowMap = {
-            'A': 1,
-            'B': 2,
-            'C': 3,
-            'JV A': 4,
-            'JV B': 5,
-            'JV C': 6,
-            'JV Mixed': 7
-          };
+        const teamRowMap = {
+          'A': 1,
+          'B': 2,
+          'C': 3,
+          'JV A': 4,
+          'JV B': 5,
+          'JV C': 6,
+          'JV Mixed': 7
+        };
 
-          const teamRowIndex = teamRowMap[team];
-          if (teamRowIndex !== undefined && data.length > teamRowIndex) {
-            const teamRow = data[teamRowIndex];
+        // Build team results for each meet
+        const teamResults = [];
+        for (let meetIndex = 0; meetIndex < 4; meetIndex++) {
+          const meetTeam = meetTeams[meetIndex];
 
-            // Team results for each meet:
-            // Meet 1: N-R (indices 13-17)
-            // Meet 2: S-W (indices 18-22)
-            // Meet 3: X-AB (indices 23-27)
-            // Meet 4: AC-AG (indices 28-32)
-            teamResults = [];
+          if (meetTeam) {
+            const teamRowIndex = teamRowMap[meetTeam];
+            if (teamRowIndex !== undefined && data.length > teamRowIndex) {
+              const teamRow = data[teamRowIndex];
 
-            for (let meetIndex = 0; meetIndex < 4; meetIndex++) {
-              const baseCol = 13 + (meetIndex * 5); // N=13, S=18, X=23, AC=28
+              // Team results columns:
+              // Meet 1: P-T (indices 15-19)
+              // Meet 2: U-Y (indices 20-24)
+              // Meet 3: Z-AD (indices 25-29)
+              // Meet 4: AE-AI (indices 30-34)
+              const baseCol = 15 + (meetIndex * 5); // P=15, U=20, Z=25, AE=30
               teamResults.push({
+                team: meetTeam,
                 teamScore: teamRow[baseCol] !== undefined && teamRow[baseCol] !== '' ? parseFloat(teamRow[baseCol]) : null,
                 relay1Score: teamRow[baseCol + 1] !== undefined && teamRow[baseCol + 1] !== '' ? parseFloat(teamRow[baseCol + 1]) : null,
                 relay2Score: teamRow[baseCol + 2] !== undefined && teamRow[baseCol + 2] !== '' ? parseFloat(teamRow[baseCol + 2]) : null,
@@ -540,12 +549,21 @@ function getMathLeagueResults(mcpsId) {
                 maxRelayScore: 8,
                 maxTeamTotal: 64
               });
+            } else {
+              // No team scores available for this meet
+              teamResults.push(null);
             }
+          } else {
+            // Student not assigned to a team for this meet
+            teamResults.push(null);
           }
         }
 
+        // Get the most recent team assignment for backward compatibility
+        const currentTeam = meet4Team || meet3Team || meet2Team || meet1Team || null;
+
         return {
-          team: team,
+          team: currentTeam, // Most recent team for backward compatibility
           armlTracked: isArmlTracked,
           meetScores: meetScores,
           teamResults: teamResults

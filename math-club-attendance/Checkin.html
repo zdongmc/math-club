@@ -831,20 +831,12 @@
         function parseCompetitionDates(competitionName, details, isWaitlisted, team, moemsData, mathLeagueData) {
             let html = '<div class="competition-dates">';
 
-            // Display team assignment and ARML tracking for Math League
-            if (competitionName === 'MCPS Math League' && (team || mathLeagueData)) {
-                const teamText = team || 'Not Assigned';
-                html += '<div style="background: #fef3c7; border: 2px solid #fbbf24; border-radius: 8px; padding: 12px; margin-bottom: 8px; text-align: center;">';
-                html += '<div style="font-weight: bold; color: #92400e; font-size: 1.1rem;">Team ' + escapeHtml(teamText) + '</div>';
+            // Display ARML tracking for Math League
+            if (competitionName === 'MCPS Math League' && mathLeagueData) {
+                const armlStatus = mathLeagueData.armlTracked ? 'on' : 'off';
+                html += '<div style="margin-bottom: 12px; text-align: center;">';
+                html += '<span style="color: #666; font-size: 0.85rem;">ARML Tracking: ' + armlStatus + '</span>';
                 html += '</div>';
-
-                // Display ARML tracking separately and smaller
-                if (mathLeagueData) {
-                    const armlStatus = mathLeagueData.armlTracked ? 'on' : 'off';
-                    html += '<div style="margin-bottom: 12px; text-align: center;">';
-                    html += '<span style="color: #666; font-size: 0.85rem;">ARML Tracking: ' + armlStatus + '</span>';
-                    html += '</div>';
-                }
             }
 
             // Display MOEMS fee payment status if available
@@ -907,8 +899,8 @@
                         html += '</div>';
                     }
 
-                    // ONLY show results for Contest #1 (contestIndex === 0)
-                    if (signedUp && contestIndex === 0) {
+                    // Show results for Contest #1 and Contest #2 (contestIndex 0-1)
+                    if (signedUp && contestIndex <= 1) {
                         // Contest results (if available)
                         if (moemsData && moemsData.contests && moemsData.contests[contestIndex]) {
                             const contestResult = moemsData.contests[contestIndex];
@@ -967,6 +959,14 @@
                     html += '<div style="margin-top: 15px; background: #f8f9fa; border: 2px solid #d1d5db; border-radius: 10px; padding: 15px;">';
                     html += '<div style="font-weight: bold; color: #333; margin-bottom: 12px; font-size: 1.15rem;">' + escapeHtml(meet.name) + ' - ' + escapeHtml(meet.date) + '</div>';
 
+                    // Display team assignment for this meet
+                    if (mathLeagueData && mathLeagueData.teamResults && mathLeagueData.teamResults[meetIndex] && mathLeagueData.teamResults[meetIndex].team) {
+                        const meetTeam = mathLeagueData.teamResults[meetIndex].team;
+                        html += '<div style="background: #fef3c7; border: 2px solid #fbbf24; border-radius: 8px; padding: 10px; margin-bottom: 10px; text-align: center;">';
+                        html += '<div style="font-weight: bold; color: #92400e; font-size: 1rem;">Team ' + escapeHtml(meetTeam) + '</div>';
+                        html += '</div>';
+                    }
+
                     // Sign-up status
                     let signedUp = false;
                     if (isWaitlisted) {
@@ -984,36 +984,42 @@
                         html += '</div>';
                     }
 
-                    // ONLY show results for Meet #1 (meetIndex === 0)
-                    if (signedUp && !isWaitlisted && meetIndex === 0) {
+                    // Show results for Meet #1 and Meet #2 (meetIndex 0-1)
+                    if (signedUp && !isWaitlisted && meetIndex <= 1) {
                         // Individual results (if available)
                         if (mathLeagueData && mathLeagueData.meetScores && mathLeagueData.meetScores[meetIndex] !== undefined) {
                             const meetScore = mathLeagueData.meetScores[meetIndex];
 
-                            html += '<div style="margin-top: 10px; background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px;">';
-                            html += '<div style="font-weight: bold; color: #1e40af; margin-bottom: 8px; font-size: 1rem;">Individual Results</div>';
-
-                            if (meetScore === null) {
-                                // Score pending
-                                html += '<div style="padding: 8px; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; text-align: center;">';
-                                html += '<span style="color: #92400e; font-weight: bold;">Score Pending</span>';
-                                html += '</div>';
-                            } else if (meetScore === 'NA') {
-                                html += '<div style="padding: 8px; background: #fee; border: 1px solid #dc2626; border-radius: 6px; text-align: center;">';
-                                html += '<span style="color: #dc2626; font-weight: bold;">Did Not Attend</span>';
+                            // If student did not attend (NA), only show "Did Not Attend" message
+                            if (meetScore === 'NA') {
+                                html += '<div style="margin-top: 10px; background: #fee; border: 2px solid #dc2626; border-radius: 8px; padding: 15px; text-align: center;">';
+                                html += '<span style="color: #dc2626; font-weight: bold; font-size: 1.1rem;">Did Not Attend</span>';
                                 html += '</div>';
                             } else {
-                                html += '<div class="info-row" style="border: none; padding: 5px 0;">';
-                                html += '<span class="info-label">Individual Score</span>';
-                                html += '<span class="info-value"><strong>' + meetScore + '</strong> / 6</span>';
+                                // Student attended or score is pending - show individual results
+                                html += '<div style="margin-top: 10px; background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px;">';
+                                html += '<div style="font-weight: bold; color: #1e40af; margin-bottom: 8px; font-size: 1rem;">Individual Results</div>';
+
+                                if (meetScore === null) {
+                                    // Score pending
+                                    html += '<div style="padding: 8px; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; text-align: center;">';
+                                    html += '<span style="color: #92400e; font-weight: bold;">Score Pending</span>';
+                                    html += '</div>';
+                                } else {
+                                    html += '<div class="info-row" style="border: none; padding: 5px 0;">';
+                                    html += '<span class="info-label">Individual Score</span>';
+                                    html += '<span class="info-value"><strong>' + meetScore + '</strong> / 6</span>';
+                                    html += '</div>';
+                                }
+
                                 html += '</div>';
                             }
-
-                            html += '</div>';
                         }
 
                         // Team results (if available and student actually has a team assignment)
-                        if (mathLeagueData && mathLeagueData.team && mathLeagueData.teamResults && mathLeagueData.teamResults[meetIndex] !== null) {
+                        // Only show team results if student attended (individual score is not 'NA')
+                        const studentAttended = mathLeagueData && mathLeagueData.meetScores && mathLeagueData.meetScores[meetIndex] !== 'NA';
+                        if (studentAttended && mathLeagueData && mathLeagueData.teamResults && mathLeagueData.teamResults[meetIndex] !== null && mathLeagueData.teamResults[meetIndex].team) {
                             const teamData = mathLeagueData.teamResults[meetIndex];
 
                             // Only display team results if at least one score is entered

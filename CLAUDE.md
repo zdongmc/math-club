@@ -89,11 +89,13 @@ Located in `math-club-attendance/` directory:
   - Paid (Column K): TRUE/true/Yes/Y/Paid = paid, FALSE/false/blank = not paid
   - Used for: Retrieving MOEMS contest results and fee payment status by MCPS ID. Results displayed for students signed up for each contest.
 - **Math League** - Math League meet results and ARML tracking
-  - Student data columns: A=Team, B=Name, C=ID, D=Grade, E=ARML Tracking (Yes/No), F=Placeholder, G=Meet #1 individual score (out of 6), H-J=Meet #2-4 (future)
+  - Student data columns: A=Name, B=ID, C=Grade, D=ARML Tracking (Yes/No), E=Meet 1 Team, F=Meet 1 score (out of 6), G=Meet 2 Team, H=Meet 2 score, I=Meet 3 Team, J=Meet 3 score, K=Meet 4 Team, L=Meet 4 score, M=Total score (individual)
   - Team results rows (2-8): Team A (row 2), Team B (row 3), Team C (row 4), Team JV A (row 5), Team JV B (row 6), Team JV C (row 7), Team JV Mixed (row 8)
-  - Team score columns (for each meet): N=Team Score (out of 12), O=Relay 1 (out of 8), P=Relay 2 (out of 8), Q=Team Individual Score (sum), R=Team Total (out of 64)
+  - Team score columns start at Column O: O=Team, P=Meet 1 Team score (out of 12), Q=Meet 1 Relay 1 (out of 8), R=Meet 1 Relay 2 (out of 8), S=Meet 1 Individual score (sum), T=Meet 1 total score (out of 64)
+  - Meet 2-4 team scores follow same pattern: Meet 2 (U-Y), Meet 3 (Z-AD), Meet 4 (AE-AI)
   - Individual scores: "NA" = did not attend, number = score, blank = will attend but score pending
-  - Used for: Retrieving team assignment, ARML tracking status, individual meet scores, and team meet scores by MCPS ID
+  - Students are assigned teams per meet (not a single team for all meets)
+  - Used for: Retrieving team assignments per meet, ARML tracking status, individual meet scores, and team meet scores by MCPS ID
 - **MATHCOUNTS** - MATHCOUNTS competition results
   - Columns: A=Name, B=ID, G=Sprint Round, H=Target Round, I=Individual Score, J=Rank, K=Chapter Advancement, M=Fee Required, N=Fee Paid
   - Fee Required (Column M): "$40" or "NA" (if NA, fee info not displayed)
