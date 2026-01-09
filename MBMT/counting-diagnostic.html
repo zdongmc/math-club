@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBMT Division Diagnostic - Hallie Wells Math Club</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: #dc2626;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        .intro {
+            background: #f9fafb;
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #dc2626;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        .intro h2 {
+            color: #dc2626;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header h2 {
+            font-size: 1.8rem;
+        }
+
+        .section-badge {
+            background: white;
+            color: #dc2626;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .problem {
+            background: #f9fafb;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #e5e7eb;
+        }
+
+        .problem-number {
+            color: #dc2626;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .problem-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .answer-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        .answer-input {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .answer-input input {
+            flex: 1;
+            padding: 12px;
+            font-size: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+
+        .answer-input input:focus {
+            outline: none;
+            border-color: #dc2626;
+        }
+
+        .difficulty-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .difficulty-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 20px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .difficulty-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .difficulty-btn.selected {
+            border-width: 3px;
+            font-weight: bold;
+        }
+
+        .difficulty-btn.easy.selected {
+            background: #dcfce7;
+            border-color: #16a34a;
+            color: #16a34a;
+        }
+
+        .difficulty-btn.right.selected {
+            background: #dbeafe;
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+
+        .difficulty-btn.hard.selected {
+            background: #fee2e2;
+            border-color: #dc2626;
+            color: #dc2626;
+        }
+
+        .show-solution-btn {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .show-solution-btn:hover {
+            background: #4b5563;
+        }
+
+        .solution {
+            display: none;
+            background: #f0fdf4;
+            border: 2px solid #16a34a;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .solution.visible {
+            display: block;
+        }
+
+        .solution-label {
+            color: #16a34a;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .results-container {
+            background: linear-gradient(135deg, #f9fafb 0%, #e5e7eb 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .results-container h2 {
+            color: #dc2626;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+
+        .recommendation {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            border: 3px solid #dc2626;
+            margin-top: 20px;
+        }
+
+        .recommendation h3 {
+            color: #dc2626;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .recommendation p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .calculate-btn {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+
+        .calculate-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .section-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+
+            .difficulty-buttons {
+                flex-direction: column;
+            }
+
+            .difficulty-btn {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MBMT Counting & Probability Diagnostic</h1>
+        <p class="subtitle">Hallie Wells Middle School Competition Math Club</p>
+
+        <div class="intro">
+            <h2>How to Use This Tool</h2>
+            <p><strong>Goal:</strong> Help you understand your counting & probability skills and choose the right division for MBMT 2026.</p>
+            <p style="margin-top: 15px;">
+                <strong>Instructions:</strong>
+            </p>
+            <ol style="margin-left: 20px; margin-top: 10px;">
+                <li>Try solving each problem below (use scratch paper if needed)</li>
+                <li>Enter your answer in the box provided</li>
+                <li>Rate how difficult the problem felt to YOU:
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li><strong>Too Easy</strong> - You solved it quickly and confidently</li>
+                        <li><strong>Just Right</strong> - Challenging but doable with effort</li>
+                        <li><strong>Too Hard</strong> - Couldn't solve it or very struggling</li>
+                    </ul>
+                </li>
+                <li>Click "Show Solution" to check your work</li>
+                <li>After rating all problems, click "Get Recommendation"</li>
+            </ol>
+            <p style="margin-top: 15px; color: #dc2626; font-weight: 500;">
+                <strong>Note:</strong> These problems are from past MBMT competitions. Your ratings will help determine which division suits you best.
+            </p>
+        </div>
+
+        <!-- Set 1 Section -->
+        <div class="section" id="lower-section">
+            <div class="section-header">
+                <h2>Problem Set 1</h2>
+                <span class="section-badge">3 Problems</span>
+            </div>
+
+            <!-- Problem 1 -->
+            <div class="problem">
+                <div class="problem-number">Problem 1</div>
+                <div class="problem-text">
+                    Veena is selling three pots colored purple, turquoise, and orange. If she sold the purple pot sometime after the orange pot, in how many possible orders could she have sold the pots?
+                </div>
+                <div class="answer-section">
+                    <div class="answer-input">
+                        <label><strong>Your Answer:</strong></label>
+                        <input type="text" id="lower-1-answer" placeholder="Enter your answer">
+                    </div>
+                    <label><strong>How difficult was this?</strong></label>
+                    <div class="difficulty-buttons">
+                        <button class="difficulty-btn easy" onclick="selectDifficulty('lower-1', 'easy')">😊 Too Easy</button>
+                        <button class="difficulty-btn right" onclick="selectDifficulty('lower-1', 'right')">👍 Just Right</button>
+                        <button class="difficulty-btn hard" onclick="selectDifficulty('lower-1', 'hard')">😰 Too Hard</button>
+                    </div>
+                    <button class="show-solution-btn" onclick="toggleSolution('lower-1')">Show Solution</button>
+                    <div class="solution" id="lower-1-solution">
+                        <div class="solution-label">Answer: 3</div>
+                        <p><strong>Solution:</strong> There are \(3! = 6\) permutations of these three pots. Listing out the permutations and counting them, we find that three permutations have the purple pot after the orange pot.</p>
+                        <p>Symmetry can also be used. Since the purple pot is either before or after the orange pot and both outcomes have equal probability, we get \(\frac{1}{2} \cdot 6 = 3\).</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Problem 2 -->
+            <div class="problem">
+                <div class="problem-number">Problem 2</div>
+                <div class="problem-text">
+                    Frank the Frog is jumping on a row of lilypads numbered 1 through 13 in that order. He can only jump forward 2 or 5 lilypads at a time. Frank is currently on the first lilypad and wishes to reach his home on the thirteenth lilypad. How many ways are there for him to get to his home?
+                </div>
+                <div class="answer-section">
+                    <div class="answer-input">
+                        <label><strong>Your Answer:</strong></label>
+                        <input type="text" id="lower-2-answer" placeholder="Enter your answer">
+                    </div>
+                    <label><strong>How difficult was this?</strong></label>
+                    <div class="difficulty-buttons">
+                        <button class="difficulty-btn easy" onclick="selectDifficulty('lower-2', 'easy')">😊 Too Easy</button>
+                        <button class="difficulty-btn right" onclick="selectDifficulty('lower-2', 'right')">👍 Just Right</button>
+                        <button class="difficulty-btn hard" onclick="selectDifficulty('lower-2', 'hard')">😰 Too Hard</button>
+                    </div>
+                    <button class="show-solution-btn" onclick="toggleSolution('lower-2')">Show Solution</button>
+                    <div class="solution" id="lower-2-solution">
+                        <div class="solution-label">Answer: 4</div>
+                        <p><strong>Solution:</strong> Jumping forward 2 lilypads doesn't change whether Frank is on an even or odd numbered lilypad. Jumping forward 5 lilypads will. Frank is trying to go from an odd numbered lilypad to another odd numbered lilypad, so he will need to jump 5 lilypads an even number of times.</p>
+                        <p>– If he never jumps 5 lilypads, there is only one option (jump 2 lilypads 6 times).</p>
+                        <p>– If he jumps 5 lilypads twice, he will also need to jump 2 lilypads once. With three jumps, there are three places in the ordering for him to jump 2 lilypads.</p>
+                        <p>The total is then \(1 + 3 = 4\) different ways.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Problem 3 -->
+            <div class="problem">
+                <div class="problem-number">Problem 3</div>
+                <div class="problem-text">
+                    Evan wants to become a snapping turtle. A magic genie will turn him into a snapping turtle if he flips two heads in a row with a fair coin. If Evan flips the coin three times, what is the probability that he becomes a snapping turtle?
+                </div>
+                <div class="answer-section">
+                    <div class="answer-input">
+                        <label><strong>Your Answer:</strong></label>
+                        <input type="text" id="lower-3-answer" placeholder="Enter your answer">
+                    </div>
+                    <label><strong>How difficult was this?</strong></label>
+                    <div class="difficulty-buttons">
+                        <button class="difficulty-btn easy" onclick="selectDifficulty('lower-3', 'easy')">😊 Too Easy</button>
+                        <button class="difficulty-btn right" onclick="selectDifficulty('lower-3', 'right')">👍 Just Right</button>
+                        <button class="difficulty-btn hard" onclick="selectDifficulty('lower-3', 'hard')">😰 Too Hard</button>
+                    </div>
+                    <button class="show-solution-btn" onclick="toggleSolution('lower-3')">Show Solution</button>
+                    <div class="solution" id="lower-3-solution">
+                        <div class="solution-label">Answer: 3/8</div>
+                        <p><strong>Solution:</strong> All possible sequences of heads and tails are HHH, HHT, HTH, HTT, THH, THT, TTH, TTT. The bolded items are the cases in which Evan will become a snapping turtle: <strong>HHH</strong>, <strong>HHT</strong>, <strong>THH</strong>. Counting occurrences, the probability is \(\frac{3}{8}\).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Set 2 Section -->
+        <div class="section" id="upper-section">
+            <div class="section-header">
+                <h2>Problem Set 2</h2>
+                <span class="section-badge">3 Problems</span>
+            </div>
+
+            <!-- Problem 4 -->
+            <div class="problem">
+                <div class="problem-number">Problem 4</div>
+                <div class="problem-text">
+                    Sam is playing a round of rock paper scissors against a robotic arm. The arm picks randomly between rock, paper, and scissors while Sam picks rock 20% of the time, paper 30% of the time, and scissors 50% of the time. What is the probability Sam wins?
+                </div>
+                <div class="answer-section">
+                    <div class="answer-input">
+                        <label><strong>Your Answer:</strong></label>
+                        <input type="text" id="upper-1-answer" placeholder="Enter your answer">
+                    </div>
+                    <label><strong>How difficult was this?</strong></label>
+                    <div class="difficulty-buttons">
+                        <button class="difficulty-btn easy" onclick="selectDifficulty('upper-1', 'easy')">😊 Too Easy</button>
+                        <button class="difficulty-btn right" onclick="selectDifficulty('upper-1', 'right')">👍 Just Right</button>
+                        <button class="difficulty-btn hard" onclick="selectDifficulty('upper-1', 'hard')">😰 Too Hard</button>
+                    </div>
+                    <button class="show-solution-btn" onclick="toggleSolution('upper-1')">Show Solution</button>
+                    <div class="solution" id="upper-1-solution">
+                        <div class="solution-label">Answer: 1/3</div>
+                        <p><strong>Solution:</strong> No matter what Sam chooses, the robot has one choice to win, one choice to tie, and one choice to lose. Each is chosen with \(\frac{1}{3}\) chance, so Sam has a \(\frac{1}{3}\) chance to win.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Problem 5 -->
+            <div class="problem">
+                <div class="problem-number">Problem 5</div>
+                <div class="problem-text">
+                    Michelle flips a coin 9 times in a row and notices 6 flips come up heads. In how many ways can there be three distinct strings of heads of length 1, 2, and 3 in some order? (For example HTHHTHHHT would count)
+                </div>
+                <div class="answer-section">
+                    <div class="answer-input">
+                        <label><strong>Your Answer:</strong></label>
+                        <input type="text" id="upper-2-answer" placeholder="Enter your answer">
+                    </div>
+                    <label><strong>How difficult was this?</strong></label>
+                    <div class="difficulty-buttons">
+                        <button class="difficulty-btn easy" onclick="selectDifficulty('upper-2', 'easy')">😊 Too Easy</button>
+                        <button class="difficulty-btn right" onclick="selectDifficulty('upper-2', 'right')">👍 Just Right</button>
+                        <button class="difficulty-btn hard" onclick="selectDifficulty('upper-2', 'hard')">😰 Too Hard</button>
+                    </div>
+                    <button class="show-solution-btn" onclick="toggleSolution('upper-2')">Show Solution</button>
+                    <div class="solution" id="upper-2-solution">
+                        <div class="solution-label">Answer: 24</div>
+                        <p><strong>Solution:</strong> Consider the positions of the tails in the ordering. There must be a tails between adjacent strings of heads, requiring two tails. With one tails left, there are 4 choices on where to order it (before, after, or one of the two locations in between). With \(3! = 6\) ways to order the strings of heads, there is a total of \(6 \cdot 4 = 24\) possibilities.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Problem 6 -->
+            <div class="problem">
+                <div class="problem-number">Problem 6</div>
+                <div class="problem-text">
+                    After combining like terms, how many terms are there in the expansion of \((x + 2y + 3z + 4)^{12}\)?
+                </div>
+                <div class="answer-section">
+                    <div class="answer-input">
+                        <label><strong>Your Answer:</strong></label>
+                        <input type="text" id="upper-3-answer" placeholder="Enter your answer">
+                    </div>
+                    <label><strong>How difficult was this?</strong></label>
+                    <div class="difficulty-buttons">
+                        <button class="difficulty-btn easy" onclick="selectDifficulty('upper-3', 'easy')">😊 Too Easy</button>
+                        <button class="difficulty-btn right" onclick="selectDifficulty('upper-3', 'right')">👍 Just Right</button>
+                        <button class="difficulty-btn hard" onclick="selectDifficulty('upper-3', 'hard')">😰 Too Hard</button>
+                    </div>
+                    <button class="show-solution-btn" onclick="toggleSolution('upper-3')">Show Solution</button>
+                    <div class="solution" id="upper-3-solution">
+                        <div class="solution-label">Answer: 455</div>
+                        <p><strong>Solution:</strong> All terms are of the form \(kx^a(2y)^b(3z)^c4^d\) where \(k\) is a nonzero integer and \(a, b, c,\) and \(d\) are non-negative integers with \(a + b + c + d = 12\). The number of terms is then equal to the number of non-negative integer solutions to \(a + b + c + d = 12\). Using stars and bars gives an answer of \(\binom{15}{3} = 455\).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-container">
+            <h2>Ready for Your Recommendation?</h2>
+            <p style="margin-bottom: 20px; font-size: 1.1rem;">Make sure you've rated all 6 problems above, then click below:</p>
+            <button class="calculate-btn" onclick="calculateRecommendation()">Get My Division Recommendation</button>
+
+            <div class="recommendation" id="recommendation" style="display: none;">
+                <h3 id="rec-title"></h3>
+                <p id="rec-text"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Store difficulty ratings
+        const ratings = {};
+
+        function selectDifficulty(problemId, difficulty) {
+            ratings[problemId] = difficulty;
+
+            // Update button styles
+            const buttons = document.querySelectorAll(`#${problemId.replace('-', '-')}`).length
+                ? document.querySelectorAll(`[onclick*="${problemId}"]`)
+                : [];
+
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                if (btn.getAttribute('onclick').includes(problemId)) {
+                    btn.classList.remove('selected');
+                    if (btn.getAttribute('onclick').includes(`'${difficulty}'`)) {
+                        btn.classList.add('selected');
+                    }
+                }
+            });
+
+            console.log('Current ratings:', ratings);
+        }
+
+        function toggleSolution(problemId) {
+            const solution = document.getElementById(`${problemId}-solution`);
+            solution.classList.toggle('visible');
+
+            const button = event.target;
+            if (solution.classList.contains('visible')) {
+                button.textContent = 'Hide Solution';
+            } else {
+                button.textContent = 'Show Solution';
+            }
+        }
+
+        function calculateRecommendation() {
+            // Check if all problems are rated
+            const requiredRatings = ['lower-1', 'lower-2', 'lower-3', 'upper-1', 'upper-2', 'upper-3'];
+            const missingRatings = requiredRatings.filter(id => !ratings[id]);
+
+            if (missingRatings.length > 0) {
+                alert(`Please rate all problems before getting your recommendation. You haven't rated: ${missingRatings.length} problem(s).`);
+                return;
+            }
+
+            // Calculate scores
+            const scoreMap = { 'easy': 3, 'right': 2, 'hard': 1 };
+
+            const lowerScore = (scoreMap[ratings['lower-1']] || 0) +
+                               (scoreMap[ratings['lower-2']] || 0) +
+                               (scoreMap[ratings['lower-3']] || 0);
+
+            const upperScore = (scoreMap[ratings['upper-1']] || 0) +
+                               (scoreMap[ratings['upper-2']] || 0) +
+                               (scoreMap[ratings['upper-3']] || 0);
+
+            console.log('Lower score:', lowerScore, 'Upper score:', upperScore);
+
+            // Determine recommendation
+            let title = '';
+            let text = '';
+            let color = '';
+
+            if (lowerScore >= 8 && upperScore >= 7) {
+                // Found Set 1 easy and Set 2 manageable
+                title = '🎯 Counting & Probability Recommendation: Upper Division';
+                text = 'You found the first set of problems comfortable and handled the second set well. You\'re ready for the upper division in counting & probability!';
+                color = '#dc2626';
+            } else if (lowerScore >= 7 && upperScore >= 5) {
+                // Moderate on both
+                title = '🤔 Counting & Probability Recommendation: Discuss with Coach';
+                text = 'You\'re right on the border! You could compete successfully in either division for counting & probability. Discuss with Prof. Jojo to decide based on your overall comfort level across all subjects.';
+                color = '#d97706';
+            } else if (lowerScore >= 6 && upperScore <= 4) {
+                // Set 1 comfortable, Set 2 hard
+                title = '👍 Counting & Probability Recommendation: Lower Division';
+                text = 'The first problem set was at a good level for you. The lower division will let you showcase your counting & probability skills and build confidence!';
+                color = '#16a34a';
+            } else if (lowerScore <= 5) {
+                // Struggled with Set 1
+                title = '💪 Counting & Probability Recommendation: Lower Division';
+                text = 'The first set of problems were challenging for you. The lower division is a great fit where you can compete effectively and continue developing your counting & probability skills!';
+                color = '#16a34a';
+            } else {
+                // Default to upper if they did well on Set 2
+                title = '🎯 Counting & Probability Recommendation: Upper Division';
+                text = 'Based on your performance, you\'re ready for the upper division. You handled the more difficult problems well!';
+                color = '#dc2626';
+            }
+
+            // Save results to localStorage
+            const results = {
+                lowerScore: lowerScore,
+                upperScore: upperScore,
+                totalScore: lowerScore + upperScore,
+                recommendation: title,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('mbmt-counting-results', JSON.stringify(results));
+
+            // Display recommendation
+            document.getElementById('rec-title').textContent = title;
+            document.getElementById('rec-text').textContent = text;
+            document.getElementById('recommendation').style.display = 'block';
+            document.getElementById('recommendation').style.borderColor = color;
+
+            // Add button to return to main page
+            if (!document.getElementById('return-btn')) {
+                const returnBtn = document.createElement('button');
+                returnBtn.id = 'return-btn';
+                returnBtn.className = 'calculate-btn';
+                returnBtn.style.marginTop = '20px';
+                returnBtn.textContent = 'Return to Diagnostic Center';
+                returnBtn.onclick = function() {
+                    window.location.href = 'division-diagnostic.html';
+                };
+                document.getElementById('recommendation').appendChild(returnBtn);
+            }
+
+            // Scroll to recommendation
+            document.getElementById('recommendation').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Trigger MathJax rendering after page load
+        window.addEventListener('load', function() {
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        });
+    </script>
+</body>
+</html>

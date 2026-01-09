@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your MBMT Recommendations - Hallie Wells Math Club</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: #dc2626;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        .recommendation-box {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(22, 163, 74, 0.3);
+        }
+
+        .recommendation-box h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .recommendation-box p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .division-badge {
+            background: white;
+            color: #16a34a;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .subjects-box {
+            background: #f9fafb;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 5px solid #dc2626;
+        }
+
+        .subjects-box h2 {
+            color: #dc2626;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .subject-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .subject-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 3px solid #e5e7eb;
+        }
+
+        .subject-item.recommended {
+            border-color: #16a34a;
+            background: #f0fdf4;
+        }
+
+        .subject-item.recommended .subject-name {
+            color: #16a34a;
+        }
+
+        .subject-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #dc2626;
+        }
+
+        .subject-score {
+            font-size: 1.1rem;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .subject-description {
+            font-size: 0.95rem;
+            color: #666;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .subject-badge {
+            background: #16a34a;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .coach-discussion {
+            background: #fef3c7;
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #f59e0b;
+            margin-bottom: 30px;
+        }
+
+        .coach-discussion h3 {
+            color: #f59e0b;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .discussion-item {
+            margin-bottom: 15px;
+            line-height: 1.8;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .discussion-item:before {
+            content: "💬";
+            position: absolute;
+            left: 0;
+        }
+
+        .return-btn {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+
+        .return-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subject-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Your MBMT 2026 Recommendations</h1>
+        <p class="subtitle">Based on Your Diagnostic Results</p>
+
+        <div id="content-area">
+            <!-- Content will be generated by JavaScript -->
+        </div>
+
+        <div class="button-container">
+            <a href="division-diagnostic.html" class="return-btn">Return to Diagnostic Center</a>
+        </div>
+    </div>
+
+    <script>
+        function getConfidenceLevel(score, maxScore) {
+            const percentage = score / maxScore;
+            if (percentage >= 0.85) return "very confident";
+            if (percentage >= 0.70) return "confident";
+            if (percentage >= 0.55) return "comfortable";
+            if (percentage >= 0.40) return "challenged";
+            return "found challenging";
+        }
+
+        function getProblemSetDescription(lowerScore, upperScore) {
+            const lowerPct = lowerScore / 9;
+            const upperPct = upperScore / 9;
+
+            let desc = "";
+
+            if (lowerPct >= 0.85) {
+                desc = "You found the first problem set very easy";
+            } else if (lowerPct >= 0.70) {
+                desc = "You handled the first problem set well";
+            } else if (lowerPct >= 0.55) {
+                desc = "You found the first problem set appropriately challenging";
+            } else {
+                desc = "You found the first problem set challenging";
+            }
+
+            desc += " and ";
+
+            if (upperPct >= 0.85) {
+                desc += "found the second problem set manageable as well";
+            } else if (upperPct >= 0.70) {
+                desc += "handled the more difficult problems reasonably well";
+            } else if (upperPct >= 0.55) {
+                desc += "found the more difficult problems challenging but doable";
+            } else {
+                desc += "found the more difficult problems quite challenging";
+            }
+
+            return desc + ".";
+        }
+
+        function generateRecommendations() {
+            const subjects = [
+                { key: 'algebra', name: 'Algebra', icon: '🔢' },
+                { key: 'geometry', name: 'Geometry', icon: '📐' },
+                { key: 'counting', name: 'Counting & Probability', icon: '🎲' },
+                { key: 'numberTheory', name: 'Number Theory', icon: '🔐' }
+            ];
+
+            const results = {};
+            let allComplete = true;
+
+            // Load all results
+            subjects.forEach(subject => {
+                const data = localStorage.getItem(`mbmt-${subject.key}-results`);
+                if (data) {
+                    results[subject.key] = JSON.parse(data);
+                } else {
+                    allComplete = false;
+                }
+            });
+
+            const contentArea = document.getElementById('content-area');
+
+            if (!allComplete) {
+                contentArea.innerHTML = `
+                    <div class="coach-discussion">
+                        <h3>⚠️ Incomplete Diagnostics</h3>
+                        <p>You haven't completed all four diagnostics yet. Please complete all diagnostics to receive your personalized recommendations.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Calculate overall scores
+            let totalLowerScore = 0;
+            let totalUpperScore = 0;
+            const subjectScores = [];
+
+            subjects.forEach(subject => {
+                const data = results[subject.key];
+                totalLowerScore += data.lowerScore;
+                totalUpperScore += data.upperScore;
+                subjectScores.push({
+                    name: subject.name,
+                    icon: subject.icon,
+                    key: subject.key,
+                    totalScore: data.totalScore,
+                    lowerScore: data.lowerScore,
+                    upperScore: data.upperScore
+                });
+            });
+
+            // Sort subjects by total score (descending)
+            subjectScores.sort((a, b) => b.totalScore - a.totalScore);
+
+            // Determine division recommendation
+            const avgLowerScore = totalLowerScore / 4;
+            const avgUpperScore = totalUpperScore / 4;
+            let divisionBadge = '';
+            let divisionText = '';
+            let discussionPoints = [];
+
+            if (avgLowerScore >= 7.5 && avgUpperScore >= 6.5) {
+                divisionBadge = '🎯 Jacobi Division (Upper)';
+                divisionText = `You performed consistently well across all subjects! You found the first problem sets comfortable and handled the more challenging problems with confidence. You're ready for the upper division (Jacobi) where you can compete at a higher level.`;
+            } else if (avgLowerScore >= 6.5 && avgUpperScore >= 5) {
+                divisionBadge = '🤔 Either Division - Your Choice';
+                divisionText = `You're in a great position! Your performance suggests you could be successful in either division. The upper division (Jacobi) will offer more challenge, while the lower division (Abel) will allow you to build confidence with strong performance.`;
+                discussionPoints.push("Which division feels right based on your comfort level and goals");
+                discussionPoints.push("Your overall math competition experience and how you handle pressure");
+            } else if (avgLowerScore >= 5.5) {
+                divisionBadge = '👍 Abel Division (Lower)';
+                divisionText = `Based on your results across all subjects, the lower division (Abel) is an excellent fit for you. You'll be able to compete effectively and confidently, showcasing your mathematical skills while continuing to develop your problem-solving abilities.`;
+            } else {
+                divisionBadge = '💪 Abel Division (Lower)';
+                divisionText = `The lower division (Abel) is perfect for you! This division will provide appropriate challenges that match your current skill level, allowing you to compete successfully while building your mathematical confidence and experience.`;
+            }
+
+            // Generate subject descriptions and discussion points
+            const subjectDescriptions = [];
+            subjectScores.forEach((subject, index) => {
+                const isRecommended = index < 2;
+                const confidence = getConfidenceLevel(subject.totalScore, 18);
+                const problemDesc = getProblemSetDescription(subject.lowerScore, subject.upperScore);
+
+                let desc = `You were ${confidence} in ${subject.name}. ${problemDesc}`;
+
+                subjectDescriptions.push({
+                    ...subject,
+                    isRecommended: isRecommended,
+                    description: desc
+                });
+
+                // Add discussion points for borderline subjects
+                if (!isRecommended && subject.totalScore >= subjectScores[1].totalScore - 2) {
+                    discussionPoints.push(`${subject.name} - You performed nearly as well as your recommended subjects`);
+                }
+
+                // Add discussion points for subjects with mixed performance
+                const scoreDiff = Math.abs(subject.lowerScore - subject.upperScore);
+                if (scoreDiff >= 4) {
+                    const stronger = subject.lowerScore > subject.upperScore ? "first" : "second";
+                    const weaker = subject.lowerScore > subject.upperScore ? "second" : "first";
+                    discussionPoints.push(`${subject.name} - Your performance varied significantly between problem sets (stronger on ${stronger} set)`);
+                }
+            });
+
+            // Generate HTML
+            let html = `
+                <div class="recommendation-box">
+                    <h2>🏆 Division Recommendation</h2>
+                    <p>${divisionText}</p>
+                    <div class="division-badge">${divisionBadge}</div>
+                </div>
+
+                <div class="subjects-box">
+                    <h2>📚 Individual Round Subject Recommendations</h2>
+                    <p style="margin-bottom: 20px; line-height: 1.8;">For the individual round, you need to choose <strong>2 subjects</strong>. Based on your diagnostic results, we recommend:</p>
+
+                    <div class="subject-list">
+            `;
+
+            subjectDescriptions.forEach((subject) => {
+                html += `
+                    <div class="subject-item ${subject.isRecommended ? 'recommended' : ''}">
+                        <div class="subject-name">${subject.icon} ${subject.name}</div>
+                        <div class="subject-description">${subject.description}</div>
+                        ${subject.isRecommended ? '<div class="subject-badge">✓ Recommended</div>' : ''}
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+                    <p style="margin-top: 20px; color: #16a34a; font-weight: 600;">
+                        ✓ We recommend <strong>${subjectDescriptions[0].name}</strong> and <strong>${subjectDescriptions[1].name}</strong> as your two individual subjects.
+                    </p>
+                </div>
+            `;
+
+            // Add discussion section if there are points to discuss
+            if (discussionPoints.length > 0) {
+                html += `
+                    <div class="coach-discussion">
+                        <h3>💬 Topics to Discuss with Prof. Jojo</h3>
+                        <p style="margin-bottom: 15px;">Consider discussing these items to finalize your competition strategy:</p>
+                `;
+                discussionPoints.forEach(point => {
+                    html += `<div class="discussion-item">${point}</div>`;
+                });
+                html += `</div>`;
+            }
+
+            html += `
+                <div class="coach-discussion" style="background: #e0f2fe; border-color: #0284c7;">
+                    <h3 style="color: #0284c7;">🎯 Next Steps</h3>
+                    <p style="line-height: 1.8; margin-bottom: 15px;">
+                        Review these recommendations with Prof. Jojo, practice with past MBMT problems in your chosen subjects, and continue building your skills in preparation for the competition on <strong>March 8, 2026</strong>!
+                    </p>
+                    <p style="line-height: 1.8;">
+                        <strong>📚 Practice Resources:</strong> Access past MBMT competition problems at the <a href="https://mbmt.mbhs.edu/archive/" target="_blank" style="color: #0284c7; text-decoration: underline; font-weight: 600;">MBMT Problem Archive</a> to continue preparing for the competition.
+                    </p>
+                </div>
+            `;
+
+            contentArea.innerHTML = html;
+        }
+
+        // Generate recommendations on page load
+        window.addEventListener('load', generateRecommendations);
+    </script>
+</body>
+</html>
