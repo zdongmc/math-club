@@ -14,6 +14,7 @@ const HEADER_HTML = `
             <nav class="header-nav">
                 <a class="nav-item" href="announcements.html" data-page="announcements">📢 Announcements</a>
                 <a class="nav-item" href="club.html" data-page="club">ℹ️ Club Info</a>
+                <a class="nav-item" href="materials.html" data-page="materials">📚 Materials</a>
                 <a class="nav-item" href="competitions.html" data-page="competitions">📅 Competition Info</a>
                 <a class="nav-item" href="registration.html" data-page="registration">📝 Registration & Records</a>
             </nav>
@@ -173,7 +174,8 @@ function loadHeader() {
     const currentPage = window.location.pathname.split('/').pop() || 'announcements.html';
     const pageMap = {
         'announcements.html': 'announcements',
-        'club.html': 'club', 
+        'club.html': 'club',
+        'materials.html': 'materials',
         'competitions.html': 'competitions',
         'registration.html': 'registration'
     };
