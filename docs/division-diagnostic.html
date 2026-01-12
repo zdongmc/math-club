@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBMT Diagnostic Tools - Hallie Wells Math Club</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: #dc2626;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        .intro {
+            background: #f9fafb;
+            padding: 30px;
+            border-radius: 15px;
+            border-left: 5px solid #dc2626;
+            margin-bottom: 40px;
+            line-height: 1.8;
+        }
+
+        .intro h2 {
+            color: #dc2626;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .intro p {
+            margin-bottom: 10px;
+        }
+
+        .intro ul {
+            margin-left: 30px;
+            margin-top: 10px;
+        }
+
+        .intro li {
+            margin-bottom: 8px;
+        }
+
+        .diagnostics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .diagnostic-card {
+            background: linear-gradient(135deg, #f9fafb 0%, #e5e7eb 100%);
+            border-radius: 15px;
+            padding: 30px;
+            border: 3px solid #e5e7eb;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .diagnostic-card:hover {
+            transform: translateY(-5px);
+            border-color: #dc2626;
+            box-shadow: 0 10px 30px rgba(220, 38, 38, 0.2);
+        }
+
+        .diagnostic-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .diagnostic-card h3 {
+            color: #dc2626;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .diagnostic-card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .diagnostic-btn {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .diagnostic-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+
+        .completed-badge {
+            background: #16a34a;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .recommendations-section {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            padding: 40px;
+            border-radius: 15px;
+            margin-top: 40px;
+            text-align: center;
+            color: white;
+        }
+
+        .recommendations-section h2 {
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        .recommendations-btn {
+            background: white;
+            color: #16a34a;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            margin-top: 20px;
+        }
+
+        .recommendations-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .info-box {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 40px;
+        }
+
+        .info-box h3 {
+            color: #f59e0b;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .info-box ul {
+            margin-left: 30px;
+            line-height: 1.8;
+        }
+
+        .info-box li {
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .diagnostics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MBMT 2026 Diagnostic Tools</h1>
+        <p class="subtitle">Hallie Wells Middle School Competition Math Club</p>
+
+        <div class="intro">
+            <h2>Welcome to the MBMT Diagnostic Center!</h2>
+            <p><strong>What are these diagnostics for?</strong></p>
+            <p>The <a href="https://mbmt.mbhs.edu/" target="_blank" style="color: #dc2626; text-decoration: underline; font-weight: 600;">Montgomery Blair Math Tournament (MBMT)</a> has two divisions:</p>
+            <ul>
+                <li><strong>Abel Division (Lower)</strong> - Generally recommended for newer competitors</li>
+                <li><strong>Jacobi Division (Upper)</strong> - Generally recommended for experienced competitors</li>
+            </ul>
+            <p style="margin-top: 15px;">These diagnostic tools help you:</p>
+            <ul>
+                <li>Determine which division is right for you</li>
+                <li>Identify which 2 subjects you should choose for the individual round</li>
+                <li>Build confidence by practicing with real MBMT problems</li>
+            </ul>
+        </div>
+
+        <h2 style="text-align: center; color: #dc2626; margin-bottom: 20px; font-size: 1.8rem;">Choose a Subject to Get Started</h2>
+
+        <div class="diagnostics-grid">
+            <!-- Algebra Card -->
+            <div class="diagnostic-card">
+                <div class="diagnostic-icon">🔢</div>
+                <h3>Algebra</h3>
+                <p>Includes 6 problems from past MBMT competitions.</p>
+                <a href="algebra-diagnostic.html" class="diagnostic-btn">Start Algebra Diagnostic</a>
+            </div>
+
+            <!-- Geometry Card -->
+            <div class="diagnostic-card">
+                <div class="diagnostic-icon">📐</div>
+                <h3>Geometry</h3>
+                <p>Includes 6 problems from past MBMT competitions.</p>
+                <a href="geometry-diagnostic.html" class="diagnostic-btn">Start Geometry Diagnostic</a>
+            </div>
+
+            <!-- Counting & Probability Card -->
+            <div class="diagnostic-card">
+                <div class="diagnostic-icon">🎲</div>
+                <h3>Counting & Probability</h3>
+                <p>Includes 6 problems from past MBMT competitions.</p>
+                <a href="counting-diagnostic.html" class="diagnostic-btn">Start Counting Diagnostic</a>
+            </div>
+
+            <!-- Number Theory Card -->
+            <div class="diagnostic-card">
+                <div class="diagnostic-icon">🔐</div>
+                <h3>Number Theory</h3>
+                <p>Includes 6 problems from past MBMT competitions.</p>
+                <a href="number-theory-diagnostic.html" class="diagnostic-btn">Start Number Theory Diagnostic</a>
+            </div>
+        </div>
+
+        <div id="recommendations-section" class="recommendations-section" style="display: none;">
+            <h2>🎉 All Diagnostics Complete!</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 10px;">You've completed all four subject diagnostics.</p>
+            <p style="font-size: 1.1rem;">Ready to see your personalized recommendations?</p>
+            <a href="recommendations.html" class="recommendations-btn">View My Recommendations</a>
+        </div>
+
+        <div class="info-box">
+            <h3>How to Use These Diagnostics</h3>
+            <ul>
+                <li><strong>Complete all four diagnostics</strong> to receive personalized recommendations</li>
+                <li><strong>Be honest with yourself</strong> when rating difficulty - this helps you find the right level</li>
+                <li><strong>Work at your own pace</strong> - you can complete the diagnostics in any order</li>
+                <li><strong>Discuss with Prof. Jojo</strong> if you have questions about which division or subjects to choose</li>
+                <li><strong>Remember:</strong> The goal is to find the right challenge level where you can perform your best and enjoy the competition!</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Check completion status on page load
+        function checkCompletion() {
+            const subjects = ['algebra', 'geometry', 'counting', 'numberTheory'];
+            let completedCount = 0;
+
+            subjects.forEach(subject => {
+                const results = localStorage.getItem(`mbmt-${subject}-results`);
+                if (results) {
+                    completedCount++;
+                    // Add completed badge to card
+                    const card = document.querySelector(`a[href="${subject === 'numberTheory' ? 'number-theory' : subject}-diagnostic.html"]`).parentElement;
+                    if (!card.querySelector('.completed-badge')) {
+                        const badge = document.createElement('div');
+                        badge.className = 'completed-badge';
+                        badge.textContent = '✓ Completed';
+                        card.appendChild(badge);
+                    }
+                }
+            });
+
+            // Show recommendations button if all 4 are complete
+            if (completedCount === 4) {
+                document.getElementById('recommendations-section').style.display = 'block';
+            }
+        }
+
+        // Run on page load
+        window.addEventListener('load', checkCompletion);
+    </script>
+</body>
+</html>
