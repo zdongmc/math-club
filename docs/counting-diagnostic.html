@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MBMT Division Diagnostic - Hallie Wells Math Club</title>
+    <title>MBMT Counting & Probability Diagnostic - Hallie Wells Math Club</title>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
@@ -307,7 +307,7 @@
 
         <div class="intro">
             <h2>How to Use This Tool</h2>
-            <p><strong>Goal:</strong> Help you understand your counting & probability skills and choose the right division for MBMT 2026.</p>
+            <p><strong>Goal:</strong> Help you understand your counting and probability skills and choose the right division for MBMT 2026.</p>
             <p style="margin-top: 15px;">
                 <strong>Instructions:</strong>
             </p>
@@ -329,16 +329,16 @@
             </p>
         </div>
 
-        <!-- Set 1 Section -->
+        <!-- Set 1: Lower Division Section -->
         <div class="section" id="lower-section">
             <div class="section-header">
-                <h2>Problem Set 1</h2>
+                <h2>Lower Division Problems</h2>
                 <span class="section-badge">3 Problems</span>
             </div>
 
-            <!-- Problem 1 -->
+            <!-- Problem 1: Lower -->
             <div class="problem">
-                <div class="problem-number">Problem 1</div>
+                <div class="problem-number">Problem 1 (Lower)</div>
                 <div class="problem-text">
                     Veena is selling three pots colored purple, turquoise, and orange. If she sold the purple pot sometime after the orange pot, in how many possible orders could she have sold the pots?
                 </div>
@@ -349,24 +349,23 @@
                     </div>
                     <label><strong>How difficult was this?</strong></label>
                     <div class="difficulty-buttons">
-                        <button class="difficulty-btn easy" onclick="selectDifficulty('lower-1', 'easy')">😊 Too Easy</button>
-                        <button class="difficulty-btn right" onclick="selectDifficulty('lower-1', 'right')">👍 Just Right</button>
-                        <button class="difficulty-btn hard" onclick="selectDifficulty('lower-1', 'hard')">😰 Too Hard</button>
+                        <button class="difficulty-btn easy" onclick="selectDifficulty('lower-1', 'easy')">Too Easy</button>
+                        <button class="difficulty-btn right" onclick="selectDifficulty('lower-1', 'right')">Just Right</button>
+                        <button class="difficulty-btn hard" onclick="selectDifficulty('lower-1', 'hard')">Too Hard</button>
                     </div>
                     <button class="show-solution-btn" onclick="toggleSolution('lower-1')">Show Solution</button>
                     <div class="solution" id="lower-1-solution">
                         <div class="solution-label">Answer: 3</div>
-                        <p><strong>Solution:</strong> There are \(3! = 6\) permutations of these three pots. Listing out the permutations and counting them, we find that three permutations have the purple pot after the orange pot.</p>
-                        <p>Symmetry can also be used. Since the purple pot is either before or after the orange pot and both outcomes have equal probability, we get \(\frac{1}{2} \cdot 6 = 3\).</p>
+                        <p><strong>Solution:</strong> There are \(3! = 6\) permutations of these three pots. Listing out the permutations and counting them, we find that three permutations have the purple pot after the orange pot. Symmetry can also be used. Since the purple pot is either before or after the orange pot and both outcomes have equal probability, we get \(\frac{1}{2} \cdot 6 = 3\).</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Problem 2 -->
+            <!-- Problem 2: Lower -->
             <div class="problem">
-                <div class="problem-number">Problem 2</div>
+                <div class="problem-number">Problem 2 (Lower)</div>
                 <div class="problem-text">
-                    Frank the Frog is jumping on a row of lilypads numbered 1 through 13 in that order. He can only jump forward 2 or 5 lilypads at a time. Frank is currently on the first lilypad and wishes to reach his home on the thirteenth lilypad. How many ways are there for him to get to his home?
+                    Evan wants to become a snapping turtle. A magic genie will turn him into a snapping turtle if he flips two heads in a row with a fair coin. If Evan flips the coin three times, what is the probability that he becomes a snapping turtle?
                 </div>
                 <div class="answer-section">
                     <div class="answer-input">
@@ -375,26 +374,23 @@
                     </div>
                     <label><strong>How difficult was this?</strong></label>
                     <div class="difficulty-buttons">
-                        <button class="difficulty-btn easy" onclick="selectDifficulty('lower-2', 'easy')">😊 Too Easy</button>
-                        <button class="difficulty-btn right" onclick="selectDifficulty('lower-2', 'right')">👍 Just Right</button>
-                        <button class="difficulty-btn hard" onclick="selectDifficulty('lower-2', 'hard')">😰 Too Hard</button>
+                        <button class="difficulty-btn easy" onclick="selectDifficulty('lower-2', 'easy')">Too Easy</button>
+                        <button class="difficulty-btn right" onclick="selectDifficulty('lower-2', 'right')">Just Right</button>
+                        <button class="difficulty-btn hard" onclick="selectDifficulty('lower-2', 'hard')">Too Hard</button>
                     </div>
                     <button class="show-solution-btn" onclick="toggleSolution('lower-2')">Show Solution</button>
                     <div class="solution" id="lower-2-solution">
-                        <div class="solution-label">Answer: 4</div>
-                        <p><strong>Solution:</strong> Jumping forward 2 lilypads doesn't change whether Frank is on an even or odd numbered lilypad. Jumping forward 5 lilypads will. Frank is trying to go from an odd numbered lilypad to another odd numbered lilypad, so he will need to jump 5 lilypads an even number of times.</p>
-                        <p>– If he never jumps 5 lilypads, there is only one option (jump 2 lilypads 6 times).</p>
-                        <p>– If he jumps 5 lilypads twice, he will also need to jump 2 lilypads once. With three jumps, there are three places in the ordering for him to jump 2 lilypads.</p>
-                        <p>The total is then \(1 + 3 = 4\) different ways.</p>
+                        <div class="solution-label">Answer: \(\frac{3}{8}\)</div>
+                        <p><strong>Solution:</strong> All possible sequences of heads and tails are HHH, HHT, HTH, HTT, THH, THT, TTH, TTT. The cases in which Evan will become a snapping turtle are HHH, HHT, and THH. Counting occurrences, the probability is \(\frac{3}{8}\).</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Problem 3 -->
+            <!-- Problem 3: Lower -->
             <div class="problem">
-                <div class="problem-number">Problem 3</div>
+                <div class="problem-number">Problem 3 (Lower)</div>
                 <div class="problem-text">
-                    Evan wants to become a snapping turtle. A magic genie will turn him into a snapping turtle if he flips two heads in a row with a fair coin. If Evan flips the coin three times, what is the probability that he becomes a snapping turtle?
+                    How many positive integers less than or equal to 300 are divisible by exactly two of 2, 3, and 5? (For example, 12 works because it is divisible by 2 and 3, but not by 5)
                 </div>
                 <div class="answer-section">
                     <div class="answer-input">
@@ -403,31 +399,37 @@
                     </div>
                     <label><strong>How difficult was this?</strong></label>
                     <div class="difficulty-buttons">
-                        <button class="difficulty-btn easy" onclick="selectDifficulty('lower-3', 'easy')">😊 Too Easy</button>
-                        <button class="difficulty-btn right" onclick="selectDifficulty('lower-3', 'right')">👍 Just Right</button>
-                        <button class="difficulty-btn hard" onclick="selectDifficulty('lower-3', 'hard')">😰 Too Hard</button>
+                        <button class="difficulty-btn easy" onclick="selectDifficulty('lower-3', 'easy')">Too Easy</button>
+                        <button class="difficulty-btn right" onclick="selectDifficulty('lower-3', 'right')">Just Right</button>
+                        <button class="difficulty-btn hard" onclick="selectDifficulty('lower-3', 'hard')">Too Hard</button>
                     </div>
                     <button class="show-solution-btn" onclick="toggleSolution('lower-3')">Show Solution</button>
                     <div class="solution" id="lower-3-solution">
-                        <div class="solution-label">Answer: 3/8</div>
-                        <p><strong>Solution:</strong> All possible sequences of heads and tails are HHH, HHT, HTH, HTT, THH, THT, TTH, TTT. The bolded items are the cases in which Evan will become a snapping turtle: <strong>HHH</strong>, <strong>HHT</strong>, <strong>THH</strong>. Counting occurrences, the probability is \(\frac{3}{8}\).</p>
+                        <div class="solution-label">Answer: 70</div>
+                        <p><strong>Solution:</strong> 2, 3, and 5 are relatively prime, so the desired values are one of:
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>divisible by 6, but not 5</li>
+                        <li>divisible by 10, but not 3</li>
+                        <li>divisible by 15, but not 2</li>
+                        </ul>
+                        The total is then calculated as \(\frac{300}{6}\left(1 - \frac{1}{5}\right) + \frac{300}{10}\left(1 - \frac{1}{3}\right) + \frac{300}{15}\left(1 - \frac{1}{2}\right) = 70\).</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Set 2 Section -->
+        <!-- Set 2: Upper Division Section -->
         <div class="section" id="upper-section">
             <div class="section-header">
-                <h2>Problem Set 2</h2>
+                <h2>Upper Division Problems</h2>
                 <span class="section-badge">3 Problems</span>
             </div>
 
-            <!-- Problem 4 -->
+            <!-- Problem 4: Upper -->
             <div class="problem">
-                <div class="problem-number">Problem 4</div>
+                <div class="problem-number">Problem 4 (Upper)</div>
                 <div class="problem-text">
-                    Sam is playing a round of rock paper scissors against a robotic arm. The arm picks randomly between rock, paper, and scissors while Sam picks rock 20% of the time, paper 30% of the time, and scissors 50% of the time. What is the probability Sam wins?
+                    Michelle flips a coin 9 times in a row and notices 6 flips come up heads. In how many ways can there be three distinct strings of heads of length 1, 2, and 3 in some order? (For example HTHHTHHHT would count)
                 </div>
                 <div class="answer-section">
                     <div class="answer-input">
@@ -436,23 +438,23 @@
                     </div>
                     <label><strong>How difficult was this?</strong></label>
                     <div class="difficulty-buttons">
-                        <button class="difficulty-btn easy" onclick="selectDifficulty('upper-1', 'easy')">😊 Too Easy</button>
-                        <button class="difficulty-btn right" onclick="selectDifficulty('upper-1', 'right')">👍 Just Right</button>
-                        <button class="difficulty-btn hard" onclick="selectDifficulty('upper-1', 'hard')">😰 Too Hard</button>
+                        <button class="difficulty-btn easy" onclick="selectDifficulty('upper-1', 'easy')">Too Easy</button>
+                        <button class="difficulty-btn right" onclick="selectDifficulty('upper-1', 'right')">Just Right</button>
+                        <button class="difficulty-btn hard" onclick="selectDifficulty('upper-1', 'hard')">Too Hard</button>
                     </div>
                     <button class="show-solution-btn" onclick="toggleSolution('upper-1')">Show Solution</button>
                     <div class="solution" id="upper-1-solution">
-                        <div class="solution-label">Answer: 1/3</div>
-                        <p><strong>Solution:</strong> No matter what Sam chooses, the robot has one choice to win, one choice to tie, and one choice to lose. Each is chosen with \(\frac{1}{3}\) chance, so Sam has a \(\frac{1}{3}\) chance to win.</p>
+                        <div class="solution-label">Answer: 24</div>
+                        <p><strong>Solution:</strong> Consider the positions of the tails in the ordering. There must be a tail between adjacent strings of heads, requiring two tails. With one tail left, there are 4 choices on where to order it (before, after, or one of the two locations in between). With \(3! = 6\) ways to order the strings of heads, there is a total of \(6 \cdot 4 = 24\) possibilities.</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Problem 5 -->
+            <!-- Problem 5: Upper -->
             <div class="problem">
-                <div class="problem-number">Problem 5</div>
+                <div class="problem-number">Problem 5 (Upper)</div>
                 <div class="problem-text">
-                    Michelle flips a coin 9 times in a row and notices 6 flips come up heads. In how many ways can there be three distinct strings of heads of length 1, 2, and 3 in some order? (For example HTHHTHHHT would count)
+                    After combining like terms, how many terms are there in the expansion of \((x + 2y + 3z + 4)^{12}\)?
                 </div>
                 <div class="answer-section">
                     <div class="answer-input">
@@ -461,23 +463,23 @@
                     </div>
                     <label><strong>How difficult was this?</strong></label>
                     <div class="difficulty-buttons">
-                        <button class="difficulty-btn easy" onclick="selectDifficulty('upper-2', 'easy')">😊 Too Easy</button>
-                        <button class="difficulty-btn right" onclick="selectDifficulty('upper-2', 'right')">👍 Just Right</button>
-                        <button class="difficulty-btn hard" onclick="selectDifficulty('upper-2', 'hard')">😰 Too Hard</button>
+                        <button class="difficulty-btn easy" onclick="selectDifficulty('upper-2', 'easy')">Too Easy</button>
+                        <button class="difficulty-btn right" onclick="selectDifficulty('upper-2', 'right')">Just Right</button>
+                        <button class="difficulty-btn hard" onclick="selectDifficulty('upper-2', 'hard')">Too Hard</button>
                     </div>
                     <button class="show-solution-btn" onclick="toggleSolution('upper-2')">Show Solution</button>
                     <div class="solution" id="upper-2-solution">
-                        <div class="solution-label">Answer: 24</div>
-                        <p><strong>Solution:</strong> Consider the positions of the tails in the ordering. There must be a tails between adjacent strings of heads, requiring two tails. With one tails left, there are 4 choices on where to order it (before, after, or one of the two locations in between). With \(3! = 6\) ways to order the strings of heads, there is a total of \(6 \cdot 4 = 24\) possibilities.</p>
+                        <div class="solution-label">Answer: 455</div>
+                        <p><strong>Solution:</strong> All terms are of the form \(kx^a(2y)^b(3z)^c4^d\) where \(k\) is a nonzero integer and \(a\), \(b\), \(c\), and \(d\) are non-negative integers with \(a + b + c + d = 12\). The number of terms is then equal the number of non-negative integer solutions to \(a + b + c + d = 12\). Using stars and bars gives an answer of \(\binom{15}{3} = 455\).</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Problem 6 -->
+            <!-- Problem 6: Upper -->
             <div class="problem">
-                <div class="problem-number">Problem 6</div>
+                <div class="problem-number">Problem 6 (Upper)</div>
                 <div class="problem-text">
-                    After combining like terms, how many terms are there in the expansion of \((x + 2y + 3z + 4)^{12}\)?
+                    Mr. Rose has stuffed all subsets of the set \(\{1, 2, 3, 4\}\) into a magical hat. Daniel, Leo, and Hannah each pick a subset out of the hat with replacement. What is the probability that Daniel's set is a proper subset of Leo's set, and Leo's set is a proper subset of Hannah's set? (A proper subset of a set \(S\) is any subset of \(S\) including the empty set but excluding \(S\) itself)
                 </div>
                 <div class="answer-section">
                     <div class="answer-input">
@@ -486,14 +488,14 @@
                     </div>
                     <label><strong>How difficult was this?</strong></label>
                     <div class="difficulty-buttons">
-                        <button class="difficulty-btn easy" onclick="selectDifficulty('upper-3', 'easy')">😊 Too Easy</button>
-                        <button class="difficulty-btn right" onclick="selectDifficulty('upper-3', 'right')">👍 Just Right</button>
-                        <button class="difficulty-btn hard" onclick="selectDifficulty('upper-3', 'hard')">😰 Too Hard</button>
+                        <button class="difficulty-btn easy" onclick="selectDifficulty('upper-3', 'easy')">Too Easy</button>
+                        <button class="difficulty-btn right" onclick="selectDifficulty('upper-3', 'right')">Just Right</button>
+                        <button class="difficulty-btn hard" onclick="selectDifficulty('upper-3', 'hard')">Too Hard</button>
                     </div>
                     <button class="show-solution-btn" onclick="toggleSolution('upper-3')">Show Solution</button>
                     <div class="solution" id="upper-3-solution">
-                        <div class="solution-label">Answer: 455</div>
-                        <p><strong>Solution:</strong> All terms are of the form \(kx^a(2y)^b(3z)^c4^d\) where \(k\) is a nonzero integer and \(a, b, c,\) and \(d\) are non-negative integers with \(a + b + c + d = 12\). The number of terms is then equal to the number of non-negative integer solutions to \(a + b + c + d = 12\). Using stars and bars gives an answer of \(\binom{15}{3} = 455\).</p>
+                        <div class="solution-label">Answer: \(\frac{55}{2048}\)</div>
+                        <p><strong>Solution:</strong> With \(2^4\) subsets, there are \(2^{12}\) ways for the three to choose their subsets. Using the Principle of Inclusion-Exclusion, the number of cases ignoring the proper part of the condition is computed first. If the subsets are ordered Daniel's, Leo's, then Hannah's, there will first be some (potentially 0) number of people who don't have 1 in their subset. The remaining in the list will have 1 in their subset. With 0 to 3 people who have 1 in their subset, there are 4 choices in regards to 1 being in subsets. Across the 4 different numbers, this is \(4^4\) possibilities. Now, the cases with at least one pair of equal subsets are subtracted. WLOG, Daniel and Leo's sets are the same. Then, the above idea is repeated for \(3^4\) possibilities. Additionally accounting for Leo and Hannah having the same set, the total to be subtracted is \(2 \cdot 3^4\). Lastly, the number of cases where all three have the same set must be added back in. This is just the number of subsets, or \(2^4\). The final probability is then \(\frac{4^4 - 2 \cdot 3^4 + 2^4}{2^{12}} = \frac{55}{2048}\).</p>
                     </div>
                 </div>
             </div>
@@ -519,11 +521,6 @@
         function selectDifficulty(problemId, difficulty) {
             ratings[problemId] = difficulty;
 
-            // Update button styles
-            const buttons = document.querySelectorAll(`#${problemId.replace('-', '-')}`).length
-                ? document.querySelectorAll(`[onclick*="${problemId}"]`)
-                : [];
-
             document.querySelectorAll('.difficulty-btn').forEach(btn => {
                 if (btn.getAttribute('onclick').includes(problemId)) {
                     btn.classList.remove('selected');
@@ -532,8 +529,6 @@
                     }
                 }
             });
-
-            console.log('Current ratings:', ratings);
         }
 
         function toggleSolution(problemId) {
@@ -569,38 +564,25 @@
                                (scoreMap[ratings['upper-2']] || 0) +
                                (scoreMap[ratings['upper-3']] || 0);
 
-            console.log('Lower score:', lowerScore, 'Upper score:', upperScore);
-
             // Determine recommendation
             let title = '';
             let text = '';
-            let color = '';
 
             if (lowerScore >= 8 && upperScore >= 7) {
-                // Found Set 1 easy and Set 2 manageable
-                title = '🎯 Counting & Probability Recommendation: Upper Division';
-                text = 'You found the first set of problems comfortable and handled the second set well. You\'re ready for the upper division in counting & probability!';
-                color = '#dc2626';
+                title = 'Counting & Probability Recommendation: Upper Division';
+                text = 'You found the lower division problems comfortable and handled the upper division problems well. You\'re ready for the upper division in counting and probability!';
             } else if (lowerScore >= 7 && upperScore >= 5) {
-                // Moderate on both
-                title = '🤔 Counting & Probability Recommendation: Discuss with Coach';
-                text = 'You\'re right on the border! You could compete successfully in either division for counting & probability. Discuss with Prof. Jojo to decide based on your overall comfort level across all subjects.';
-                color = '#d97706';
+                title = 'Counting & Probability Recommendation: Discuss with Coach';
+                text = 'You\'re right on the border! You could compete successfully in either division for counting and probability. Discuss with Prof. Jojo to decide based on your overall comfort level across all subjects.';
             } else if (lowerScore >= 6 && upperScore <= 4) {
-                // Set 1 comfortable, Set 2 hard
-                title = '👍 Counting & Probability Recommendation: Lower Division';
-                text = 'The first problem set was at a good level for you. The lower division will let you showcase your counting & probability skills and build confidence!';
-                color = '#16a34a';
+                title = 'Counting & Probability Recommendation: Lower Division';
+                text = 'The lower division problems were at a good level for you. The lower division will let you showcase your counting and probability skills and build confidence!';
             } else if (lowerScore <= 5) {
-                // Struggled with Set 1
-                title = '💪 Counting & Probability Recommendation: Lower Division';
-                text = 'The first set of problems were challenging for you. The lower division is a great fit where you can compete effectively and continue developing your counting & probability skills!';
-                color = '#16a34a';
+                title = 'Counting & Probability Recommendation: Lower Division';
+                text = 'The lower division problems were challenging for you. The lower division is a great fit where you can compete effectively and continue developing your counting and probability skills!';
             } else {
-                // Default to upper if they did well on Set 2
-                title = '🎯 Counting & Probability Recommendation: Upper Division';
+                title = 'Counting & Probability Recommendation: Upper Division';
                 text = 'Based on your performance, you\'re ready for the upper division. You handled the more difficult problems well!';
-                color = '#dc2626';
             }
 
             // Save results to localStorage
@@ -617,7 +599,6 @@
             document.getElementById('rec-title').textContent = title;
             document.getElementById('rec-text').textContent = text;
             document.getElementById('recommendation').style.display = 'block';
-            document.getElementById('recommendation').style.borderColor = color;
 
             // Add button to return to main page
             if (!document.getElementById('return-btn')) {

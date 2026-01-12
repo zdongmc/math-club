@@ -329,16 +329,16 @@
             </p>
         </div>
 
-        <!-- Set 1 Section -->
+        <!-- Set 1: Lower Division Section -->
         <div class="section" id="lower-section">
             <div class="section-header">
-                <h2>Problem Set 1</h2>
+                <h2>Lower Division Problems</h2>
                 <span class="section-badge">3 Problems</span>
             </div>
 
-            <!-- Problem 1 -->
+            <!-- Problem 1: Lower -->
             <div class="problem">
-                <div class="problem-number">Problem 1</div>
+                <div class="problem-number">Problem 1 (Lower)</div>
                 <div class="problem-text">
                     What is the smallest positive three-digit integer that is a multiple of 5, but not a multiple of 2 or 3?
                 </div>
@@ -356,17 +356,16 @@
                     <button class="show-solution-btn" onclick="toggleSolution('lower-1')">Show Solution</button>
                     <div class="solution" id="lower-1-solution">
                         <div class="solution-label">Answer: 115</div>
-                        <p><strong>Solution:</strong> To be a multiple of 5 but not 2, the number must end in 5. The smallest three-digit number ending in 5 is 105, but \(1 + 0 + 5 = 6\) is divisible by 3, so 105 is divisible by 3.</p>
-                        <p>The next candidate is 115. We check: \(1 + 1 + 5 = 7\) is not divisible by 3, so 115 is not divisible by 3. Therefore, 115 is the answer.</p>
+                        <p><strong>Solution:</strong> The smallest three-digit multiple of 5 is 100, but that is divisible by 2. Next up is 105, but that is divisible by 3. 110 is likewise divisible by 2, but 115 is not divisible by 2 or 3, so that is our answer.</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Problem 2 -->
+            <!-- Problem 2: Lower -->
             <div class="problem">
-                <div class="problem-number">Problem 2</div>
+                <div class="problem-number">Problem 2 (Lower)</div>
                 <div class="problem-text">
-                    Evan bakes seventy cookies and places them into bags, each bag containing at least one cookie. Assuming that all the bags of cookies are identical when you peek inside the bag and the cookies are all identical as well, how many different arrangements of cookies into bags are there if there are exactly 4 bags, and exactly 3 of them have the same number of cookies in them?
+                    What is the smallest positive integer \(N\) such that its value is 5 times the sum of its digits?
                 </div>
                 <div class="answer-section">
                     <div class="answer-input">
@@ -381,27 +380,17 @@
                     </div>
                     <button class="show-solution-btn" onclick="toggleSolution('lower-2')">Show Solution</button>
                     <div class="solution" id="lower-2-solution">
-                        <div class="solution-label">Answer: 4</div>
-                        <p><strong>Solution:</strong> Say the 3 bags with the same amount have \(x\) cookies each, and the last bag has \(y\) cookies. Then \(3x + y = 70\), so \(y = 70 - 3x\). We need \(y \geq 1\) and \(y \neq x\) (since exactly 3 bags have the same amount).</p>
-                        <p>From \(y \geq 1\): \(70 - 3x \geq 1\), so \(x \leq 23\).</p>
-                        <p>From \(y \neq x\): \(70 - 3x \neq x\), so \(x \neq 17.5\) (which is already satisfied since \(x\) must be a positive integer).</p>
-                        <p>Also need \(x \geq 1\). However, we must check when \(3x = y\). This gives \(3x = 70 - 3x\), so \(x = \frac{70}{6}\), which is not an integer.</p>
-                        <p>Wait, let me reconsider: we need \(y \neq x\). From \(y = 70 - 3x\), if \(x = y\), then \(x = 70 - 3x\), giving \(4x = 70\) or \(x = 17.5\). Since \(x\) must be an integer, this never happens.</p>
-                        <p>So valid values are \(x \in \{1, 2, 3, ..., 23\}\), giving 23 arrangements. Wait, that doesn't match the answer.</p>
-                        <p>Actually, rereading: we need exactly 3 bags with the same number. Let me recalculate. If \(x\) is the number in each of the 3 identical bags, then \(y = 70 - 3x\) is in the fourth bag. We need \(1 \leq x \leq 23\) and \(y \neq x\).</p>
-                        <p>When does \(y = x\)? When \(70 - 3x = x\), so \(x = 17.5\), impossible. So all integer values \(1 \leq x \leq 23\) work... but answer is 4?</p>
-                        <p>Hmm, let me reread the problem. "exactly 3 of them have the same number" - maybe this means exactly 3 bags total have matching counts? That would mean either (3-1) split or we're counting something else.</p>
-                        <p>Looking at the answer key: the solution involves finding when bags can be partitioned. With 70 cookies and 4 bags where exactly 3 have the same amount: if the 3 bags each have \(k\) cookies, the fourth has \(70-3k\). We need \(k \geq 1\), \(70-3k \geq 1\), and \(70-3k \neq k\). The answer is 4, suggesting there are specific constraints I'm missing from the original problem.</p>
-                        <p><em>(Note: Full solution may involve additional constraints from original problem statement)</em></p>
+                        <div class="solution-label">Answer: 45</div>
+                        <p><strong>Solution:</strong> Clearly \(N\) cannot have only a single digit, because otherwise \(5N = N\), but \(N\) is positive. If \(N\) is a two-digit number, let \(N = 10a+b\), so \(10a+b = 5(a+b)\). This rearranges to \(5a = 4b\). Since \(a\) and \(b\) are both digits, we have \(a = 4\) and \(b = 5\).</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Problem 3 -->
+            <!-- Problem 3: Lower -->
             <div class="problem">
-                <div class="problem-number">Problem 3</div>
+                <div class="problem-number">Problem 3 (Lower)</div>
                 <div class="problem-text">
-                    What is the smallest positive integer \(N\) such that its value is 5 times the sum of its digits?
+                    Shriyan divides his favorite three-digit number by 2, 3, 4, 8, 9, and 11 and gets a remainder of 1 each time. What is Shriyan's favorite three-digit number?
                 </div>
                 <div class="answer-section">
                     <div class="answer-input">
@@ -416,28 +405,25 @@
                     </div>
                     <button class="show-solution-btn" onclick="toggleSolution('lower-3')">Show Solution</button>
                     <div class="solution" id="lower-3-solution">
-                        <div class="solution-label">Answer: 45</div>
-                        <p><strong>Solution:</strong> Let the sum of the digits be \(s\). Then \(N = 5s\). Since \(N\) has digit sum \(s\), we're looking for the smallest number whose digit sum is \(s\) and whose value is \(5s\).</p>
-                        <p>For a one-digit number: \(N = d\) and \(s = d\), so \(d = 5d\), giving \(d = 0\), which is not positive.</p>
-                        <p>For a two-digit number: \(N = 10a + b\) where \(s = a + b\), so \(10a + b = 5(a + b)\), giving \(5a = 4b\). Since \(a, b\) are digits with \(a \geq 1\), we get \(b = \frac{5a}{4}\). For \(a = 4\), \(b = 5\), giving \(N = 45\).</p>
-                        <p>We can verify: \(4 + 5 = 9\) and \(5 \times 9 = 45\). ✓</p>
+                        <div class="solution-label">Answer: 793</div>
+                        <p><strong>Solution:</strong> Let us find the least common multiple of 2, 3, 4, 8, 9, and 11. We need to have 3 factors of 2, 2 factors of 3, and 1 factor of 11. Multiplying these out gives a value of 792, so if Shriyan's number is 793, it will have a remainder of 1 when divided by each of 2, 3, 4, 8, 9, and 11.</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Set 2 Section -->
+        <!-- Set 2: Upper Division Section -->
         <div class="section" id="upper-section">
             <div class="section-header">
-                <h2>Problem Set 2</h2>
+                <h2>Upper Division Problems</h2>
                 <span class="section-badge">3 Problems</span>
             </div>
 
-            <!-- Problem 4 -->
+            <!-- Problem 4: Upper -->
             <div class="problem">
-                <div class="problem-number">Problem 4</div>
+                <div class="problem-number">Problem 4 (Upper)</div>
                 <div class="problem-text">
-                    Stephen correctly computes the product of the first four prime numbers, and the product of the first four perfect squares (not including 0). What is his sum?
+                    Stephen correctly computes the product of the first four prime numbers. Ricky also attempts to compute the product of the first four prime numbers, but he mistakenly believes that the first prime number is 1, not 2. What is the positive difference between Stephen's and Ricky's calculations?
                 </div>
                 <div class="answer-section">
                     <div class="answer-input">
@@ -453,21 +439,16 @@
                     <button class="show-solution-btn" onclick="toggleSolution('upper-1')">Show Solution</button>
                     <div class="solution" id="upper-1-solution">
                         <div class="solution-label">Answer: 180</div>
-                        <p><strong>Solution:</strong> The first four prime numbers are 2, 3, 5, 7. Their product is \(2 \times 3 \times 5 \times 7 = 210\).</p>
-                        <p>The first four perfect squares (not including 0) are 1, 4, 9, 16. Their product is \(1 \times 4 \times 9 \times 16 = 576\).</p>
-                        <p>Wait, that gives a sum of \(210 + 576 = 786\), not 180. Let me re-read the problem...</p>
-                        <p>Ah, perhaps the problem asks for something different. Looking at the answer of 180, perhaps it's asking for the product of the first four primes minus the product of something else? Or maybe I misread.</p>
-                        <p>Alternative interpretation: The sum could involve different operations. \(2 \times 3 \times 5 \times 7 = 210\), and if we're looking at factorials or different products... Actually, \(1 + 4 + 9 + 16 = 30\), and \(210 - 30 = 180\). That might be it!</p>
-                        <p><em>(The exact problem statement may clarify whether it's sum of products, difference, or another operation)</em></p>
+                        <p><strong>Solution:</strong> The first four prime numbers are 2, 3, 5, and 7. Stephen calculates \(2 \times 3 \times 5 \times 7 = 210\). Ricky calculates \(1 \times 2 \times 3 \times 5 = 30\). The positive difference is \(210 − 30 = 180\).</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Problem 5 -->
+            <!-- Problem 5: Upper -->
             <div class="problem">
-                <div class="problem-number">Problem 5</div>
+                <div class="problem-number">Problem 5 (Upper)</div>
                 <div class="problem-text">
-                    Three consecutive nonzero digits are taken in order to form a three-digit number (like 123 or 789). The sum of all possible numbers that can be formed this way is written on the board. What is that sum?
+                    Three consecutive nonzero digits are taken, and the 6 numbers formed by permuting the digits are added. What is the largest integer that must divide the sum?
                 </div>
                 <div class="answer-section">
                     <div class="answer-input">
@@ -483,25 +464,16 @@
                     <button class="show-solution-btn" onclick="toggleSolution('upper-2')">Show Solution</button>
                     <div class="solution" id="upper-2-solution">
                         <div class="solution-label">Answer: 666</div>
-                        <p><strong>Solution:</strong> The possible three-digit numbers with consecutive digits are: 123, 234, 345, 456, 567, 678, 789.</p>
-                        <p>We can write each as \(100d + 10(d+1) + (d+2)\) where \(d\) is the first digit.</p>
-                        <p>This simplifies to \(100d + 10d + 10 + d + 2 = 111d + 12\).</p>
-                        <p>For \(d \in \{1, 2, 3, 4, 5, 6, 7\}\), the sum is:</p>
-                        <p>\(\sum_{d=1}^{7} (111d + 12) = 111 \sum_{d=1}^{7} d + 7 \times 12 = 111 \times 28 + 84 = 3108 + 84 = 3192\)</p>
-                        <p>Hmm, that doesn't match 666. Let me recalculate by adding directly:</p>
-                        <p>\(123 + 234 + 345 + 456 + 567 + 678 + 789\)</p>
-                        <p>Grouping: \((123 + 789) + (234 + 678) + (345 + 567) + 456 = 912 + 912 + 912 + 456 = 3192\)</p>
-                        <p>That's still 3192, not 666. Perhaps the problem is asking for something else, like the sum modulo something, or a different interpretation. The answer 666 suggests there might be additional constraints or a different question.</p>
-                        <p><em>(The answer key shows 666, which may involve a different problem formulation or calculation)</em></p>
+                        <p><strong>Solution:</strong> Let the digits be \(n − 1\), \(n\), and \(n + 1\) where \(2 \leq n \leq 8\). Each digit appears in each location twice, so the sum is \(200((n − 1) + n + (n + 1)) + 20((n − 1) + n + (n + 1)) + 2((n − 1) + n + (n + 1))\). This becomes \(222 \cdot 3n = 666n\). 666 clearly divides this. Trying both \(n = 2\) and \(n = 3\) shows 666 is the largest number that will always divide \(666n\).</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Problem 6 -->
+            <!-- Problem 6: Upper -->
             <div class="problem">
-                <div class="problem-number">Problem 6</div>
+                <div class="problem-number">Problem 6 (Upper)</div>
                 <div class="problem-text">
-                    Let \(m, n > 2025\) be prime numbers such that \(m = n + 2\). Compute the remainder when \(m + n\) is divided by 36.
+                    Let \(m, n > 2025\) be prime numbers such that \(m = n + 2\). What is the remainder when \(mn\) is divided by 36?
                 </div>
                 <div class="answer-section">
                     <div class="answer-input">
@@ -517,18 +489,7 @@
                     <button class="show-solution-btn" onclick="toggleSolution('upper-3')">Show Solution</button>
                     <div class="solution" id="upper-3-solution">
                         <div class="solution-label">Answer: 35</div>
-                        <p><strong>Solution:</strong> We're looking for twin primes greater than 2025. Since \(m\) and \(n\) are both prime and \(m = n + 2\), they form a twin prime pair.</p>
-                        <p>For any prime \(p > 3\), we know \(p \equiv 1\) or \(5 \pmod{6}\) (since multiples of 2 or 3 can't be prime).</p>
-                        <p>If \(n \equiv 1 \pmod{6}\), then \(m = n + 2 \equiv 3 \pmod{6}\), which means \(m\) is divisible by 3 and thus not prime (unless \(m = 3\), but we need \(m > 2025\)).</p>
-                        <p>Therefore, \(n \equiv 5 \pmod{6}\), which gives \(m = n + 2 \equiv 1 \pmod{6}\).</p>
-                        <p>So \(m + n \equiv 5 + 1 = 6 \equiv 0 \pmod{6}\).</p>
-                        <p>Now check modulo 4: Since \(n\) and \(m\) are both odd primes (> 2), we have \(n \equiv 1\) or \(3 \pmod{4}\).</p>
-                        <p>If \(n \equiv 1 \pmod{4}\), then \(m = n + 2 \equiv 3 \pmod{4}\), so \(m + n \equiv 4 \equiv 0 \pmod{4}\).</p>
-                        <p>If \(n \equiv 3 \pmod{4}\), then \(m = n + 2 \equiv 1 \pmod{4}\), so \(m + n \equiv 4 \equiv 0 \pmod{4}\).</p>
-                        <p>Either way, \(m + n \equiv 0 \pmod{4}\).</p>
-                        <p>By Chinese Remainder Theorem, since \(m + n \equiv 0 \pmod{4}\) and \(m + n \equiv 0 \pmod{9}\)... wait, let me check mod 9.</p>
-                        <p>Actually, twin primes greater than 3 must satisfy certain conditions. Through careful analysis of twin prime patterns and modular arithmetic with 36, the answer is 35.</p>
-                        <p><em>(Full rigorous proof involves checking all residue classes modulo 36 for twin prime pairs)</em></p>
+                        <p><strong>Solution:</strong> Since \(n\) and \(n + 2\) are both prime and therefore not multiples of 3, \(n + 1\) must be a multiple of 3. Similarly, \(n + 1\) must be even. Thus, \(n + 1\) is a multiple of 6. Let \(n + 1 = 6a\). Then \(mn = (6a + 1)(6a − 1) = 36a^2 − 1\). Since \(36a^2\) is divisible by 36, \(36a^2 − 1\) leaves a remainder of 35 when divided by 36.</p>
                     </div>
                 </div>
             </div>
@@ -554,11 +515,6 @@
         function selectDifficulty(problemId, difficulty) {
             ratings[problemId] = difficulty;
 
-            // Update button styles
-            const buttons = document.querySelectorAll(`#${problemId.replace('-', '-')}`).length
-                ? document.querySelectorAll(`[onclick*="${problemId}"]`)
-                : [];
-
             document.querySelectorAll('.difficulty-btn').forEach(btn => {
                 if (btn.getAttribute('onclick').includes(problemId)) {
                     btn.classList.remove('selected');
@@ -567,8 +523,6 @@
                     }
                 }
             });
-
-            console.log('Current ratings:', ratings);
         }
 
         function toggleSolution(problemId) {
@@ -604,38 +558,25 @@
                                (scoreMap[ratings['upper-2']] || 0) +
                                (scoreMap[ratings['upper-3']] || 0);
 
-            console.log('Lower score:', lowerScore, 'Upper score:', upperScore);
-
             // Determine recommendation
             let title = '';
             let text = '';
-            let color = '';
 
             if (lowerScore >= 8 && upperScore >= 7) {
-                // Found Set 1 easy and Set 2 manageable
                 title = '🎯 Number Theory Recommendation: Upper Division';
-                text = 'You found the first set of problems comfortable and handled the second set well. You\'re ready for the upper division in number theory!';
-                color = '#dc2626';
+                text = 'You found the lower division problems comfortable and handled the upper division problems well. You\'re ready for the upper division in number theory!';
             } else if (lowerScore >= 7 && upperScore >= 5) {
-                // Moderate on both
                 title = '🤔 Number Theory Recommendation: Discuss with Coach';
                 text = 'You\'re right on the border! You could compete successfully in either division for number theory. Discuss with Prof. Jojo to decide based on your overall comfort level across all subjects.';
-                color = '#d97706';
             } else if (lowerScore >= 6 && upperScore <= 4) {
-                // Set 1 comfortable, Set 2 hard
                 title = '👍 Number Theory Recommendation: Lower Division';
-                text = 'The first problem set was at a good level for you. The lower division will let you showcase your number theory skills and build confidence!';
-                color = '#16a34a';
+                text = 'The lower division problems were at a good level for you. The lower division will let you showcase your number theory skills and build confidence!';
             } else if (lowerScore <= 5) {
-                // Struggled with Set 1
                 title = '💪 Number Theory Recommendation: Lower Division';
-                text = 'The first set of problems were challenging for you. The lower division is a great fit where you can compete effectively and continue developing your number theory skills!';
-                color = '#16a34a';
+                text = 'The lower division problems were challenging for you. The lower division is a great fit where you can compete effectively and continue developing your number theory skills!';
             } else {
-                // Default to upper if they did well on Set 2
                 title = '🎯 Number Theory Recommendation: Upper Division';
                 text = 'Based on your performance, you\'re ready for the upper division. You handled the more difficult problems well!';
-                color = '#dc2626';
             }
 
             // Save results to localStorage
@@ -652,7 +593,6 @@
             document.getElementById('rec-title').textContent = title;
             document.getElementById('rec-text').textContent = text;
             document.getElementById('recommendation').style.display = 'block';
-            document.getElementById('recommendation').style.borderColor = color;
 
             // Add button to return to main page
             if (!document.getElementById('return-btn')) {
