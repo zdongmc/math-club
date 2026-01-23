@@ -775,7 +775,7 @@
                     <div id="practice-equation" class="problem-equation"></div>
                     <div>
                         <input type="text" id="practice-answer" class="answer-input" placeholder="?">
-                        <button class="btn" onclick="checkPracticeAnswer()">Check</button>
+                        <button id="practice-btn" class="btn" onclick="checkPracticeAnswer()">Check</button>
                     </div>
                     <button class="hint-btn" onclick="showHint()">Show Hint</button>
                     <div id="hint-box" class="hint-box"></div>
@@ -783,7 +783,6 @@
                 </div>
                 <div class="lesson-nav" style="margin-top: 20px;">
                     <button class="btn btn-secondary" onclick="startLesson()">Review Lesson</button>
-                    <button id="practice-next-btn" class="btn" onclick="nextPracticeProblem()" style="display: none;">Next Problem</button>
                     <button id="goto-test-btn" class="btn btn-success" onclick="startTest()" style="display: none;">Go to Mastery Test</button>
                 </div>
             </div>
@@ -799,13 +798,9 @@
                     <div id="test-equation" class="problem-equation"></div>
                     <div>
                         <input type="text" id="test-answer" class="answer-input" placeholder="?">
-                        <button class="btn" onclick="submitTestAnswer()">Submit</button>
+                        <button id="test-btn" class="btn" onclick="submitTestAnswer()">Submit</button>
                     </div>
                     <div id="test-feedback" class="feedback"></div>
-                </div>
-                <div class="lesson-nav" style="margin-top: 20px;">
-                    <div></div>
-                    <button id="test-next-btn" class="btn" onclick="nextTestProblem()" style="display: none;">Next Problem</button>
                 </div>
             </div>
 
@@ -892,18 +887,6 @@
                         </ul>
                         <p style="margin-top: 20px;">Click "Start Practice" to try some problems with hints, then take the Mastery Test when you're ready!</p>`
                     }
-                ],
-                problems: [
-                    { context: 'You have 15 apples and use 7 for pie.', equation: '15 - 7 = ?', answer: 8, hint: 'Subtract to find what remains.' },
-                    { context: 'Each pizza needs 3 cups of cheese. You make 4 pizzas.', equation: '3 x 4 = ?', answer: 12, hint: 'Multiply cups by number of pizzas.' },
-                    { context: 'Split 36 cookies among 9 plates.', equation: '36 ÷ 9 = ?', answer: 4, hint: 'Divide total by number of plates.' },
-                    { context: 'Add 8 carrots to 14 carrots already in the pot.', equation: '8 + 14 = ?', answer: 22, hint: 'Add the two amounts together.' },
-                    { context: 'Recipe serves 6, you want to serve 18.', equation: '18 ÷ 6 = ?', answer: 3, hint: 'How many times does 6 fit into 18?' },
-                    { context: 'You need 20 muffins, you made 13.', equation: '20 - 13 = ?', answer: 7, hint: 'Subtract to find how many more needed.' },
-                    { context: '5 batches of cookies, 12 per batch.', equation: '5 x 12 = ?', answer: 60, hint: 'Multiply batches by cookies per batch.' },
-                    { context: '48 grapes divided into 8 servings.', equation: '48 ÷ 8 = ?', answer: 6, hint: 'Divide total by servings.' },
-                    { context: '17 red peppers plus 9 green peppers.', equation: '17 + 9 = ?', answer: 26, hint: 'Add the two amounts.' },
-                    { context: '7 chefs, each makes 8 dishes.', equation: '7 x 8 = ?', answer: 56, hint: 'Multiply chefs by dishes each.' }
                 ]
             },
             {
@@ -973,18 +956,6 @@
                         </ul>
                         <p style="margin-top: 20px;">Time to find those missing ingredients!</p>`
                     }
-                ],
-                problems: [
-                    { context: 'Find the missing amount of sugar.', equation: 'x + 7 = 15', answer: 8, hint: 'Subtract 7 from both sides.' },
-                    { context: 'Find how much flour you started with.', equation: 'x - 4 = 11', answer: 15, hint: 'Add 4 to both sides.' },
-                    { context: 'Each batch uses x cups. 3 batches use 18 cups.', equation: '3x = 18', answer: 6, hint: 'Divide both sides by 3.' },
-                    { context: 'Split equally, each gets 5.', equation: 'x ÷ 4 = 5', answer: 20, hint: 'Multiply both sides by 4.' },
-                    { context: 'After adding 9, you have 23 total.', equation: 'x + 9 = 23', answer: 14, hint: 'Subtract 9 from 23.' },
-                    { context: 'You used some, now have 7 left from 19.', equation: '19 - x = 7', answer: 12, hint: 'What subtracted from 19 gives 7?' },
-                    { context: '5 portions equal 35 grams.', equation: '5x = 35', answer: 7, hint: 'Divide 35 by 5.' },
-                    { context: 'When divided by 6, you get 8.', equation: 'x ÷ 6 = 8', answer: 48, hint: 'Multiply 8 by 6.' },
-                    { context: 'The total minus 15 is 28.', equation: 'x - 15 = 28', answer: 43, hint: 'Add 15 to 28.' },
-                    { context: '4 times the amount is 36.', equation: '4x = 36', answer: 9, hint: 'Divide 36 by 4.' }
                 ]
             },
             {
@@ -1062,18 +1033,6 @@
                         </ol>
                         <p style="margin-top: 20px;">A helpful phrase: "Please Excuse My Dear Aunt Sally"</p>`
                     }
-                ],
-                problems: [
-                    { context: 'Calculate the total cook time.', equation: '3 + 4 x 2 = ?', answer: 11, hint: 'Multiply first: 4 x 2 = 8, then add 3.' },
-                    { context: 'Find the prep time.', equation: '(5 + 3) x 2 = ?', answer: 16, hint: 'Parentheses first: 5 + 3 = 8, then multiply.' },
-                    { context: 'Calculate total minutes.', equation: '20 - 3 x 4 = ?', answer: 8, hint: 'Multiply first: 3 x 4 = 12, then subtract.' },
-                    { context: 'Recipe timing calculation.', equation: '2 x (10 - 4) = ?', answer: 12, hint: 'Parentheses first: 10 - 4 = 6, then multiply.' },
-                    { context: 'Multiple steps combined.', equation: '15 ÷ 3 + 2 = ?', answer: 7, hint: 'Divide first: 15 ÷ 3 = 5, then add.' },
-                    { context: 'Complex timing.', equation: '4 + 6 ÷ 2 = ?', answer: 7, hint: 'Divide first: 6 ÷ 2 = 3, then add 4.' },
-                    { context: 'Two operations together.', equation: '(8 + 4) ÷ 3 = ?', answer: 4, hint: 'Parentheses first: 8 + 4 = 12, then divide.' },
-                    { context: 'Scaling recipe time.', equation: '5 x 4 - 6 = ?', answer: 14, hint: 'Multiply first: 5 x 4 = 20, then subtract.' },
-                    { context: 'Multiple batches.', equation: '2 x 3 + 4 x 2 = ?', answer: 14, hint: 'Both multiplications first: 6 + 8 = 14.' },
-                    { context: 'Final timing.', equation: '(12 - 4) x 3 = ?', answer: 24, hint: 'Parentheses first: 12 - 4 = 8, then multiply.' }
                 ]
             },
             {
@@ -1142,18 +1101,6 @@
                             <li>Simplify when possible (3/6 = 1/2)</li>
                         </ul>`
                     }
-                ],
-                problems: [
-                    { context: 'Convert to decimal:', equation: '1/2 = ?', answer: 0.5, hint: 'Divide 1 by 2.' },
-                    { context: 'Convert to decimal:', equation: '3/4 = ?', answer: 0.75, hint: 'Divide 3 by 4.' },
-                    { context: 'Add the fractions (as decimal):', equation: '1/4 + 1/4 = ?', answer: 0.5, hint: '1/4 + 1/4 = 2/4 = 1/2 = 0.5' },
-                    { context: 'Convert to decimal:', equation: '1/4 = ?', answer: 0.25, hint: 'Divide 1 by 4.' },
-                    { context: 'Double the amount (as decimal):', equation: '2 x 0.5 = ?', answer: 1, hint: 'Multiply 2 times 0.5.' },
-                    { context: 'Half of 3/4 (as decimal):', equation: '1/2 x 3/4 = ?', answer: 0.375, hint: '3/8 = 0.375 or multiply 0.5 x 0.75' },
-                    { context: 'Add the amounts:', equation: '0.25 + 0.75 = ?', answer: 1, hint: 'Add the decimals directly.' },
-                    { context: 'Convert to decimal:', equation: '2/5 = ?', answer: 0.4, hint: 'Divide 2 by 5.' },
-                    { context: 'Multiply the measurements:', equation: '0.5 x 0.5 = ?', answer: 0.25, hint: 'Half of a half.' },
-                    { context: 'Add the fractions (as decimal):', equation: '1/2 + 1/4 = ?', answer: 0.75, hint: '2/4 + 1/4 = 3/4 = 0.75' }
                 ]
             },
             {
@@ -1217,18 +1164,6 @@
                         </div>
                         <p style="margin-top: 20px;">This keeps the equation balanced and helps you find x!</p>`
                     }
-                ],
-                problems: [
-                    { context: 'Solve by subtracting 5 from both sides:', equation: 'x + 5 = 12', answer: 7, hint: 'x = 12 - 5' },
-                    { context: 'Solve by dividing both sides by 4:', equation: '4x = 20', answer: 5, hint: 'x = 20 ÷ 4' },
-                    { context: 'Solve by adding 3 to both sides:', equation: 'x - 3 = 10', answer: 13, hint: 'x = 10 + 3' },
-                    { context: 'Solve by multiplying both sides by 5:', equation: 'x ÷ 5 = 6', answer: 30, hint: 'x = 6 x 5' },
-                    { context: 'Two steps: subtract 4, then divide by 2:', equation: '2x + 4 = 14', answer: 5, hint: '2x = 10, then x = 5' },
-                    { context: 'Solve by subtracting 7:', equation: 'x + 7 = 25', answer: 18, hint: 'x = 25 - 7' },
-                    { context: 'Solve by dividing by 6:', equation: '6x = 42', answer: 7, hint: 'x = 42 ÷ 6' },
-                    { context: 'Two steps: add 2, then divide by 3:', equation: '3x - 2 = 13', answer: 5, hint: '3x = 15, then x = 5' },
-                    { context: 'Solve by adding 9:', equation: 'x - 9 = 16', answer: 25, hint: 'x = 16 + 9' },
-                    { context: 'Two steps: subtract 5, then divide by 4:', equation: '4x + 5 = 25', answer: 5, hint: '4x = 20, then x = 5' }
                 ]
             }
         ];
@@ -1243,6 +1178,7 @@
         let testIndex = 0;
         let testCorrect = 0;
         let currentProblems = [];
+        let hasAnswered = false; // Prevent double-submission
 
         // ==================== HELPER FUNCTIONS ====================
         function shuffleArray(array) {
@@ -1252,6 +1188,474 @@
                 [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
             }
             return shuffled;
+        }
+
+        function randInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function pickRandom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        // ==================== DYNAMIC PROBLEM GENERATORS ====================
+
+        // Module 1: Basic Operations
+        function generateBasicOpsProblem() {
+            const contexts = {
+                add: [
+                    (a, b) => ({ context: `You have ${a} apples and buy ${b} more.`, hint: 'Add the two amounts together.' }),
+                    (a, b) => ({ context: `Add ${a} carrots to ${b} carrots already in the pot.`, hint: 'Combine the amounts.' }),
+                    (a, b) => ({ context: `${a} cookies on one tray, ${b} on another.`, hint: 'Add both trays together.' }),
+                    (a, b) => ({ context: `Mix ${a} red peppers with ${b} green peppers.`, hint: 'Add the peppers together.' })
+                ],
+                subtract: [
+                    (a, b) => ({ context: `You have ${a} eggs and use ${b} for the cake.`, hint: 'Subtract to find what remains.' }),
+                    (a, b) => ({ context: `Start with ${a} muffins, eat ${b}.`, hint: 'Subtract to find how many are left.' }),
+                    (a, b) => ({ context: `You need ${a} cupcakes but only made ${b}.`, hint: 'Subtract to find how many more needed.' }),
+                    (a, b) => ({ context: `${a} strawberries minus ${b} eaten.`, hint: 'Subtract the eaten amount.' })
+                ],
+                multiply: [
+                    (a, b) => ({ context: `Each pizza needs ${a} cups of cheese. You make ${b} pizzas.`, hint: 'Multiply cups by pizzas.' }),
+                    (a, b) => ({ context: `${a} batches of cookies, ${b} per batch.`, hint: 'Multiply batches by cookies per batch.' }),
+                    (a, b) => ({ context: `${a} chefs each make ${b} dishes.`, hint: 'Multiply chefs by dishes.' }),
+                    (a, b) => ({ context: `Each cupcake needs ${a} tablespoons of frosting. Making ${b} cupcakes.`, hint: 'Multiply to find total frosting.' })
+                ],
+                divide: [
+                    (a, b) => ({ context: `Split ${a} cookies among ${b} plates.`, hint: 'Divide total by number of plates.' }),
+                    (a, b) => ({ context: `${a} grapes divided into ${b} servings.`, hint: 'Divide total by servings.' }),
+                    (a, b) => ({ context: `Share ${a} strawberries equally among ${b} desserts.`, hint: 'Divide to find amount per dessert.' }),
+                    (a, b) => ({ context: `${a} slices of pizza for ${b} people.`, hint: 'Divide slices by people.' })
+                ]
+            };
+
+            const opType = pickRandom(['add', 'subtract', 'multiply', 'divide']);
+            let a, b, answer, equation;
+
+            switch (opType) {
+                case 'add':
+                    a = randInt(5, 25);
+                    b = randInt(3, 20);
+                    answer = a + b;
+                    equation = `${a} + ${b} = ?`;
+                    break;
+                case 'subtract':
+                    a = randInt(12, 30);
+                    b = randInt(3, a - 1);
+                    answer = a - b;
+                    equation = `${a} - ${b} = ?`;
+                    break;
+                case 'multiply':
+                    a = randInt(2, 9);
+                    b = randInt(2, 12);
+                    answer = a * b;
+                    equation = `${a} × ${b} = ?`;
+                    break;
+                case 'divide':
+                    b = randInt(2, 9);
+                    answer = randInt(2, 10);
+                    a = b * answer;
+                    equation = `${a} ÷ ${b} = ?`;
+                    break;
+            }
+
+            const template = pickRandom(contexts[opType]);
+            const { context, hint } = template(a, b);
+            return { context, equation, answer, hint };
+        }
+
+        // Module 2: Pre-Algebra (Missing Ingredients)
+        function generatePreAlgebraProblem() {
+            const templates = [
+                // x + a = b
+                () => {
+                    const answer = randInt(3, 20);
+                    const a = randInt(2, 15);
+                    const b = answer + a;
+                    return {
+                        context: 'Find the missing amount.',
+                        equation: `x + ${a} = ${b}`,
+                        answer,
+                        hint: `Subtract ${a} from both sides.`
+                    };
+                },
+                // x - a = b
+                () => {
+                    const answer = randInt(10, 30);
+                    const a = randInt(2, answer - 3);
+                    const b = answer - a;
+                    return {
+                        context: 'Find how much you started with.',
+                        equation: `x - ${a} = ${b}`,
+                        answer,
+                        hint: `Add ${a} to both sides.`
+                    };
+                },
+                // ax = b
+                () => {
+                    const a = randInt(2, 8);
+                    const answer = randInt(2, 12);
+                    const b = a * answer;
+                    return {
+                        context: `Each batch uses x cups. ${a} batches use ${b} cups total.`,
+                        equation: `${a}x = ${b}`,
+                        answer,
+                        hint: `Divide both sides by ${a}.`
+                    };
+                },
+                // x ÷ a = b
+                () => {
+                    const a = randInt(2, 8);
+                    const b = randInt(2, 10);
+                    const answer = a * b;
+                    return {
+                        context: 'Split equally, find the original amount.',
+                        equation: `x ÷ ${a} = ${b}`,
+                        answer,
+                        hint: `Multiply both sides by ${a}.`
+                    };
+                },
+                // a - x = b
+                () => {
+                    const a = randInt(15, 30);
+                    const answer = randInt(3, a - 5);
+                    const b = a - answer;
+                    return {
+                        context: `You used some from ${a}, now have ${b} left.`,
+                        equation: `${a} - x = ${b}`,
+                        answer,
+                        hint: `What subtracted from ${a} gives ${b}?`
+                    };
+                }
+            ];
+
+            return pickRandom(templates)();
+        }
+
+        // Module 3: Order of Operations (PEMDAS)
+        function generatePEMDASProblem() {
+            const templates = [
+                // a + b × c
+                () => {
+                    const a = randInt(2, 10);
+                    const b = randInt(2, 6);
+                    const c = randInt(2, 6);
+                    return {
+                        context: 'Calculate using order of operations.',
+                        equation: `${a} + ${b} × ${c} = ?`,
+                        answer: a + (b * c),
+                        hint: `Multiply first: ${b} × ${c} = ${b * c}, then add ${a}.`
+                    };
+                },
+                // (a + b) × c
+                () => {
+                    const a = randInt(2, 8);
+                    const b = randInt(2, 8);
+                    const c = randInt(2, 5);
+                    return {
+                        context: 'Parentheses first!',
+                        equation: `(${a} + ${b}) × ${c} = ?`,
+                        answer: (a + b) * c,
+                        hint: `Parentheses first: ${a} + ${b} = ${a + b}, then multiply by ${c}.`
+                    };
+                },
+                // a - b × c
+                () => {
+                    const b = randInt(2, 5);
+                    const c = randInt(2, 5);
+                    const a = randInt(b * c + 2, b * c + 15);
+                    return {
+                        context: 'Calculate the total time.',
+                        equation: `${a} - ${b} × ${c} = ?`,
+                        answer: a - (b * c),
+                        hint: `Multiply first: ${b} × ${c} = ${b * c}, then subtract from ${a}.`
+                    };
+                },
+                // a × (b - c)
+                () => {
+                    const a = randInt(2, 5);
+                    const b = randInt(8, 15);
+                    const c = randInt(2, b - 2);
+                    return {
+                        context: 'Recipe timing calculation.',
+                        equation: `${a} × (${b} - ${c}) = ?`,
+                        answer: a * (b - c),
+                        hint: `Parentheses first: ${b} - ${c} = ${b - c}, then multiply by ${a}.`
+                    };
+                },
+                // a ÷ b + c
+                () => {
+                    const b = randInt(2, 6);
+                    const quotient = randInt(2, 8);
+                    const a = b * quotient;
+                    const c = randInt(2, 10);
+                    return {
+                        context: 'Multiple steps combined.',
+                        equation: `${a} ÷ ${b} + ${c} = ?`,
+                        answer: quotient + c,
+                        hint: `Divide first: ${a} ÷ ${b} = ${quotient}, then add ${c}.`
+                    };
+                },
+                // a + b ÷ c
+                () => {
+                    const c = randInt(2, 6);
+                    const quotient = randInt(2, 8);
+                    const b = c * quotient;
+                    const a = randInt(2, 10);
+                    return {
+                        context: 'Complex timing.',
+                        equation: `${a} + ${b} ÷ ${c} = ?`,
+                        answer: a + quotient,
+                        hint: `Divide first: ${b} ÷ ${c} = ${quotient}, then add ${a}.`
+                    };
+                },
+                // (a + b) ÷ c
+                () => {
+                    const c = randInt(2, 6);
+                    const quotient = randInt(2, 8);
+                    const sum = c * quotient;
+                    const a = randInt(2, sum - 2);
+                    const b = sum - a;
+                    return {
+                        context: 'Divide after adding.',
+                        equation: `(${a} + ${b}) ÷ ${c} = ?`,
+                        answer: quotient,
+                        hint: `Parentheses first: ${a} + ${b} = ${sum}, then divide by ${c}.`
+                    };
+                },
+                // a × b - c
+                () => {
+                    const a = randInt(2, 6);
+                    const b = randInt(2, 8);
+                    const c = randInt(2, a * b - 2);
+                    return {
+                        context: 'Scaling recipe time.',
+                        equation: `${a} × ${b} - ${c} = ?`,
+                        answer: (a * b) - c,
+                        hint: `Multiply first: ${a} × ${b} = ${a * b}, then subtract ${c}.`
+                    };
+                },
+                // a × b + c × d
+                () => {
+                    const a = randInt(2, 5);
+                    const b = randInt(2, 5);
+                    const c = randInt(2, 5);
+                    const d = randInt(2, 5);
+                    return {
+                        context: 'Multiple batches.',
+                        equation: `${a} × ${b} + ${c} × ${d} = ?`,
+                        answer: (a * b) + (c * d),
+                        hint: `Both multiplications first: ${a * b} + ${c * d}.`
+                    };
+                }
+            ];
+
+            return pickRandom(templates)();
+        }
+
+        // Module 4: Fractions & Decimals
+        function generateFractionsProblem() {
+            const fractions = [
+                { frac: '1/2', dec: 0.5 },
+                { frac: '1/4', dec: 0.25 },
+                { frac: '3/4', dec: 0.75 },
+                { frac: '1/5', dec: 0.2 },
+                { frac: '2/5', dec: 0.4 },
+                { frac: '3/5', dec: 0.6 },
+                { frac: '4/5', dec: 0.8 },
+                { frac: '1/8', dec: 0.125 },
+                { frac: '3/8', dec: 0.375 },
+                { frac: '5/8', dec: 0.625 },
+                { frac: '1/10', dec: 0.1 },
+                { frac: '3/10', dec: 0.3 }
+            ];
+
+            const templates = [
+                // Convert fraction to decimal
+                () => {
+                    const f = pickRandom(fractions);
+                    return {
+                        context: 'Convert to decimal:',
+                        equation: `${f.frac} = ?`,
+                        answer: f.dec,
+                        hint: 'Divide the numerator by the denominator.'
+                    };
+                },
+                // Add two fractions (same denominator, answer as decimal)
+                () => {
+                    const denoms = [4, 8, 5, 10];
+                    const d = pickRandom(denoms);
+                    const a = randInt(1, d - 2);
+                    const b = randInt(1, d - a);
+                    const answer = (a + b) / d;
+                    return {
+                        context: 'Add the fractions (answer as decimal):',
+                        equation: `${a}/${d} + ${b}/${d} = ?`,
+                        answer: Math.round(answer * 1000) / 1000,
+                        hint: `${a}/${d} + ${b}/${d} = ${a + b}/${d} = ${answer}`
+                    };
+                },
+                // Add decimals
+                () => {
+                    const a = pickRandom([0.25, 0.5, 0.75, 0.1, 0.2, 0.3]);
+                    const b = pickRandom([0.25, 0.5, 0.75, 0.1, 0.2, 0.3]);
+                    return {
+                        context: 'Add the amounts:',
+                        equation: `${a} + ${b} = ?`,
+                        answer: Math.round((a + b) * 1000) / 1000,
+                        hint: 'Add the decimals directly.'
+                    };
+                },
+                // Multiply decimals
+                () => {
+                    const a = pickRandom([0.5, 2, 3, 4]);
+                    const b = pickRandom([0.25, 0.5, 0.75]);
+                    return {
+                        context: 'Multiply the measurements:',
+                        equation: `${a} × ${b} = ?`,
+                        answer: Math.round((a * b) * 1000) / 1000,
+                        hint: 'Multiply the two numbers.'
+                    };
+                },
+                // Double an amount
+                () => {
+                    const f = pickRandom(fractions.filter(x => x.dec <= 0.5));
+                    return {
+                        context: 'Double the amount (answer as decimal):',
+                        equation: `2 × ${f.frac} = ?`,
+                        answer: Math.round((2 * f.dec) * 1000) / 1000,
+                        hint: `Double ${f.dec}.`
+                    };
+                },
+                // Half of a fraction
+                () => {
+                    const options = [
+                        { frac: '1/2', answer: 0.25 },
+                        { frac: '3/4', answer: 0.375 },
+                        { frac: '1/4', answer: 0.125 }
+                    ];
+                    const choice = pickRandom(options);
+                    return {
+                        context: 'Half of this amount (as decimal):',
+                        equation: `1/2 × ${choice.frac} = ?`,
+                        answer: choice.answer,
+                        hint: 'Multiply the fraction by 1/2, or divide by 2.'
+                    };
+                },
+                // Add mixed (fraction + decimal as decimal)
+                () => {
+                    const f = pickRandom(fractions.filter(x => x.dec <= 0.5));
+                    const d = pickRandom([0.25, 0.5, 0.1, 0.2]);
+                    return {
+                        context: 'Add (answer as decimal):',
+                        equation: `${f.frac} + ${d} = ?`,
+                        answer: Math.round((f.dec + d) * 1000) / 1000,
+                        hint: `Convert ${f.frac} to ${f.dec}, then add ${d}.`
+                    };
+                }
+            ];
+
+            return pickRandom(templates)();
+        }
+
+        // Module 5: Balancing Equations
+        function generateBalancingProblem() {
+            const templates = [
+                // x + a = b
+                () => {
+                    const answer = randInt(5, 25);
+                    const a = randInt(3, 15);
+                    const b = answer + a;
+                    return {
+                        context: `Solve by subtracting ${a} from both sides:`,
+                        equation: `x + ${a} = ${b}`,
+                        answer,
+                        hint: `x = ${b} - ${a}`
+                    };
+                },
+                // x - a = b
+                () => {
+                    const answer = randInt(10, 30);
+                    const a = randInt(3, 12);
+                    const b = answer - a;
+                    return {
+                        context: `Solve by adding ${a} to both sides:`,
+                        equation: `x - ${a} = ${b}`,
+                        answer,
+                        hint: `x = ${b} + ${a}`
+                    };
+                },
+                // ax = b
+                () => {
+                    const a = randInt(2, 8);
+                    const answer = randInt(3, 12);
+                    const b = a * answer;
+                    return {
+                        context: `Solve by dividing both sides by ${a}:`,
+                        equation: `${a}x = ${b}`,
+                        answer,
+                        hint: `x = ${b} ÷ ${a}`
+                    };
+                },
+                // x ÷ a = b
+                () => {
+                    const a = randInt(2, 8);
+                    const b = randInt(3, 10);
+                    const answer = a * b;
+                    return {
+                        context: `Solve by multiplying both sides by ${a}:`,
+                        equation: `x ÷ ${a} = ${b}`,
+                        answer,
+                        hint: `x = ${b} × ${a}`
+                    };
+                },
+                // ax + b = c (two-step)
+                () => {
+                    const a = randInt(2, 5);
+                    const answer = randInt(2, 10);
+                    const b = randInt(2, 10);
+                    const c = (a * answer) + b;
+                    return {
+                        context: `Two steps: subtract ${b}, then divide by ${a}:`,
+                        equation: `${a}x + ${b} = ${c}`,
+                        answer,
+                        hint: `${a}x = ${c - b}, then x = ${answer}`
+                    };
+                },
+                // ax - b = c (two-step)
+                () => {
+                    const a = randInt(2, 5);
+                    const answer = randInt(3, 10);
+                    const b = randInt(2, 8);
+                    const c = (a * answer) - b;
+                    return {
+                        context: `Two steps: add ${b}, then divide by ${a}:`,
+                        equation: `${a}x - ${b} = ${c}`,
+                        answer,
+                        hint: `${a}x = ${c + b}, then x = ${answer}`
+                    };
+                }
+            ];
+
+            return pickRandom(templates)();
+        }
+
+        // Master generator function
+        function generateProblems(moduleId, count = 10) {
+            const generators = {
+                1: generateBasicOpsProblem,
+                2: generatePreAlgebraProblem,
+                3: generatePEMDASProblem,
+                4: generateFractionsProblem,
+                5: generateBalancingProblem
+            };
+
+            const generator = generators[moduleId];
+            const problems = [];
+            for (let i = 0; i < count; i++) {
+                problems.push(generator());
+            }
+            return problems;
         }
 
         function showScreen(screenId) {
@@ -1398,6 +1802,7 @@
         }
 
         function returnToDashboard() {
+            renderDashboard();
             showScreen('dashboard');
         }
 
@@ -1453,7 +1858,7 @@
             currentStage = 'practice';
             practiceIndex = 0;
             practiceCorrect = 0;
-            currentProblems = shuffleArray(currentModule.problems);
+            currentProblems = generateProblems(currentModule.id, 10);
             updateStageIndicator();
 
             document.getElementById('lesson-content').style.display = 'none';
@@ -1477,8 +1882,13 @@
             document.getElementById('practice-feedback').textContent = '';
             document.getElementById('hint-box').className = 'hint-box';
             document.getElementById('hint-box').textContent = problem.hint;
-            document.getElementById('practice-next-btn').style.display = 'none';
             document.getElementById('goto-test-btn').style.display = practiceIndex >= 9 ? 'inline-block' : 'none';
+
+            // Reset button to Check
+            const btn = document.getElementById('practice-btn');
+            btn.textContent = 'Check';
+            btn.onclick = checkPracticeAnswer;
+            hasAnswered = false;
 
             document.getElementById('practice-answer').focus();
         }
@@ -1488,6 +1898,8 @@
         }
 
         function checkPracticeAnswer() {
+            if (hasAnswered) return; // Prevent double-submission
+
             const problem = currentProblems[practiceIndex];
             const userAnswer = parseFloat(document.getElementById('practice-answer').value);
             const feedback = document.getElementById('practice-feedback');
@@ -1498,6 +1910,8 @@
                 feedback.textContent = 'Please enter a number.';
                 return;
             }
+
+            hasAnswered = true;
 
             // Allow for floating point comparison
             const isCorrect = Math.abs(userAnswer - problem.answer) < 0.01;
@@ -1513,7 +1927,14 @@
                 input.className = 'answer-input incorrect';
             }
 
-            document.getElementById('practice-next-btn').style.display = practiceIndex < 9 ? 'inline-block' : 'none';
+            // Change button to Next Problem (or show Go to Test on last problem)
+            const btn = document.getElementById('practice-btn');
+            if (practiceIndex < 9) {
+                btn.textContent = 'Next Problem';
+                btn.onclick = nextPracticeProblem;
+            } else {
+                btn.style.display = 'none';
+            }
             document.getElementById('goto-test-btn').style.display = 'inline-block';
         }
 
@@ -1529,7 +1950,7 @@
             currentStage = 'test';
             testIndex = 0;
             testCorrect = 0;
-            currentProblems = shuffleArray(currentModule.problems);
+            currentProblems = generateProblems(currentModule.id, 10);
             updateStageIndicator();
 
             document.getElementById('lesson-content').style.display = 'none';
@@ -1551,12 +1972,20 @@
             document.getElementById('test-answer').className = 'answer-input';
             document.getElementById('test-feedback').className = 'feedback';
             document.getElementById('test-feedback').textContent = '';
-            document.getElementById('test-next-btn').style.display = 'none';
+
+            // Reset button to Submit
+            const btn = document.getElementById('test-btn');
+            btn.textContent = 'Submit';
+            btn.onclick = submitTestAnswer;
+            btn.style.display = 'inline-block';
+            hasAnswered = false;
 
             document.getElementById('test-answer').focus();
         }
 
         function submitTestAnswer() {
+            if (hasAnswered) return; // Prevent double-submission
+
             const problem = currentProblems[testIndex];
             const userAnswer = parseFloat(document.getElementById('test-answer').value);
             const feedback = document.getElementById('test-feedback');
@@ -1567,6 +1996,8 @@
                 feedback.textContent = 'Please enter a number.';
                 return;
             }
+
+            hasAnswered = true;
 
             const isCorrect = Math.abs(userAnswer - problem.answer) < 0.01;
 
@@ -1581,9 +2012,13 @@
                 input.className = 'answer-input incorrect';
             }
 
+            // Change button to Next Problem or hide on last problem
+            const btn = document.getElementById('test-btn');
             if (testIndex < 9) {
-                document.getElementById('test-next-btn').style.display = 'inline-block';
+                btn.textContent = 'Next Problem';
+                btn.onclick = nextTestProblem;
             } else {
+                btn.style.display = 'none';
                 setTimeout(showResults, 1500);
             }
         }
@@ -1598,7 +2033,7 @@
         // ==================== RESULTS FUNCTIONS ====================
         async function showResults() {
             const passed = testCorrect >= 8;
-            const percentage = (testCorrect / 10) * 100;
+            const percentage = Math.round((testCorrect / 10) * 100);
 
             document.getElementById('test-content').style.display = 'none';
             document.getElementById('results-content').style.display = 'block';
@@ -1655,15 +2090,15 @@
         document.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 if (currentStage === 'practice') {
-                    const nextBtn = document.getElementById('practice-next-btn');
-                    if (nextBtn.style.display !== 'none') {
+                    const btn = document.getElementById('practice-btn');
+                    if (btn.textContent === 'Next Problem') {
                         nextPracticeProblem();
                     } else {
                         checkPracticeAnswer();
                     }
                 } else if (currentStage === 'test') {
-                    const nextBtn = document.getElementById('test-next-btn');
-                    if (nextBtn.style.display !== 'none') {
+                    const btn = document.getElementById('test-btn');
+                    if (btn.textContent === 'Next Problem') {
                         nextTestProblem();
                     } else {
                         submitTestAnswer();

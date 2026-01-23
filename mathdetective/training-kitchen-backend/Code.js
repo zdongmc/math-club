@@ -10,12 +10,11 @@
 
 const SHEET_ID = '1MSYlXi37I9x4PMSpf8ovtmq6zLMwY_-vK7SBlydCjnI';
 const PROGRESS_SHEET_NAME = 'Training Kitchen';
-
-// Parent Portal Sheet ID (for student lookup)
-const PARENT_PORTAL_SHEET_ID = '1sbpU2U06lL65_ZhDnwB92cbGKl9lRIcT4tPqxd3bLEc';
+const ROSTER_SHEET_NAME = 'Roster';
 
 /**
- * Look up student info from the parent portal spreadsheet
+ * Look up student info from the Roster tab
+ * Roster tab has: Column A = Name, Column B = MCPS ID
  */
 function lookupStudent(mcpsId) {
   try {
@@ -25,78 +24,25 @@ function lookupStudent(mcpsId) {
       return { success: false, message: 'Please enter a valid MCPS ID' };
     }
 
-    const ss = SpreadsheetApp.openById(PARENT_PORTAL_SHEET_ID);
+    const ss = SpreadsheetApp.openById(SHEET_ID);
+    const rosterSheet = ss.getSheetByName(ROSTER_SHEET_NAME);
 
-    // Try Form Responses 1 (by email pattern)
-    let studentName = null;
+    if (!rosterSheet || rosterSheet.getLastRow() <= 1) {
+      return { success: false, message: 'Roster not found' };
+    }
 
-    const registrationSheet = ss.getSheetByName('Form Responses 1');
-    if (registrationSheet && registrationSheet.getLastRow() > 1) {
-      const data = registrationSheet.getDataRange().getValues();
-      for (let i = 1; i < data.length; i++) {
-        const email = (data[i][4] || '').toString().trim();
-        const emailMatch = email.match(/(\d+)@mcpsmd\.net/);
-        if (emailMatch && emailMatch[1] === mcpsIdStr) {
-          const firstName = (data[i][1] || '').toString().trim();
-          const lastName = (data[i][2] || '').toString().trim();
-          studentName = `${firstName} ${lastName}`.trim();
-          break;
-        }
+    const data = rosterSheet.getDataRange().getValues();
+
+    // Look for student by MCPS ID in column B
+    for (let i = 1; i < data.length; i++) {
+      const studentId = (data[i][1] || '').toString().trim();
+      if (studentId === mcpsIdStr) {
+        const studentName = (data[i][0] || '').toString().trim();
+        return { success: true, name: studentName, mcpsId: mcpsIdStr };
       }
     }
 
-    // Try Attendance Records
-    if (!studentName) {
-      const attendanceSheet = ss.getSheetByName('Attendance Records');
-      if (attendanceSheet && attendanceSheet.getLastRow() > 1) {
-        const data = attendanceSheet.getDataRange().getValues();
-        for (let i = 1; i < data.length; i++) {
-          const studentId = data[i][1] ? data[i][1].toString().trim() : '';
-          if (studentId === mcpsIdStr) {
-            studentName = (data[i][0] || '').toString().trim();
-            break;
-          }
-        }
-      }
-    }
-
-    // Try School List
-    if (!studentName) {
-      const schoolListSheet = ss.getSheetByName('School List');
-      if (schoolListSheet && schoolListSheet.getLastRow() > 1) {
-        const data = schoolListSheet.getDataRange().getValues();
-        for (let i = 1; i < data.length; i++) {
-          const studentId = data[i][1] ? data[i][1].toString().trim() : '';
-          if (studentId === mcpsIdStr) {
-            const firstName = (data[i][3] || '').toString().trim();
-            const lastName = (data[i][2] || '').toString().trim();
-            studentName = `${firstName} ${lastName}`.trim();
-            break;
-          }
-        }
-      }
-    }
-
-    // Try Form Responses 2
-    if (!studentName) {
-      const competitionSheet = ss.getSheetByName('Form Responses 2');
-      if (competitionSheet && competitionSheet.getLastRow() > 1) {
-        const data = competitionSheet.getDataRange().getValues();
-        for (let i = 1; i < data.length; i++) {
-          const studentId = data[i][2] ? data[i][2].toString().trim() : '';
-          if (studentId === mcpsIdStr) {
-            studentName = (data[i][1] || '').toString().trim();
-            break;
-          }
-        }
-      }
-    }
-
-    if (!studentName) {
-      return { success: false, message: 'Student not found with MCPS ID: ' + mcpsIdStr };
-    }
-
-    return { success: true, name: studentName, mcpsId: mcpsIdStr };
+    return { success: false, message: 'Student not found with MCPS ID: ' + mcpsIdStr };
 
   } catch (error) {
     Logger.log('Error looking up student: ' + error.toString());
