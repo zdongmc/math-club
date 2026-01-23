@@ -1,0 +1,2118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training Kitchen - HWMS Competition Math Club</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #d97706;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .chef-hat {
+            font-size: 2.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #92400e;
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 70vh;
+        }
+
+        .welcome-card {
+            background: #ffffff;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            border: 3px solid #f59e0b;
+        }
+
+        .welcome-card h2 {
+            color: #d97706;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+
+        .welcome-card p {
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .welcome-card input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .welcome-card input:focus {
+            outline: none;
+            border-color: #f59e0b;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+        }
+
+        .error-message {
+            color: #ef4444;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 5px 15px rgba(107, 114, 128, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .chef-status {
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            border-left: 5px solid #f59e0b;
+        }
+
+        .chef-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .chef-badge {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        .chef-details h3 {
+            font-size: 1.4rem;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .chef-level {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .progress-summary {
+            text-align: right;
+        }
+
+        .progress-summary h4 {
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .progress-count {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #d97706;
+        }
+
+        /* Module Grid */
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .module-card {
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            border-radius: 20px;
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            border-color: #f59e0b;
+        }
+
+        .module-card.completed {
+            border-color: #10b981;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(255, 255, 255, 1));
+        }
+
+        .module-card.completed:hover {
+            border-color: #10b981;
+        }
+
+        .completed-stamp {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #10b981;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .module-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .module-card h3 {
+            color: #d97706;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .module-card p {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .module-theme {
+            background: rgba(245, 158, 11, 0.1);
+            color: #92400e;
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .module-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .module-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .module-btn.learn {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .module-btn.practice {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .module-btn.test {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .module-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Module Content Screen */
+        .module-screen {
+            display: none;
+        }
+
+        .module-screen.active {
+            display: block;
+        }
+
+        .module-header {
+            background: #ffffff;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px 25px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .module-header h2 {
+            color: #d97706;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stage-indicator {
+            display: flex;
+            gap: 10px;
+        }
+
+        .stage-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            background: #e5e7eb;
+            color: #666;
+        }
+
+        .stage-dot.active {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .stage-dot.completed {
+            background: #10b981;
+            color: white;
+        }
+
+        /* Lesson Content */
+        .lesson-content {
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+        }
+
+        .lesson-step {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .lesson-step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .lesson-step h3 {
+            color: #d97706;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+
+        .lesson-step p {
+            color: #333;
+            line-height: 1.8;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .example-box {
+            background: linear-gradient(135deg, #fef3c7, #fffbeb);
+            border: 2px solid #f59e0b;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .example-box h4 {
+            color: #92400e;
+            margin-bottom: 10px;
+        }
+
+        .example-box .problem {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .example-box .solution {
+            color: #059669;
+            font-weight: bold;
+        }
+
+        .tip-box {
+            background: linear-gradient(135deg, #dbeafe, #eff6ff);
+            border: 2px solid #3b82f6;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .tip-box h4 {
+            color: #1d4ed8;
+            margin-bottom: 10px;
+        }
+
+        .lesson-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .step-counter {
+            color: #666;
+            font-weight: bold;
+        }
+
+        /* Practice/Test Content */
+        .practice-content, .test-content {
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+        }
+
+        .problem-display {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .problem-context {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .problem-equation {
+            font-size: 2rem;
+            font-family: 'Courier New', monospace;
+            color: #333;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 10px;
+            display: inline-block;
+            min-width: 200px;
+        }
+
+        .answer-input {
+            width: 150px;
+            padding: 15px;
+            font-size: 1.5rem;
+            text-align: center;
+            border: 3px solid #e5e7eb;
+            border-radius: 10px;
+            margin-right: 15px;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: #f59e0b;
+        }
+
+        .answer-input.correct {
+            border-color: #10b981;
+            background: #ecfdf5;
+        }
+
+        .answer-input.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .feedback.correct {
+            display: block;
+            background: #ecfdf5;
+            color: #059669;
+            border: 2px solid #10b981;
+        }
+
+        .feedback.incorrect {
+            display: block;
+            background: #fef2f2;
+            color: #dc2626;
+            border: 2px solid #ef4444;
+        }
+
+        .hint-btn {
+            background: #8b5cf6;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .hint-box {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f3e8ff;
+            border: 2px solid #8b5cf6;
+            border-radius: 10px;
+            color: #6b21a8;
+            display: none;
+        }
+
+        .hint-box.visible {
+            display: block;
+        }
+
+        .problem-counter {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+
+        /* Results Screen */
+        .results-screen {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .results-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+        }
+
+        .results-screen h3 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        .results-screen.passed h3 {
+            color: #059669;
+        }
+
+        .results-screen.failed h3 {
+            color: #dc2626;
+        }
+
+        .score-display {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .results-screen.passed .score-display {
+            color: #10b981;
+        }
+
+        .results-screen.failed .score-display {
+            color: #ef4444;
+        }
+
+        .results-message {
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #e5e7eb;
+            border-top-color: #f59e0b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .chef-status {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .chef-info {
+                flex-direction: column;
+            }
+
+            .progress-summary {
+                text-align: center;
+            }
+
+            .modules-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .module-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .problem-equation {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><span class="chef-hat">👨‍🍳</span> Training Kitchen <span class="chef-hat">🍳</span></h1>
+            <p>Master your math skills and earn your chef credentials!</p>
+        </div>
+
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="welcome-screen">
+            <div class="welcome-card">
+                <h2>Welcome to Training Kitchen!</h2>
+                <p>Train your math skills through cooking-themed lessons and challenges. Complete all 5 modules to become a Certified Chef!</p>
+                <div id="error-message" class="error-message"></div>
+                <input type="text" id="mcps-id-input" placeholder="Enter your MCPS ID" maxlength="10">
+                <br>
+                <button class="btn" onclick="startTraining()">Start Training</button>
+            </div>
+        </div>
+
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="loading">
+            <div class="spinner"></div>
+            <p>Loading your progress...</p>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="dashboard">
+            <div class="chef-status">
+                <div class="chef-info">
+                    <div class="chef-badge">👨‍🍳</div>
+                    <div class="chef-details">
+                        <h3 id="student-name">Chef Student</h3>
+                        <span id="chef-level" class="chef-level">Kitchen Trainee</span>
+                    </div>
+                </div>
+                <div class="progress-summary">
+                    <h4>Modules Completed</h4>
+                    <div class="progress-count"><span id="completed-count">0</span> / 5</div>
+                </div>
+                <button class="btn btn-secondary" onclick="logout()">Log Out</button>
+            </div>
+
+            <div class="modules-grid" id="modules-grid">
+                <!-- Module cards will be dynamically generated -->
+            </div>
+        </div>
+
+        <!-- Module Screen -->
+        <div id="module-screen" class="module-screen">
+            <div class="module-header">
+                <h2 id="module-title">Module Title</h2>
+                <div class="stage-indicator">
+                    <div id="stage-learn" class="stage-dot">1</div>
+                    <div id="stage-practice" class="stage-dot">2</div>
+                    <div id="stage-test" class="stage-dot">3</div>
+                </div>
+                <button class="btn btn-secondary" onclick="returnToDashboard()">Back to Dashboard</button>
+            </div>
+
+            <!-- Lesson Content -->
+            <div id="lesson-content" class="lesson-content">
+                <!-- Lesson steps will be dynamically generated -->
+            </div>
+
+            <!-- Practice Content -->
+            <div id="practice-content" class="practice-content" style="display: none;">
+                <div class="problem-counter">Problem <span id="practice-problem-num">1</span> of 10</div>
+                <div class="progress-bar">
+                    <div id="practice-progress" class="progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="problem-display">
+                    <p id="practice-context" class="problem-context"></p>
+                    <div id="practice-equation" class="problem-equation"></div>
+                    <div>
+                        <input type="text" id="practice-answer" class="answer-input" placeholder="?">
+                        <button id="practice-btn" class="btn" onclick="checkPracticeAnswer()">Check</button>
+                    </div>
+                    <button class="hint-btn" onclick="showHint()">Show Hint</button>
+                    <div id="hint-box" class="hint-box"></div>
+                    <div id="practice-feedback" class="feedback"></div>
+                </div>
+                <div class="lesson-nav" style="margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="startLesson()">Review Lesson</button>
+                    <button id="goto-test-btn" class="btn btn-success" onclick="startTest()" style="display: none;">Go to Mastery Test</button>
+                </div>
+            </div>
+
+            <!-- Test Content -->
+            <div id="test-content" class="test-content" style="display: none;">
+                <div class="problem-counter">Problem <span id="test-problem-num">1</span> of 10</div>
+                <div class="progress-bar">
+                    <div id="test-progress" class="progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="problem-display">
+                    <p id="test-context" class="problem-context"></p>
+                    <div id="test-equation" class="problem-equation"></div>
+                    <div>
+                        <input type="text" id="test-answer" class="answer-input" placeholder="?">
+                        <button id="test-btn" class="btn" onclick="submitTestAnswer()">Submit</button>
+                    </div>
+                    <div id="test-feedback" class="feedback"></div>
+                </div>
+            </div>
+
+            <!-- Results Screen -->
+            <div id="results-content" class="practice-content" style="display: none;">
+                <div id="results-screen" class="results-screen">
+                    <!-- Results will be dynamically generated -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== CONFIGURATION ====================
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyhI3zS593H2vHpPhbsgj5CZUHcUnYeISd_8rPLPcWX81jHf92a4N6KCUW2PtpRWqt4/exec';
+
+        // ==================== MODULE DATA ====================
+        const modules = [
+            {
+                id: 1,
+                title: 'Basic Operations',
+                theme: 'Mise en Place (Prep Station)',
+                icon: '🥄',
+                description: 'Master addition, subtraction, multiplication, and division with kitchen-themed problems.',
+                lessons: [
+                    {
+                        title: 'Welcome to the Prep Station!',
+                        content: `<p>Every great chef knows that <strong>mise en place</strong> (pronounced "meez ahn plahs") is the foundation of cooking. It means "everything in its place" - having all your ingredients measured and ready before you start cooking.</p>
+                        <p>In math, basic operations are your mise en place. You need to master addition, subtraction, multiplication, and division before tackling more complex recipes!</p>
+                        <div class="tip-box">
+                            <h4>Chef's Tip</h4>
+                            <p>Just like how chefs prepare ingredients before cooking, mathematicians prepare their basic skills before solving complex problems.</p>
+                        </div>`
+                    },
+                    {
+                        title: 'Addition & Subtraction',
+                        content: `<p>Addition and subtraction help us combine or separate ingredients.</p>
+                        <div class="example-box">
+                            <h4>Kitchen Example</h4>
+                            <p class="problem">You have 8 eggs. You use 3 for the cake. How many are left?</p>
+                            <p class="solution">8 - 3 = 5 eggs remaining</p>
+                        </div>
+                        <div class="example-box">
+                            <h4>Kitchen Example</h4>
+                            <p class="problem">You need 12 cookies for the party. You've baked 7. How many more do you need?</p>
+                            <p class="solution">12 - 7 = 5 more cookies needed</p>
+                        </div>`
+                    },
+                    {
+                        title: 'Multiplication',
+                        content: `<p>Multiplication helps us scale recipes up or repeat the same measurement multiple times.</p>
+                        <div class="example-box">
+                            <h4>Kitchen Example</h4>
+                            <p class="problem">Each cupcake needs 2 tablespoons of frosting. You're making 6 cupcakes. How much frosting total?</p>
+                            <p class="solution">2 x 6 = 12 tablespoons of frosting</p>
+                        </div>
+                        <div class="example-box">
+                            <h4>Kitchen Example</h4>
+                            <p class="problem">A recipe serves 4 people. You want to serve 12 people. Multiply each ingredient by what number?</p>
+                            <p class="solution">12 ÷ 4 = 3, so multiply each ingredient by 3</p>
+                        </div>`
+                    },
+                    {
+                        title: 'Division',
+                        content: `<p>Division helps us split things evenly or reduce recipe portions.</p>
+                        <div class="example-box">
+                            <h4>Kitchen Example</h4>
+                            <p class="problem">You have 24 strawberries to share equally among 6 desserts. How many per dessert?</p>
+                            <p class="solution">24 ÷ 6 = 4 strawberries per dessert</p>
+                        </div>
+                        <div class="tip-box">
+                            <h4>Chef's Tip</h4>
+                            <p>When halving a recipe, divide each ingredient by 2. When making a third of a recipe, divide by 3!</p>
+                        </div>`
+                    },
+                    {
+                        title: 'Ready to Practice!',
+                        content: `<p>You've learned the basics of kitchen math! Remember:</p>
+                        <ul style="margin-left: 20px; line-height: 2;">
+                            <li><strong>Addition (+)</strong> - Combining ingredients</li>
+                            <li><strong>Subtraction (-)</strong> - Finding what's left or what's needed</li>
+                            <li><strong>Multiplication (x)</strong> - Scaling recipes up</li>
+                            <li><strong>Division (÷)</strong> - Splitting evenly or scaling down</li>
+                        </ul>
+                        <p style="margin-top: 20px;">Click "Start Practice" to try some problems with hints, then take the Mastery Test when you're ready!</p>`
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: 'Pre-Algebra Basics',
+                theme: 'Missing Ingredients',
+                icon: '🔍',
+                description: 'Find the missing numbers in equations - like figuring out unknown ingredient amounts!',
+                lessons: [
+                    {
+                        title: 'The Mystery Ingredient',
+                        content: `<p>Sometimes a recipe card gets smudged and you can't read one of the amounts. In math, we call this unknown amount a <strong>variable</strong>, usually written as x, y, or ?.</p>
+                        <p>Finding the missing ingredient is just like solving for the variable!</p>
+                        <div class="example-box">
+                            <h4>Kitchen Mystery</h4>
+                            <p class="problem">You have ? cups of flour. After adding 3 more cups, you have 7 cups total.</p>
+                            <p class="solution">? + 3 = 7, so ? = 4 cups</p>
+                        </div>`
+                    },
+                    {
+                        title: 'Addition Mysteries',
+                        content: `<p>When the mystery involves addition, we use subtraction to solve it.</p>
+                        <div class="example-box">
+                            <h4>Example</h4>
+                            <p class="problem">x + 5 = 12</p>
+                            <p class="solution">To find x, subtract 5 from both sides: x = 12 - 5 = 7</p>
+                        </div>
+                        <div class="tip-box">
+                            <h4>Chef's Tip</h4>
+                            <p>Think: "What number plus 5 equals 12?" You can also think backwards: 12 minus 5 equals what?</p>
+                        </div>`
+                    },
+                    {
+                        title: 'Subtraction Mysteries',
+                        content: `<p>When the mystery involves subtraction, we use addition to solve it.</p>
+                        <div class="example-box">
+                            <h4>Example</h4>
+                            <p class="problem">x - 4 = 9</p>
+                            <p class="solution">To find x, add 4 to both sides: x = 9 + 4 = 13</p>
+                        </div>
+                        <div class="example-box">
+                            <h4>Kitchen Example</h4>
+                            <p class="problem">You had some eggs. After using 6 for breakfast, you have 8 left. How many did you start with?</p>
+                            <p class="solution">x - 6 = 8, so x = 8 + 6 = 14 eggs</p>
+                        </div>`
+                    },
+                    {
+                        title: 'Multiplication & Division Mysteries',
+                        content: `<p>For multiplication mysteries, divide. For division mysteries, multiply!</p>
+                        <div class="example-box">
+                            <h4>Multiplication Example</h4>
+                            <p class="problem">3x = 15</p>
+                            <p class="solution">Divide both sides by 3: x = 15 ÷ 3 = 5</p>
+                        </div>
+                        <div class="example-box">
+                            <h4>Division Example</h4>
+                            <p class="problem">x ÷ 4 = 6</p>
+                            <p class="solution">Multiply both sides by 4: x = 6 x 4 = 24</p>
+                        </div>`
+                    },
+                    {
+                        title: 'Ready to Solve Mysteries!',
+                        content: `<p>Remember the inverse operations:</p>
+                        <ul style="margin-left: 20px; line-height: 2;">
+                            <li><strong>Addition ↔ Subtraction</strong> - Use subtraction to undo addition</li>
+                            <li><strong>Multiplication ↔ Division</strong> - Use division to undo multiplication</li>
+                        </ul>
+                        <p style="margin-top: 20px;">Time to find those missing ingredients!</p>`
+                    }
+                ]
+            },
+            {
+                id: 3,
+                title: 'Order of Operations',
+                theme: 'Recipe Timing',
+                icon: '⏱️',
+                description: 'Learn PEMDAS through calculating cooking times and combining recipe steps.',
+                lessons: [
+                    {
+                        title: 'Kitchen Timing is Everything!',
+                        content: `<p>In cooking, the order you do things matters. You can't frost a cake before baking it! Similarly, in math, the order of operations matters.</p>
+                        <p>We use <strong>PEMDAS</strong> to remember the correct order:</p>
+                        <ul style="margin-left: 20px; line-height: 2;">
+                            <li><strong>P</strong>arentheses (do these first!)</li>
+                            <li><strong>E</strong>xponents</li>
+                            <li><strong>M</strong>ultiplication & <strong>D</strong>ivision (left to right)</li>
+                            <li><strong>A</strong>ddition & <strong>S</strong>ubtraction (left to right)</li>
+                        </ul>`
+                    },
+                    {
+                        title: 'Parentheses First',
+                        content: `<p>Parentheses group operations together, like grouping ingredients that need to be mixed first.</p>
+                        <div class="example-box">
+                            <h4>Example</h4>
+                            <p class="problem">2 x (3 + 4) = ?</p>
+                            <p class="solution">First: (3 + 4) = 7<br>Then: 2 x 7 = 14</p>
+                        </div>
+                        <div class="example-box">
+                            <h4>Kitchen Example</h4>
+                            <p class="problem">Prep time (10 + 5) minutes, doubled for two batches.</p>
+                            <p class="solution">2 x (10 + 5) = 2 x 15 = 30 minutes</p>
+                        </div>`
+                    },
+                    {
+                        title: 'Multiplication Before Addition',
+                        content: `<p>Without parentheses, multiplication comes before addition.</p>
+                        <div class="example-box">
+                            <h4>Compare These</h4>
+                            <p class="problem">2 + 3 x 4 = ?</p>
+                            <p class="solution">First multiply: 3 x 4 = 12<br>Then add: 2 + 12 = 14</p>
+                        </div>
+                        <div class="example-box">
+                            <h4>With Parentheses</h4>
+                            <p class="problem">(2 + 3) x 4 = ?</p>
+                            <p class="solution">First parentheses: 2 + 3 = 5<br>Then multiply: 5 x 4 = 20</p>
+                        </div>
+                        <div class="tip-box">
+                            <h4>Chef's Tip</h4>
+                            <p>The parentheses changed the answer from 14 to 20! Order matters!</p>
+                        </div>`
+                    },
+                    {
+                        title: 'Complex Recipes',
+                        content: `<p>Sometimes we have multiple operations to coordinate.</p>
+                        <div class="example-box">
+                            <h4>Example</h4>
+                            <p class="problem">Total time: 2 x (15 + 5) - 10 = ?</p>
+                            <p class="solution">Step 1: (15 + 5) = 20<br>Step 2: 2 x 20 = 40<br>Step 3: 40 - 10 = 30 minutes</p>
+                        </div>
+                        <div class="example-box">
+                            <h4>Example</h4>
+                            <p class="problem">18 ÷ 3 + 2 x 4 = ?</p>
+                            <p class="solution">Step 1: 18 ÷ 3 = 6<br>Step 2: 2 x 4 = 8<br>Step 3: 6 + 8 = 14</p>
+                        </div>`
+                    },
+                    {
+                        title: 'PEMDAS Practice Time!',
+                        content: `<p>Remember the order:</p>
+                        <ol style="margin-left: 20px; line-height: 2;">
+                            <li><strong>Parentheses</strong> - Solve what's inside first</li>
+                            <li><strong>Exponents</strong> - Powers come next</li>
+                            <li><strong>Multiply/Divide</strong> - Left to right</li>
+                            <li><strong>Add/Subtract</strong> - Left to right</li>
+                        </ol>
+                        <p style="margin-top: 20px;">A helpful phrase: "Please Excuse My Dear Aunt Sally"</p>`
+                    }
+                ]
+            },
+            {
+                id: 4,
+                title: 'Fractions & Decimals',
+                theme: 'Measurement Conversions',
+                icon: '📏',
+                description: 'Work with recipe measurements - halving, doubling, and converting between fractions and decimals.',
+                lessons: [
+                    {
+                        title: 'Measuring Like a Pro Chef',
+                        content: `<p>Professional chefs work with fractions and decimals constantly. Whether it's 1/2 cup of sugar or 0.25 kg of flour, these numbers are the language of recipes!</p>
+                        <div class="tip-box">
+                            <h4>Common Kitchen Fractions</h4>
+                            <p>1/4 cup, 1/3 cup, 1/2 cup, 2/3 cup, 3/4 cup</p>
+                        </div>`
+                    },
+                    {
+                        title: 'Fractions to Decimals',
+                        content: `<p>Converting fractions to decimals means dividing the top by the bottom.</p>
+                        <div class="example-box">
+                            <h4>Common Conversions</h4>
+                            <p class="solution">1/2 = 0.5<br>1/4 = 0.25<br>3/4 = 0.75<br>1/3 ≈ 0.33<br>2/3 ≈ 0.67</p>
+                        </div>
+                        <div class="example-box">
+                            <h4>How to Convert</h4>
+                            <p class="problem">Convert 3/4 to a decimal</p>
+                            <p class="solution">3 ÷ 4 = 0.75</p>
+                        </div>`
+                    },
+                    {
+                        title: 'Adding Fractions',
+                        content: `<p>When adding fractions with the same denominator, just add the numerators.</p>
+                        <div class="example-box">
+                            <h4>Same Denominator</h4>
+                            <p class="problem">1/4 + 2/4 = ?</p>
+                            <p class="solution">1/4 + 2/4 = 3/4</p>
+                        </div>
+                        <div class="example-box">
+                            <h4>Kitchen Example</h4>
+                            <p class="problem">You add 1/8 cup sugar, then another 3/8 cup. Total?</p>
+                            <p class="solution">1/8 + 3/8 = 4/8 = 1/2 cup</p>
+                        </div>`
+                    },
+                    {
+                        title: 'Multiplying Fractions',
+                        content: `<p>To multiply fractions, multiply the tops together and the bottoms together.</p>
+                        <div class="example-box">
+                            <h4>Example</h4>
+                            <p class="problem">1/2 x 3/4 = ?</p>
+                            <p class="solution">1 x 3 = 3 (top)<br>2 x 4 = 8 (bottom)<br>Answer: 3/8</p>
+                        </div>
+                        <div class="example-box">
+                            <h4>Halving a Recipe</h4>
+                            <p class="problem">Recipe calls for 3/4 cup. You're making half. 1/2 x 3/4 = ?</p>
+                            <p class="solution">1/2 x 3/4 = 3/8 cup</p>
+                        </div>`
+                    },
+                    {
+                        title: 'Ready for Measurement Challenges!',
+                        content: `<p>Key skills for the test:</p>
+                        <ul style="margin-left: 20px; line-height: 2;">
+                            <li>Convert fractions to decimals (divide top by bottom)</li>
+                            <li>Add fractions (same denominator: add tops)</li>
+                            <li>Multiply fractions (multiply tops, multiply bottoms)</li>
+                            <li>Simplify when possible (3/6 = 1/2)</li>
+                        </ul>`
+                    }
+                ]
+            },
+            {
+                id: 5,
+                title: 'Balancing Equations',
+                theme: 'Recipe Scaling (Balance Scale)',
+                icon: '⚖️',
+                description: 'Keep recipes balanced by doing the same thing to both sides - the foundation of algebra!',
+                lessons: [
+                    {
+                        title: 'The Balance Scale Principle',
+                        content: `<p>Imagine a balance scale with ingredients on both sides. To keep it balanced, whatever you do to one side, you must do to the other!</p>
+                        <div class="example-box">
+                            <h4>The Rule</h4>
+                            <p class="solution">If you add 5 to the left side, add 5 to the right side.<br>If you multiply the left by 2, multiply the right by 2.</p>
+                        </div>
+                        <p>This is the fundamental rule of solving equations!</p>`
+                    },
+                    {
+                        title: 'Balancing with Addition',
+                        content: `<p>When you subtract from one side, subtract from the other to keep balance.</p>
+                        <div class="example-box">
+                            <h4>Example</h4>
+                            <p class="problem">x + 5 = 12</p>
+                            <p class="solution">Subtract 5 from BOTH sides:<br>x + 5 - 5 = 12 - 5<br>x = 7</p>
+                        </div>
+                        <div class="tip-box">
+                            <h4>Chef's Tip</h4>
+                            <p>The +5 and -5 on the left cancel out, leaving just x!</p>
+                        </div>`
+                    },
+                    {
+                        title: 'Balancing with Multiplication',
+                        content: `<p>When you have multiplication, divide both sides to balance.</p>
+                        <div class="example-box">
+                            <h4>Example</h4>
+                            <p class="problem">3x = 21</p>
+                            <p class="solution">Divide BOTH sides by 3:<br>3x ÷ 3 = 21 ÷ 3<br>x = 7</p>
+                        </div>
+                        <div class="example-box">
+                            <h4>Kitchen Example</h4>
+                            <p class="problem">Tripling a recipe uses 24 eggs. Original recipe?</p>
+                            <p class="solution">3x = 24<br>x = 24 ÷ 3 = 8 eggs</p>
+                        </div>`
+                    },
+                    {
+                        title: 'Two-Step Balancing',
+                        content: `<p>Sometimes you need two operations to isolate x.</p>
+                        <div class="example-box">
+                            <h4>Example</h4>
+                            <p class="problem">2x + 3 = 11</p>
+                            <p class="solution">Step 1: Subtract 3 from both sides:<br>2x + 3 - 3 = 11 - 3<br>2x = 8<br><br>Step 2: Divide both sides by 2:<br>2x ÷ 2 = 8 ÷ 2<br>x = 4</p>
+                        </div>`
+                    },
+                    {
+                        title: 'Master Chef Balance!',
+                        content: `<p>Remember the golden rule:</p>
+                        <div class="example-box">
+                            <h4>Whatever you do to one side, do to the other!</h4>
+                            <p class="solution">• Add → Add<br>• Subtract → Subtract<br>• Multiply → Multiply<br>• Divide → Divide</p>
+                        </div>
+                        <p style="margin-top: 20px;">This keeps the equation balanced and helps you find x!</p>`
+                    }
+                ]
+            }
+        ];
+
+        // ==================== STATE ====================
+        let currentStudent = null;
+        let currentModule = null;
+        let currentStage = null; // 'lesson', 'practice', 'test'
+        let lessonStep = 0;
+        let practiceIndex = 0;
+        let practiceCorrect = 0;
+        let testIndex = 0;
+        let testCorrect = 0;
+        let currentProblems = [];
+        let hasAnswered = false; // Prevent double-submission
+
+        // ==================== HELPER FUNCTIONS ====================
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function randInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function pickRandom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        // ==================== DYNAMIC PROBLEM GENERATORS ====================
+
+        // Module 1: Basic Operations
+        function generateBasicOpsProblem() {
+            const contexts = {
+                add: [
+                    (a, b) => ({ context: `You have ${a} apples and buy ${b} more.`, hint: 'Add the two amounts together.' }),
+                    (a, b) => ({ context: `Add ${a} carrots to ${b} carrots already in the pot.`, hint: 'Combine the amounts.' }),
+                    (a, b) => ({ context: `${a} cookies on one tray, ${b} on another.`, hint: 'Add both trays together.' }),
+                    (a, b) => ({ context: `Mix ${a} red peppers with ${b} green peppers.`, hint: 'Add the peppers together.' })
+                ],
+                subtract: [
+                    (a, b) => ({ context: `You have ${a} eggs and use ${b} for the cake.`, hint: 'Subtract to find what remains.' }),
+                    (a, b) => ({ context: `Start with ${a} muffins, eat ${b}.`, hint: 'Subtract to find how many are left.' }),
+                    (a, b) => ({ context: `You need ${a} cupcakes but only made ${b}.`, hint: 'Subtract to find how many more needed.' }),
+                    (a, b) => ({ context: `${a} strawberries minus ${b} eaten.`, hint: 'Subtract the eaten amount.' })
+                ],
+                multiply: [
+                    (a, b) => ({ context: `Each pizza needs ${a} cups of cheese. You make ${b} pizzas.`, hint: 'Multiply cups by pizzas.' }),
+                    (a, b) => ({ context: `${a} batches of cookies, ${b} per batch.`, hint: 'Multiply batches by cookies per batch.' }),
+                    (a, b) => ({ context: `${a} chefs each make ${b} dishes.`, hint: 'Multiply chefs by dishes.' }),
+                    (a, b) => ({ context: `Each cupcake needs ${a} tablespoons of frosting. Making ${b} cupcakes.`, hint: 'Multiply to find total frosting.' })
+                ],
+                divide: [
+                    (a, b) => ({ context: `Split ${a} cookies among ${b} plates.`, hint: 'Divide total by number of plates.' }),
+                    (a, b) => ({ context: `${a} grapes divided into ${b} servings.`, hint: 'Divide total by servings.' }),
+                    (a, b) => ({ context: `Share ${a} strawberries equally among ${b} desserts.`, hint: 'Divide to find amount per dessert.' }),
+                    (a, b) => ({ context: `${a} slices of pizza for ${b} people.`, hint: 'Divide slices by people.' })
+                ]
+            };
+
+            const opType = pickRandom(['add', 'subtract', 'multiply', 'divide']);
+            let a, b, answer, equation;
+
+            switch (opType) {
+                case 'add':
+                    a = randInt(5, 25);
+                    b = randInt(3, 20);
+                    answer = a + b;
+                    equation = `${a} + ${b} = ?`;
+                    break;
+                case 'subtract':
+                    a = randInt(12, 30);
+                    b = randInt(3, a - 1);
+                    answer = a - b;
+                    equation = `${a} - ${b} = ?`;
+                    break;
+                case 'multiply':
+                    a = randInt(2, 9);
+                    b = randInt(2, 12);
+                    answer = a * b;
+                    equation = `${a} × ${b} = ?`;
+                    break;
+                case 'divide':
+                    b = randInt(2, 9);
+                    answer = randInt(2, 10);
+                    a = b * answer;
+                    equation = `${a} ÷ ${b} = ?`;
+                    break;
+            }
+
+            const template = pickRandom(contexts[opType]);
+            const { context, hint } = template(a, b);
+            return { context, equation, answer, hint };
+        }
+
+        // Module 2: Pre-Algebra (Missing Ingredients)
+        function generatePreAlgebraProblem() {
+            const templates = [
+                // x + a = b
+                () => {
+                    const answer = randInt(3, 20);
+                    const a = randInt(2, 15);
+                    const b = answer + a;
+                    return {
+                        context: 'Find the missing amount.',
+                        equation: `x + ${a} = ${b}`,
+                        answer,
+                        hint: `Subtract ${a} from both sides.`
+                    };
+                },
+                // x - a = b
+                () => {
+                    const answer = randInt(10, 30);
+                    const a = randInt(2, answer - 3);
+                    const b = answer - a;
+                    return {
+                        context: 'Find how much you started with.',
+                        equation: `x - ${a} = ${b}`,
+                        answer,
+                        hint: `Add ${a} to both sides.`
+                    };
+                },
+                // ax = b
+                () => {
+                    const a = randInt(2, 8);
+                    const answer = randInt(2, 12);
+                    const b = a * answer;
+                    return {
+                        context: `Each batch uses x cups. ${a} batches use ${b} cups total.`,
+                        equation: `${a}x = ${b}`,
+                        answer,
+                        hint: `Divide both sides by ${a}.`
+                    };
+                },
+                // x ÷ a = b
+                () => {
+                    const a = randInt(2, 8);
+                    const b = randInt(2, 10);
+                    const answer = a * b;
+                    return {
+                        context: 'Split equally, find the original amount.',
+                        equation: `x ÷ ${a} = ${b}`,
+                        answer,
+                        hint: `Multiply both sides by ${a}.`
+                    };
+                },
+                // a - x = b
+                () => {
+                    const a = randInt(15, 30);
+                    const answer = randInt(3, a - 5);
+                    const b = a - answer;
+                    return {
+                        context: `You used some from ${a}, now have ${b} left.`,
+                        equation: `${a} - x = ${b}`,
+                        answer,
+                        hint: `What subtracted from ${a} gives ${b}?`
+                    };
+                }
+            ];
+
+            return pickRandom(templates)();
+        }
+
+        // Module 3: Order of Operations (PEMDAS)
+        function generatePEMDASProblem() {
+            const templates = [
+                // a + b × c
+                () => {
+                    const a = randInt(2, 10);
+                    const b = randInt(2, 6);
+                    const c = randInt(2, 6);
+                    return {
+                        context: 'Calculate using order of operations.',
+                        equation: `${a} + ${b} × ${c} = ?`,
+                        answer: a + (b * c),
+                        hint: `Multiply first: ${b} × ${c} = ${b * c}, then add ${a}.`
+                    };
+                },
+                // (a + b) × c
+                () => {
+                    const a = randInt(2, 8);
+                    const b = randInt(2, 8);
+                    const c = randInt(2, 5);
+                    return {
+                        context: 'Parentheses first!',
+                        equation: `(${a} + ${b}) × ${c} = ?`,
+                        answer: (a + b) * c,
+                        hint: `Parentheses first: ${a} + ${b} = ${a + b}, then multiply by ${c}.`
+                    };
+                },
+                // a - b × c
+                () => {
+                    const b = randInt(2, 5);
+                    const c = randInt(2, 5);
+                    const a = randInt(b * c + 2, b * c + 15);
+                    return {
+                        context: 'Calculate the total time.',
+                        equation: `${a} - ${b} × ${c} = ?`,
+                        answer: a - (b * c),
+                        hint: `Multiply first: ${b} × ${c} = ${b * c}, then subtract from ${a}.`
+                    };
+                },
+                // a × (b - c)
+                () => {
+                    const a = randInt(2, 5);
+                    const b = randInt(8, 15);
+                    const c = randInt(2, b - 2);
+                    return {
+                        context: 'Recipe timing calculation.',
+                        equation: `${a} × (${b} - ${c}) = ?`,
+                        answer: a * (b - c),
+                        hint: `Parentheses first: ${b} - ${c} = ${b - c}, then multiply by ${a}.`
+                    };
+                },
+                // a ÷ b + c
+                () => {
+                    const b = randInt(2, 6);
+                    const quotient = randInt(2, 8);
+                    const a = b * quotient;
+                    const c = randInt(2, 10);
+                    return {
+                        context: 'Multiple steps combined.',
+                        equation: `${a} ÷ ${b} + ${c} = ?`,
+                        answer: quotient + c,
+                        hint: `Divide first: ${a} ÷ ${b} = ${quotient}, then add ${c}.`
+                    };
+                },
+                // a + b ÷ c
+                () => {
+                    const c = randInt(2, 6);
+                    const quotient = randInt(2, 8);
+                    const b = c * quotient;
+                    const a = randInt(2, 10);
+                    return {
+                        context: 'Complex timing.',
+                        equation: `${a} + ${b} ÷ ${c} = ?`,
+                        answer: a + quotient,
+                        hint: `Divide first: ${b} ÷ ${c} = ${quotient}, then add ${a}.`
+                    };
+                },
+                // (a + b) ÷ c
+                () => {
+                    const c = randInt(2, 6);
+                    const quotient = randInt(2, 8);
+                    const sum = c * quotient;
+                    const a = randInt(2, sum - 2);
+                    const b = sum - a;
+                    return {
+                        context: 'Divide after adding.',
+                        equation: `(${a} + ${b}) ÷ ${c} = ?`,
+                        answer: quotient,
+                        hint: `Parentheses first: ${a} + ${b} = ${sum}, then divide by ${c}.`
+                    };
+                },
+                // a × b - c
+                () => {
+                    const a = randInt(2, 6);
+                    const b = randInt(2, 8);
+                    const c = randInt(2, a * b - 2);
+                    return {
+                        context: 'Scaling recipe time.',
+                        equation: `${a} × ${b} - ${c} = ?`,
+                        answer: (a * b) - c,
+                        hint: `Multiply first: ${a} × ${b} = ${a * b}, then subtract ${c}.`
+                    };
+                },
+                // a × b + c × d
+                () => {
+                    const a = randInt(2, 5);
+                    const b = randInt(2, 5);
+                    const c = randInt(2, 5);
+                    const d = randInt(2, 5);
+                    return {
+                        context: 'Multiple batches.',
+                        equation: `${a} × ${b} + ${c} × ${d} = ?`,
+                        answer: (a * b) + (c * d),
+                        hint: `Both multiplications first: ${a * b} + ${c * d}.`
+                    };
+                }
+            ];
+
+            return pickRandom(templates)();
+        }
+
+        // Module 4: Fractions & Decimals
+        function generateFractionsProblem() {
+            const fractions = [
+                { frac: '1/2', dec: 0.5 },
+                { frac: '1/4', dec: 0.25 },
+                { frac: '3/4', dec: 0.75 },
+                { frac: '1/5', dec: 0.2 },
+                { frac: '2/5', dec: 0.4 },
+                { frac: '3/5', dec: 0.6 },
+                { frac: '4/5', dec: 0.8 },
+                { frac: '1/8', dec: 0.125 },
+                { frac: '3/8', dec: 0.375 },
+                { frac: '5/8', dec: 0.625 },
+                { frac: '1/10', dec: 0.1 },
+                { frac: '3/10', dec: 0.3 }
+            ];
+
+            const templates = [
+                // Convert fraction to decimal
+                () => {
+                    const f = pickRandom(fractions);
+                    return {
+                        context: 'Convert to decimal:',
+                        equation: `${f.frac} = ?`,
+                        answer: f.dec,
+                        hint: 'Divide the numerator by the denominator.'
+                    };
+                },
+                // Add two fractions (same denominator, answer as decimal)
+                () => {
+                    const denoms = [4, 8, 5, 10];
+                    const d = pickRandom(denoms);
+                    const a = randInt(1, d - 2);
+                    const b = randInt(1, d - a);
+                    const answer = (a + b) / d;
+                    return {
+                        context: 'Add the fractions (answer as decimal):',
+                        equation: `${a}/${d} + ${b}/${d} = ?`,
+                        answer: Math.round(answer * 1000) / 1000,
+                        hint: `${a}/${d} + ${b}/${d} = ${a + b}/${d} = ${answer}`
+                    };
+                },
+                // Add decimals
+                () => {
+                    const a = pickRandom([0.25, 0.5, 0.75, 0.1, 0.2, 0.3]);
+                    const b = pickRandom([0.25, 0.5, 0.75, 0.1, 0.2, 0.3]);
+                    return {
+                        context: 'Add the amounts:',
+                        equation: `${a} + ${b} = ?`,
+                        answer: Math.round((a + b) * 1000) / 1000,
+                        hint: 'Add the decimals directly.'
+                    };
+                },
+                // Multiply decimals
+                () => {
+                    const a = pickRandom([0.5, 2, 3, 4]);
+                    const b = pickRandom([0.25, 0.5, 0.75]);
+                    return {
+                        context: 'Multiply the measurements:',
+                        equation: `${a} × ${b} = ?`,
+                        answer: Math.round((a * b) * 1000) / 1000,
+                        hint: 'Multiply the two numbers.'
+                    };
+                },
+                // Double an amount
+                () => {
+                    const f = pickRandom(fractions.filter(x => x.dec <= 0.5));
+                    return {
+                        context: 'Double the amount (answer as decimal):',
+                        equation: `2 × ${f.frac} = ?`,
+                        answer: Math.round((2 * f.dec) * 1000) / 1000,
+                        hint: `Double ${f.dec}.`
+                    };
+                },
+                // Half of a fraction
+                () => {
+                    const options = [
+                        { frac: '1/2', answer: 0.25 },
+                        { frac: '3/4', answer: 0.375 },
+                        { frac: '1/4', answer: 0.125 }
+                    ];
+                    const choice = pickRandom(options);
+                    return {
+                        context: 'Half of this amount (as decimal):',
+                        equation: `1/2 × ${choice.frac} = ?`,
+                        answer: choice.answer,
+                        hint: 'Multiply the fraction by 1/2, or divide by 2.'
+                    };
+                },
+                // Add mixed (fraction + decimal as decimal)
+                () => {
+                    const f = pickRandom(fractions.filter(x => x.dec <= 0.5));
+                    const d = pickRandom([0.25, 0.5, 0.1, 0.2]);
+                    return {
+                        context: 'Add (answer as decimal):',
+                        equation: `${f.frac} + ${d} = ?`,
+                        answer: Math.round((f.dec + d) * 1000) / 1000,
+                        hint: `Convert ${f.frac} to ${f.dec}, then add ${d}.`
+                    };
+                }
+            ];
+
+            return pickRandom(templates)();
+        }
+
+        // Module 5: Balancing Equations
+        function generateBalancingProblem() {
+            const templates = [
+                // x + a = b
+                () => {
+                    const answer = randInt(5, 25);
+                    const a = randInt(3, 15);
+                    const b = answer + a;
+                    return {
+                        context: `Solve by subtracting ${a} from both sides:`,
+                        equation: `x + ${a} = ${b}`,
+                        answer,
+                        hint: `x = ${b} - ${a}`
+                    };
+                },
+                // x - a = b
+                () => {
+                    const answer = randInt(10, 30);
+                    const a = randInt(3, 12);
+                    const b = answer - a;
+                    return {
+                        context: `Solve by adding ${a} to both sides:`,
+                        equation: `x - ${a} = ${b}`,
+                        answer,
+                        hint: `x = ${b} + ${a}`
+                    };
+                },
+                // ax = b
+                () => {
+                    const a = randInt(2, 8);
+                    const answer = randInt(3, 12);
+                    const b = a * answer;
+                    return {
+                        context: `Solve by dividing both sides by ${a}:`,
+                        equation: `${a}x = ${b}`,
+                        answer,
+                        hint: `x = ${b} ÷ ${a}`
+                    };
+                },
+                // x ÷ a = b
+                () => {
+                    const a = randInt(2, 8);
+                    const b = randInt(3, 10);
+                    const answer = a * b;
+                    return {
+                        context: `Solve by multiplying both sides by ${a}:`,
+                        equation: `x ÷ ${a} = ${b}`,
+                        answer,
+                        hint: `x = ${b} × ${a}`
+                    };
+                },
+                // ax + b = c (two-step)
+                () => {
+                    const a = randInt(2, 5);
+                    const answer = randInt(2, 10);
+                    const b = randInt(2, 10);
+                    const c = (a * answer) + b;
+                    return {
+                        context: `Two steps: subtract ${b}, then divide by ${a}:`,
+                        equation: `${a}x + ${b} = ${c}`,
+                        answer,
+                        hint: `${a}x = ${c - b}, then x = ${answer}`
+                    };
+                },
+                // ax - b = c (two-step)
+                () => {
+                    const a = randInt(2, 5);
+                    const answer = randInt(3, 10);
+                    const b = randInt(2, 8);
+                    const c = (a * answer) - b;
+                    return {
+                        context: `Two steps: add ${b}, then divide by ${a}:`,
+                        equation: `${a}x - ${b} = ${c}`,
+                        answer,
+                        hint: `${a}x = ${c + b}, then x = ${answer}`
+                    };
+                }
+            ];
+
+            return pickRandom(templates)();
+        }
+
+        // Master generator function
+        function generateProblems(moduleId, count = 10) {
+            const generators = {
+                1: generateBasicOpsProblem,
+                2: generatePreAlgebraProblem,
+                3: generatePEMDASProblem,
+                4: generateFractionsProblem,
+                5: generateBalancingProblem
+            };
+
+            const generator = generators[moduleId];
+            const problems = [];
+            for (let i = 0; i < count; i++) {
+                problems.push(generator());
+            }
+            return problems;
+        }
+
+        function showScreen(screenId) {
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('loading-screen').classList.remove('active');
+            document.getElementById('dashboard').classList.remove('active');
+            document.getElementById('module-screen').classList.remove('active');
+
+            if (screenId === 'welcome') {
+                document.getElementById('welcome-screen').style.display = 'flex';
+            } else if (screenId === 'loading') {
+                document.getElementById('loading-screen').classList.add('active');
+            } else if (screenId === 'dashboard') {
+                document.getElementById('dashboard').classList.add('active');
+            } else if (screenId === 'module') {
+                document.getElementById('module-screen').classList.add('active');
+            }
+        }
+
+        // ==================== LOGIN FUNCTIONS ====================
+        async function startTraining() {
+            const mcpsId = document.getElementById('mcps-id-input').value.trim();
+            const errorDiv = document.getElementById('error-message');
+
+            if (!mcpsId || !/^\d+$/.test(mcpsId)) {
+                errorDiv.textContent = 'Please enter a valid MCPS ID (numbers only)';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            errorDiv.style.display = 'none';
+            showScreen('loading');
+
+            try {
+                // Try to get progress from Google Sheets
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=getTrainingProgress&mcpsId=${mcpsId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    currentStudent = {
+                        name: data.studentName,
+                        mcpsId: data.mcpsId,
+                        progress: data.progress,
+                        completedCount: data.completedCount,
+                        chefLevel: data.chefLevel
+                    };
+                } else {
+                    // Student not found, show error
+                    showScreen('welcome');
+                    errorDiv.textContent = data.message || 'Student not found. Please check your MCPS ID.';
+                    errorDiv.style.display = 'block';
+                    return;
+                }
+            } catch (error) {
+                console.error('Error fetching progress:', error);
+                // Fallback: allow offline mode with no saved progress
+                currentStudent = {
+                    name: 'Guest Chef',
+                    mcpsId: mcpsId,
+                    progress: { module1: null, module2: null, module3: null, module4: null, module5: null },
+                    completedCount: 0,
+                    chefLevel: 'Kitchen Trainee'
+                };
+            }
+
+            renderDashboard();
+            showScreen('dashboard');
+        }
+
+        function logout() {
+            currentStudent = null;
+            document.getElementById('mcps-id-input').value = '';
+            showScreen('welcome');
+        }
+
+        // ==================== DASHBOARD FUNCTIONS ====================
+        function renderDashboard() {
+            document.getElementById('student-name').textContent = currentStudent.name;
+            document.getElementById('chef-level').textContent = currentStudent.chefLevel;
+            document.getElementById('completed-count').textContent = currentStudent.completedCount;
+
+            const grid = document.getElementById('modules-grid');
+            grid.innerHTML = '';
+
+            modules.forEach(module => {
+                const isCompleted = currentStudent.progress[`module${module.id}`];
+                const card = document.createElement('div');
+                card.className = `module-card${isCompleted ? ' completed' : ''}`;
+
+                card.innerHTML = `
+                    ${isCompleted ? '<div class="completed-stamp">Complete</div>' : ''}
+                    <div class="module-icon">${module.icon}</div>
+                    <h3>Module ${module.id}: ${module.title}</h3>
+                    <div class="module-theme">${module.theme}</div>
+                    <p>${module.description}</p>
+                    <div class="module-buttons">
+                        <button class="module-btn learn" onclick="openModule(${module.id}, 'lesson')">Learn</button>
+                        <button class="module-btn practice" onclick="openModule(${module.id}, 'practice')">Practice</button>
+                        <button class="module-btn test" onclick="openModule(${module.id}, 'test')">${isCompleted ? 'Retake Test' : 'Test'}</button>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        // ==================== MODULE FUNCTIONS ====================
+        function openModule(moduleId, stage) {
+            currentModule = modules.find(m => m.id === moduleId);
+            currentStage = stage;
+
+            document.getElementById('module-title').innerHTML = `${currentModule.icon} Module ${currentModule.id}: ${currentModule.title}`;
+
+            updateStageIndicator();
+
+            if (stage === 'lesson') {
+                startLesson();
+            } else if (stage === 'practice') {
+                startPractice();
+            } else if (stage === 'test') {
+                startTest();
+            }
+
+            showScreen('module');
+        }
+
+        function updateStageIndicator() {
+            const stages = ['learn', 'practice', 'test'];
+            stages.forEach(s => {
+                const dot = document.getElementById(`stage-${s}`);
+                dot.classList.remove('active', 'completed');
+            });
+
+            if (currentStage === 'lesson') {
+                document.getElementById('stage-learn').classList.add('active');
+            } else if (currentStage === 'practice') {
+                document.getElementById('stage-learn').classList.add('completed');
+                document.getElementById('stage-practice').classList.add('active');
+            } else if (currentStage === 'test') {
+                document.getElementById('stage-learn').classList.add('completed');
+                document.getElementById('stage-practice').classList.add('completed');
+                document.getElementById('stage-test').classList.add('active');
+            }
+        }
+
+        function returnToDashboard() {
+            renderDashboard();
+            showScreen('dashboard');
+        }
+
+        // ==================== LESSON FUNCTIONS ====================
+        function startLesson() {
+            currentStage = 'lesson';
+            lessonStep = 0;
+            updateStageIndicator();
+
+            document.getElementById('lesson-content').style.display = 'block';
+            document.getElementById('practice-content').style.display = 'none';
+            document.getElementById('test-content').style.display = 'none';
+            document.getElementById('results-content').style.display = 'none';
+
+            renderLessonStep();
+        }
+
+        function renderLessonStep() {
+            const lesson = currentModule.lessons[lessonStep];
+            const content = document.getElementById('lesson-content');
+
+            content.innerHTML = `
+                <div class="lesson-step active">
+                    <h3>${lesson.title}</h3>
+                    ${lesson.content}
+                    <div class="lesson-nav">
+                        <button class="btn btn-secondary" onclick="prevLessonStep()" ${lessonStep === 0 ? 'disabled' : ''}>Previous</button>
+                        <span class="step-counter">Step ${lessonStep + 1} of ${currentModule.lessons.length}</span>
+                        ${lessonStep === currentModule.lessons.length - 1
+                            ? '<button class="btn btn-success" onclick="startPractice()">Start Practice</button>'
+                            : '<button class="btn" onclick="nextLessonStep()">Next</button>'}
+                    </div>
+                </div>
+            `;
+        }
+
+        function nextLessonStep() {
+            if (lessonStep < currentModule.lessons.length - 1) {
+                lessonStep++;
+                renderLessonStep();
+            }
+        }
+
+        function prevLessonStep() {
+            if (lessonStep > 0) {
+                lessonStep--;
+                renderLessonStep();
+            }
+        }
+
+        // ==================== PRACTICE FUNCTIONS ====================
+        function startPractice() {
+            currentStage = 'practice';
+            practiceIndex = 0;
+            practiceCorrect = 0;
+            currentProblems = generateProblems(currentModule.id, 10);
+            updateStageIndicator();
+
+            document.getElementById('lesson-content').style.display = 'none';
+            document.getElementById('practice-content').style.display = 'block';
+            document.getElementById('test-content').style.display = 'none';
+            document.getElementById('results-content').style.display = 'none';
+
+            renderPracticeProblem();
+        }
+
+        function renderPracticeProblem() {
+            const problem = currentProblems[practiceIndex];
+
+            document.getElementById('practice-problem-num').textContent = practiceIndex + 1;
+            document.getElementById('practice-progress').style.width = `${(practiceIndex / 10) * 100}%`;
+            document.getElementById('practice-context').textContent = problem.context;
+            document.getElementById('practice-equation').textContent = problem.equation;
+            document.getElementById('practice-answer').value = '';
+            document.getElementById('practice-answer').className = 'answer-input';
+            document.getElementById('practice-feedback').className = 'feedback';
+            document.getElementById('practice-feedback').textContent = '';
+            document.getElementById('hint-box').className = 'hint-box';
+            document.getElementById('hint-box').textContent = problem.hint;
+            document.getElementById('goto-test-btn').style.display = practiceIndex >= 9 ? 'inline-block' : 'none';
+
+            // Reset button to Check
+            const btn = document.getElementById('practice-btn');
+            btn.textContent = 'Check';
+            btn.onclick = checkPracticeAnswer;
+            hasAnswered = false;
+
+            document.getElementById('practice-answer').focus();
+        }
+
+        function showHint() {
+            document.getElementById('hint-box').classList.add('visible');
+        }
+
+        function checkPracticeAnswer() {
+            if (hasAnswered) return; // Prevent double-submission
+
+            const problem = currentProblems[practiceIndex];
+            const userAnswer = parseFloat(document.getElementById('practice-answer').value);
+            const feedback = document.getElementById('practice-feedback');
+            const input = document.getElementById('practice-answer');
+
+            if (isNaN(userAnswer)) {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = 'Please enter a number.';
+                return;
+            }
+
+            hasAnswered = true;
+
+            // Allow for floating point comparison
+            const isCorrect = Math.abs(userAnswer - problem.answer) < 0.01;
+
+            if (isCorrect) {
+                practiceCorrect++;
+                feedback.className = 'feedback correct';
+                feedback.textContent = 'Correct! Great job, chef!';
+                input.className = 'answer-input correct';
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = `Not quite. The answer is ${problem.answer}. Try the next one!`;
+                input.className = 'answer-input incorrect';
+            }
+
+            // Change button to Next Problem (or show Go to Test on last problem)
+            const btn = document.getElementById('practice-btn');
+            if (practiceIndex < 9) {
+                btn.textContent = 'Next Problem';
+                btn.onclick = nextPracticeProblem;
+            } else {
+                btn.style.display = 'none';
+            }
+            document.getElementById('goto-test-btn').style.display = 'inline-block';
+        }
+
+        function nextPracticeProblem() {
+            if (practiceIndex < 9) {
+                practiceIndex++;
+                renderPracticeProblem();
+            }
+        }
+
+        // ==================== TEST FUNCTIONS ====================
+        function startTest() {
+            currentStage = 'test';
+            testIndex = 0;
+            testCorrect = 0;
+            currentProblems = generateProblems(currentModule.id, 10);
+            updateStageIndicator();
+
+            document.getElementById('lesson-content').style.display = 'none';
+            document.getElementById('practice-content').style.display = 'none';
+            document.getElementById('test-content').style.display = 'block';
+            document.getElementById('results-content').style.display = 'none';
+
+            renderTestProblem();
+        }
+
+        function renderTestProblem() {
+            const problem = currentProblems[testIndex];
+
+            document.getElementById('test-problem-num').textContent = testIndex + 1;
+            document.getElementById('test-progress').style.width = `${(testIndex / 10) * 100}%`;
+            document.getElementById('test-context').textContent = problem.context;
+            document.getElementById('test-equation').textContent = problem.equation;
+            document.getElementById('test-answer').value = '';
+            document.getElementById('test-answer').className = 'answer-input';
+            document.getElementById('test-feedback').className = 'feedback';
+            document.getElementById('test-feedback').textContent = '';
+
+            // Reset button to Submit
+            const btn = document.getElementById('test-btn');
+            btn.textContent = 'Submit';
+            btn.onclick = submitTestAnswer;
+            btn.style.display = 'inline-block';
+            hasAnswered = false;
+
+            document.getElementById('test-answer').focus();
+        }
+
+        function submitTestAnswer() {
+            if (hasAnswered) return; // Prevent double-submission
+
+            const problem = currentProblems[testIndex];
+            const userAnswer = parseFloat(document.getElementById('test-answer').value);
+            const feedback = document.getElementById('test-feedback');
+            const input = document.getElementById('test-answer');
+
+            if (isNaN(userAnswer)) {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = 'Please enter a number.';
+                return;
+            }
+
+            hasAnswered = true;
+
+            const isCorrect = Math.abs(userAnswer - problem.answer) < 0.01;
+
+            if (isCorrect) {
+                testCorrect++;
+                feedback.className = 'feedback correct';
+                feedback.textContent = 'Correct!';
+                input.className = 'answer-input correct';
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = `Incorrect. The answer was ${problem.answer}.`;
+                input.className = 'answer-input incorrect';
+            }
+
+            // Change button to Next Problem or hide on last problem
+            const btn = document.getElementById('test-btn');
+            if (testIndex < 9) {
+                btn.textContent = 'Next Problem';
+                btn.onclick = nextTestProblem;
+            } else {
+                btn.style.display = 'none';
+                setTimeout(showResults, 1500);
+            }
+        }
+
+        function nextTestProblem() {
+            if (testIndex < 9) {
+                testIndex++;
+                renderTestProblem();
+            }
+        }
+
+        // ==================== RESULTS FUNCTIONS ====================
+        async function showResults() {
+            const passed = testCorrect >= 8;
+            const percentage = Math.round((testCorrect / 10) * 100);
+
+            document.getElementById('test-content').style.display = 'none';
+            document.getElementById('results-content').style.display = 'block';
+
+            const resultsScreen = document.getElementById('results-screen');
+            resultsScreen.className = `results-screen ${passed ? 'passed' : 'failed'}`;
+
+            if (passed) {
+                resultsScreen.innerHTML = `
+                    <div class="results-icon">🎉</div>
+                    <h3>Congratulations, Chef!</h3>
+                    <div class="score-display">${testCorrect}/10 (${percentage}%)</div>
+                    <p class="results-message">You've mastered ${currentModule.title}! Your progress has been saved.</p>
+                    <button class="btn btn-success" onclick="returnToDashboard()">Return to Dashboard</button>
+                `;
+
+                // Save progress to Google Sheets
+                try {
+                    const response = await fetch(`${APPS_SCRIPT_URL}?action=recordTrainingProgress&mcpsId=${currentStudent.mcpsId}&module=${currentModule.id}&passed=true`);
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Update local state
+                        currentStudent.progress[`module${currentModule.id}`] = data.completionDate || new Date().toLocaleDateString();
+                        currentStudent.completedCount++;
+
+                        // Update chef level
+                        if (currentStudent.completedCount === 5) {
+                            currentStudent.chefLevel = 'Certified Chef';
+                        } else if (currentStudent.completedCount >= 3) {
+                            currentStudent.chefLevel = 'Line Cook';
+                        } else if (currentStudent.completedCount >= 1) {
+                            currentStudent.chefLevel = 'Prep Cook';
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error saving progress:', error);
+                }
+            } else {
+                resultsScreen.innerHTML = `
+                    <div class="results-icon">📚</div>
+                    <h3>Keep Practicing!</h3>
+                    <div class="score-display">${testCorrect}/10 (${percentage}%)</div>
+                    <p class="results-message">You need 80% (8/10) to pass. Review the lesson and try again!</p>
+                    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                        <button class="btn btn-secondary" onclick="startLesson()">Review Lesson</button>
+                        <button class="btn" onclick="startTest()">Try Again</button>
+                    </div>
+                `;
+            }
+        }
+
+        // ==================== KEYBOARD SUPPORT ====================
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                if (currentStage === 'practice') {
+                    const btn = document.getElementById('practice-btn');
+                    if (btn.textContent === 'Next Problem') {
+                        nextPracticeProblem();
+                    } else {
+                        checkPracticeAnswer();
+                    }
+                } else if (currentStage === 'test') {
+                    const btn = document.getElementById('test-btn');
+                    if (btn.textContent === 'Next Problem') {
+                        nextTestProblem();
+                    } else {
+                        submitTestAnswer();
+                    }
+                }
+            }
+        });
+
+        // ==================== INITIALIZATION ====================
+        document.getElementById('mcps-id-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                startTraining();
+            }
+        });
+    </script>
+</body>
+</html>
