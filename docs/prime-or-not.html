@@ -281,10 +281,25 @@
         .continue-hint {
             text-align: center;
             font-size: 1rem;
-            color: #666;
+            color: #fff;
+            background: #666;
             margin-top: 15px;
+            padding: 12px 24px;
+            border-radius: 8px;
             font-weight: bold;
+            cursor: pointer;
             animation: pulse 1.5s ease-in-out infinite;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .continue-hint:hover {
+            background: #555;
+        }
+
+        .continue-hint:active {
+            background: #444;
+            transform: scale(0.98);
         }
 
         @keyframes pulse {
@@ -571,7 +586,7 @@
                 </div>
 
                 <div class="feedback-message" id="feedback"></div>
-                <div class="continue-hint" id="continueHint" style="display: none;">Press ENTER to continue</div>
+                <div class="continue-hint" id="continueHint" style="display: none;" onclick="moveToNext()">Tap or press ENTER to continue</div>
 
                 <div class="number-display">
                     <div class="number" id="currentNumber">42</div>
