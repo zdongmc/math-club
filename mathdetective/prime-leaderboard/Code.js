@@ -5,7 +5,7 @@
  * Scores are stored in a Google Sheet with columns:
  * A: Timestamp, B: Player Name, C: Min Range, D: Max Range,
  * E: Total Questions, F: Correct, G: Incorrect, H: Accuracy %,
- * I: Total Time (seconds), J: Time Display
+ * I: Total Time (milliseconds), J: Time Display
  */
 
 // IMPORTANT: Replace this with your actual Google Sheets ID
@@ -15,7 +15,7 @@ const SHEET_NAME = 'Leaderboard';
 /**
  * Submit a new score to the leaderboard
  */
-function submitScore(playerName, minRange, maxRange, correct, incorrect, totalSeconds) {
+function submitScore(playerName, minRange, maxRange, correct, incorrect, totalMilliseconds) {
   try {
     const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(SHEET_NAME);
 
@@ -28,9 +28,11 @@ function submitScore(playerName, minRange, maxRange, correct, incorrect, totalSe
 
     const totalQuestions = correct + incorrect;
     const accuracy = totalQuestions > 0 ? Math.round((correct / totalQuestions) * 100) : 0;
+    const totalSeconds = Math.floor(totalMilliseconds / 1000);
+    const milliseconds = totalMilliseconds % 1000;
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
-    const timeDisplay = `${minutes}:${String(seconds).padStart(2, '0')}`;
+    const timeDisplay = `${minutes}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
 
     // Add row to sheet
     sheet.appendRow([
@@ -42,7 +44,7 @@ function submitScore(playerName, minRange, maxRange, correct, incorrect, totalSe
       correct,
       incorrect,
       accuracy,
-      totalSeconds,
+      totalMilliseconds,
       timeDisplay
     ]);
 
@@ -90,7 +92,7 @@ function getLeaderboard(minRange, maxRange, totalQuestions, limit = 50) {
         correct: row[5],
         incorrect: row[6],
         accuracy: row[7],
-        totalSeconds: row[8],
+        totalMilliseconds: row[8],
         timeDisplay: row[9]
       }))
       .sort((a, b) => {
@@ -98,7 +100,7 @@ function getLeaderboard(minRange, maxRange, totalQuestions, limit = 50) {
         if (b.accuracy !== a.accuracy) {
           return b.accuracy - a.accuracy;
         }
-        return a.totalSeconds - b.totalSeconds;
+        return a.totalMilliseconds - b.totalMilliseconds;
       })
       .slice(0, limit);
 
@@ -182,7 +184,7 @@ function doPost(e) {
         data.maxRange,
         data.correct,
         data.incorrect,
-        data.totalSeconds
+        data.totalMilliseconds
       );
 
       return ContentService.createTextOutput(JSON.stringify(result))
@@ -223,7 +225,7 @@ function initializeSheet() {
       'Correct',
       'Incorrect',
       'Accuracy %',
-      'Total Time (seconds)',
+      'Total Time (milliseconds)',
       'Time Display'
     ];
 
@@ -262,11 +264,13 @@ function fixTimeDisplayFormat() {
 
     // Fix each row's time display
     for (let i = 1; i < data.length; i++) {
-      const totalSeconds = data[i][8]; // Column I: Total Time (seconds)
-      if (totalSeconds && typeof totalSeconds === 'number') {
+      const totalMilliseconds = data[i][8]; // Column I: Total Time (milliseconds)
+      if (totalMilliseconds && typeof totalMilliseconds === 'number') {
+        const totalSeconds = Math.floor(totalMilliseconds / 1000);
+        const milliseconds = totalMilliseconds % 1000;
         const minutes = Math.floor(totalSeconds / 60);
         const seconds = totalSeconds % 60;
-        const timeDisplay = `${minutes}:${String(seconds).padStart(2, '0')}`;
+        const timeDisplay = `${minutes}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
         sheet.getRange(i + 1, 10).setValue(timeDisplay); // Column J
       }
     }

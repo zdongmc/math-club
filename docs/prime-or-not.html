@@ -906,6 +906,7 @@
 
             const elapsed = Date.now() - gameState.startTime;
             const totalSeconds = Math.floor(elapsed / 1000);
+            const milliseconds = elapsed % 1000;
             const minutes = Math.floor(totalSeconds / 60);
             const seconds = totalSeconds % 60;
 
@@ -913,7 +914,7 @@
             const accuracy = total > 0 ? Math.round((gameState.correct / total) * 100) : 0;
 
             document.getElementById('totalTime').textContent =
-                `${minutes}:${String(seconds).padStart(2, '0')}`;
+                `${minutes}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
             document.getElementById('correctAnswers').textContent = gameState.correct;
             document.getElementById('incorrectAnswers').textContent = gameState.incorrect;
             document.getElementById('accuracy').textContent = `${accuracy}%`;
@@ -1015,7 +1016,6 @@
 
             try {
                 const elapsed = Date.now() - gameState.startTime;
-                const totalSeconds = Math.floor(elapsed / 1000);
 
                 const response = await fetch(LEADERBOARD_API_URL, {
                     method: 'POST',
@@ -1030,7 +1030,7 @@
                         maxRange: gameState.max,
                         correct: gameState.correct,
                         incorrect: gameState.incorrect,
-                        totalSeconds: totalSeconds
+                        totalMilliseconds: elapsed
                     })
                 });
 
