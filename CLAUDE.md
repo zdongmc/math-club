@@ -397,7 +397,7 @@ Located in `mathdetective/` directory (with copies in `docs/`):
 - `.clasp.json` - Clasp CLI deployment configuration (Script ID: 1OaLaE9nIdQpMUtn3bmqMQYXSi_iYqMOiqf27nJzllOf7oCXvwhr8TByu)
 - Google Sheet: https://docs.google.com/spreadsheets/d/19P1KPhQXMMsYEgx8dpmhZQynegf5iygu4nqLMNXU4ss
 - Sheet columns: A=Timestamp, B=Player Name, C=Min Range, D=Max Range, E=Total Questions, F=Correct, G=Incorrect, H=Accuracy %, I=Total Time (milliseconds), J=Time Display
-- **Leaderboard API URL**: https://script.google.com/macros/s/AKfycbyRCgVtXPepiKszzihrE6PmrarBXy8CEwvYR5G7PnsXYBNHxsDPLvV5m_ka14JwKLkL/exec
+- **Leaderboard API URL**: https://script.google.com/macros/s/AKfycbwqgiNs6ohsr0caANxdgY4QynVsIp1zeSX2KjnEE9U/exec (current HEAD deployment)
 
 **Time Tracking:**
 - Frontend sends full elapsed time in milliseconds to backend
