@@ -15,7 +15,7 @@ The repository is organized into focused directories:
 - **`mathcounts/`** - MATHCOUNTS competition tools and materials
 - **`MathLeague/`** - Math League meet timer and documentation
 - **`MOEMS/`** - MOEMS teaching materials and vocabulary activities
-- **`mathdetective/`** - Interactive math detective game and certificates
+- **`mathdetective/`** - Interactive games: Math Detective, Training Kitchen, Prime or Not; includes separate backend folders
 - **Root directory** - Configuration files (`.gitignore`, `CLAUDE.md`, `README.md`)
 
 ### Main Website Structure
@@ -66,7 +66,7 @@ Located in `math-club-attendance/` directory:
   - **Math Kangaroo**: Always displayed for all students. Shows either:
     - If registered: Green checkmark with "Registered for Math Kangaroo", competition date (March 19, 2026), and Math Kangaroo ID
     - If not registered: Yellow alert with complete registration instructions including invitation code (MDCLARK0003001@2026math), fees ($18 by Dec 31, $35 late), and competition date
-- `appsscript.json` - Apps Script configuration
+- `appsscript.json` - Apps Script configuration (must have `"access": "ANYONE_ANONYMOUS"` for public access)
 - `.clasp.json` - Clasp CLI configuration for deployment
 
 **Data Sources (Google Sheets):**
@@ -94,6 +94,7 @@ Located in `math-club-attendance/` directory:
   - Team score columns start at Column O: O=Team, P=Meet 1 Team score (out of 12), Q=Meet 1 Relay 1 (out of 8), R=Meet 1 Relay 2 (out of 8), S=Meet 1 Individual score (sum), T=Meet 1 total score (out of 64)
   - Meet 2-4 team scores follow same pattern: Meet 2 (U-Y), Meet 3 (Z-AD), Meet 4 (AE-AI)
   - Individual scores: "NA" = did not attend, number = score, blank = will attend but score pending
+  - Team assignment values: Team name (e.g., "Team A", "Team JV B") or "Individual" for students who only take Individual Round
   - Students are assigned teams per meet (not a single team for all meets)
   - Used for: Retrieving team assignments per meet, ARML tracking status, individual meet scores, and team meet scores by MCPS ID
 - **MATHCOUNTS** - MATHCOUNTS competition results
@@ -195,7 +196,7 @@ Located in `MathLeague/` directory:
   - Controls: Start/Pause/Reset buttons, keyboard shortcuts (Space to start, arrows to navigate)
   - Relay special: "4 minutes remaining - bonus window ended" announcement
 - **Slides**: Welcome, instructions for each round, timer for each round, completion summary
-- **Meet Dates 2025-2026**: Nov 14, Dec 12, Jan 16, Feb 13
+- **Meet Dates 2025-2026**: Nov 14, Dec 12, Jan 20, Feb 13
 
 **Additional Resources:**
 - `Math League Meet Information 2025-2026.pdf` - Meet logistics and schedule
@@ -253,6 +254,27 @@ Located in `mathdetective/` directory:
 - Python script to batch generate certificates
 - PDF output for printing
 
+**training-kitchen.html** - Cooking-themed math training game
+- 5 skill modules: Basic Operations, Pre-Algebra, PEMDAS, Fractions/Decimals, Balancing Equations
+- Each module has: Lesson (5 steps), Practice (10 problems with hints), Mastery Test (10 problems, 80% to pass)
+- MCPS ID login with student name lookup
+- Chef credential levels: Kitchen Trainee → Prep Cook → Line Cook → Certified Chef
+- Progress saved to Google Sheets via separate Apps Script backend
+- Test-out option: students can skip directly to Mastery Test for any module
+- Warm amber/cream color scheme with cooking theme
+- URL: https://script.google.com/macros/s/AKfycbyhI3zS593H2vHpPhbsgj5CZUHcUnYeISd_8rPLPcWX81jHf92a4N6KCUW2PtpRWqt4/exec
+
+**training-kitchen-backend/** - Separate Apps Script backend for Training Kitchen
+- `Code.js` - Backend functions for student lookup and progress tracking
+  - `lookupStudent(mcpsId)` - Looks up student name from parent portal sheet (read-only)
+  - `getProgress(mcpsId)` - Retrieves student's module completion dates
+  - `saveProgress(mcpsId, studentName, module)` - Records module completion
+- `appsscript.json` - Apps Script configuration with public access
+- `.clasp.json` - Deployment configuration (Script ID: 1UylPA2eIg_OvElEziMy20NZs6SgbKO3UvcUHRAGnIeCHSz58DYzEhBl_)
+- Google Sheet: https://docs.google.com/spreadsheets/d/1MSYlXi37I9x4PMSpf8ovtmq6zLMwY_-vK7SBlydCjnI
+- Sheet columns: A=Student Name, B=MCPS ID, C-G=Module 1-5 completion dates
+- Pattern: Separate Apps Script project for each standalone game (like prime-or-not)
+
 ### Navigation System
 The `header-template.js` (in `docs/` directory) provides a shared navigation component for all pages:
 - Navigation items: Announcements, Club Info, Competition Info, Registration & Records
@@ -306,10 +328,14 @@ The repository is organized into the following directories:
   - Vocabulary activities and reference documents
   - Preparatory guide PDF
 
-- **`mathdetective/`** - Math Detective game files
+- **`mathdetective/`** - Math Detective game, Training Kitchen, and Prime or Not game
   - Interactive game, classroom version, certificates
   - Answer keys and final challenges
   - Python certificate generator
+  - `training-kitchen.html` - Cooking-themed math training game
+  - `training-kitchen-backend/` - Separate Apps Script backend for Training Kitchen progress tracking
+  - `prime-or-not.html` - Prime number recognition game
+  - `prime-leaderboard/` - Separate Apps Script backend for Prime or Not leaderboard
 
 **General Principles:**
 - All HTML files are self-contained with embedded CSS and JavaScript
@@ -329,6 +355,55 @@ The repository is organized into the following directories:
 - **Math League**: Interactive timer slides in `MathLeague/math-league-meet-slides.html` - fully standalone, no external dependencies
 - **MOEMS**: Teaching materials in `MOEMS/` directory
 - **Math Detective**: Game files in `mathdetective/` directory - all self-contained HTML files
+- **Training Kitchen**: `mathdetective/training-kitchen.html` with separate backend in `mathdetective/training-kitchen-backend/`
+
+### Standalone Games with Separate Apps Script Projects
+Games that need Google Sheets integration but should be separate from the parent portal use their own Apps Script project:
+- **Pattern**: Each game has its own `-backend/` folder with `Code.js`, `appsscript.json`, `.clasp.json`
+- **Examples**: `prime-leaderboard/`, `training-kitchen-backend/`
+- **Benefits**: Separate deployments, separate Google Sheets, no coupling with parent portal
+- **Deployment**: Use `clasp push --force` to push code changes, then `clasp deploy --description "description"` to create new deployment
+
+### Prime or Not Game
+Located in `mathdetective/` directory (with copies in `docs/`):
+
+**prime-or-not.html** - Main interactive prime number recognition game
+- Students determine if displayed numbers are prime or composite
+- **Settings Screen**: Player name, customizable number range (1-300), number of questions
+- **Quick Presets**: 1-20, 1-50, 1-100, 1-200, 50-150, 100-300
+- **Gameplay**: Display numbers one at a time, click "Prime" or "Not Prime" button
+- **Keyboard Controls**: Left Arrow = Prime, Right Arrow = Not Prime
+- **Feedback System**:
+  - Correct answers: Auto-advance after confirmation
+  - Incorrect answers: Show prime factorization (e.g., "42 = 2 × 3 × 7"), require manual advancement
+- **Results Screen**: Total time (MM:SS.MSS format with millisecond precision), correct/incorrect count, accuracy percentage, performance message
+- **Mobile Friendly**: Responsive design, touch-optimized buttons, viewport meta tag
+- Two copies: `docs/prime-or-not.html` and `mathdetective/prime-or-not.html`
+
+**prime-or-not-leaderboard.html** - Leaderboard display
+- View top 50 scores filtered by number range and question count
+- Scores sorted by accuracy (descending), then time (ascending)
+- Medal indicators: Gold (🥇), Silver (🥈), Bronze (🥉)
+- Two copies: `docs/prime-or-not-leaderboard.html` and `mathdetective/prime-or-not-leaderboard.html`
+
+**prime-leaderboard/** - Separate Apps Script backend for leaderboard
+- `Code.js` - Backend functions
+  - `submitScore()` - Stores scores with millisecond precision time tracking
+  - `getLeaderboard()` - Retrieves and sorts scores by accuracy and time
+  - `getAvailableRanges()` - Lists all unique ranges with scores
+  - `initializeSheet()` - Sets up Google Sheet with proper headers
+  - `fixTimeDisplayFormat()` - Utility to reformat existing time data
+- `appsscript.json` - Apps Script configuration with public access
+- `.clasp.json` - Clasp CLI deployment configuration (Script ID: 1OaLaE9nIdQpMUtn3bmqMQYXSi_iYqMOiqf27nJzllOf7oCXvwhr8TByu)
+- Google Sheet: https://docs.google.com/spreadsheets/d/19P1KPhQXMMsYEgx8dpmhZQynegf5iygu4nqLMNXU4ss
+- Sheet columns: A=Timestamp, B=Player Name, C=Min Range, D=Max Range, E=Total Questions, F=Correct, G=Incorrect, H=Accuracy %, I=Total Time (milliseconds), J=Time Display
+- **Leaderboard API URL**: https://script.google.com/macros/s/AKfycbyRCgVtXPepiKszzihrE6PmrarBXy8CEwvYR5G7PnsXYBNHxsDPLvV5m_ka14JwKLkL/exec
+
+**Time Tracking:**
+- Frontend sends full elapsed time in milliseconds to backend
+- Backend stores millisecond precision for accurate sorting
+- Time display format: MM:SS.MSS (e.g., 2:34.567 = 2 minutes, 34 seconds, 567 milliseconds)
+- Allows differentiation of scores even when students finish in the same second
 
 ### Working with Parent Portal (Apps Script)
 **Deployment Process:**
@@ -353,12 +428,13 @@ The repository is organized into the following directories:
 - Date columns contain `true` values or timestamp strings like "time - meeting type"
 - Competition sign-ups parsed from "Form Responses 2" sheet by MCPS ID
 - Always displays all 4 competitions (signed up or not)
-- **MOEMS**: Shows 5 individual contests (Nov 21, Dec 19, Jan 9, Feb 6, Mar 6) with Yes/No. For signed-up contests, displays results in blue box (score out of 5, "Score Pending", or "Did Not Attend"). Shows total score in gold box if available.
-- **Math League**: Organized by meets in gray containers. Shows team assignment and ARML tracking at top. Each meet (Nov 14, Dec 12, Jan 16, Feb 13) displays:
-  - Sign-up status badge (Signed Up/Not Signed Up)
+- **MOEMS**: Shows 5 individual contests (Nov 21, Dec 19, Jan 9, Feb 6, Mar 6). Sign-up status (Yes/No) only shown for future contests (Contests 4-5). For signed-up contests, displays results in blue box (score out of 5, "Score Pending", or "Did Not Attend"). Shows total score in gold box if available.
+- **Math League**: Organized by meets in gray containers. Shows team assignment and ARML tracking at top. Each meet (Nov 14, Dec 12, Jan 20, Feb 13) displays:
+  - Sign-up status badge (only for future meets - Meet #4)
   - Individual results in blue box if available (score out of 6 or "Did Not Attend")
   - Team results in gold box if available (Team Score/12, Relay 1/8, Relay 2/8, Team Individual Score, Team Total/64)
-- **MATHCOUNTS**: Displays signup details and competition results if available (Sprint/Target/Individual scores out of 30/16/46, rank, chapter advancement status)
+  - **Individual-only students**: If team column says "Individual", shows "Individual Round Only" label and only displays individual score (no team results)
+- **MATHCOUNTS**: Displays competition results if available (Sprint/Target/Individual scores out of 30/16/46, rank, chapter advancement status). Sign-up status no longer shown since competition has occurred.
 - **AMC 8**: Displays "January 23, 2026"
 
 **Data Quality Requirements:**
@@ -373,6 +449,7 @@ The repository is organized into the following directories:
 
 **Important Notes:**
 - Web app deployment must be set to "Execute as: Me" and "Who has access: Anyone" (via web UI)
+- For public access, `appsscript.json` must have `"access": "ANYONE_ANONYMOUS"` in the webapp section
 - Changes require manual deployment update (not automatic with clasp push)
 - Test function `testLookup190949()` available for debugging in Apps Script editor
 - Current stable deployment URL must not change - always edit existing deployment, never create new one
