@@ -409,16 +409,17 @@ Located in `mathdetective/` directory (with copies in `docs/`):
 **Deployment Process:**
 1. Make changes to files in `math-club-attendance/` directory
 2. Push changes using `clasp push --force` (requires clasp CLI and authentication with correct Google account)
-3. **IMPORTANT**: Pushing code only updates the script files, NOT the live deployment
-4. To update the live URL, must manually update deployment in Apps Script web UI:
+3. **IMPORTANT**: Do NOT create new deployments. Always update the existing stable deployment.
+4. To update the live URL, update the existing deployment in Apps Script web UI:
    - Go to https://script.google.com/home
    - Open the parent portal project
    - Click **Deploy** → **Manage deployments**
-   - Click **Edit** (pencil icon) next to the deployment ending in `...Y9udIEskvIMJ`
-   - Select **"New version"** from dropdown
-   - Add a description
+   - Click **Edit** (pencil icon) next to the EXISTING deployment ending in `...Y9udIEskvIMJ` (the stable public URL)
+   - Select the new version number from dropdown (e.g., @79, @80, etc.)
+   - Add a description for the changes
    - Click **Deploy**
-5. This keeps the same URL stable while updating the code
+5. **CRITICAL**: This keeps the same URL (ending in `...Y9udIEskvIMJ`) stable for `registration.html` while updating the code version
+6. DO NOT use `clasp deploy` - this creates new deployment IDs. Use only `clasp push --force` to update code
 
 **Key Implementation Details:**
 - MCPS IDs can be variable length (not just 6 digits) - validation uses `/^\d+$/`
@@ -435,7 +436,7 @@ Located in `mathdetective/` directory (with copies in `docs/`):
   - Team results in gold box if available (Team Score/12, Relay 1/8, Relay 2/8, Team Individual Score, Team Total/64)
   - **Individual-only students**: If team column says "Individual", shows "Individual Round Only" label and only displays individual score (no team results)
 - **MATHCOUNTS**: Displays competition results if available (Sprint/Target/Individual scores out of 30/16/46, rank, chapter advancement status). Sign-up status no longer shown since competition has occurred.
-- **AMC 8**: Displays "January 23, 2026"
+- **AMC 8**: Displays score from AMC 8 spreadsheet tab (out of 25) with direct link to download individual PDF score report from Google Drive
 
 **Data Quality Requirements:**
 - **Student names must match exactly** across all sheets (case-insensitive, but spelling must be identical)
