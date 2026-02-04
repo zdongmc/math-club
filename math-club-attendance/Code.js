@@ -3,6 +3,7 @@ const REGISTRATION_SHEET_NAME = 'Form Responses 1';
 const COMPETITION_SIGNUP_SHEET_NAME = 'Form Responses 2';
 const ATTENDANCE_SHEET_NAME = 'Attendance Records';
 const SCHOOL_LIST_SHEET_NAME = 'School List';
+const AMC8_FOLDER_ID = '1wRU08nJSVcSy2ed3blxepkVj1BmyU6ru';
 
 function doGet() {
   return HtmlService.createTemplateFromFile('Checkin')
@@ -12,6 +13,31 @@ function doGet() {
 
 function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
+}
+
+/**
+ * Get AMC8 score report PDF link for a student
+ * Searches the Google Drive folder for the student's PDF report
+ */
+function getAMC8ScoreReportLink(firstName, lastName) {
+  try {
+    if (!firstName || !lastName) {
+      return null;
+    }
+
+    const folder = DriveApp.getFolderById(AMC8_FOLDER_ID);
+    const files = folder.getFilesByName(new RegExp(`^${lastName}_${firstName.charAt(0).toLowerCase()}AMC8ScoreReport\\.pdf$`, 'i'));
+
+    if (files.hasNext()) {
+      const file = files.next();
+      return `https://drive.google.com/file/d/${file.getId()}/view?usp=sharing`;
+    }
+
+    return null;
+  } catch (error) {
+    Logger.log(`Error getting AMC8 link for ${firstName} ${lastName}: ${error}`);
+    return null;
+  }
 }
 
 function getSpreadsheet() {
@@ -550,8 +576,19 @@ function getMathLeagueResults(mcpsId) {
                 maxTeamTotal: 64
               });
             } else {
-              // No team scores available for this meet
-              teamResults.push(null);
+              // Team assignment exists but not in teamRowMap (e.g., "Individual")
+              // Still include the team name so the UI can detect it
+              teamResults.push({
+                team: meetTeam,
+                teamScore: null,
+                relay1Score: null,
+                relay2Score: null,
+                teamIndividualScore: null,
+                teamTotalScore: null,
+                maxTeamScore: 12,
+                maxRelayScore: 8,
+                maxTeamTotal: 64
+              });
             }
           } else {
             // Student not assigned to a team for this meet
@@ -792,17 +829,16 @@ function getAmc8Results(mcpsId) {
     const data = sheet.getDataRange().getValues();
 
     // Look for student by MCPS ID in column B
-    // Columns: A=Name, B=ID, C=Grade, D=?, E=Registered (has value if registered)
+    // Columns: A=Name, B=ID, C=Grade, D=?, E=Score (out of 25)
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
       const studentId = (row[1] || '').toString().trim(); // Column B (index 1)
 
       if (studentId === mcpsId.toString().trim()) {
-        const registered = row[4] !== undefined && row[4] !== null && row[4].toString().trim() !== '';
+        const score = row[4] ? parseInt(row[4]) : null; // Column E (index 4) - the score
 
         return {
-          registered: registered,
-          registrationLink: 'https://maa.edvistas.com/datamate/testRegister.aspx?id=1c11c106-b611-4250-a1ba-a59a0430df62'
+          score: score
         };
       }
     }
@@ -1115,6 +1151,16 @@ function lookupStudentByMcpsId(mcpsId) {
       amc8Results = getAmc8Results(mcpsIdStr);
       if (amc8Results) {
         Logger.log('AMC 8 results retrieved: Registered=' + amc8Results.registered);
+        // Add PDF score report link
+        try {
+          const pdfLink = getAMC8ScoreReportLink(studentInfo.firstName, studentInfo.lastName);
+          if (pdfLink) {
+            amc8Results.pdfLink = pdfLink;
+            Logger.log('AMC 8 PDF link found: ' + pdfLink);
+          }
+        } catch (pdfErr) {
+          Logger.log('Could not get AMC 8 PDF link: ' + pdfErr.toString());
+        }
       } else {
         Logger.log('No AMC 8 results found for this student');
       }
