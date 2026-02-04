@@ -3,7 +3,6 @@ const REGISTRATION_SHEET_NAME = 'Form Responses 1';
 const COMPETITION_SIGNUP_SHEET_NAME = 'Form Responses 2';
 const ATTENDANCE_SHEET_NAME = 'Attendance Records';
 const SCHOOL_LIST_SHEET_NAME = 'School List';
-const AMC8_FOLDER_ID = '1wRU08nJSVcSy2ed3blxepkVj1BmyU6ru';
 
 function doGet() {
   return HtmlService.createTemplateFromFile('Checkin')
@@ -13,31 +12,6 @@ function doGet() {
 
 function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
-}
-
-/**
- * Get AMC8 score report PDF link for a student
- * Searches the Google Drive folder for the student's PDF report
- */
-function getAMC8ScoreReportLink(firstName, lastName) {
-  try {
-    if (!firstName || !lastName) {
-      return null;
-    }
-
-    const folder = DriveApp.getFolderById(AMC8_FOLDER_ID);
-    const files = folder.getFilesByName(new RegExp(`^${lastName}_${firstName.charAt(0).toLowerCase()}AMC8ScoreReport\\.pdf$`, 'i'));
-
-    if (files.hasNext()) {
-      const file = files.next();
-      return `https://drive.google.com/file/d/${file.getId()}/view?usp=sharing`;
-    }
-
-    return null;
-  } catch (error) {
-    Logger.log(`Error getting AMC8 link for ${firstName} ${lastName}: ${error}`);
-    return null;
-  }
 }
 
 function getSpreadsheet() {
@@ -829,16 +803,18 @@ function getAmc8Results(mcpsId) {
     const data = sheet.getDataRange().getValues();
 
     // Look for student by MCPS ID in column B
-    // Columns: A=Name, B=ID, C=Grade, D=?, E=Score (out of 25)
+    // Columns: A=Name, B=ID, C=Grade, D=Score (out of 25), E=?, F=PDF Link
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
       const studentId = (row[1] || '').toString().trim(); // Column B (index 1)
 
       if (studentId === mcpsId.toString().trim()) {
-        const score = row[4] ? parseInt(row[4]) : null; // Column E (index 4) - the score
+        const score = row[3] ? parseInt(row[3]) : null; // Column D (index 3) - the score
+        const pdfLink = (row[5] || '').toString().trim(); // Column F (index 5) - the PDF link
 
         return {
-          score: score
+          score: score,
+          pdfLink: pdfLink || null
         };
       }
     }
@@ -924,15 +900,6 @@ function checkFormCompletion(mcpsId, studentName) {
       }
     };
   }
-}
-
-// TEST FUNCTION - Run this directly in Apps Script editor
-function testLookup190949() {
-  Logger.log('=== Starting test for MCPS ID 190949 ===');
-  const result = lookupStudentByMcpsId('190949');
-  Logger.log('=== Test complete ===');
-  Logger.log('Result: ' + JSON.stringify(result, null, 2));
-  return result;
 }
 
 function lookupStudentByMcpsId(mcpsId) {
@@ -1150,22 +1117,14 @@ function lookupStudentByMcpsId(mcpsId) {
       Logger.log('Getting AMC 8 results for: ' + mcpsIdStr);
       amc8Results = getAmc8Results(mcpsIdStr);
       if (amc8Results) {
-        Logger.log('AMC 8 results retrieved: Registered=' + amc8Results.registered);
-        // Add PDF score report link
-        try {
-          const pdfLink = getAMC8ScoreReportLink(studentInfo.firstName, studentInfo.lastName);
-          if (pdfLink) {
-            amc8Results.pdfLink = pdfLink;
-            Logger.log('AMC 8 PDF link found: ' + pdfLink);
-          }
-        } catch (pdfErr) {
-          Logger.log('Could not get AMC 8 PDF link: ' + pdfErr.toString());
-        }
+        Logger.log('AMC 8 results retrieved: score=' + amc8Results.score + ', pdfLink=' + amc8Results.pdfLink);
       } else {
         Logger.log('No AMC 8 results found for this student');
       }
     } catch (err) {
       Logger.log('Error getting AMC 8 results: ' + err.toString());
+      // Don't fail the whole lookup if AMC 8 fails
+      amc8Results = null;
     }
 
     const result = {
@@ -1278,12 +1237,12 @@ function getStudentCompetitionSignups(mcpsId) {
   try {
     const sheet = getCompetitionSignupSheet();
 
-    // Initialize all competitions as not signed up
+    // Initialize competitions as not signed up
+    // Note: AMC 8 is past, so we only track MATHCOUNTS, Math League, and MOEMS
     const competitions = [
       { name: 'MATHCOUNTS', details: '', status: 'Not Signed Up', signedUp: false, waitlisted: false },
       { name: 'MCPS Math League', details: '', status: 'Not Signed Up', signedUp: false, waitlisted: false },
-      { name: 'MOEMS', details: '', status: 'Not Signed Up', signedUp: false, waitlisted: false },
-      { name: 'AMC 8', details: '', status: 'Not Signed Up', signedUp: false, waitlisted: false }
+      { name: 'MOEMS', details: '', status: 'Not Signed Up', signedUp: false, waitlisted: false }
     ];
 
     if (!sheet || sheet.getLastRow() <= 1) {
@@ -1347,20 +1306,6 @@ function getStudentCompetitionSignups(mcpsId) {
           competitions[2] = {
             name: 'MOEMS',
             details: moems,
-            status: isWaitlisted ? 'Waitlisted' : 'Signed Up',
-            signedUp: true,
-            waitlisted: isWaitlisted
-          };
-        }
-
-        // Parse AMC 8
-        const amc8 = (row[9] || '').toString();
-        if (amc8 && amc8.toLowerCase().includes('yes')) {
-          const isWaitlisted = isOnWaitlist(amc8);
-          Logger.log('AMC 8 value: "' + amc8 + '", isWaitlisted: ' + isWaitlisted);
-          competitions[3] = {
-            name: 'AMC 8',
-            details: 'January 23, 2026',
             status: isWaitlisted ? 'Waitlisted' : 'Signed Up',
             signedUp: true,
             waitlisted: isWaitlisted

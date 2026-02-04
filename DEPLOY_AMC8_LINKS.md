@@ -1,74 +1,50 @@
 # Quick Deployment Guide - AMC 8 Score Report Links
 
-**Status**: Code ready, manual deployment needed
-**Time Required**: ~10 minutes
+**Status**: ✅ Deployed and working
+**Last Updated**: February 4, 2026
 
 ---
 
-## One-Time Setup (Already Done)
+## Completed Setup
 - ✅ Google Drive folder created with 49 PDF files
-- ✅ Code updated with PDF link functionality
-- ✅ Changes committed to GitHub (commit: `58c8710`)
+- ✅ Code updated to read PDF links from spreadsheet
+- ✅ Changes committed to GitHub
+- ✅ Deployed to live parent portal (version @82)
 
 ---
 
-## Deploy to Production (YOU DO THIS NOW)
+## How It Works
 
-### Step 1: Copy Updated Code to Apps Script
-```
-1. Go to: https://script.google.com/home
-2. Open project: Math Club Parent Portal (ID: 1fif0wIdKDZQUjJgFaf-SOEDj60OqNz2pKXWezwpZlGlmJrqubXTBIZ2i)
-3. Open Code.js tab
-4. Copy from GitHub: https://github.com/zdongmc/math-club/blob/main/math-club-attendance/Code.js
-5. Replace EVERYTHING in Code.js with the new code
-6. Save (Ctrl+S or Cmd+S)
-```
+## Implementation Details
 
-### Step 2: Copy Updated HTML to Apps Script
-```
-1. Open Checkin.html tab in same Apps Script project
-2. Copy from GitHub: https://github.com/zdongmc/math-club/blob/main/math-club-attendance/Checkin.html
-3. Replace EVERYTHING with the new code
-4. Save (Ctrl+S or Cmd+S)
-```
+### Spreadsheet Setup
+The AMC 8 tab in the Google Sheet contains:
+- **Column A**: Student Name
+- **Column B**: MCPS ID
+- **Column C**: Grade
+- **Column D**: Score (out of 25)
+- **Column E**: (unused)
+- **Column F**: PDF Link (direct Google Drive link to individual PDF)
 
-### Step 3: Create New Deployment
+Example:
 ```
-1. Click "Deploy" button (top right)
-2. Click "New deployment"
-3. Select Type: "Web app"
-4. Click "Deploy"
-5. Go back to "Manage deployments"
-6. Find existing deployment (ends in ...Y9udIEskvIMJ)
-7. Click pencil icon to edit
-8. Select "New version" dropdown
-9. Add description: "Add AMC 8 score report PDF links"
-10. Click "Deploy"
+Name          | ID     | Grade | Score | E | PDF Link
+Nathaniel Lam | 190949 | 6     | 16    |   | https://drive.google.com/file/d/1uw7c3eQnEYGK3jPBs90slHckmc8MbZLO/view?usp=drive_link
 ```
 
----
+### Backend (Code.js)
+The `getAmc8Results(mcpsId)` function:
+1. Searches AMC 8 tab for student by MCPS ID (Column B)
+2. Reads score from Column D
+3. Reads PDF link from Column F
+4. Returns both score and pdfLink to frontend
 
-## Test It Works
-
-### Test Case 1: Student WITH Score
-```
-1. Open parent portal URL
-2. Enter MCPS ID of a student with AMC 8 score
-3. Expected:
-   - See AMC 8 section
-   - Score shows (e.g., "Your Score: 22 out of 25")
-   - Blue "📄 Download Score Report" button appears
-   - Click button → PDF opens in new tab
-```
-
-### Test Case 2: Student WITHOUT Score
-```
-1. Enter MCPS ID of a student with no AMC 8 score
-2. Expected:
-   - See AMC 8 section
-   - Shows "No score recorded yet."
-   - NO download button
-```
+### Frontend (Checkin.html)
+The AMC 8 section:
+1. Displays score if it exists: "Your Score: 16 out of 25"
+2. Shows download button if PDF link exists
+3. Button opens PDF in new browser tab (not forced download)
+4. Shows "No score recorded yet" if no score in spreadsheet
 
 ---
 
@@ -84,15 +60,52 @@
 ## What Changed
 
 ### Code.js
-- Added: `const AMC8_FOLDER_ID = '1wRU08nJSVcSy2ed3blxepkVj1BmyU6ru'`
-- Added: `getAMC8ScoreReportLink(firstName, lastName)` function
-- Updated: `getAmc8Results()` to return score from spreadsheet
-- Updated: `lookupStudentByMcpsId()` to fetch PDF link
+- Updated: `getAmc8Results()` now reads both score (Column D) and PDF link (Column F) from spreadsheet
+- Updated: `lookupStudentByMcpsId()` includes AMC 8 results (score + link) in response
 
 ### Checkin.html
-- Simplified: AMC 8 section (no more registration checks)
-- Changed: Only shows score if it exists in spreadsheet
-- Added: "📄 Download Score Report" button when PDF available
+- AMC 8 section displays score if it exists: "Your Score: X out of 25"
+- Shows "📄 Download Score Report" button when PDF link is available
+- Button opens PDF in new browser tab
+- Shows "No score recorded yet." if no score in spreadsheet
+
+---
+
+## Maintaining the Solution
+
+### Adding New Scores
+1. Add student name and MCPS ID to AMC 8 spreadsheet (Columns A & B)
+2. Enter score in Column D
+3. Enter PDF link in Column F (direct Google Drive link)
+4. Save - changes appear immediately in parent portal
+
+### Updating an Existing Score
+1. Update the score in Column D
+2. Update the PDF link in Column F if needed
+3. Save - parent portal reflects changes instantly
+
+### Removing a Score
+1. Delete the score from Column D
+2. Clear the PDF link from Column F
+3. Save - "No score recorded yet" message will appear
+
+---
+
+## Troubleshooting
+
+### PDF Link Not Showing
+- **Check**: Is Column F populated with a valid Google Drive link?
+- **Check**: Is the link in format: `https://drive.google.com/file/d/FILE_ID/view?usp=...`
+- **Fix**: Add or correct the link in Column F
+
+### Score Not Showing
+- **Check**: Is the score entered in Column D?
+- **Check**: Does the MCPS ID in Column B match what the parent enters?
+- **Fix**: Add the score and verify the student ID is correct
+
+### Wrong Score Showing
+- **Check**: Are there duplicate MCPS IDs in the sheet?
+- **Fix**: Delete duplicate rows, keep only one entry per student
 
 ---
 
@@ -111,27 +124,31 @@
 
 ---
 
-## Before You Deploy
+## Questions Answered
 
-Verify:
-- [ ] You have access to Google Apps Script project
-- [ ] Google Drive folder exists with 49 PDFs
-- [ ] Student names match PDF filenames
-- [ ] You have a few student MCPS IDs to test with
-- [ ] You know the current deployment ID (...Y9udIEskvIMJ)
+**Q: Why does the PDF open in the browser instead of downloading?**
+A: This is the standard Google Drive behavior. Users can save/download from the browser's menu if needed.
+
+**Q: Can students see other students' reports?**
+A: No - each parent only sees their child's data based on MCPS ID lookup.
+
+**Q: What if a student doesn't have a PDF link yet?**
+A: The download button won't appear until Column F is populated with a link.
+
+**Q: Do I need to redeploy after updating the spreadsheet?**
+A: No - changes appear immediately in the parent portal. Just save the spreadsheet.
+
+**Q: What if there are duplicate MCPS IDs?**
+A: The first match found will be returned. Keep MCPS IDs unique in the spreadsheet.
 
 ---
 
-## After Deployment
-
-Send to parents:
-- "Your child's AMC 8 score report is now available in the parent portal!"
-- "Just log in with your MCPS ID and click the blue 'Download Score Report' button"
+## Google Drive Folder Reference
+- **Location**: https://drive.google.com/drive/folders/1wRU08nJSVcSy2ed3blxepkVj1BmyU6ru
+- **Contains**: 49 individual AMC 8 score report PDFs
+- **Note**: Links to individual PDFs are stored in Column F of the spreadsheet
 
 ---
 
-**Estimated Time**: 10 minutes
-**Difficulty**: Easy (copy-paste code)
-**Risk**: Low (can rollback to previous version)
-
-Good luck! 🎉
+**Status**: ✅ Live and working (version @82)
+**Last Tested**: February 4, 2026

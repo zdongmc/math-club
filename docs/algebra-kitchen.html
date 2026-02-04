@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algebra Kitchen - HWMS Competition Math Club</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #d97706;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .chef-hat {
+            font-size: 2.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #92400e;
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 70vh;
+        }
+
+        .welcome-card {
+            background: #ffffff;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            border: 3px solid #f59e0b;
+        }
+
+        .welcome-card h2 {
+            color: #d97706;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+
+        .welcome-card p {
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .welcome-card input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .welcome-card input:focus {
+            outline: none;
+            border-color: #f59e0b;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+        }
+
+        .error-message {
+            color: #ef4444;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        /* Locked Screen */
+        .locked-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 70vh;
+        }
+
+        .locked-screen.active {
+            display: flex;
+        }
+
+        .locked-card {
+            background: #ffffff;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            border: 3px solid #f59e0b;
+        }
+
+        .locked-card h2 {
+            color: #d97706;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+
+        .locked-card p {
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        .locked-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 5px 15px rgba(107, 114, 128, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .dish-card {
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            border-radius: 20px;
+            border: 2px solid #e5e7eb;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .dish-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            border-color: #f59e0b;
+        }
+
+        .dish-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .dish-icon {
+            font-size: 3rem;
+        }
+
+        .dish-info h2 {
+            color: #d97706;
+            margin-bottom: 5px;
+            font-size: 1.5rem;
+        }
+
+        .dish-info p {
+            color: #666;
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 5px;
+            font-size: 2rem;
+            margin: 20px 0;
+            justify-content: center;
+        }
+
+        .star-rating .star {
+            opacity: 0.3;
+        }
+
+        .star-rating .star.filled {
+            opacity: 1;
+        }
+
+        .dish-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .module-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .module-btn.learn {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .module-btn.practice {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .module-btn.test {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .module-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Dish Screen */
+        .dish-screen {
+            display: none;
+        }
+
+        .dish-screen.active {
+            display: block;
+        }
+
+        .dish-header-bar {
+            background: #ffffff;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px 25px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .dish-header-bar h2 {
+            color: #d97706;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stage-indicator {
+            display: flex;
+            gap: 10px;
+        }
+
+        .stage-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            background: #e5e7eb;
+            color: #666;
+        }
+
+        .stage-dot.active {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .stage-dot.completed {
+            background: #10b981;
+            color: white;
+        }
+
+        /* Lesson Content */
+        .lesson-content {
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+        }
+
+        .lesson-step {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .lesson-step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .lesson-step h3 {
+            color: #d97706;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+
+        .lesson-step p {
+            color: #333;
+            line-height: 1.8;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .example-box {
+            background: linear-gradient(135deg, #fef3c7, #fffbeb);
+            border: 2px solid #f59e0b;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .example-box h4 {
+            color: #92400e;
+            margin-bottom: 10px;
+        }
+
+        .example-box .problem {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .example-box .solution {
+            color: #059669;
+            font-weight: bold;
+        }
+
+        .tip-box {
+            background: linear-gradient(135deg, #dbeafe, #eff6ff);
+            border: 2px solid #3b82f6;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .tip-box h4 {
+            color: #1d4ed8;
+            margin-bottom: 10px;
+        }
+
+        .lesson-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .step-counter {
+            color: #666;
+            font-weight: bold;
+        }
+
+        /* Practice/Test Content */
+        .practice-content, .test-content {
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+        }
+
+        .problem-display {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .problem-context {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .system-equations {
+            font-size: 1.3rem;
+            font-family: 'Courier New', monospace;
+            color: #333;
+            margin: 25px 0;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 10px;
+            display: inline-block;
+            min-width: 250px;
+            line-height: 1.8;
+        }
+
+        .answer-inputs {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+
+        .answer-input {
+            width: 120px;
+            padding: 15px;
+            font-size: 1.3rem;
+            text-align: center;
+            border: 3px solid #e5e7eb;
+            border-radius: 10px;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: #f59e0b;
+        }
+
+        .answer-input.correct {
+            border-color: #10b981;
+            background: #ecfdf5;
+        }
+
+        .answer-input.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .input-label {
+            font-weight: bold;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .feedback.correct {
+            display: block;
+            background: #ecfdf5;
+            color: #059669;
+            border: 2px solid #10b981;
+        }
+
+        .feedback.incorrect {
+            display: block;
+            background: #fef2f2;
+            color: #dc2626;
+            border: 2px solid #ef4444;
+        }
+
+        .hint-btn {
+            background: #8b5cf6;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .hint-box {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f3e8ff;
+            border: 2px solid #8b5cf6;
+            border-radius: 10px;
+            color: #6b21a8;
+            display: none;
+        }
+
+        .hint-box.visible {
+            display: block;
+        }
+
+        .problem-counter {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+
+        /* Results Screen */
+        .results-screen {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .results-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+        }
+
+        .results-screen h3 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        .results-screen.passed h3 {
+            color: #059669;
+        }
+
+        .results-screen.failed h3 {
+            color: #dc2626;
+        }
+
+        .star-display {
+            font-size: 3rem;
+            margin: 20px 0;
+        }
+
+        .score-breakdown {
+            background: linear-gradient(135deg, #fef3c7, #fffbeb);
+            border: 2px solid #f59e0b;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .score-breakdown h4 {
+            color: #92400e;
+            margin-bottom: 10px;
+        }
+
+        .score-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            color: #666;
+        }
+
+        .score-line.total {
+            border-top: 1px solid #d97706;
+            padding-top: 10px;
+            font-weight: bold;
+            color: #d97706;
+        }
+
+        .results-message {
+            color: #666;
+            font-size: 1.1rem;
+            margin: 20px 0;
+        }
+
+        .new-best {
+            background: #fef08a;
+            border: 2px solid #f59e0b;
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin: 15px 0;
+            color: #92400e;
+            font-weight: bold;
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #e5e7eb;
+            border-top-color: #f59e0b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .dish-header {
+                flex-direction: column;
+            }
+
+            .dish-header-bar {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .system-equations {
+                font-size: 1.1rem;
+            }
+
+            .answer-inputs {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><span class="chef-hat">👨‍🍳</span> Algebra Kitchen <span class="chef-hat">🍳</span></h1>
+            <p>Advanced algebra challenges for Certified Chefs!</p>
+        </div>
+
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="welcome-screen">
+            <div class="welcome-card">
+                <h2>Welcome to Algebra Kitchen!</h2>
+                <p>You've completed Training Kitchen! Now tackle advanced algebra dishes and earn stars for speed and accuracy.</p>
+                <div id="error-message" class="error-message"></div>
+                <input type="text" id="mcps-id-input" placeholder="Enter your MCPS ID" maxlength="10">
+                <br>
+                <button class="btn" onclick="startAlgebra()">Start Cooking</button>
+            </div>
+        </div>
+
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="loading">
+            <div class="spinner"></div>
+            <p>Loading your progress...</p>
+        </div>
+
+        <!-- Locked Screen -->
+        <div id="locked-screen" class="locked-screen">
+            <div class="locked-card">
+                <div class="locked-icon">🔒</div>
+                <h2>Algebra Kitchen is Locked</h2>
+                <p>You must complete all 5 modules in Training Kitchen first to unlock Algebra Kitchen!</p>
+                <p style="font-size: 0.95rem; color: #888;">Once you become a Certified Chef, come back here to tackle these advanced dishes.</p>
+                <button class="btn btn-secondary" onclick="logout()">Log Out</button>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="dashboard">
+            <div class="dish-card">
+                <div class="dish-header">
+                    <div class="dish-icon">🥘</div>
+                    <div class="dish-info">
+                        <h2>Dish 1: Systems of Equations</h2>
+                        <p>Solve two equations with two unknowns</p>
+                    </div>
+                </div>
+
+                <div class="star-rating" id="star-rating">
+                    <span class="star">☆</span>
+                    <span class="star">☆</span>
+                    <span class="star">☆</span>
+                </div>
+
+                <div class="dish-buttons">
+                    <button class="module-btn learn" onclick="openDish(1, 'lesson')">Learn</button>
+                    <button class="module-btn practice" onclick="openDish(1, 'practice')">Practice</button>
+                    <button class="module-btn test" onclick="openDish(1, 'test')">Test</button>
+                </div>
+
+                <button class="btn btn-secondary" style="width: 100%; margin-top: 15px;" onclick="logout()">Log Out</button>
+            </div>
+        </div>
+
+        <!-- Dish Screen -->
+        <div id="dish-screen" class="dish-screen">
+            <div class="dish-header-bar">
+                <h2 id="dish-title">Dish 1: Systems of Equations</h2>
+                <div class="stage-indicator">
+                    <div id="stage-learn" class="stage-dot">1</div>
+                    <div id="stage-practice" class="stage-dot">2</div>
+                    <div id="stage-test" class="stage-dot">3</div>
+                </div>
+                <button class="btn btn-secondary" onclick="returnToDashboard()">Back to Dashboard</button>
+            </div>
+
+            <!-- Lesson Content -->
+            <div id="lesson-content" class="lesson-content">
+                <!-- Lesson steps will be dynamically generated -->
+            </div>
+
+            <!-- Practice Content -->
+            <div id="practice-content" class="practice-content" style="display: none;">
+                <div class="problem-counter">Problem <span id="practice-problem-num">1</span> of 10</div>
+                <div class="progress-bar">
+                    <div id="practice-progress" class="progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="problem-display">
+                    <p id="practice-context" class="problem-context"></p>
+                    <div id="practice-equations" class="system-equations"></div>
+                    <div class="answer-inputs">
+                        <div>
+                            <div class="input-label">x =</div>
+                            <input type="text" id="practice-x" class="answer-input" placeholder="?">
+                        </div>
+                        <div>
+                            <div class="input-label">y =</div>
+                            <input type="text" id="practice-y" class="answer-input" placeholder="?">
+                        </div>
+                        <button id="practice-btn" class="btn" onclick="checkPracticeAnswer()">Check</button>
+                    </div>
+                    <button class="hint-btn" onclick="showHint()">Show Hint</button>
+                    <div id="hint-box" class="hint-box"></div>
+                    <div id="practice-feedback" class="feedback"></div>
+                </div>
+                <div class="lesson-nav" style="margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="startLesson()">Review Lesson</button>
+                    <button id="goto-test-btn" class="btn btn-success" onclick="startTest()" style="display: none;">Go to Mastery Test</button>
+                </div>
+            </div>
+
+            <!-- Test Content -->
+            <div id="test-content" class="test-content" style="display: none;">
+                <div class="problem-counter">Problem <span id="test-problem-num">1</span> of 10</div>
+                <div class="progress-bar">
+                    <div id="test-progress" class="progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="problem-display">
+                    <p id="test-context" class="problem-context"></p>
+                    <div id="test-equations" class="system-equations"></div>
+                    <div class="answer-inputs">
+                        <div>
+                            <div class="input-label">x =</div>
+                            <input type="text" id="test-x" class="answer-input" placeholder="?">
+                        </div>
+                        <div>
+                            <div class="input-label">y =</div>
+                            <input type="text" id="test-y" class="answer-input" placeholder="?">
+                        </div>
+                        <button id="test-btn" class="btn" onclick="submitTestAnswer()">Submit</button>
+                    </div>
+                    <div id="test-feedback" class="feedback"></div>
+                </div>
+            </div>
+
+            <!-- Results Screen -->
+            <div id="results-content" class="practice-content" style="display: none;">
+                <div id="results-screen" class="results-screen">
+                    <!-- Results will be dynamically generated -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== CONFIGURATION ====================
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyhI3zS593H2vHpPhbsgj5CZUHcUnYeISd_8rPLPcWX81jHf92a4N6KCUW2PtpRWqt4/exec';
+        const ALGEBRA_KITCHEN_URL = 'https://script.google.com/macros/s/PLACEHOLDER/exec'; // Will be replaced after Apps Script deployment
+
+        // ==================== LESSON DATA ====================
+        const lessonContent = [
+            {
+                title: 'What Is a System of Equations?',
+                content: `<p>A <strong>system of equations</strong> is two (or more) equations that must be solved together. Instead of one equation with one unknown, we have <strong>two equations with two unknowns</strong> (usually x and y).</p>
+                <p>The solution is a pair of values (x, y) that makes <strong>both</strong> equations true at the same time.</p>
+                <div class="example-box">
+                    <h4>Kitchen Example</h4>
+                    <p class="problem">Two recipes use flour and sugar:</p>
+                    <p class="problem">Recipe A: 2 cups flour + 3 cups sugar</p>
+                    <p class="problem">Recipe B: 1 cup flour + 2 cups sugar</p>
+                    <p class="solution">To compare costs, we'd write two equations and solve them together!</p>
+                </div>
+                <div class="example-box">
+                    <h4>Example System</h4>
+                    <p class="problem">x + y = 5</p>
+                    <p class="problem">x - y = 1</p>
+                    <p class="solution">Solution: x = 3, y = 2 (both equations are satisfied!)</p>
+                </div>`
+            },
+            {
+                title: 'The Substitution Method',
+                content: `<p>The <strong>substitution method</strong> works by solving one equation for one variable, then substituting it into the other equation.</p>
+                <div class="example-box">
+                    <h4>Worked Example</h4>
+                    <p class="problem">Solve:<br>x + 2y = 8 ... (1)<br>x - y = 2 ... (2)</p>
+                    <p class="solution">
+                        Step 1: Solve equation (2) for x:<br>
+                        x = y + 2<br><br>
+                        Step 2: Substitute into equation (1):<br>
+                        (y + 2) + 2y = 8<br>
+                        3y + 2 = 8<br>
+                        3y = 6<br>
+                        y = 2<br><br>
+                        Step 3: Plug back to find x:<br>
+                        x = 2 + 2 = 4<br><br>
+                        Solution: x = 4, y = 2
+                    </p>
+                </div>
+                <div class="tip-box">
+                    <h4>When to Use Substitution</h4>
+                    <p>Substitution works best when one equation has a coefficient of 1 on a variable (like "x + 3y = 10"). That variable is easiest to isolate.</p>
+                </div>`
+            },
+            {
+                title: 'The Elimination Method',
+                content: `<p>The <strong>elimination method</strong> works by adding or subtracting equations to eliminate one variable.</p>
+                <div class="example-box">
+                    <h4>Worked Example</h4>
+                    <p class="problem">Solve:<br>2x + 3y = 8<br>2x - y = 4</p>
+                    <p class="solution">
+                        Step 1: Notice both equations have 2x. Subtract equation 2 from equation 1:<br>
+                        (2x + 3y) - (2x - y) = 8 - 4<br>
+                        4y = 4<br>
+                        y = 1<br><br>
+                        Step 2: Plug back into either equation:<br>
+                        2x - 1 = 4<br>
+                        2x = 5<br>
+                        x = 2.5<br><br>
+                        Solution: x = 2.5, y = 1
+                    </p>
+                </div>
+                <div class="tip-box">
+                    <h4>When to Use Elimination</h4>
+                    <p>Elimination works best when the coefficients of one variable match (or can be made to match by multiplying).</p>
+                </div>`
+            },
+            {
+                title: 'Checking Your Answer',
+                content: `<p>Always verify your solution by plugging both x and y back into <strong>both</strong> original equations!</p>
+                <div class="example-box">
+                    <h4>Example Check</h4>
+                    <p class="problem">If x = 3, y = 2:<br>Check x + y = 5:<br>3 + 2 = 5 ✓<br><br>Check x - y = 1:<br>3 - 2 = 1 ✓</p>
+                    <p class="solution">Both equations satisfied! Solution is correct.</p>
+                </div>
+                <div class="example-box">
+                    <h4>Wrong Answer Example</h4>
+                    <p class="problem">If someone guessed x = 4, y = 2:<br>Check x + y = 5:<br>4 + 2 = 6 ✗ (Not 5!)</p>
+                    <p class="solution">This answer is wrong because it doesn't satisfy the first equation.</p>
+                </div>`
+            },
+            {
+                title: 'Ready to Cook!',
+                content: `<p>You now know two powerful methods to solve systems of equations:</p>
+                <ul style="margin-left: 20px; line-height: 2;">
+                    <li><strong>Substitution</strong> - Solve one equation for a variable, substitute into the other</li>
+                    <li><strong>Elimination</strong> - Add or subtract equations to eliminate a variable</li>
+                </ul>
+                <p style="margin-top: 20px;">Remember to <strong>check your answer</strong> in both equations!</p>
+                <p>Click "Start Practice" to try some systems of equations with hints, then take the Mastery Test when you're ready!</p>`
+            }
+        ];
+
+        // ==================== STATE ====================
+        let currentStudent = null;
+        let currentStage = null; // 'lesson', 'practice', 'test'
+        let lessonStep = 0;
+        let practiceIndex = 0;
+        let practiceCorrect = 0;
+        let testIndex = 0;
+        let testCorrect = 0;
+        let testStartTime = null;
+        let previousStars = 0;
+        let currentProblems = [];
+        let hasAnswered = false;
+
+        // ==================== PROBLEM GENERATOR ====================
+        function generateSystemOfEquations() {
+            // Pick factory type: 50/50 Substitution or Elimination
+            const factory = Math.random() < 0.5 ? 'substitution' : 'elimination';
+
+            if (factory === 'substitution') {
+                return generateSubstitutionFriendly();
+            } else {
+                return generateEliminationFriendly();
+            }
+        }
+
+        function generateSubstitutionFriendly() {
+            // One equation has coefficient 1 on x
+            const answerX = randInt(-10, 10);
+            const answerY = randInt(-10, 10);
+
+            if (answerX === 0 && answerY === 0) {
+                return generateSystemOfEquations(); // Reject, try again
+            }
+
+            // Equation 1: x + by = c (coefficient of x is 1)
+            const b1 = randInt(1, 5);
+            const rhs1 = answerX + b1 * answerY;
+
+            // Equation 2: ax + dy = e
+            const a2 = randInt(1, 5);
+            const d2 = randInt(1, 5);
+            const rhs2 = a2 * answerX + d2 * answerY;
+
+            // Check determinant != 0 (not degenerate)
+            const det = 1 * d2 - b1 * a2;
+            if (det === 0) {
+                // Degenerate, try again (bounded retry)
+                return generateEliminationFriendly();
+            }
+
+            const eq1 = formatEquation(1, b1, rhs1);
+            const eq2 = formatEquation(a2, d2, rhs2);
+
+            const context = pickRandom([
+                "Chef Rosa needs to figure out how much of each ingredient to buy.",
+                "The kitchen inventory is running low — find the missing amounts.",
+                "Two recipes share ingredients. Solve to find how much of each you need.",
+                "A catering order requires balancing two different dish quantities.",
+                "Calculating portions for two recipes with shared ingredients.",
+                "Inventory adjustment: determine the quantities of two items.",
+                "Two cooking stations need different amounts of the same supplies."
+            ]);
+
+            return {
+                context,
+                eq1,
+                eq2,
+                answerX,
+                answerY,
+                hint: 'Try substitution: solve one equation for x, then substitute into the other.'
+            };
+        }
+
+        function generateEliminationFriendly() {
+            // Both equations have same coefficient on y
+            const answerX = randInt(-10, 10);
+            const answerY = randInt(-10, 10);
+
+            if (answerX === 0 && answerY === 0) {
+                return generateSystemOfEquations();
+            }
+
+            // Both equations: ax + cy = rhs (same c)
+            const a1 = randInt(1, 5);
+            const a2 = randInt(1, 5);
+            const c = randInt(1, 5); // Same coefficient on y
+            const rhs1 = a1 * answerX + c * answerY;
+            const rhs2 = a2 * answerX + c * answerY;
+
+            // Check determinant != 0
+            const det = a1 * c - a2 * c;
+            if (det === 0) {
+                return generateSubstitutionFriendly();
+            }
+
+            const eq1 = formatEquation(a1, c, rhs1);
+            const eq2 = formatEquation(a2, c, rhs2);
+
+            const context = pickRandom([
+                "Chef Rosa needs to figure out how much of each ingredient to buy.",
+                "The kitchen inventory is running low — find the missing amounts.",
+                "Two recipes share ingredients. Solve to find how much of each you need.",
+                "A catering order requires balancing two different dish quantities.",
+                "Calculating portions for two recipes with shared ingredients.",
+                "Inventory adjustment: determine the quantities of two items.",
+                "Two cooking stations need different amounts of the same supplies."
+            ]);
+
+            return {
+                context,
+                eq1,
+                eq2,
+                answerX,
+                answerY,
+                hint: 'Try elimination: subtract equations to eliminate one variable.'
+            };
+        }
+
+        function formatEquation(a, b, rhs) {
+            let eq = '';
+
+            // Handle a*x term
+            if (a === 1) {
+                eq += 'x';
+            } else if (a === -1) {
+                eq += '-x';
+            } else {
+                eq += a + 'x';
+            }
+
+            // Handle +/- b*y term
+            if (b > 0) {
+                if (b === 1) {
+                    eq += ' + y';
+                } else {
+                    eq += ' + ' + b + 'y';
+                }
+            } else if (b < 0) {
+                if (b === -1) {
+                    eq += ' - y';
+                } else {
+                    eq += ' - ' + Math.abs(b) + 'y';
+                }
+            }
+
+            eq += ' = ' + rhs;
+            return eq;
+        }
+
+        function generateProblems(count = 10) {
+            const problems = [];
+            for (let i = 0; i < count; i++) {
+                problems.push(generateSystemOfEquations());
+            }
+            return problems;
+        }
+
+        // ==================== HELPER FUNCTIONS ====================
+        function randInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function pickRandom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        // ==================== SCREEN FUNCTIONS ====================
+        function showScreen(screenId) {
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('loading-screen').classList.remove('active');
+            document.getElementById('locked-screen').classList.remove('active');
+            document.getElementById('dashboard').classList.remove('active');
+            document.getElementById('dish-screen').classList.remove('active');
+
+            if (screenId === 'welcome') {
+                document.getElementById('welcome-screen').style.display = 'flex';
+            } else if (screenId === 'loading') {
+                document.getElementById('loading-screen').classList.add('active');
+            } else if (screenId === 'locked') {
+                document.getElementById('locked-screen').classList.add('active');
+            } else if (screenId === 'dashboard') {
+                document.getElementById('dashboard').classList.add('active');
+            } else if (screenId === 'dish') {
+                document.getElementById('dish-screen').classList.add('active');
+            }
+        }
+
+        // ==================== LOGIN FUNCTIONS ====================
+        async function startAlgebra() {
+            const mcpsId = document.getElementById('mcps-id-input').value.trim();
+            const errorDiv = document.getElementById('error-message');
+
+            if (!mcpsId || !/^\d+$/.test(mcpsId)) {
+                errorDiv.textContent = 'Please enter a valid MCPS ID (numbers only)';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            errorDiv.style.display = 'none';
+            showScreen('loading');
+
+            try {
+                // First, get progress from Training Kitchen backend to check if Certified Chef
+                const progressResponse = await fetch(`${APPS_SCRIPT_URL}?action=getTrainingProgress&mcpsId=${mcpsId}`);
+                const progressData = await progressResponse.json();
+
+                if (!progressData.success || progressData.chefLevel !== 'Certified Chef') {
+                    showScreen('locked');
+                    return;
+                }
+
+                currentStudent = {
+                    name: progressData.studentName,
+                    mcpsId: progressData.mcpsId
+                };
+
+                // Now get Algebra Kitchen progress (will implement)
+                try {
+                    const algebraResponse = await fetch(`${ALGEBRA_KITCHEN_URL}?action=getAlgebraProgress&mcpsId=${mcpsId}`);
+                    const algebraData = await algebraResponse.json();
+                    if (algebraData.success) {
+                        previousStars = algebraData.dish1Stars || 0;
+                    }
+                } catch (e) {
+                    // Backend not deployed yet, offline mode
+                    previousStars = 0;
+                }
+
+                renderDashboard();
+                showScreen('dashboard');
+
+            } catch (error) {
+                console.error('Error fetching progress:', error);
+                // Fallback: show locked screen if no Training Kitchen data
+                showScreen('locked');
+            }
+        }
+
+        function logout() {
+            currentStudent = null;
+            document.getElementById('mcps-id-input').value = '';
+            showScreen('welcome');
+        }
+
+        // ==================== DASHBOARD ====================
+        function renderDashboard() {
+            const starRating = document.getElementById('star-rating');
+            starRating.innerHTML = '';
+            for (let i = 0; i < 3; i++) {
+                const star = document.createElement('span');
+                star.className = `star${i < previousStars ? ' filled' : ''}`;
+                star.textContent = i < previousStars ? '⭐' : '☆';
+                starRating.appendChild(star);
+            }
+        }
+
+        // ==================== DISH SCREEN ====================
+        function openDish(dishId, stage) {
+            currentStage = stage;
+
+            document.getElementById('dish-title').innerHTML = `🥘 Dish ${dishId}: Systems of Equations`;
+            updateStageIndicator();
+
+            if (stage === 'lesson') {
+                startLesson();
+            } else if (stage === 'practice') {
+                startPractice();
+            } else if (stage === 'test') {
+                startTest();
+            }
+
+            showScreen('dish');
+        }
+
+        function updateStageIndicator() {
+            const stages = ['learn', 'practice', 'test'];
+            stages.forEach(s => {
+                const dot = document.getElementById(`stage-${s}`);
+                dot.classList.remove('active', 'completed');
+            });
+
+            if (currentStage === 'lesson') {
+                document.getElementById('stage-learn').classList.add('active');
+            } else if (currentStage === 'practice') {
+                document.getElementById('stage-learn').classList.add('completed');
+                document.getElementById('stage-practice').classList.add('active');
+            } else if (currentStage === 'test') {
+                document.getElementById('stage-learn').classList.add('completed');
+                document.getElementById('stage-practice').classList.add('completed');
+                document.getElementById('stage-test').classList.add('active');
+            }
+        }
+
+        function returnToDashboard() {
+            renderDashboard();
+            showScreen('dashboard');
+        }
+
+        // ==================== LESSON ====================
+        function startLesson() {
+            currentStage = 'lesson';
+            lessonStep = 0;
+            updateStageIndicator();
+
+            document.getElementById('lesson-content').style.display = 'block';
+            document.getElementById('practice-content').style.display = 'none';
+            document.getElementById('test-content').style.display = 'none';
+            document.getElementById('results-content').style.display = 'none';
+
+            renderLessonStep();
+        }
+
+        function renderLessonStep() {
+            const lesson = lessonContent[lessonStep];
+            const content = document.getElementById('lesson-content');
+
+            content.innerHTML = `
+                <div class="lesson-step active">
+                    <h3>${lesson.title}</h3>
+                    ${lesson.content}
+                    <div class="lesson-nav">
+                        <button class="btn btn-secondary" onclick="prevLessonStep()" ${lessonStep === 0 ? 'disabled' : ''}>Previous</button>
+                        <span class="step-counter">Step ${lessonStep + 1} of ${lessonContent.length}</span>
+                        ${lessonStep === lessonContent.length - 1
+                            ? '<button class="btn btn-success" onclick="startPractice()">Start Practice</button>'
+                            : '<button class="btn" onclick="nextLessonStep()">Next</button>'}
+                    </div>
+                </div>
+            `;
+        }
+
+        function nextLessonStep() {
+            if (lessonStep < lessonContent.length - 1) {
+                lessonStep++;
+                renderLessonStep();
+            }
+        }
+
+        function prevLessonStep() {
+            if (lessonStep > 0) {
+                lessonStep--;
+                renderLessonStep();
+            }
+        }
+
+        // ==================== PRACTICE ====================
+        function startPractice() {
+            currentStage = 'practice';
+            practiceIndex = 0;
+            practiceCorrect = 0;
+            currentProblems = generateProblems(10);
+            updateStageIndicator();
+
+            document.getElementById('lesson-content').style.display = 'none';
+            document.getElementById('practice-content').style.display = 'block';
+            document.getElementById('test-content').style.display = 'none';
+            document.getElementById('results-content').style.display = 'none';
+
+            renderPracticeProblem();
+        }
+
+        function renderPracticeProblem() {
+            const problem = currentProblems[practiceIndex];
+
+            document.getElementById('practice-problem-num').textContent = practiceIndex + 1;
+            document.getElementById('practice-progress').style.width = `${(practiceIndex / 10) * 100}%`;
+            document.getElementById('practice-context').textContent = problem.context;
+
+            const eqDisplay = `${problem.eq1}\n${problem.eq2}`;
+            document.getElementById('practice-equations').textContent = eqDisplay;
+
+            document.getElementById('practice-x').value = '';
+            document.getElementById('practice-y').value = '';
+            document.getElementById('practice-x').className = 'answer-input';
+            document.getElementById('practice-y').className = 'answer-input';
+            document.getElementById('practice-feedback').className = 'feedback';
+            document.getElementById('practice-feedback').textContent = '';
+            document.getElementById('hint-box').className = 'hint-box';
+            document.getElementById('hint-box').textContent = problem.hint;
+            document.getElementById('goto-test-btn').style.display = practiceIndex >= 9 ? 'inline-block' : 'none';
+
+            const btn = document.getElementById('practice-btn');
+            btn.textContent = 'Check';
+            btn.onclick = checkPracticeAnswer;
+            hasAnswered = false;
+
+            document.getElementById('practice-x').focus();
+        }
+
+        function showHint() {
+            document.getElementById('hint-box').classList.add('visible');
+        }
+
+        function checkPracticeAnswer() {
+            if (hasAnswered) return;
+
+            const problem = currentProblems[practiceIndex];
+            const userX = parseFloat(document.getElementById('practice-x').value);
+            const userY = parseFloat(document.getElementById('practice-y').value);
+            const feedback = document.getElementById('practice-feedback');
+            const xInput = document.getElementById('practice-x');
+            const yInput = document.getElementById('practice-y');
+
+            if (isNaN(userX) || isNaN(userY)) {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = 'Please enter both x and y values.';
+                return;
+            }
+
+            hasAnswered = true;
+
+            const isCorrect = Math.abs(userX - problem.answerX) < 0.01 && Math.abs(userY - problem.answerY) < 0.01;
+
+            if (isCorrect) {
+                practiceCorrect++;
+                feedback.className = 'feedback correct';
+                feedback.textContent = 'Correct! Great job, chef!';
+                xInput.className = 'answer-input correct';
+                yInput.className = 'answer-input correct';
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = `Not quite. The answer is x = ${problem.answerX}, y = ${problem.answerY}. Try the next one!`;
+                xInput.className = 'answer-input incorrect';
+                yInput.className = 'answer-input incorrect';
+            }
+
+            const btn = document.getElementById('practice-btn');
+            if (practiceIndex < 9) {
+                btn.textContent = 'Next Problem';
+                btn.onclick = nextPracticeProblem;
+            } else {
+                btn.style.display = 'none';
+            }
+            document.getElementById('goto-test-btn').style.display = 'inline-block';
+        }
+
+        function nextPracticeProblem() {
+            if (practiceIndex < 9) {
+                practiceIndex++;
+                renderPracticeProblem();
+            }
+        }
+
+        // ==================== TEST ====================
+        function startTest() {
+            currentStage = 'test';
+            testIndex = 0;
+            testCorrect = 0;
+            currentProblems = generateProblems(10);
+            testStartTime = Date.now();
+            updateStageIndicator();
+
+            document.getElementById('lesson-content').style.display = 'none';
+            document.getElementById('practice-content').style.display = 'none';
+            document.getElementById('test-content').style.display = 'block';
+            document.getElementById('results-content').style.display = 'none';
+
+            renderTestProblem();
+        }
+
+        function renderTestProblem() {
+            const problem = currentProblems[testIndex];
+
+            document.getElementById('test-problem-num').textContent = testIndex + 1;
+            document.getElementById('test-progress').style.width = `${(testIndex / 10) * 100}%`;
+            document.getElementById('test-context').textContent = problem.context;
+
+            const eqDisplay = `${problem.eq1}\n${problem.eq2}`;
+            document.getElementById('test-equations').textContent = eqDisplay;
+
+            document.getElementById('test-x').value = '';
+            document.getElementById('test-y').value = '';
+            document.getElementById('test-x').className = 'answer-input';
+            document.getElementById('test-y').className = 'answer-input';
+            document.getElementById('test-feedback').className = 'feedback';
+            document.getElementById('test-feedback').textContent = '';
+
+            const btn = document.getElementById('test-btn');
+            btn.textContent = 'Submit';
+            btn.onclick = submitTestAnswer;
+            btn.style.display = 'inline-block';
+            hasAnswered = false;
+
+            document.getElementById('test-x').focus();
+        }
+
+        function submitTestAnswer() {
+            if (hasAnswered) return;
+
+            const problem = currentProblems[testIndex];
+            const userX = parseFloat(document.getElementById('test-x').value);
+            const userY = parseFloat(document.getElementById('test-y').value);
+            const feedback = document.getElementById('test-feedback');
+            const xInput = document.getElementById('test-x');
+            const yInput = document.getElementById('test-y');
+
+            if (isNaN(userX) || isNaN(userY)) {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = 'Please enter both x and y values.';
+                return;
+            }
+
+            hasAnswered = true;
+
+            const isCorrect = Math.abs(userX - problem.answerX) < 0.01 && Math.abs(userY - problem.answerY) < 0.01;
+
+            if (isCorrect) {
+                testCorrect++;
+                feedback.className = 'feedback correct';
+                feedback.textContent = 'Correct!';
+                xInput.className = 'answer-input correct';
+                yInput.className = 'answer-input correct';
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = `Incorrect. The answer was x = ${problem.answerX}, y = ${problem.answerY}.`;
+                xInput.className = 'answer-input incorrect';
+                yInput.className = 'answer-input incorrect';
+            }
+
+            const btn = document.getElementById('test-btn');
+            if (testIndex < 9) {
+                btn.textContent = 'Next Problem';
+                btn.onclick = nextTestProblem;
+            } else {
+                btn.style.display = 'none';
+                setTimeout(showResults, 1500);
+            }
+        }
+
+        function nextTestProblem() {
+            if (testIndex < 9) {
+                testIndex++;
+                renderTestProblem();
+            }
+        }
+
+        // ==================== RESULTS ====================
+        async function showResults() {
+            const testElapsedMs = Date.now() - testStartTime;
+            const passed = testCorrect >= 8;
+
+            if (!passed) {
+                showFailScreen();
+                return;
+            }
+
+            // Calculate stars
+            const accuracy = testCorrect / 10;
+            const speedFactor = Math.max(0, 1 - (testElapsedMs / 600000)); // 10 min max
+            const combined = (accuracy * 0.6) + (speedFactor * 0.4);
+
+            let newStars;
+            if (combined >= 0.85) {
+                newStars = 3;
+            } else if (combined >= 0.72 || accuracy === 1.0) {
+                newStars = 2;
+            } else {
+                newStars = 1;
+            }
+            newStars = Math.max(1, newStars); // Floor: 1 star minimum on pass
+
+            // Format time display
+            const minutes = Math.floor(testElapsedMs / 60000);
+            const seconds = Math.floor((testElapsedMs % 60000) / 1000);
+            const milliseconds = Math.floor((testElapsedMs % 1000));
+            const timeDisplay = `${minutes}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
+
+            document.getElementById('test-content').style.display = 'none';
+            document.getElementById('results-content').style.display = 'block';
+
+            const resultsScreen = document.getElementById('results-screen');
+            resultsScreen.className = 'results-screen passed';
+
+            const newBestHtml = newStars > previousStars ? '<div class="new-best">⭐ New best: ' + newStars + ' stars!</div>' : '';
+            const starDisplay = Array(newStars).fill('⭐').join('') + Array(3 - newStars).fill('☆').join('');
+
+            resultsScreen.innerHTML = `
+                <div class="results-icon">🎉</div>
+                <h3>Congratulations, Chef!</h3>
+                <div class="star-display">${starDisplay}</div>
+                <div class="score-breakdown">
+                    <h4>Score Breakdown</h4>
+                    <div class="score-line">
+                        <span>Accuracy:</span>
+                        <span>${testCorrect}/10 (${Math.round(accuracy * 100)}%)</span>
+                    </div>
+                    <div class="score-line">
+                        <span>Speed Bonus:</span>
+                        <span>${Math.round(speedFactor * 100)}%</span>
+                    </div>
+                    <div class="score-line">
+                        <span>Combined Score:</span>
+                        <span>${Math.round(combined * 100)}%</span>
+                    </div>
+                    <div class="score-line">
+                        <span>Time Taken:</span>
+                        <span>${timeDisplay}</span>
+                    </div>
+                    <div class="score-line total">
+                        <span>Stars Earned:</span>
+                        <span>${newStars} / 3</span>
+                    </div>
+                </div>
+                ${newBestHtml}
+                <p class="results-message">Your progress has been saved.</p>
+                <button class="btn btn-success" onclick="saveAndReturn('${newStars}')">Return to Dashboard</button>
+            `;
+        }
+
+        function showFailScreen() {
+            const percentage = Math.round((testCorrect / 10) * 100);
+
+            document.getElementById('test-content').style.display = 'none';
+            document.getElementById('results-content').style.display = 'block';
+
+            const resultsScreen = document.getElementById('results-screen');
+            resultsScreen.className = 'results-screen failed';
+
+            resultsScreen.innerHTML = `
+                <div class="results-icon">📚</div>
+                <h3>Keep Practicing!</h3>
+                <div class="star-display" style="color: #dc2626;">${testCorrect}/10 (${percentage}%)</div>
+                <p class="results-message">You need 80% (8/10) to pass. Review the lesson and try again!</p>
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <button class="btn btn-secondary" onclick="startLesson()">Review Lesson</button>
+                    <button class="btn" onclick="startTest()">Try Again</button>
+                </div>
+            `;
+        }
+
+        async function saveAndReturn(newStars) {
+            // Save to backend (will work once Apps Script is deployed)
+            try {
+                await fetch(`${ALGEBRA_KITCHEN_URL}?action=recordAlgebraProgress&mcpsId=${currentStudent.mcpsId}&dish=1&stars=${newStars}`);
+            } catch (e) {
+                console.log('Backend not deployed yet');
+            }
+
+            // Update local state
+            previousStars = Math.max(previousStars, parseInt(newStars));
+            renderDashboard();
+            showScreen('dashboard');
+        }
+
+        // ==================== INITIALIZATION ====================
+        document.getElementById('mcps-id-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                startAlgebra();
+            }
+        });
+    </script>
+</body>
+</html>

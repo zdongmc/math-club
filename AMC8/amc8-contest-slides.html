@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MOEMS Contest - Hallie Wells Middle School</title>
+    <title>AMC 8 Contest - Hallie Wells Middle School</title>
     <style>
         * {
             margin: 0;
@@ -92,8 +93,15 @@
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
         }
 
         .timer-controls {
@@ -113,12 +121,12 @@
             border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         }
 
         .btn:active {
@@ -174,6 +182,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Slide Counter -->
     <div class="slide-counter">
@@ -182,8 +191,8 @@
 
     <!-- Slide 1: Introduction -->
     <div class="slide active intro-slide">
-        <h1>MOEMS Contest</h1>
-        <h2>Mathematical Olympiads for Elementary and Middle Schools</h2>
+        <h1>AMC 8 Contest</h1>
+        <h2>American Mathematics Competitions 8</h2>
 
         <div class="contest-info">
             <div><strong>Hallie Wells Middle School - Competition Math Club</strong></div>
@@ -192,7 +201,7 @@
 
         <div class="instructions">
             <div style="margin-bottom: 20px; font-size: 1.3rem; color: #991b1b;"><strong>Before we begin:</strong></div>
-            <div>• Check-in with Prof. Jojo</div>
+            <div>• Check-in with Prof. Jojo or Mrs. DeStefano</div>
             <div>• Except for pencils, all belongings must be put up on the stage</div>
             <div style="margin-top: 40px; font-size: 1.3rem; color: #991b1b;">Good luck, mathletes!</div>
         </div>
@@ -207,26 +216,28 @@
 
             <div style="font-size: 1.6rem; line-height: 2.2; text-align: left;">
                 <div style="margin-bottom: 30px;">
-                    After all questions have been read by your PICO, you will have <strong>30 minutes</strong> to complete this contest.
+                    You will have <strong>40 minutes</strong> to complete this contest.
                 </div>
 
                 <div style="margin-bottom: 30px;">
-                    <strong style="color: #991b1b;">You may not have a pen or pencil in your hand while the PICO reads the set of questions to the class.</strong>
+                    <strong style="color: #991b1b;">Do not open the contest booklet until instructed to do so.</strong>
                 </div>
 
-                <div style="margin-bottom: 20px;">• Calculators are not permitted</div>
-                <div style="margin-bottom: 20px;">• All work is to be done on the pages provided</div>
-                <div style="margin-bottom: 20px;">• No additional scrap paper is to be used</div>
-                <div style="margin-bottom: 20px;">• Answers must be placed in the corresponding boxes in the answer column</div>
+                <div style="margin-bottom: 20px;">• <strong>Allowed:</strong> Writing utensils, blank scratch paper
+                    (provided by teacher), rulers, erasers</div>
+                <div style="margin-bottom: 20px;">• <strong>NOT Allowed:</strong> Graph paper, Calculators, Phones,
+                    Electronic Devices</div>
+                <div style="margin-bottom: 20px;">• No questions require the use of a calculator</div>
+                <div style="margin-bottom: 20px;">• 25 Questions, Multiple Choice, No penalty for guessing</div>
             </div>
         </div>
     </div>
 
     <!-- Slide 3: Timer -->
     <div class="slide timer-slide">
-        <h2>MOEMS Contest Timer</h2>
+        <h2>AMC 8 Contest Timer</h2>
 
-        <div class="timer-display" id="timerDisplay">30:00</div>
+        <div class="timer-display" id="timerDisplay">40:00</div>
 
         <div class="timer-controls">
             <button class="btn" id="startBtn" onclick="startTimer()">Start Timer</button>
@@ -234,7 +245,28 @@
             <button class="btn" id="resetBtn" onclick="resetTimer()">Reset</button>
         </div>
 
-        <div class="timer-info" id="timerInfo">Press Start to begin the 30-minute contest</div>
+        <div class="timer-info" id="timerInfo">Press Start to begin the 40-minute contest</div>
+    </div>
+
+    <!-- Slide 4: Contest Integrity -->
+    <div class="slide intro-slide">
+        <h1 style="color: #991b1b; margin-bottom: 40px;">⚠️ Important Rule ⚠️</h1>
+
+        <div class="instructions" style="max-width: 1100px;">
+            <div
+                style="font-size: 1.8rem; line-height: 2.2; text-align: left; background: #fef2f2; padding: 40px; border-radius: 20px; border: 3px solid #fca5a5;">
+                <p style="margin-bottom: 30px;">
+                    <strong>Students cannot discuss problems until after 8 a.m. ET on January 29, 2026.</strong>
+                </p>
+                <p style="margin-bottom: 30px;">
+                    The reproduction or dissemination of problems and/or solutions via phone, email, or digital media of
+                    any type is a violation of the competition rules.
+                </p>
+                <p style="text-align: center; color: #dc2626; font-weight: bold; font-size: 2.2rem; margin-top: 40px;">
+                    Students will be disqualified for violation of the competition rules.
+                </p>
+            </div>
+        </div>
     </div>
 
     <!-- Navigation Buttons -->
@@ -249,7 +281,7 @@
         const totalSlides = slides.length;
 
         // Timer variables
-        let timeRemaining = 30 * 60; // 30 minutes in seconds
+        let timeRemaining = 40 * 60; // 40 minutes in seconds
         let timerInterval = null;
         let isRunning = false;
         let announcedTimes = new Set();
@@ -280,7 +312,7 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowRight') nextSlide();
             if (e.key === 'ArrowLeft') prevSlide();
-            if (e.key === ' ' && currentSlide === 1) { // Space bar on timer slide
+            if (e.key === ' ' && currentSlide === 2) { // Space bar on timer slide (index 2)
                 e.preventDefault();
                 if (!isRunning) {
                     startTimer();
@@ -327,8 +359,8 @@
             document.getElementById('timerInfo').textContent = 'Contest in progress...';
 
             // Announce start
-            if (timeRemaining === 30 * 60) {
-                speak('Contest begins. You have 30 minutes.');
+            if (timeRemaining === 40 * 60) {
+                speak('Contest begins. You have 40 minutes.');
             } else {
                 speak('Timer resumed.');
             }
@@ -338,6 +370,10 @@
                 updateDisplay();
 
                 // Voice announcements
+                if (timeRemaining === 20 * 60 && !announcedTimes.has(1200)) {
+                    speak('20 minutes remaining.');
+                    announcedTimes.add(1200);
+                }
                 if (timeRemaining === 15 * 60 && !announcedTimes.has(900)) {
                     speak('15 minutes remaining.');
                     announcedTimes.add(900);
@@ -377,16 +413,17 @@
         function resetTimer() {
             clearInterval(timerInterval);
             isRunning = false;
-            timeRemaining = 30 * 60;
+            timeRemaining = 40 * 60;
             announcedTimes.clear();
             updateDisplay();
             document.getElementById('startBtn').disabled = false;
             document.getElementById('pauseBtn').disabled = true;
-            document.getElementById('timerInfo').textContent = 'Press Start to begin the 30-minute contest';
+            document.getElementById('timerInfo').textContent = 'Press Start to begin the 40-minute contest';
         }
 
         // Initialize display
         updateDisplay();
     </script>
 </body>
+
 </html>

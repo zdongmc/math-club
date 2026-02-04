@@ -148,6 +148,13 @@
             border-color: #fbbf24;
         }
 
+        .timer-display.bonus-ending {
+            animation: flash 0.5s infinite;
+            color: #f59e0b;
+            background: rgba(245, 158, 11, 0.2);
+            border-color: #f59e0b;
+        }
+
         .timer-display.critical {
             animation: pulse-fast 0.5s infinite;
             color: #ef4444;
@@ -158,6 +165,11 @@
         @keyframes pulse {
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.8; transform: scale(1.02); }
+        }
+
+        @keyframes flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
         }
 
         @keyframes pulse-fast {
@@ -298,16 +310,22 @@
         <div class="slide active welcome-slide">
             <h1>MCPS Mathematics League</h1>
             <div class="meet-dates-grid">
-                <div class="meet-date-item">Meet 1: November 14</div>
-                <div class="meet-date-item">Meet 2: December 12</div>
-                <div class="meet-date-item">Meet 3: January 16</div>
+                <div class="meet-date-item" style="opacity: 0.4; text-decoration: line-through;">Meet 1: November 14</div>
+                <div class="meet-date-item" style="opacity: 0.4; text-decoration: line-through;">Meet 2: December 12</div>
+                <div class="meet-date-item">Meet 3: January 20</div>
                 <div class="meet-date-item">Meet 4: February 13</div>
             </div>
 
             <div style="margin: 15px auto 30px; padding: 25px; background: rgba(251, 191, 36, 0.15); border: 2px solid #fbbf24; border-radius: 15px; max-width: 900px;">
                 <p style="font-size: 1.4rem; font-weight: bold; color: #fbbf24; margin-bottom: 10px;">Before We Begin:</p>
+                <p style="font-size: 1.2rem; line-height: 1.6; margin-bottom: 10px;">
+                    <span class="highlight">Check in</span> with Prof. Jojo when you arrive.
+                </p>
+                <p style="font-size: 1.2rem; line-height: 1.6; margin-bottom: 10px;">
+                    Please put everything except your <span class="highlight">pencils and calculators</span> away in your backpacks and leave your backpacks by the door.
+                </p>
                 <p style="font-size: 1.2rem; line-height: 1.6;">
-                    Please put everything except your <span class="highlight">pencils and calculators</span> away in your backpacks and leave your backpacks at the front of the room.
+                    <span class="highlight">Answer sheets</span> for each team are already at your tables. Notify Prof. Jojo if you need additional answer sheets.
                 </p>
             </div>
 
@@ -340,7 +358,7 @@
                     <li>Each correct answer is worth <span class="highlight">2 points</span></li>
                     <li>Maximum points: <span class="highlight">12 points</span></li>
                     <li><span class="highlight">Non-graphing calculators are allowed</span> for this round only</li>
-                    <li>Record answers on the team recording form</li>
+                    <li>Record answers on the <span class="highlight">answer sheets provided at your tables</span></li>
                 </ul>
             </div>
 
@@ -352,6 +370,9 @@
         <!-- Slide 3: Team Round Timer -->
         <div class="slide">
             <div class="round-title">Team Round</div>
+            <div class="round-subtitle" style="margin-bottom: 20px;">
+                <span class="highlight">✓ Calculators allowed</span> &nbsp;•&nbsp; <span class="highlight">✓ Communication within team allowed</span>
+            </div>
             <div class="timer-display" id="timer-team">20:00</div>
             <div class="status-message" id="status-team"></div>
 
@@ -387,17 +408,20 @@
         <!-- Slide 5: Relay Round 1 Timer -->
         <div class="slide">
             <div class="round-title">Relay Round 1</div>
+            <div class="round-subtitle" style="margin-bottom: 20px;">
+                <span style="color: #ef4444;">✗ No calculators</span> &nbsp;•&nbsp; <span class="highlight">✓ Communication within trio allowed</span>
+            </div>
             <div class="timer-display" id="timer-relay1">8:00</div>
             <div class="status-message" id="status-relay1"></div>
 
             <div class="relay-info">
                 <div class="relay-card">
                     <h3>Bonus Window</h3>
-                    <p>Submit in under 4 minutes: <span class="highlight">4 points</span></p>
+                    <p>Correct answer submitted in under 4 minutes: <span class="highlight">4 points</span></p>
                 </div>
                 <div class="relay-card">
                     <h3>Regular Window</h3>
-                    <p>Submit by 8 minutes: <span class="highlight">2 points</span></p>
+                    <p>Correct answer submitted by 8 minutes: <span class="highlight">2 points</span></p>
                 </div>
             </div>
 
@@ -411,17 +435,20 @@
         <!-- Slide 6: Relay Round 2 Timer -->
         <div class="slide">
             <div class="round-title">Relay Round 2</div>
+            <div class="round-subtitle" style="margin-bottom: 20px;">
+                <span style="color: #ef4444;">✗ No calculators</span> &nbsp;•&nbsp; <span class="highlight">✓ Communication within trio allowed</span>
+            </div>
             <div class="timer-display" id="timer-relay2">8:00</div>
             <div class="status-message" id="status-relay2"></div>
 
             <div class="relay-info">
                 <div class="relay-card">
                     <h3>Bonus Window</h3>
-                    <p>Submit in under 4 minutes: <span class="highlight">4 points</span></p>
+                    <p>Correct answer submitted in under 4 minutes: <span class="highlight">4 points</span></p>
                 </div>
                 <div class="relay-card">
                     <h3>Regular Window</h3>
-                    <p>Submit by 8 minutes: <span class="highlight">2 points</span></p>
+                    <p>Correct answer submitted by 8 minutes: <span class="highlight">2 points</span></p>
                 </div>
             </div>
 
@@ -439,12 +466,13 @@
 
             <div class="round-info">
                 <ul class="instructions-list">
+                    <li><span class="highlight">Spread out</span> and make sure you have space around yourself</li>
                     <li>Each student completes <span class="highlight">6 problems individually</span></li>
                     <li>Students earn <span class="highlight">1 point</span> for each correct answer</li>
                     <li>Maximum team score: <span class="highlight">36 points</span> (6 students × 6 points)</li>
                     <li><span class="highlight">No communication</span> among players during this round</li>
                     <li>Individual scores tracked for ARML standings</li>
-                    <li>Record answers on individual recording sheet</li>
+                    <li>Record answers on the <span class="highlight">answer sheets provided at your tables</span></li>
                 </ul>
             </div>
 
@@ -456,6 +484,9 @@
         <!-- Slide 8: Individual Round Timer -->
         <div class="slide">
             <div class="round-title">Individual Round</div>
+            <div class="round-subtitle" style="margin-bottom: 20px;">
+                <span style="color: #ef4444;">✗ No calculators</span> &nbsp;•&nbsp; <span style="color: #ef4444;">✗ No communication</span>
+            </div>
             <div class="timer-display" id="timer-individual">24:00</div>
             <div class="status-message" id="status-individual"></div>
 
@@ -573,9 +604,14 @@
                 // Voice announcements at key intervals
                 if (roundName === 'relay1' || roundName === 'relay2') {
                     // Relay-specific announcements
-                    if (timer.remaining === 240) { // 4 minutes (halfway, end of bonus)
+                    if (timer.remaining === 255) { // 4:15 - bonus window closing soon
+                        speak("Bonus window closes in 15 seconds.");
+                        status.textContent = "Bonus window closes in 15 seconds!";
+                        display.classList.add('bonus-ending');
+                    } else if (timer.remaining === 240) { // 4 minutes (halfway, end of bonus)
                         speak("4 minutes remaining. Bonus window has ended.");
                         status.textContent = "Bonus window ended - 2 points for correct answer";
+                        display.classList.remove('bonus-ending');
                     } else if (timer.remaining === 60) {
                         speak("1 minute remaining.");
                     } else if (timer.remaining === 10) {

@@ -1,0 +1,6 @@
+# Clasp credentials and settings
+.clasprc.json
+
+# Only ignore .clasp.json if it contains sensitive script IDs
+# Uncomment if you want to keep script IDs private:
+# .clasp.json
