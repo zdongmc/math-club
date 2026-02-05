@@ -741,6 +741,9 @@
 
         <!-- Dashboard -->
         <div id="dashboard" class="dashboard">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 id="student-name" style="color: #d97706; font-size: 1.5rem; margin: 0;">Welcome, Chef!</h2>
+            </div>
             <div class="dish-card">
                 <div class="dish-header">
                     <div class="dish-icon">🥘</div>
@@ -1202,6 +1205,7 @@
 
         // ==================== DASHBOARD ====================
         function renderDashboard() {
+            document.getElementById('student-name').textContent = `Welcome, ${currentStudent.name}!`;
             const starRating = document.getElementById('star-rating');
             starRating.innerHTML = '';
             for (let i = 0; i < 3; i++) {
