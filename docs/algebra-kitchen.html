@@ -1328,8 +1328,7 @@
             document.getElementById('practice-progress').style.width = `${(practiceIndex / 10) * 100}%`;
             document.getElementById('practice-context').textContent = problem.context;
 
-            const eqDisplay = `${problem.eq1}\n${problem.eq2}`;
-            document.getElementById('practice-equations').textContent = eqDisplay;
+            document.getElementById('practice-equations').innerHTML = `<div>${problem.eq1}</div><div>${problem.eq2}</div>`;
 
             document.getElementById('practice-x').value = '';
             document.getElementById('practice-y').value = '';
@@ -1427,8 +1426,7 @@
             document.getElementById('test-progress').style.width = `${(testIndex / 10) * 100}%`;
             document.getElementById('test-context').textContent = problem.context;
 
-            const eqDisplay = `${problem.eq1}\n${problem.eq2}`;
-            document.getElementById('test-equations').textContent = eqDisplay;
+            document.getElementById('test-equations').innerHTML = `<div>${problem.eq1}</div><div>${problem.eq2}</div>`;
 
             document.getElementById('test-x').value = '';
             document.getElementById('test-y').value = '';
