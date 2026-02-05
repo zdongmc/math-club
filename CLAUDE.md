@@ -275,6 +275,73 @@ Located in `mathdetective/` directory:
 - Sheet columns: A=Student Name, B=MCPS ID, C-G=Module 1-5 completion dates
 - Pattern: Separate Apps Script project for each standalone game (like prime-or-not)
 
+### Algebra Kitchen Game
+Located in `mathdetective/` directory (with copies in `docs/`):
+
+**algebra-kitchen.html** - Cooking-themed algebra learning game (unlocks after Training Kitchen)
+- **Login System**: MCPS ID login with student name lookup
+- **Prerequisites**: Students must complete all 5 Training Kitchen modules to unlock (Certified Chef status required)
+- **Locked Screen**: Message directing students to complete Training Kitchen first, with auto-login link
+- **Dashboard**: Displays current dish with star rating and mode buttons (Learn, Practice, Test)
+- **Star Rating System** (1-3 stars based on accuracy + speed):
+  - Pass threshold: 80% accuracy (8/10 correct)
+  - Accuracy weight: 60%, Speed weight: 40%
+  - Combined score formula: `(accuracy * 0.6) + (speedFactor * 0.4)` where speedFactor = max(0, 1 - elapsedMs/600000)
+  - Star thresholds: 3 stars (≥0.85), 2 stars (≥0.72 OR 100% accuracy), 1 star (any pass)
+  - Minimum 1 star on any pass (combined score clamped to ≥1)
+- **Warm amber/cream color scheme** matching Training Kitchen
+- **URL**: https://script.google.com/macros/s/AKfycbw6kaj6j92g9C2txlLaMcFU8crA_H6RXLjOnjZYbniLkCCfHdmI0LLUYOcWNQPi9n4AUg/exec
+- **Auto-login from Training Kitchen**: Accepts `mcpsId` URL parameter to auto-populate and bypass login screen
+
+**Dish 1: Systems of Equations**
+- **Lesson** (5 steps):
+  1. What Is a System of Equations? — Define systems, introduce concrete kitchen example (recipes with ingredients), show transition to abstract form
+  2. The Substitution Method — Full worked example showing when to use (coefficient of 1 exists)
+  3. The Elimination Method — Full worked example showing when to use (matching coefficients)
+  4. Checking Your Answer — Verify solutions by plugging (x, y) into both original equations with worked examples
+  5. Ready to Cook! — Summary of methods, transition to practice
+- **Practice Mode** (10 problems): Problems with hints, visual feedback, no time pressure
+- **Test Mode** (10 problems): No hints, 10-minute timer, visual progress tracker
+- **Results Screen**: Shows stars earned, score breakdown (accuracy %, speed bonus, combined score, time taken), "New best!" message if improved, buttons to retake or return to dashboard
+- **Timer**: Starts when test begins (not at first problem render), displays as M:SS (no leading zero on minutes)
+- **Two-answer validation**: Problems require both x and y answers, both must be correct for credit
+
+**Problem Generation (Two Factory Functions)**
+- **Factory A (Substitution-Friendly)**: One equation has coefficient 1 on x, determinant verification for degeneracy
+- **Factory B (Elimination-Friendly)**: Both equations share same coefficient on y
+- **Solution Range**: answerX and answerY in [-10, 10], reject if both are 0
+- **Coefficients**: Range [1, 5] appropriate to factory type
+- **Determinant Check**: Factory A verifies non-zero determinant (max 50 retry attempts, falls back to Factory B on failure)
+- **Context Templates**: Cooking-themed one-liners (6-8 pool, randomly selected), e.g., "Find how much of each ingredient..."
+- **Problem Format**: Equations as strings with proper formatting (e.g., "x + 2y = 8", omit coefficient of 1, handle negative values)
+
+**algebra-kitchen-backend/** - Separate Apps Script backend for Algebra Kitchen
+- `Code.js` - Backend functions for student lookup and progress tracking
+  - `lookupStudent(mcpsId)` - Looks up student name from parent portal Roster sheet (read-only)
+  - `getAlgebraProgress(mcpsId)` - Returns: `{ success, studentName, mcpsId, isCertifiedChef, dish1Stars }`
+    - Checks Training Kitchen tab to verify student completed all 5 modules
+    - Reads Algebra Kitchen tab for current dish star ratings
+  - `recordAlgebraProgress(mcpsId, dish, stars)` - Records star rating, only overwrites if `stars > currentStars`
+    - Returns: `{ success, currentStars, newStars, updated }`
+  - `doGet(e)` - Routes on `action` param: `getAlgebraProgress` or `recordAlgebraProgress`
+- `appsscript.json` - Apps Script configuration with public access
+- `.clasp.json` - Deployment configuration (Script ID: 1we0rmj2d9JFEhogb0b1Ag82MMarJCKkdfVG92cmVe3GTv8HkORT6Lme_)
+- **Google Sheet** (same as Training Kitchen): https://docs.google.com/spreadsheets/d/1MSYlXi37I9x4PMSpf8ovtmq6zLMwY_-vK7SBlydCjnI
+  - **Roster tab** — read-only student lookup (column B = MCPS ID, column A = student name)
+  - **Training Kitchen tab** — read-only, check columns C-G for module completion (non-empty = complete)
+  - **Algebra Kitchen tab** — read/write progress tracking
+    - Column A: Student Name
+    - Column B: MCPS ID
+    - Column C: Dish 1 Stars (0 if blank/new student)
+
+**Key Implementation Details**
+- **Certified Chef Check**: Student must have all 5 Training Kitchen modules completed (Training Kitchen columns C-G all non-empty)
+- **Star Persistence**: Only overwrites with higher star values, prevents score degradation
+- **previousStars State Variable**: Set once at login, never updated mid-session (used for "New best!" comparison)
+- **testStartTime**: Set when test begins, prevents gaming by reading first problem before clock starts
+- **Two-input Answer Checking**: Both fields validated as non-empty before checking correctness, focus moves to empty field on partial entry
+- **Degenerate System Fallback**: If Factory A produces singular system (determinant = 0), automatically falls back to Factory B after max 50 retry attempts
+
 ### Navigation System
 The `header-template.js` (in `docs/` directory) provides a shared navigation component for all pages:
 - Navigation items: Announcements, Club Info, Competition Info, Registration & Records
@@ -328,12 +395,14 @@ The repository is organized into the following directories:
   - Vocabulary activities and reference documents
   - Preparatory guide PDF
 
-- **`mathdetective/`** - Math Detective game, Training Kitchen, and Prime or Not game
+- **`mathdetective/`** - Math Detective game, Training Kitchen, Algebra Kitchen, and Prime or Not game
   - Interactive game, classroom version, certificates
   - Answer keys and final challenges
   - Python certificate generator
-  - `training-kitchen.html` - Cooking-themed math training game
+  - `training-kitchen.html` - Cooking-themed math training game (prerequisite for Algebra Kitchen)
   - `training-kitchen-backend/` - Separate Apps Script backend for Training Kitchen progress tracking
+  - `algebra-kitchen.html` - Cooking-themed algebra learning game (unlocks after Training Kitchen)
+  - `algebra-kitchen-backend/` - Separate Apps Script backend for Algebra Kitchen progress tracking
   - `prime-or-not.html` - Prime number recognition game
   - `prime-leaderboard/` - Separate Apps Script backend for Prime or Not leaderboard
 
@@ -356,6 +425,7 @@ The repository is organized into the following directories:
 - **MOEMS**: Teaching materials in `MOEMS/` directory
 - **Math Detective**: Game files in `mathdetective/` directory - all self-contained HTML files
 - **Training Kitchen**: `mathdetective/training-kitchen.html` with separate backend in `mathdetective/training-kitchen-backend/`
+- **Algebra Kitchen**: `mathdetective/algebra-kitchen.html` with separate backend in `mathdetective/algebra-kitchen-backend/` - unlocks after Training Kitchen completion
 
 ### Standalone Games with Separate Apps Script Projects
 Games that need Google Sheets integration but should be separate from the parent portal use their own Apps Script project:
