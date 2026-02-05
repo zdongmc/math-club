@@ -733,7 +733,7 @@
                 <p>You must complete all 5 modules in Training Kitchen first to unlock Algebra Kitchen!</p>
                 <p style="font-size: 0.95rem; color: #888;">Once you become a Certified Chef, come back here to tackle these advanced dishes.</p>
                 <div style="display: flex; gap: 10px; justify-content: center;">
-                    <a href="training-kitchen.html" class="btn">Go to Training Kitchen</a>
+                    <button class="btn" onclick="goToTrainingKitchen()">Go to Training Kitchen</button>
                     <button class="btn btn-secondary" onclick="logout()">Log Out</button>
                 </div>
             </div>
@@ -1186,6 +1186,15 @@
             currentStudent = null;
             document.getElementById('mcps-id-input').value = '';
             showScreen('welcome');
+        }
+
+        function goToTrainingKitchen() {
+            // Get the current MCPS ID from the locked screen's input
+            const mcpsIdInput = document.getElementById('mcps-id-input').value.trim();
+            if (mcpsIdInput) {
+                // Pass the MCPS ID as a URL parameter for auto-login
+                window.location.href = `training-kitchen.html?mcpsId=${mcpsIdInput}`;
+            }
         }
 
         // ==================== DASHBOARD ====================

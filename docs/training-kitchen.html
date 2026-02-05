@@ -2108,6 +2108,15 @@
         });
 
         // ==================== INITIALIZATION ====================
+        // Check for auto-login from Algebra Kitchen
+        const urlParams = new URLSearchParams(window.location.search);
+        const autoLoginMcpsId = urlParams.get('mcpsId');
+        if (autoLoginMcpsId) {
+            document.getElementById('mcps-id-input').value = autoLoginMcpsId;
+            // Auto-login after a brief delay to ensure DOM is ready
+            setTimeout(startTraining, 100);
+        }
+
         document.getElementById('mcps-id-input').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 startTraining();
