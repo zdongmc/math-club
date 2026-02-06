@@ -479,7 +479,12 @@ Located in `mathdetective/` directory (with copies in `docs/`):
 **Deployment Process:**
 1. Make changes to files in `math-club-attendance/` directory
 2. Push changes using `clasp push --force` (requires clasp CLI and authentication with correct Google account)
-3. **IMPORTANT**: Do NOT create new deployments. Always update the existing stable deployment.
+3. **(Optional) Create test deployment for verification:**
+   - Run `clasp deploy --description "TEST: [description]"` to create a new test deployment
+   - This creates a unique test URL (different from the stable production URL)
+   - Test the changes thoroughly using the test URL
+   - When satisfied, proceed to step 4
+   - Delete the test deployment if desired (optional - unused deployments don't affect the stable URL)
 4. To update the live URL, update the existing deployment in Apps Script web UI:
    - Go to https://script.google.com/home
    - Open the parent portal project
@@ -489,7 +494,7 @@ Located in `mathdetective/` directory (with copies in `docs/`):
    - Add a description for the changes
    - Click **Deploy**
 5. **CRITICAL**: This keeps the same URL (ending in `...Y9udIEskvIMJ`) stable for `registration.html` while updating the code version
-6. DO NOT use `clasp deploy` - this creates new deployment IDs. Use only `clasp push --force` to update code
+6. **Note on deployments:** Test deployments created with `clasp deploy` are separate from the stable production URL and do not affect it. Always update the existing stable deployment (step 4) for production changes.
 
 **Key Implementation Details:**
 - MCPS IDs can be variable length (not just 6 digits) - validation uses `/^\d+$/`
@@ -523,7 +528,9 @@ Located in `mathdetective/` directory (with copies in `docs/`):
 - For public access, `appsscript.json` must have `"access": "ANYONE_ANONYMOUS"` in the webapp section
 - Changes require manual deployment update (not automatic with clasp push)
 - Test function `testLookup190949()` available for debugging in Apps Script editor
-- Current stable deployment URL must not change - always edit existing deployment, never create new one
+- Current stable deployment URL must not change - always edit existing deployment for production changes
+- Test deployments can be created separately without affecting the stable production URL
+- Delete test deployments after verification to keep the deployment list clean (optional)
 
 ### Data Quality Checks
 To verify data consistency across sheets before making portal changes, use this Python script:
