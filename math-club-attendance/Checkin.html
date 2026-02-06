@@ -144,6 +144,12 @@
             opacity: 0.9;
         }
 
+        .student-grade {
+            font-size: 1rem;
+            opacity: 0.95;
+            color: white;
+        }
+
         .section-title {
             font-size: 1.4rem;
             color: #dc2626;
@@ -735,6 +741,7 @@
                 <div class="student-header">
                     <div class="student-name">${escapeHtml(student.name)}</div>
                     <div class="student-id">MCPS ID: ${escapeHtml(student.mcpsId)}</div>
+                    ${student.gradeLevel ? `<div class="student-grade">Grade: ${escapeHtml(student.gradeLevel)}</div>` : ''}
                 </div>
             `;
 
@@ -944,137 +951,94 @@
                 html += '</div>';
                 html += '</div>';
             } else {
-                // Not registered - registration deadline has passed
+                // Not registered - show status
                 html += '<div style="background: #f3f4f6; border: 2px solid #d1d5db; border-radius: 10px; padding: 20px; text-align: center;">';
-                html += '<div style="color: #6b7280; font-size: 0.95rem;">Registration deadline has passed</div>';
+                html += '<div style="color: #6b7280; font-size: 0.95rem; font-weight: 600; margin-bottom: 10px;">Not Signed Up</div>';
+                html += '<div style="color: #9ca3af; font-size: 0.9rem;">Registration deadline has passed</div>';
                 html += '<div style="color: #6b7280; font-size: 0.95rem; margin-top: 10px;">Competition Date: Thursday, March 19, 2026</div>';
                 html += '</div>';
             }
 
-            // NOETIC LEARNING SECTION DISABLED - Temporarily disabled for debugging
-            // html += '<h2 class="section-title">🎯 Noetic Learning Math Contest</h2>';
-            if (false) { // Disable entire Noetic section
+            // Noetic Learning Math Contest Section
+            html += '<h2 class="section-title">🎯 Noetic Learning Math Contest</h2>';
             html += '<div class="info-card">';
             html += '<div style="padding: 15px;">';
 
-            // Competition info
-            html += '<div style="color: #666; font-size: 0.95rem; margin-bottom: 15px;">Competition Date: <strong>Friday, April 10, 2026 (3:15 - 4:15 PM)</strong></div>';
-            html += '<div style="margin-bottom: 20px;"><a href="https://www.noetic-learning.com/mathcontest/" target="_blank" style="color: #dc2626; text-decoration: none; font-weight: 600; display: inline-block;">Visit Noetic Learning →</a></div>';
+            // Competition date
+            html += '<div style="color: #666; font-size: 0.95rem; margin-bottom: 15px;">Contest Date: <strong>Friday, April 10, 2026 (3:15 - 4:00 PM)</strong></div>';
 
-            // Cost & Grading Information
+            // Website link
+            html += '<div style="margin-bottom: 15px;"><a href="https://www.noetic-learning.com/mathcontest/" target="_blank" style="color: #dc2626; text-decoration: none; font-weight: 600; display: inline-block;">Visit Noetic Learning →</a></div>';
+
+            // Contest format and cost information
             html += '<div style="background: #f0f9ff; border: 2px solid #bfdbfe; border-radius: 8px; padding: 15px; margin-bottom: 15px;">';
-            html += '<div style="font-weight: bold; color: #1e40af; margin-bottom: 10px;">Cost & Grading Information</div>';
+            html += '<div style="font-weight: bold; color: #1e40af; margin-bottom: 10px;">Contest Format</div>';
             html += '<div style="color: #666; font-size: 0.9rem; line-height: 1.6;">';
-            html += '<p style="margin-bottom: 8px;">The Noetic Contest costs <strong>$99 per team</strong> (up to 30 students).</p>';
+            html += '<p style="margin-bottom: 8px;">• <strong>20 problems</strong>, 45-50 minutes, no calculator</p>';
+            html += '<p style="margin-bottom: 8px;">• Questions vary by grade level (6th, 7th, 8th)</p>';
+            html += '<p style="margin-bottom: 8px;">• Team format: If a team has mixed grades, all students answer the highest grade level questions</p>';
+            html += '<p style="margin-bottom: 0;">• <strong>Cost:</strong> $99 per team (up to 30 students)</p>';
 
-            // Show real-time cost based on current sign-ups
+            // Current sign-ups by grade - moved under Contest Format
             if (noetic && noetic.signUpCounts) {
               const counts = noetic.signUpCounts;
-              const yourCost = Math.round((99 / (counts.total + 1)) * 100) / 100;
-
-              html += '<div style="background: #fef3c7; padding: 10px; border-radius: 6px; margin-bottom: 10px; border-left: 4px solid #f59e0b;">';
-              html += '<div style="font-weight: bold; color: #92400e; margin-bottom: 8px;">Your Cost: $' + yourCost + ' per student</div>';
-
-              // Show team breakdown
-              html += '<div style="font-size: 0.85rem; color: #78350f; margin-bottom: 8px;">';
-              html += '• Your Grade Level: ' + counts.byGradePreference.own + ' student' + (counts.byGradePreference.own !== 1 ? 's' : '') + '</div>';
-              html += '<div style="font-size: 0.85rem; color: #78350f; margin-bottom: 10px;">';
-              html += '• Mixed Grade Team: ' + counts.byGradePreference.mixed + ' student' + (counts.byGradePreference.mixed !== 1 ? 's' : '') + '</div>';
-
-              // Show current status and note about cost decreasing
-              if (counts.total > 0) {
-                html += '<div style="font-size: 0.8rem; color: #78350f; font-style: italic;">(' + counts.total + ' students signed up so far)</div>';
-              } else {
-                html += '<div style="font-size: 0.8rem; color: #78350f; font-style: italic;">Be the first to sign up!</div>';
-              }
-              html += '<div style="font-size: 0.8rem; color: #78350f; font-style: italic; margin-top: 5px;">Cost will likely decrease as more students sign up.</div>';
+              html += '<hr style="border: none; border-top: 1px solid #bfdbfe; margin: 12px 0;">';
+              html += '<div style="margin-top: 12px;">';
+              html += '<div style="font-weight: 600; color: #1e40af; margin-bottom: 8px;">Current Sign-ups</div>';
+              html += '<p style="margin-bottom: 5px;">• 6th Grade: ' + (counts.by6th || 0) + ' student' + ((counts.by6th || 0) !== 1 ? 's' : '') + '</p>';
+              html += '<p style="margin-bottom: 5px;">• 7th Grade: ' + (counts.by7th || 0) + ' student' + ((counts.by7th || 0) !== 1 ? 's' : '') + '</p>';
+              html += '<p style="margin-bottom: 0;">• 8th/Mixed: ' + (counts.byMixed || 0) + ' student' + ((counts.byMixed || 0) !== 1 ? 's' : '') + '</p>';
               html += '</div>';
-            } else {
-              html += '<p style="margin-bottom: 8px;">The cost is split equally among all team members, so your individual cost will depend on how many students sign up.</p>';
             }
 
-            html += '<p style="margin-bottom: 8px;">Questions are different by grade level. If a team has mixed grades, all students answer the highest grade level questions.</p>';
-            html += '<p style="margin-bottom: 0; background: #fef3c7; padding: 10px; border-radius: 6px; border-left: 4px solid #f59e0b;"><strong>Registration closes Sunday, March 1</strong>. Contest fees will be collected via SchoolCash Online during the first week of March.</p>';
-            html += '</div>';
             html += '</div>';
 
+            // Sign-up status and buttons
             const today = new Date();
-            const signUpDeadline = new Date('2026-03-12T23:59:59');
-            const contestDate = new Date('2026-04-10');
-            const beforeDeadline = today < signUpDeadline;
-            const afterContest = today > contestDate;
+            const deadline = new Date('2026-03-01T23:59:59');
+            const beforeDeadline = today < deadline;
 
             if (noetic && noetic.signedUp) {
-              // Signed up - show status
-              const gradePreferenceName = noetic.gradePreference === 'own' ? 'Your Grade Level' : 'Mixed Grade Team';
-              html += '<div style="background: #d1fae5; border: 2px solid #059669; border-radius: 8px; padding: 15px; margin-bottom: 15px; text-align: center;">';
-              html += '<div style="color: #047857; font-weight: bold; font-size: 1.1rem;">✓ Signed Up for ' + gradePreferenceName + '</div>';
-              if (noetic.signUpDate) {
-                const signUpDateStr = new Date(noetic.signUpDate).toLocaleDateString();
-                html += '<div style="color: #065f46; margin-top: 5px; font-size: 0.9rem;">Signed up on ' + signUpDateStr + '</div>';
+              // Already signed up
+              html += '<div style="background: #d1fae5; border: 2px solid #059669; border-radius: 8px; padding: 15px; margin-top: 15px; text-align: center;">';
+              html += '<div style="color: #047857; font-weight: bold; font-size: 1.1rem; margin-bottom: 8px;">✓ Signed Up</div>';
+              const preference = noetic.gradePreference === 'own' ? 'Your Grade Level' : '8th/Mixed Team';
+              html += '<div style="color: #065f46; font-size: 0.95rem; margin-bottom: 12px;">Team: ' + preference + '</div>';
+              if (beforeDeadline) {
+                html += '<button onclick="modifyNoeticSignUp(\'' + student.mcpsId + '\', \'' + escapeHtml(student.name) + '\', \'' + (student.gradeLevel || '') + '\')" style="background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; margin-right: 8px;">';
+                html += 'Modify';
+                html += '</button>';
+                html += '<button onclick="dropNoeticSignUp(\'' + student.mcpsId + '\')" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer;">';
+                html += 'Drop';
+                html += '</button>';
               }
               html += '</div>';
-
-              // Show change preference button if before March 1
-              const changeDeadline = new Date('2026-03-01T23:59:59');
-              if (today < changeDeadline) {
-                html += '<div style="text-align: center; margin-bottom: 15px;">';
-                html += '<button onclick="changeNoeticGradePreference(\'' + student.mcpsId + '\')" style="background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; transition: all 0.3s ease;">';
-                html += 'Change Grade Preference';
-                html += '</button>';
-                html += '<div style="color: #666; font-size: 0.85rem; margin-top: 8px;">Available until March 1</div>';
-                html += '</div>';
-              }
-
-              // Fee payment status
-              if (noetic.feePaid) {
-                html += '<div style="background: #d1fae5; border: 2px solid #059669; border-radius: 8px; padding: 10px; margin-bottom: 15px; text-align: center;">';
-                html += '<span style="color: #047857; font-weight: bold;">✓ Fee Paid</span>';
-                html += '</div>';
-              } else {
-                html += '<div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 10px; margin-bottom: 15px; text-align: center;">';
-                html += '<span style="color: #92400e; font-weight: bold;">⚠ Fee Payment Pending</span>';
-                html += '</div>';
-              }
-
-              // Show score after contest
-              if (afterContest && noetic.score !== null) {
-                html += '<div style="background: #eff6ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 15px; margin-bottom: 15px;">';
-                html += '<div style="color: #1e40af; font-weight: bold; margin-bottom: 8px;">Your Score</div>';
-                html += '<div style="font-size: 1.3rem; color: #1e40af; font-weight: bold;">' + noetic.score + ' out of ' + noetic.maxScore + '</div>';
-                html += '</div>';
-
-                // PDF link if available
-                if (noetic.pdfLink) {
-                  html += '<a href="' + escapeHtml(noetic.pdfLink) + '" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);">';
-                  html += '📄 Download Score Report';
-                  html += '</a>';
-                }
-              } else if (afterContest) {
-                html += '<div style="text-align: center; color: #666; padding: 10px;">';
-                html += '<p>Score not yet available.</p>';
-                html += '</div>';
-              }
             } else if (beforeDeadline) {
               // Not signed up, before deadline - show button
-              html += '<div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 15px; text-align: center;">';
-              html += '<div style="color: #92400e; font-weight: bold; margin-bottom: 10px; font-size: 1.1rem;">Sign Up Now!</div>';
-              html += '<div style="color: #78350f; margin-bottom: 15px;">20 problems, 45-50 minutes, no calculator</div>';
+              html += '<div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 15px; margin-top: 15px; text-align: center;">';
+              html += '<div style="color: #92400e; font-weight: bold; font-size: 1.1rem; margin-bottom: 10px;">Ready to Sign Up?</div>';
               html += '<button onclick="signUpForNoetic(\'' + student.mcpsId + '\', \'' + escapeHtml(student.name) + '\', \'' + (student.gradeLevel || '') + '\')" style="background: #dc2626; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer;">';
               html += 'Sign Up for Noetic Learning';
               html += '</button>';
-              html += '<div style="color: #78350f; margin-top: 10px; font-size: 0.85rem;">Deadline: March 1, 2026</div>';
               html += '</div>';
             } else {
-              // After deadline, not signed up
-              html += '<div style="text-align: center; color: #666; padding: 15px;">';
-              html += '<p>Sign-up deadline has passed.</p>';
+              // After deadline
+              html += '<div style="background: #f3f4f6; border: 2px solid #d1d5db; border-radius: 8px; padding: 15px; margin-top: 15px; text-align: center;">';
+              html += '<div style="color: #6b7280; font-size: 0.95rem;">Registration deadline has passed</div>';
               html += '</div>';
             }
 
+            // Registration info
+            html += '<div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 15px; margin-top: 15px; text-align: center;">';
+            html += '<div style="color: #92400e; font-weight: bold; margin-bottom: 8px;">Registration Information</div>';
+            html += '<div style="color: #78350f; font-size: 0.9rem; line-height: 1.6;">';
+            html += '<p style="margin-bottom: 8px;"><strong>Registration closes: Sunday, March 1, 2026</strong></p>';
+            html += '<p style="margin-bottom: 0;">Contest fees will be collected via SchoolCash Online during the first week of March</p>';
             html += '</div>';
             html += '</div>';
-            } // End of disabled Noetic section
+
+            html += '</div>';
+            html += '</div>';
 
             document.getElementById('studentResults').innerHTML = html;
             document.getElementById('resultsSection').classList.add('show');
@@ -1502,6 +1466,136 @@
             selectedGradeLevel = null;
         }
         */  // END DISABLED NOETIC FUNCTIONS
+
+        function signUpForNoetic(mcpsId, studentName, grade) {
+            grade = grade ? grade.toString().trim() : '';
+
+            // Extract numeric grade from strings like "8th grade", "8", "Grade 8", etc.
+            const numericGrade = grade.match(/\d+/);
+            const gradeNum = numericGrade ? numericGrade[0] : '';
+
+            // 8th graders automatically sign up for 8th/Mixed team
+            if (gradeNum === '8') {
+                submitNoeticSignUp(mcpsId, studentName, gradeNum, 'mixed');
+            } else if (gradeNum === '6' || gradeNum === '7') {
+                // Show dialog for 6th and 7th graders
+                showNoeticGradeDialog(mcpsId, studentName, gradeNum);
+            } else {
+                showMessage('Unable to determine grade level. Please contact the math coach.', true);
+            }
+        }
+
+        function showNoeticGradeDialog(mcpsId, studentName, grade) {
+            const message = `<div style="text-align: left; line-height: 1.8;">
+                <p style="margin-bottom: 15px;"><strong>Which team would you like to join?</strong></p>
+
+                <div style="background: #eff6ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px; margin-bottom: 12px; cursor: pointer;" onclick="selectGradeAndSubmit('${mcpsId}', '${studentName}', '${grade}', 'own')">
+                    <div style="font-weight: bold; color: #1e40af; margin-bottom: 4px;">Your Grade Level (${grade})</div>
+                    <div style="color: #1e40af; font-size: 0.9rem;">Answer ${grade}th grade level questions</div>
+                </div>
+
+                <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 12px; cursor: pointer;" onclick="selectGradeAndSubmit('${mcpsId}', '${studentName}', '${grade}', 'mixed')">
+                    <div style="font-weight: bold; color: #92400e; margin-bottom: 4px;">8th/Mixed Team</div>
+                    <div style="color: #92400e; font-size: 0.9rem; margin-bottom: 8px;">Answer 8th grade level questions</div>
+                    <div style="color: #78350f; font-size: 0.85rem; font-style: italic;">⚠ You will compete at the 8th grade level</div>
+                </div>
+            </div>`;
+
+            if (confirm(`Sign up for Noetic Learning Math Contest?\n\nContests Date: April 10, 2026\nFormat: 20 problems, 45-50 minutes, no calculator\n\nClick OK to see team options.`)) {
+                // Use alert with custom styling via showMessage
+                const html = document.createElement('div');
+                html.innerHTML = message;
+
+                // Create a custom dialog
+                const dialog = document.createElement('div');
+                dialog.id = 'noeticTeamDialog';
+                dialog.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+                dialog.innerHTML = `
+                    <div style="background: white; border-radius: 12px; padding: 25px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                        <div style="text-align: left; line-height: 1.8;">
+                            <p style="margin-bottom: 15px; font-size: 1.1rem; font-weight: bold;">Which team would you like to join?</p>
+
+                            <div style="background: #eff6ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#e0edff'" onmouseout="this.style.background='#eff6ff'" onclick="selectGradeAndSubmit('${mcpsId}', '${studentName}', '${grade}', 'own'); document.getElementById('noeticTeamDialog').remove();">
+                                <div style="font-weight: bold; color: #1e40af; margin-bottom: 4px;">Your Grade Level (${grade})</div>
+                                <div style="color: #1e40af; font-size: 0.9rem;">Answer ${grade}th grade level questions</div>
+                            </div>
+
+                            <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#fde68a'" onmouseout="this.style.background='#fef3c7'" onclick="selectGradeAndSubmit('${mcpsId}', '${studentName}', '${grade}', 'mixed'); document.getElementById('noeticTeamDialog').remove();">
+                                <div style="font-weight: bold; color: #92400e; margin-bottom: 4px;">8th/Mixed Team</div>
+                                <div style="color: #92400e; font-size: 0.9rem; margin-bottom: 8px;">Answer 8th grade level questions</div>
+                                <div style="color: #78350f; font-size: 0.85rem; font-style: italic;">⚠ You will compete at the 8th grade level</div>
+                            </div>
+
+                            <button onclick="document.getElementById('noeticTeamDialog').remove();" style="background: #e5e7eb; color: #333; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 12px;">Cancel</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(dialog);
+            }
+        }
+
+        function selectGradeAndSubmit(mcpsId, studentName, grade, gradePreference) {
+            submitNoeticSignUp(mcpsId, studentName, grade, gradePreference);
+        }
+
+        function submitNoeticSignUp(mcpsId, studentName, grade, gradePreference) {
+            showMessage('Signing up...', false);
+
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success) {
+                        showMessage(result.message, false);
+                        setTimeout(() => {
+                            lookupStudent();
+                        }, 1500);
+                    } else {
+                        showMessage(result.message, true);
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    showMessage('Error signing up. Please try again.', true);
+                    console.error('Sign-up error:', error);
+                })
+                .signUpForNoetic(mcpsId, studentName, grade, gradePreference);
+        }
+
+        function modifyNoeticSignUp(mcpsId, studentName, grade) {
+            grade = grade ? grade.toString().trim() : '';
+            const numericGrade = grade.match(/\d+/);
+            const gradeNum = numericGrade ? numericGrade[0] : '';
+
+            if (gradeNum === '8') {
+                showMessage('8th graders are assigned to the 8th/Mixed team automatically.', false);
+                return;
+            }
+
+            if (confirm('Change your team assignment?')) {
+                showNoeticGradeDialog(mcpsId, studentName, gradeNum);
+            }
+        }
+
+        function dropNoeticSignUp(mcpsId) {
+            if (confirm('Are you sure you want to drop the Noetic Learning Math Contest sign-up?')) {
+                showMessage('Dropping sign-up...', false);
+
+                google.script.run
+                    .withSuccessHandler(function(result) {
+                        if (result.success) {
+                            showMessage(result.message, false);
+                            setTimeout(() => {
+                                lookupStudent();
+                            }, 1500);
+                        } else {
+                            showMessage(result.message, true);
+                        }
+                    })
+                    .withFailureHandler(function(error) {
+                        showMessage('Error dropping sign-up. Please try again.', true);
+                        console.error('Drop error:', error);
+                    })
+                    .dropNoeticSignUp(mcpsId);
+            }
+        }
 
         function escapeHtml(text) {
             const div = document.createElement('div');

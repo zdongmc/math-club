@@ -41,6 +41,26 @@ function getSpreadsheet() {
   return SpreadsheetApp.getActiveSpreadsheet();
 }
 
+function testNoeticSheet() {
+  const spreadsheet = getSpreadsheet();
+  Logger.log('Spreadsheet ID: ' + spreadsheet.getId());
+  Logger.log('Spreadsheet name: ' + spreadsheet.getName());
+
+  const sheets = spreadsheet.getSheets();
+  Logger.log('All sheets in spreadsheet:');
+  for (let i = 0; i < sheets.length; i++) {
+    Logger.log('  ' + (i + 1) + '. ' + sheets[i].getName());
+  }
+
+  const noeticSheet = getNoeticSheet();
+  if (noeticSheet) {
+    Logger.log('✓ Noetic sheet found!');
+    Logger.log('Noetic sheet last row: ' + noeticSheet.getLastRow());
+  } else {
+    Logger.log('✗ Noetic sheet NOT found!');
+  }
+}
+
 function getRegistrationSheet() {
   return getSpreadsheet().getSheetByName(REGISTRATION_SHEET_NAME);
 }
@@ -859,43 +879,52 @@ function getNoeticSignUpCounts() {
     if (!sheet || sheet.getLastRow() <= 1) {
       return {
         total: 0,
-        byGradePreference: {},
+        by6th: 0,
+        by7th: 0,
+        byMixed: 0,
         costPerStudent: 0
       };
     }
 
     const data = sheet.getDataRange().getValues();
-    let ownGradeCount = 0;
-    let mixedGradeCount = 0;
+    let count6th = 0;
+    let count7th = 0;
+    let countMixed = 0;
 
     // Count sign-ups by grade preference (column H, index 7)
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
       const gradePreference = (row[7] || '').toString().trim().toLowerCase();
+      const grade = (row[2] || '').toString().trim();
 
-      if (gradePreference === 'own') {
-        ownGradeCount++;
+      if (gradePreference === 'own' && grade === '6') {
+        count6th++;
+      } else if (gradePreference === 'own' && grade === '7') {
+        count7th++;
       } else if (gradePreference === 'mixed') {
-        mixedGradeCount++;
+        countMixed++;
       }
     }
 
-    const totalSignUps = ownGradeCount + mixedGradeCount;
+    const totalSignUps = count6th + count7th + countMixed;
     const costPerStudent = totalSignUps > 0 ? Math.round((99 / totalSignUps) * 100) / 100 : 0;
+
+    Logger.log('Noetic sign-up counts - 6th: ' + count6th + ', 7th: ' + count7th + ', mixed: ' + countMixed + ', total: ' + totalSignUps);
 
     return {
       total: totalSignUps,
-      byGradePreference: {
-        own: ownGradeCount,
-        mixed: mixedGradeCount
-      },
+      by6th: count6th,
+      by7th: count7th,
+      byMixed: countMixed,
       costPerStudent: costPerStudent
     };
   } catch (error) {
     Logger.log('Error getting Noetic sign-up counts: ' + error.toString());
     return {
       total: 0,
-      byGradePreference: {},
+      by6th: 0,
+      by7th: 0,
+      byMixed: 0,
       costPerStudent: 0
     };
   }
@@ -946,10 +975,15 @@ function getNoeticResults(mcpsId) {
 }
 
 function signUpForNoetic(mcpsId, studentName, grade, gradePreference) {
+  Logger.log('=== signUpForNoetic called ===');
+  Logger.log('Parameters - mcpsId: ' + mcpsId + ', studentName: ' + studentName + ', grade: ' + grade + ', gradePreference: ' + gradePreference);
+
   try {
     const sheet = getNoeticSheet();
+    Logger.log('Sheet retrieved: ' + (sheet ? 'YES' : 'NO'));
 
     if (!sheet) {
+      Logger.log('Sheet is null/undefined!');
       return {
         success: false,
         message: 'Noetic sheet not found. Please contact the math coach.'
@@ -957,14 +991,18 @@ function signUpForNoetic(mcpsId, studentName, grade, gradePreference) {
     }
 
     const mcpsIdStr = mcpsId.toString().trim();
+    Logger.log('MCPS ID string: ' + mcpsIdStr);
 
     // Check if student already signed up
     const data = sheet.getDataRange().getValues();
+    Logger.log('Data retrieved, rows: ' + data.length);
+
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
       const existingId = (row[1] || '').toString().trim();
 
       if (existingId === mcpsIdStr) {
+        Logger.log('Duplicate found at row ' + (i + 1));
         return {
           success: false,
           message: 'You are already signed up for Noetic Learning Math Contest!'
@@ -985,7 +1023,9 @@ function signUpForNoetic(mcpsId, studentName, grade, gradePreference) {
       gradePreference     // H: Grade Preference (own or mixed)
     ];
 
+    Logger.log('About to append row: ' + JSON.stringify(newRow));
     sheet.appendRow(newRow);
+    Logger.log('Row appended successfully');
 
     Logger.log('Noetic sign-up successful: ' + studentName + ' (' + mcpsIdStr + ') - Grade Preference: ' + gradePreference);
 
@@ -995,10 +1035,13 @@ function signUpForNoetic(mcpsId, studentName, grade, gradePreference) {
     };
 
   } catch (error) {
-    Logger.log('Error signing up for Noetic: ' + error.toString());
+    Logger.log('ERROR in signUpForNoetic: ' + error.toString());
+    Logger.log('Error name: ' + error.name);
+    Logger.log('Error message: ' + error.message);
+    Logger.log('Stack: ' + error.stack);
     return {
       success: false,
-      message: 'An error occurred during sign-up. Please try again or contact the math coach.'
+      message: 'An error occurred during sign-up. Please try again or contact the math coach. Error: ' + error.toString()
     };
   }
 }
@@ -1055,6 +1098,60 @@ function updateNoeticGradePreference(mcpsId, gradePreference) {
     return {
       success: false,
       message: 'An error occurred updating your preference. Please try again or contact the math coach.'
+    };
+  }
+}
+
+function dropNoeticSignUp(mcpsId) {
+  try {
+    const sheet = getNoeticSheet();
+
+    if (!sheet) {
+      return {
+        success: false,
+        message: 'Noetic sheet not found. Please contact the math coach.'
+      };
+    }
+
+    const mcpsIdStr = mcpsId.toString().trim();
+
+    // Check registration deadline
+    const today = new Date();
+    const deadline = new Date('2026-03-01T23:59:59');
+    if (today > deadline) {
+      return {
+        success: false,
+        message: 'Registration deadline has passed. You can no longer drop your sign-up.'
+      };
+    }
+
+    // Find and delete the student's row
+    const data = sheet.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const studentId = (row[1] || '').toString().trim();
+
+      if (studentId === mcpsIdStr) {
+        // Delete this row
+        sheet.deleteRow(i + 1);
+        Logger.log('Noetic sign-up dropped for: ' + studentId);
+        return {
+          success: true,
+          message: 'Successfully dropped Noetic Learning Math Contest sign-up.'
+        };
+      }
+    }
+
+    return {
+      success: false,
+      message: 'Sign-up not found. Please contact the math coach.'
+    };
+
+  } catch (error) {
+    Logger.log('Error dropping Noetic sign-up: ' + error.toString());
+    return {
+      success: false,
+      message: 'An error occurred dropping your sign-up. Please try again or contact the math coach.'
     };
   }
 }
@@ -1162,10 +1259,12 @@ function lookupStudentByMcpsId(mcpsId) {
       if (emailMatch && emailMatch[1] === mcpsIdStr) {
         const firstName = (row[1] || '').toString().trim();
         const lastName = (row[2] || '').toString().trim();
+        const gradeLevel = (row[3] || '').toString().trim();
         studentInfo = {
           name: `${firstName} ${lastName}`.trim(),
           mcpsId: mcpsIdStr,
-          email: email
+          email: email,
+          gradeLevel: gradeLevel
         };
         Logger.log('Found in Form Responses 1: ' + studentInfo.name);
         break;
@@ -1254,6 +1353,27 @@ function lookupStudentByMcpsId(mcpsId) {
     if (!studentInfo) {
       Logger.log('Student not found in any sheet');
       return { success: false, message: 'Student not found with MCPS ID: ' + mcpsIdStr };
+    }
+
+    // If grade not found yet, try to get it from Form Responses 2
+    if (!studentInfo.gradeLevel) {
+      Logger.log('Grade not found yet, checking Form Responses 2 for grade...');
+      const competitionSheet = getCompetitionSignupSheet();
+      if (competitionSheet && competitionSheet.getLastRow() > 1) {
+        const competitionData = competitionSheet.getDataRange().getValues();
+        for (let i = 1; i < competitionData.length; i++) {
+          const row = competitionData[i];
+          const studentId = row[2] ? row[2].toString().trim() : '';
+          if (studentId === mcpsIdStr) {
+            const gradeLevel = (row[3] || '').toString().trim();
+            if (gradeLevel) {
+              studentInfo.gradeLevel = gradeLevel;
+              Logger.log('Grade found in Form Responses 2: ' + gradeLevel);
+            }
+            break;
+          }
+        }
+      }
     }
 
     Logger.log('Student found: ' + JSON.stringify(studentInfo));
@@ -1361,20 +1481,40 @@ function lookupStudentByMcpsId(mcpsId) {
     }
 
     // Get Noetic Learning results
-    // COMMENTED OUT - Noetic feature disabled
-    // let noeticResults = null;
-    // try {
-    //   Logger.log('Getting Noetic Learning results for: ' + mcpsIdStr);
-    //   noeticResults = getNoeticResults(mcpsIdStr);
-    //   if (noeticResults) {
-    //     Logger.log('Noetic results retrieved: Signed Up=' + noeticResults.signedUp);
-    //   } else {
-    //     Logger.log('No Noetic results found for this student');
-    //   }
-    // } catch (err) {
-    //   Logger.log('Error getting Noetic results: ' + err.toString());
-    // }
     let noeticResults = null;
+    try {
+      Logger.log('Getting Noetic Learning results for: ' + mcpsIdStr);
+      const signUpCounts = getNoeticSignUpCounts();
+
+      // Check if student is signed up
+      const sheet = getNoeticSheet();
+      let isSignedUp = false;
+      let gradePreference = null;
+
+      if (sheet && sheet.getLastRow() > 1) {
+        const data = sheet.getDataRange().getValues();
+        for (let i = 1; i < data.length; i++) {
+          const row = data[i];
+          const studentId = (row[1] || '').toString().trim();
+
+          if (studentId === mcpsIdStr) {
+            isSignedUp = true;
+            gradePreference = (row[7] || '').toString().trim().toLowerCase();
+            break;
+          }
+        }
+      }
+
+      noeticResults = {
+        signUpCounts: signUpCounts,
+        signedUp: isSignedUp,
+        gradePreference: gradePreference
+      };
+      Logger.log('Noetic results: signedUp=' + isSignedUp + ', preference=' + gradePreference);
+    } catch (err) {
+      Logger.log('Error getting Noetic results: ' + err.toString());
+      noeticResults = null;
+    }
 
     const result = {
       success: true,
