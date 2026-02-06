@@ -4,7 +4,19 @@ const COMPETITION_SIGNUP_SHEET_NAME = 'Form Responses 2';
 const ATTENDANCE_SHEET_NAME = 'Attendance Records';
 const SCHOOL_LIST_SHEET_NAME = 'School List';
 
-function doGet() {
+function doGet(e) {
+  // Handle sign-up action
+  if (e && e.parameter && e.parameter.action === 'signUpNoetic') {
+    const mcpsId = e.parameter.mcpsId;
+    const studentName = e.parameter.studentName;
+    const grade = e.parameter.grade;
+
+    const result = signUpForNoetic(mcpsId, studentName, grade);
+    return ContentService.createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  // Default: Return HTML page
   return HtmlService.createTemplateFromFile('Checkin')
     .evaluate()
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
@@ -422,6 +434,10 @@ function getAmc8Sheet() {
   return getSpreadsheet().getSheetByName('AMC 8');
 }
 
+function getNoeticSheet() {
+  return getSpreadsheet().getSheetByName('Noetic');
+}
+
 function getMathLeagueTeam(mcpsId) {
   try {
     const sheet = getMathLeagueSheet();
@@ -826,6 +842,101 @@ function getAmc8Results(mcpsId) {
   }
 }
 
+function getNoeticResults(mcpsId) {
+  try {
+    const sheet = getNoeticSheet();
+    if (!sheet || sheet.getLastRow() <= 1) {
+      return null;
+    }
+
+    const data = sheet.getDataRange().getValues();
+
+    // Columns: A=Name, B=MCPS ID, C=Grade, D=Timestamp, E=Score, F=PDF, G=Fee Paid
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const studentId = (row[1] || '').toString().trim();
+
+      if (studentId === mcpsId.toString().trim()) {
+        const signUpDate = row[3] || null;
+        const score = row[4] !== undefined && row[4] !== '' ? parseInt(row[4]) : null;
+        const pdfLink = (row[5] || '').toString().trim() || null;
+        const feePaid = row[6] ? (row[6].toString().toLowerCase() === 'true' || row[6] === true) : false;
+
+        return {
+          signedUp: true,
+          signUpDate: signUpDate,
+          score: score,
+          pdfLink: pdfLink,
+          feePaid: feePaid,
+          maxScore: 20
+        };
+      }
+    }
+
+    return null;
+  } catch (error) {
+    Logger.log('Error getting Noetic results: ' + error.toString());
+    return null;
+  }
+}
+
+function signUpForNoetic(mcpsId, studentName, grade) {
+  try {
+    const sheet = getNoeticSheet();
+
+    if (!sheet) {
+      return {
+        success: false,
+        message: 'Noetic sheet not found. Please contact the math coach.'
+      };
+    }
+
+    const mcpsIdStr = mcpsId.toString().trim();
+
+    // Check if student already signed up
+    const data = sheet.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const existingId = (row[1] || '').toString().trim();
+
+      if (existingId === mcpsIdStr) {
+        return {
+          success: false,
+          message: 'You are already signed up for Noetic Learning Math Contest!'
+        };
+      }
+    }
+
+    // Add new sign-up row
+    const timestamp = new Date();
+    const newRow = [
+      studentName,        // A: Name
+      mcpsIdStr,          // B: MCPS ID
+      grade || '',        // C: Grade
+      timestamp,          // D: Sign-up Timestamp
+      '',                 // E: Score (empty)
+      '',                 // F: PDF Link (empty)
+      ''                  // G: Fee Paid (empty)
+    ];
+
+    sheet.appendRow(newRow);
+
+    Logger.log('Noetic sign-up successful: ' + studentName + ' (' + mcpsIdStr + ')');
+
+    return {
+      success: true,
+      message: 'Successfully signed up for Noetic Learning Math Contest!'
+    };
+
+  } catch (error) {
+    Logger.log('Error signing up for Noetic: ' + error.toString());
+    return {
+      success: false,
+      message: 'An error occurred during sign-up. Please try again or contact the math coach.'
+    };
+  }
+}
+
 function checkFormCompletion(mcpsId, studentName) {
   try {
     const forms = {
@@ -1127,6 +1238,20 @@ function lookupStudentByMcpsId(mcpsId) {
       amc8Results = null;
     }
 
+    // Get Noetic Learning results
+    let noeticResults = null;
+    try {
+      Logger.log('Getting Noetic Learning results for: ' + mcpsIdStr);
+      noeticResults = getNoeticResults(mcpsIdStr);
+      if (noeticResults) {
+        Logger.log('Noetic results retrieved: Signed Up=' + noeticResults.signedUp);
+      } else {
+        Logger.log('No Noetic results found for this student');
+      }
+    } catch (err) {
+      Logger.log('Error getting Noetic results: ' + err.toString());
+    }
+
     const result = {
       success: true,
       student: studentInfo,
@@ -1137,7 +1262,8 @@ function lookupStudentByMcpsId(mcpsId) {
       moems: moemsResults,
       mathLeague: mathLeagueResults,
       mathKangaroo: mathKangarooResults,
-      amc8: amc8Results
+      amc8: amc8Results,
+      noetic: noeticResults
     };
 
     Logger.log('Returning result: ' + JSON.stringify(result));
