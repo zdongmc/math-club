@@ -17,6 +17,16 @@ function doGet(e) {
       .setMimeType(ContentService.MimeType.JSON);
   }
 
+  // Handle grade preference update action
+  if (e && e.parameter && e.parameter.action === 'updateNoeticGradePreference') {
+    const mcpsId = e.parameter.mcpsId;
+    const gradePreference = e.parameter.gradePreference || '';
+
+    const result = updateNoeticGradePreference(mcpsId, gradePreference);
+    return ContentService.createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
   // Default: Return HTML page
   return HtmlService.createTemplateFromFile('Checkin')
     .evaluate()
@@ -843,6 +853,54 @@ function getAmc8Results(mcpsId) {
   }
 }
 
+function getNoeticSignUpCounts() {
+  try {
+    const sheet = getNoeticSheet();
+    if (!sheet || sheet.getLastRow() <= 1) {
+      return {
+        total: 0,
+        byGradePreference: {},
+        costPerStudent: 0
+      };
+    }
+
+    const data = sheet.getDataRange().getValues();
+    let ownGradeCount = 0;
+    let mixedGradeCount = 0;
+
+    // Count sign-ups by grade preference (column H, index 7)
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const gradePreference = (row[7] || '').toString().trim().toLowerCase();
+
+      if (gradePreference === 'own') {
+        ownGradeCount++;
+      } else if (gradePreference === 'mixed') {
+        mixedGradeCount++;
+      }
+    }
+
+    const totalSignUps = ownGradeCount + mixedGradeCount;
+    const costPerStudent = totalSignUps > 0 ? Math.round((99 / totalSignUps) * 100) / 100 : 0;
+
+    return {
+      total: totalSignUps,
+      byGradePreference: {
+        own: ownGradeCount,
+        mixed: mixedGradeCount
+      },
+      costPerStudent: costPerStudent
+    };
+  } catch (error) {
+    Logger.log('Error getting Noetic sign-up counts: ' + error.toString());
+    return {
+      total: 0,
+      byGradePreference: {},
+      costPerStudent: 0
+    };
+  }
+}
+
 function getNoeticResults(mcpsId) {
   try {
     const sheet = getNoeticSheet();
@@ -852,7 +910,7 @@ function getNoeticResults(mcpsId) {
 
     const data = sheet.getDataRange().getValues();
 
-    // Columns: A=Name, B=MCPS ID, C=Grade, D=Timestamp, E=Score, F=PDF, G=Fee Paid
+    // Columns: A=Name, B=MCPS ID, C=Grade, D=Timestamp, E=Score, F=PDF, G=Fee Paid, H=Grade Preference
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
       const studentId = (row[1] || '').toString().trim();
@@ -862,6 +920,10 @@ function getNoeticResults(mcpsId) {
         const score = row[4] !== undefined && row[4] !== '' ? parseInt(row[4]) : null;
         const pdfLink = (row[5] || '').toString().trim() || null;
         const feePaid = row[6] ? (row[6].toString().toLowerCase() === 'true' || row[6] === true) : false;
+        const gradePreference = (row[7] || '').toString().trim().toLowerCase();
+
+        // Get current sign-up counts for display
+        const counts = getNoeticSignUpCounts();
 
         return {
           signedUp: true,
@@ -869,7 +931,9 @@ function getNoeticResults(mcpsId) {
           score: score,
           pdfLink: pdfLink,
           feePaid: feePaid,
-          maxScore: 20
+          gradePreference: gradePreference,
+          maxScore: 20,
+          signUpCounts: counts
         };
       }
     }
@@ -918,7 +982,7 @@ function signUpForNoetic(mcpsId, studentName, grade, gradePreference) {
       '',                 // E: Score (empty)
       '',                 // F: PDF Link (empty)
       '',                 // G: Fee Paid (empty)
-      gradePreference     // H: Grade Preference (own or 8th)
+      gradePreference     // H: Grade Preference (own or mixed)
     ];
 
     sheet.appendRow(newRow);
@@ -935,6 +999,62 @@ function signUpForNoetic(mcpsId, studentName, grade, gradePreference) {
     return {
       success: false,
       message: 'An error occurred during sign-up. Please try again or contact the math coach.'
+    };
+  }
+}
+
+function updateNoeticGradePreference(mcpsId, gradePreference) {
+  try {
+    const sheet = getNoeticSheet();
+
+    if (!sheet) {
+      return {
+        success: false,
+        message: 'Noetic sheet not found. Please contact the math coach.'
+      };
+    }
+
+    const mcpsIdStr = mcpsId.toString().trim();
+
+    // Check registration deadline
+    const today = new Date();
+    const deadline = new Date('2026-03-01T23:59:59');
+    if (today > deadline) {
+      return {
+        success: false,
+        message: 'Registration deadline has passed. You can no longer change your grade preference.'
+      };
+    }
+
+    // Find and update the student's row
+    const data = sheet.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const studentId = (row[1] || '').toString().trim();
+
+      if (studentId === mcpsIdStr) {
+        // Update grade preference in column H (index 7)
+        sheet.getRange(i + 1, 8).setValue(gradePreference);
+
+        Logger.log('Noetic grade preference updated: ' + mcpsIdStr + ' -> ' + gradePreference);
+
+        return {
+          success: true,
+          message: 'Grade preference updated successfully!'
+        };
+      }
+    }
+
+    return {
+      success: false,
+      message: 'Student not found in sign-up list.'
+    };
+
+  } catch (error) {
+    Logger.log('Error updating Noetic grade preference: ' + error.toString());
+    return {
+      success: false,
+      message: 'An error occurred updating your preference. Please try again or contact the math coach.'
     };
   }
 }

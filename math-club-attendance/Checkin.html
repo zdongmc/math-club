@@ -634,9 +634,9 @@
                         <div class="grade-option-title">Your Grade Level</div>
                         <div class="grade-option-description">May result in higher individual cost if fewer students at your level sign up.</div>
                     </div>
-                    <div class="grade-option" id="eighthGradeOption" onclick="selectGradeLevel('8th')">
-                        <div class="grade-option-title">8th Grade Level</div>
-                        <div class="grade-option-description">Helps reduce individual cost by having more students on the same team.</div>
+                    <div class="grade-option" id="mixedGradeOption" onclick="selectGradeLevel('mixed')">
+                        <div class="grade-option-title">Mixed Grade Team</div>
+                        <div class="grade-option-description">All students answer the highest grade level questions. Helps reduce individual cost by having more students together.</div>
                     </div>
                 </div>
 
@@ -978,9 +978,28 @@
             html += '<div style="background: #f0f9ff; border: 2px solid #bfdbfe; border-radius: 8px; padding: 15px; margin-bottom: 15px;">';
             html += '<div style="font-weight: bold; color: #1e40af; margin-bottom: 10px;">Cost & Grading Information</div>';
             html += '<div style="color: #666; font-size: 0.9rem; line-height: 1.6;">';
-            html += '<p style="margin-bottom: 8px;">The Noetic Contest costs <strong>$99 per team</strong> (up to 30 students). The cost is split equally among all team members, so your individual cost will depend on how many students sign up.</p>';
+            html += '<p style="margin-bottom: 8px;">The Noetic Contest costs <strong>$99 per team</strong> (up to 30 students).</p>';
+
+            // Show real-time cost if there are sign-ups
+            if (noetic && noetic.signUpCounts) {
+              const counts = noetic.signUpCounts;
+              if (counts.total > 0) {
+                html += '<div style="background: #fef3c7; padding: 10px; border-radius: 6px; margin-bottom: 10px; border-left: 4px solid #f59e0b;">';
+                html += '<div style="font-weight: bold; color: #92400e; margin-bottom: 5px;">Real-Time Cost: $' + counts.costPerStudent + ' per student</div>';
+                html += '<div style="font-size: 0.85rem; color: #78350f;">(' + counts.total + ' students signed up)</div>';
+                html += '<div style="font-size: 0.85rem; color: #78350f; margin-top: 8px;">';
+                html += '• Your Grade Level: ' + counts.byGradePreference.own + ' student' + (counts.byGradePreference.own !== 1 ? 's' : '') + '</div>';
+                html += '<div style="font-size: 0.85rem; color: #78350f;">• Mixed Grade Team: ' + counts.byGradePreference.mixed + ' student' + (counts.byGradePreference.mixed !== 1 ? 's' : '') + '</div>';
+                html += '</div>';
+              } else {
+                html += '<p style="margin-bottom: 8px; color: #999;">No students signed up yet. Cost will be calculated as sign-ups arrive.</p>';
+              }
+            } else {
+              html += '<p style="margin-bottom: 8px;">The cost is split equally among all team members, so your individual cost will depend on how many students sign up.</p>';
+            }
+
             html += '<p style="margin-bottom: 8px;">Questions are different by grade level. If a team has mixed grades, all students answer the highest grade level questions.</p>';
-            html += '<p style="margin-bottom: 8px; background: #fef3c7; padding: 10px; border-radius: 6px; border-left: 4px solid #f59e0b;"><strong>Registration closes Sunday, March 1</strong>. Contest fees will be collected via SchoolCash Online during the first week of March.</p>';
+            html += '<p style="margin-bottom: 0; background: #fef3c7; padding: 10px; border-radius: 6px; border-left: 4px solid #f59e0b;"><strong>Registration closes Sunday, March 1</strong>. Contest fees will be collected via SchoolCash Online during the first week of March.</p>';
             html += '</div>';
             html += '</div>';
 
@@ -992,13 +1011,25 @@
 
             if (noetic && noetic.signedUp) {
               // Signed up - show status
+              const gradePreferenceName = noetic.gradePreference === 'own' ? 'Your Grade Level' : 'Mixed Grade Team';
               html += '<div style="background: #d1fae5; border: 2px solid #059669; border-radius: 8px; padding: 15px; margin-bottom: 15px; text-align: center;">';
-              html += '<div style="color: #047857; font-weight: bold; font-size: 1.1rem;">✓ Signed Up for Noetic Learning</div>';
+              html += '<div style="color: #047857; font-weight: bold; font-size: 1.1rem;">✓ Signed Up for ' + gradePreferenceName + '</div>';
               if (noetic.signUpDate) {
                 const signUpDateStr = new Date(noetic.signUpDate).toLocaleDateString();
                 html += '<div style="color: #065f46; margin-top: 5px; font-size: 0.9rem;">Signed up on ' + signUpDateStr + '</div>';
               }
               html += '</div>';
+
+              // Show change preference button if before March 1
+              const changeDeadline = new Date('2026-03-01T23:59:59');
+              if (today < changeDeadline) {
+                html += '<div style="text-align: center; margin-bottom: 15px;">';
+                html += '<button onclick="changeNoeticGradePreference(\'' + student.mcpsId + '\')" style="background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; transition: all 0.3s ease;">';
+                html += 'Change Grade Preference';
+                html += '</button>';
+                html += '<div style="color: #666; font-size: 0.85rem; margin-top: 8px;">Available until March 1</div>';
+                html += '</div>';
+              }
 
               // Fee payment status
               if (noetic.feePaid) {
@@ -1037,7 +1068,7 @@
               html += '<button onclick="signUpForNoetic(\'' + student.mcpsId + '\', \'' + escapeHtml(student.name) + '\', \'' + (student.gradeLevel || '') + '\')" style="background: #dc2626; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer;">';
               html += 'Sign Up for Noetic Learning';
               html += '</button>';
-              html += '<div style="color: #78350f; margin-top: 10px; font-size: 0.85rem;">Deadline: March 12, 2026</div>';
+              html += '<div style="color: #78350f; margin-top: 10px; font-size: 0.85rem;">Deadline: March 1, 2026</div>';
               html += '</div>';
             } else {
               // After deadline, not signed up
@@ -1331,6 +1362,7 @@
         // Global variables for Noetic sign-up flow
         let noeticSignUpData = null;
         let selectedGradeLevel = null;
+        let noeticActionType = 'signup'; // 'signup' or 'changePreference'
 
         function signUpForNoetic(mcpsId, studentName, grade) {
             // Store sign-up data and show modal
@@ -1340,9 +1372,23 @@
                 grade: grade
             };
 
+            noeticActionType = 'signup';
             selectedGradeLevel = null;
             document.getElementById('ownGradeOption').classList.remove('selected');
-            document.getElementById('eighthGradeOption').classList.remove('selected');
+            document.getElementById('mixedGradeOption').classList.remove('selected');
+            document.getElementById('noeticModal').classList.add('show');
+        }
+
+        function changeNoeticGradePreference(mcpsId) {
+            // Store change data and show modal
+            noeticSignUpData = {
+                mcpsId: mcpsId
+            };
+
+            noeticActionType = 'changePreference';
+            selectedGradeLevel = null;
+            document.getElementById('ownGradeOption').classList.remove('selected');
+            document.getElementById('mixedGradeOption').classList.remove('selected');
             document.getElementById('noeticModal').classList.add('show');
         }
 
@@ -1351,7 +1397,7 @@
 
             // Update UI to show selection
             document.getElementById('ownGradeOption').classList.toggle('selected', level === 'own');
-            document.getElementById('eighthGradeOption').classList.toggle('selected', level === '8th');
+            document.getElementById('mixedGradeOption').classList.toggle('selected', level === 'mixed');
         }
 
         function confirmNoeticSignUp() {
@@ -1363,30 +1409,50 @@
             // Hide modal
             document.getElementById('noeticModal').classList.remove('show');
 
-            // Find and disable the sign-up button
+            // Find relevant button to disable
             const buttons = document.querySelectorAll('button');
-            let signUpButton = null;
-            for (let btn of buttons) {
-                if (btn.textContent.includes('Sign Up for Noetic')) {
-                    signUpButton = btn;
-                    break;
+            let actionButton = null;
+
+            if (noeticActionType === 'signup') {
+                for (let btn of buttons) {
+                    if (btn.textContent.includes('Sign Up for Noetic')) {
+                        actionButton = btn;
+                        break;
+                    }
+                }
+            } else if (noeticActionType === 'changePreference') {
+                for (let btn of buttons) {
+                    if (btn.textContent.includes('Change Grade Preference')) {
+                        actionButton = btn;
+                        break;
+                    }
                 }
             }
 
-            if (signUpButton) {
-                signUpButton.disabled = true;
-                signUpButton.innerHTML = '<span style="display: inline-block; width: 16px; height: 16px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite;"></span> Signing up...';
+            if (actionButton) {
+                actionButton.disabled = true;
+                actionButton.innerHTML = '<span style="display: inline-block; width: 16px; height: 16px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite;"></span> Processing...';
             }
 
             // Build URL with parameters
             const scriptUrl = window.location.href.split('?')[0];
-            const params = new URLSearchParams({
-                action: 'signUpNoetic',
-                mcpsId: noeticSignUpData.mcpsId,
-                studentName: noeticSignUpData.studentName,
-                grade: noeticSignUpData.grade,
-                gradePreference: selectedGradeLevel
-            });
+            let params;
+
+            if (noeticActionType === 'signup') {
+                params = new URLSearchParams({
+                    action: 'signUpNoetic',
+                    mcpsId: noeticSignUpData.mcpsId,
+                    studentName: noeticSignUpData.studentName,
+                    grade: noeticSignUpData.grade,
+                    gradePreference: selectedGradeLevel
+                });
+            } else {
+                params = new URLSearchParams({
+                    action: 'updateNoeticGradePreference',
+                    mcpsId: noeticSignUpData.mcpsId,
+                    gradePreference: selectedGradeLevel
+                });
+            }
 
             fetch(scriptUrl + '?' + params.toString())
                 .then(response => response.json())
@@ -1399,17 +1465,19 @@
                         }, 1000);
                     } else {
                         showMessage(result.message, true);
-                        if (signUpButton) {
-                            signUpButton.disabled = false;
-                            signUpButton.innerHTML = 'Sign Up for Noetic Learning';
+                        if (actionButton) {
+                            actionButton.disabled = false;
+                            const buttonText = noeticActionType === 'signup' ? 'Sign Up for Noetic Learning' : 'Change Grade Preference';
+                            actionButton.innerHTML = buttonText;
                         }
                     }
                 })
                 .catch(error => {
-                    showMessage('Error signing up. Please try again.', true);
-                    if (signUpButton) {
-                        signUpButton.disabled = false;
-                        signUpButton.innerHTML = 'Sign Up for Noetic Learning';
+                    showMessage('Error processing request. Please try again.', true);
+                    if (actionButton) {
+                        actionButton.disabled = false;
+                        const buttonText = noeticActionType === 'signup' ? 'Sign Up for Noetic Learning' : 'Change Grade Preference';
+                        actionButton.innerHTML = buttonText;
                     }
                 });
         }
