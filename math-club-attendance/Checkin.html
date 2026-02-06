@@ -967,8 +967,9 @@
                 html += '</div>';
             }
 
-            // Noetic Learning section
-            html += '<h2 class="section-title">🎯 Noetic Learning Math Contest</h2>';
+            // NOETIC LEARNING SECTION DISABLED - Temporarily disabled for debugging
+            // html += '<h2 class="section-title">🎯 Noetic Learning Math Contest</h2>';
+            if (false) { // Disable entire Noetic section
             html += '<div class="info-card">';
             html += '<div style="padding: 15px;">';
 
@@ -1089,6 +1090,7 @@
 
             html += '</div>';
             html += '</div>';
+            } // End of disabled Noetic section
 
             document.getElementById('studentResults').innerHTML = html;
             document.getElementById('resultsSection').classList.add('show');
@@ -1380,6 +1382,7 @@
         let selectedGradeLevel = null;
         let noeticActionType = 'signup'; // 'signup' or 'changePreference'
 
+        /* NOETIC FUNCTIONS DISABLED
         function signUpForNoetic(mcpsId, studentName, grade) {
             // Store sign-up data and show modal
             noeticSignUpData = {
@@ -1514,6 +1517,7 @@
             noeticSignUpData = null;
             selectedGradeLevel = null;
         }
+        */  // END DISABLED NOETIC FUNCTIONS
 
         function escapeHtml(text) {
             const div = document.createElement('div');

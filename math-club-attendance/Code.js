@@ -1361,18 +1361,20 @@ function lookupStudentByMcpsId(mcpsId) {
     }
 
     // Get Noetic Learning results
+    // COMMENTED OUT - Noetic feature disabled
+    // let noeticResults = null;
+    // try {
+    //   Logger.log('Getting Noetic Learning results for: ' + mcpsIdStr);
+    //   noeticResults = getNoeticResults(mcpsIdStr);
+    //   if (noeticResults) {
+    //     Logger.log('Noetic results retrieved: Signed Up=' + noeticResults.signedUp);
+    //   } else {
+    //     Logger.log('No Noetic results found for this student');
+    //   }
+    // } catch (err) {
+    //   Logger.log('Error getting Noetic results: ' + err.toString());
+    // }
     let noeticResults = null;
-    try {
-      Logger.log('Getting Noetic Learning results for: ' + mcpsIdStr);
-      noeticResults = getNoeticResults(mcpsIdStr);
-      if (noeticResults) {
-        Logger.log('Noetic results retrieved: Signed Up=' + noeticResults.signedUp);
-      } else {
-        Logger.log('No Noetic results found for this student');
-      }
-    } catch (err) {
-      Logger.log('Error getting Noetic results: ' + err.toString());
-    }
 
     const result = {
       success: true,
@@ -1388,7 +1390,14 @@ function lookupStudentByMcpsId(mcpsId) {
       noetic: noeticResults
     };
 
-    Logger.log('Returning result: ' + JSON.stringify(result));
+    try {
+      const resultJson = JSON.stringify(result);
+      Logger.log('Result size: ' + resultJson.length + ' bytes');
+      Logger.log('Returning result: ' + resultJson);
+    } catch (serializeError) {
+      Logger.log('Error serializing result: ' + serializeError.toString());
+      Logger.log('Result object keys: ' + Object.keys(result).join(', '));
+    }
     return result;
 
   } catch (error) {
