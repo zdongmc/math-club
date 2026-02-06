@@ -718,6 +718,8 @@
                 return;
             }
 
+            try {
+
             const student = result.student;
             const attendance = result.attendance;
             const competitions = result.competitions;
@@ -1090,6 +1092,12 @@
 
             document.getElementById('studentResults').innerHTML = html;
             document.getElementById('resultsSection').classList.add('show');
+            } catch (error) {
+                console.error('Error rendering results:', error);
+                console.error('Error stack:', error.stack);
+                showMessage('Error rendering results: ' + error.message, true);
+                document.getElementById('resultsSection').classList.remove('show');
+            }
         }
 
         function parseCompetitionDates(competitionName, details, isWaitlisted, team, moemsData, mathLeagueData) {
