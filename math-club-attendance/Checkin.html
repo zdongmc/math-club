@@ -986,15 +986,21 @@
               const yourCost = Math.round((99 / (counts.total + 1)) * 100) / 100;
 
               html += '<div style="background: #fef3c7; padding: 10px; border-radius: 6px; margin-bottom: 10px; border-left: 4px solid #f59e0b;">';
-              html += '<div style="font-weight: bold; color: #92400e; margin-bottom: 5px;">Your Cost: $' + yourCost + ' per student</div>';
+              html += '<div style="font-weight: bold; color: #92400e; margin-bottom: 8px;">Your Cost: $' + yourCost + ' per student</div>';
+
+              // Show team breakdown
+              html += '<div style="font-size: 0.85rem; color: #78350f; margin-bottom: 8px;">';
+              html += '• Your Grade Level: ' + counts.byGradePreference.own + ' student' + (counts.byGradePreference.own !== 1 ? 's' : '') + '</div>';
+              html += '<div style="font-size: 0.85rem; color: #78350f; margin-bottom: 10px;">';
+              html += '• Mixed Grade Team: ' + counts.byGradePreference.mixed + ' student' + (counts.byGradePreference.mixed !== 1 ? 's' : '') + '</div>';
+
+              // Show current status and note about cost decreasing
               if (counts.total > 0) {
-                html += '<div style="font-size: 0.85rem; color: #78350f;">(' + counts.total + ' students already signed up)</div>';
-                html += '<div style="font-size: 0.85rem; color: #78350f; margin-top: 8px;">';
-                html += '• Your Grade Level: ' + counts.byGradePreference.own + ' student' + (counts.byGradePreference.own !== 1 ? 's' : '') + '</div>';
-                html += '<div style="font-size: 0.85rem; color: #78350f;">• Mixed Grade Team: ' + counts.byGradePreference.mixed + ' student' + (counts.byGradePreference.mixed !== 1 ? 's' : '') + '</div>';
+                html += '<div style="font-size: 0.8rem; color: #78350f; font-style: italic;">(' + counts.total + ' students signed up so far)</div>';
               } else {
-                html += '<div style="font-size: 0.85rem; color: #78350f;">Be the first to sign up!</div>';
+                html += '<div style="font-size: 0.8rem; color: #78350f; font-style: italic;">Be the first to sign up!</div>';
               }
+              html += '<div style="font-size: 0.8rem; color: #78350f; font-style: italic; margin-top: 5px;">Cost will likely decrease as more students sign up.</div>';
               html += '</div>';
             } else {
               html += '<p style="margin-bottom: 8px;">The cost is split equally among all team members, so your individual cost will depend on how many students sign up.</p>';
