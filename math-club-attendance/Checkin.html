@@ -1373,23 +1373,7 @@
         let noeticActionType = 'signup'; // 'signup' or 'changePreference'
 
         function signUpForNoetic(mcpsId, studentName, grade) {
-            // For 8th graders, sign up automatically to mixed grade team
-            if (grade && grade.toString().trim() === '8') {
-                noeticSignUpData = {
-                    mcpsId: mcpsId,
-                    studentName: studentName,
-                    grade: grade
-                };
-
-                noeticActionType = 'signup';
-                selectedGradeLevel = 'mixed';
-
-                // Submit directly without showing modal
-                submitNoeticSignUp();
-                return;
-            }
-
-            // For 6th and 7th graders, show grade preference modal
+            // Store sign-up data and show modal
             noeticSignUpData = {
                 mcpsId: mcpsId,
                 studentName: studentName,
