@@ -443,6 +443,129 @@
             100% { transform: rotate(360deg); }
         }
 
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-dialog {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .modal-subtitle {
+            color: #666;
+            font-size: 0.95rem;
+            text-align: center;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .modal-question {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .grade-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .grade-option {
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .grade-option:hover {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+
+        .grade-option.selected {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+
+        .grade-option-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .grade-option-description {
+            font-size: 0.85rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .modal-btn-confirm {
+            background: #dc2626;
+            color: white;
+            flex: 1;
+        }
+
+        .modal-btn-confirm:hover {
+            background: #991b1b;
+        }
+
+        .modal-btn-cancel {
+            background: #e5e7eb;
+            color: #333;
+            flex: 1;
+        }
+
+        .modal-btn-cancel:hover {
+            background: #d1d5db;
+        }
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 1.6rem;
@@ -494,6 +617,34 @@
         <!-- Results Section -->
         <div class="results-section" id="resultsSection">
             <div id="studentResults"></div>
+        </div>
+
+        <!-- Noetic Sign-up Modal -->
+        <div class="modal-overlay" id="noeticModal">
+            <div class="modal-dialog">
+                <div class="modal-title">Noetic Learning Math Contest</div>
+                <div class="modal-subtitle">
+                    Friday, April 10, 2026 (3:15 - 4:15 PM)<br>
+                    20 problems, 45-50 minutes
+                </div>
+                <div class="modal-question">Which grade level would you like to take?</div>
+
+                <div class="grade-options">
+                    <div class="grade-option" id="ownGradeOption" onclick="selectGradeLevel('own')">
+                        <div class="grade-option-title">Your Grade Level</div>
+                        <div class="grade-option-description">May result in higher individual cost if fewer students at your level sign up.</div>
+                    </div>
+                    <div class="grade-option" id="eighthGradeOption" onclick="selectGradeLevel('8th')">
+                        <div class="grade-option-title">8th Grade Level</div>
+                        <div class="grade-option-description">Helps reduce individual cost by having more students on the same team.</div>
+                    </div>
+                </div>
+
+                <div class="modal-buttons">
+                    <button class="modal-btn modal-btn-confirm" onclick="confirmNoeticSignUp()">Confirm Sign Up</button>
+                    <button class="modal-btn modal-btn-cancel" onclick="cancelNoeticModal()">Cancel</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -821,7 +972,16 @@
 
             // Competition info
             html += '<div style="color: #666; font-size: 0.95rem; margin-bottom: 15px;">Competition Date: <strong>Friday, April 10, 2026 (3:15 - 4:15 PM)</strong></div>';
-            html += '<div style="margin-bottom: 15px;"><a href="https://www.noetic-learning.com/mathcontest/" target="_blank" style="color: #dc2626; text-decoration: none; font-weight: 600; display: inline-block;">Visit Noetic Learning →</a></div>';
+            html += '<div style="margin-bottom: 20px;"><a href="https://www.noetic-learning.com/mathcontest/" target="_blank" style="color: #dc2626; text-decoration: none; font-weight: 600; display: inline-block;">Visit Noetic Learning →</a></div>';
+
+            // Cost & Grading Information
+            html += '<div style="background: #f0f9ff; border: 2px solid #bfdbfe; border-radius: 8px; padding: 15px; margin-bottom: 15px;">';
+            html += '<div style="font-weight: bold; color: #1e40af; margin-bottom: 10px;">Cost & Grading Information</div>';
+            html += '<div style="color: #666; font-size: 0.9rem; line-height: 1.6;">';
+            html += '<p style="margin-bottom: 8px;">The Noetic Contest costs <strong>$99 per team</strong> (up to 30 students). The cost is split equally among all team members, so your individual cost will depend on how many students sign up.</p>';
+            html += '<p>Questions are different by grade level. If a team has mixed grades, all students answer the highest grade level questions.</p>';
+            html += '</div>';
+            html += '</div>';
 
             const today = new Date();
             const signUpDeadline = new Date('2026-03-12T23:59:59');
@@ -1167,23 +1327,64 @@
             return html;
         }
 
+        // Global variables for Noetic sign-up flow
+        let noeticSignUpData = null;
+        let selectedGradeLevel = null;
+
         function signUpForNoetic(mcpsId, studentName, grade) {
-            if (!confirm('Sign up for Noetic Learning Math Contest?\n\nContest Date: April 10, 2026\nFormat: 20 problems, 45-50 minutes\n\nClick OK to confirm.')) {
+            // Store sign-up data and show modal
+            noeticSignUpData = {
+                mcpsId: mcpsId,
+                studentName: studentName,
+                grade: grade
+            };
+
+            selectedGradeLevel = null;
+            document.getElementById('ownGradeOption').classList.remove('selected');
+            document.getElementById('eighthGradeOption').classList.remove('selected');
+            document.getElementById('noeticModal').classList.add('show');
+        }
+
+        function selectGradeLevel(level) {
+            selectedGradeLevel = level;
+
+            // Update UI to show selection
+            document.getElementById('ownGradeOption').classList.toggle('selected', level === 'own');
+            document.getElementById('eighthGradeOption').classList.toggle('selected', level === '8th');
+        }
+
+        function confirmNoeticSignUp() {
+            if (!selectedGradeLevel) {
+                alert('Please select a grade level to continue.');
                 return;
             }
 
-            // Disable button and show loading
-            const button = event.target;
-            button.disabled = true;
-            button.innerHTML = '<span style="display: inline-block; width: 16px; height: 16px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite;"></span> Signing up...';
+            // Hide modal
+            document.getElementById('noeticModal').classList.remove('show');
+
+            // Find and disable the sign-up button
+            const buttons = document.querySelectorAll('button');
+            let signUpButton = null;
+            for (let btn of buttons) {
+                if (btn.textContent.includes('Sign Up for Noetic')) {
+                    signUpButton = btn;
+                    break;
+                }
+            }
+
+            if (signUpButton) {
+                signUpButton.disabled = true;
+                signUpButton.innerHTML = '<span style="display: inline-block; width: 16px; height: 16px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite;"></span> Signing up...';
+            }
 
             // Build URL with parameters
             const scriptUrl = window.location.href.split('?')[0];
             const params = new URLSearchParams({
                 action: 'signUpNoetic',
-                mcpsId: mcpsId,
-                studentName: studentName,
-                grade: grade
+                mcpsId: noeticSignUpData.mcpsId,
+                studentName: noeticSignUpData.studentName,
+                grade: noeticSignUpData.grade,
+                gradePreference: selectedGradeLevel
             });
 
             fetch(scriptUrl + '?' + params.toString())
@@ -1197,15 +1398,25 @@
                         }, 1000);
                     } else {
                         showMessage(result.message, true);
-                        button.disabled = false;
-                        button.innerHTML = 'Sign Up for Noetic Learning';
+                        if (signUpButton) {
+                            signUpButton.disabled = false;
+                            signUpButton.innerHTML = 'Sign Up for Noetic Learning';
+                        }
                     }
                 })
                 .catch(error => {
                     showMessage('Error signing up. Please try again.', true);
-                    button.disabled = false;
-                    button.innerHTML = 'Sign Up for Noetic Learning';
+                    if (signUpButton) {
+                        signUpButton.disabled = false;
+                        signUpButton.innerHTML = 'Sign Up for Noetic Learning';
+                    }
                 });
+        }
+
+        function cancelNoeticModal() {
+            document.getElementById('noeticModal').classList.remove('show');
+            noeticSignUpData = null;
+            selectedGradeLevel = null;
         }
 
         function escapeHtml(text) {

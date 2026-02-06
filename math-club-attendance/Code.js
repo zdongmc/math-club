@@ -10,8 +10,9 @@ function doGet(e) {
     const mcpsId = e.parameter.mcpsId;
     const studentName = e.parameter.studentName;
     const grade = e.parameter.grade;
+    const gradePreference = e.parameter.gradePreference || '';
 
-    const result = signUpForNoetic(mcpsId, studentName, grade);
+    const result = signUpForNoetic(mcpsId, studentName, grade, gradePreference);
     return ContentService.createTextOutput(JSON.stringify(result))
       .setMimeType(ContentService.MimeType.JSON);
   }
@@ -880,7 +881,7 @@ function getNoeticResults(mcpsId) {
   }
 }
 
-function signUpForNoetic(mcpsId, studentName, grade) {
+function signUpForNoetic(mcpsId, studentName, grade, gradePreference) {
   try {
     const sheet = getNoeticSheet();
 
@@ -916,12 +917,13 @@ function signUpForNoetic(mcpsId, studentName, grade) {
       timestamp,          // D: Sign-up Timestamp
       '',                 // E: Score (empty)
       '',                 // F: PDF Link (empty)
-      ''                  // G: Fee Paid (empty)
+      '',                 // G: Fee Paid (empty)
+      gradePreference     // H: Grade Preference (own or 8th)
     ];
 
     sheet.appendRow(newRow);
 
-    Logger.log('Noetic sign-up successful: ' + studentName + ' (' + mcpsIdStr + ')');
+    Logger.log('Noetic sign-up successful: ' + studentName + ' (' + mcpsIdStr + ') - Grade Preference: ' + gradePreference);
 
     return {
       success: true,
