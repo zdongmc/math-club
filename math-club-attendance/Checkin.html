@@ -944,26 +944,10 @@
                 html += '</div>';
                 html += '</div>';
             } else {
-                // Not registered - show registration instructions
-                html += '<div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 10px; padding: 20px; margin-bottom: 15px;">';
-                html += '<div style="font-weight: bold; color: #92400e; font-size: 1.1rem; margin-bottom: 15px; text-align: center;">Not Yet Registered</div>';
-                html += '<div style="color: #78350f; margin-bottom: 15px;">';
-                html += '<div style="font-weight: bold; margin-bottom: 10px;">Steps to register:</div>';
-                html += '<ol style="margin-left: 20px; line-height: 1.8;">';
-                html += '<li>Go to: <a href="https://mathkangaroo.oasis-lms.com/Users/Catalog.aspx" target="_blank" style="color: #dc2626; text-decoration: underline;">https://mathkangaroo.oasis-lms.com/Users/Catalog.aspx</a></li>';
-                html += '<li>Log in with your login and password or establish your user account if you are new.</li>';
-                html += '<li>Click on the tab <strong>By Invitation</strong>.</li>';
-                html += '<li>Copy and paste this code in the field <strong>Invitation Code</strong>: <code style="background: #fff; padding: 2px 6px; border-radius: 3px; font-family: monospace;">MDCLARK0003001@2026math</code></li>';
-                html += '<li>Do not share the code with anyone</li>';
-                html += '<li>You are ready to register.</li>';
-                html += '</ol>';
-                html += '</div>';
-                html += '<div style="background: #fff; padding: 12px; border-radius: 8px; margin-bottom: 10px;">';
-                html += '<div style="color: #92400e; font-weight: bold; margin-bottom: 5px;">Registration Fees:</div>';
-                html += '<div style="color: #78350f;">$18 if you register by December 31</div>';
-                html += '<div style="color: #78350f;">$35 late registration (January 1 - February 1)</div>';
-                html += '</div>';
-                html += '<div style="text-align: center; color: #78350f; font-weight: bold;">Competition Date: Thursday, March 19, 2026</div>';
+                // Not registered - registration deadline has passed
+                html += '<div style="background: #f3f4f6; border: 2px solid #d1d5db; border-radius: 10px; padding: 20px; text-align: center;">';
+                html += '<div style="color: #6b7280; font-size: 0.95rem;">Registration deadline has passed</div>';
+                html += '<div style="color: #6b7280; font-size: 0.95rem; margin-top: 10px;">Competition Date: Thursday, March 19, 2026</div>';
                 html += '</div>';
             }
 
