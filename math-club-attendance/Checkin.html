@@ -1466,9 +1466,14 @@
                 });
             }
 
-            fetch(scriptUrl + '?' + params.toString())
-                .then(response => response.json())
-                .then(result => {
+            const fullUrl = scriptUrl + '?' + params.toString();
+            console.log('Submitting Noetic request to:', fullUrl);
+            console.log('Noetic data:', noeticSignUpData);
+            console.log('Grade preference:', selectedGradeLevel);
+
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    console.log('Noetic sign-up response:', result);
                     if (result.success) {
                         showMessage(result.message, false);
                         // Refresh display
@@ -1484,14 +1489,16 @@
                         }
                     }
                 })
-                .catch(error => {
-                    showMessage('Error processing request. Please try again.', true);
+                .withFailureHandler(function(error) {
+                    console.error('Noetic sign-up error:', error);
+                    showMessage('Error: ' + error.message, true);
                     if (actionButton) {
                         actionButton.disabled = false;
                         const buttonText = noeticActionType === 'signup' ? 'Sign Up for Noetic Learning' : 'Change Grade Preference';
                         actionButton.innerHTML = buttonText;
                     }
-                });
+                })
+                .signUpForNoetic(noeticSignUpData.mcpsId, noeticSignUpData.studentName, noeticSignUpData.grade, selectedGradeLevel);
         }
 
         function cancelNoeticModal() {
