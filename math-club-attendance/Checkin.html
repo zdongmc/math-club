@@ -977,7 +977,8 @@
             html += '<p style="margin-bottom: 8px;">• <strong>20 problems</strong>, 45-50 minutes, no calculator</p>';
             html += '<p style="margin-bottom: 8px;">• Questions vary by grade level (6th, 7th, 8th)</p>';
             html += '<p style="margin-bottom: 8px;">• Team format: If a team has mixed grades, all students answer the highest grade level questions</p>';
-            html += '<p style="margin-bottom: 0;">• <strong>Cost:</strong> $99 per team (up to 30 students)</p>';
+            html += '<p style="margin-bottom: 12px;">• <strong>Cost:</strong> $99 per team (up to 30 students)</p>';
+            html += '<p style="margin-bottom: 0;"><a href="https://drive.google.com/file/d/1gdpfFGSZN5yXnI_FVlb96B30hrY9uwD5/view?usp=drive_link" target="_blank" style="color: #1e40af; font-weight: bold; text-decoration: none;">📄 View Sample Problems</a> – Check these before deciding your team choice</p>';
 
             // Current sign-ups by grade - moved under Contest Format
             if (noetic && noetic.signUpCounts) {
@@ -1005,9 +1006,16 @@
               const preference = noetic.gradePreference === 'own' ? 'Your Grade Level' : '8th/Mixed Team';
               html += '<div style="color: #065f46; font-size: 0.95rem; margin-bottom: 12px;">Team: ' + preference + '</div>';
               if (beforeDeadline) {
-                html += '<button onclick="modifyNoeticSignUp(\'' + student.mcpsId + '\', \'' + escapeHtml(student.name) + '\', \'' + (student.gradeLevel || '') + '\')" style="background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; margin-right: 8px;">';
-                html += 'Modify';
-                html += '</button>';
+                // Only show Modify button for 6th and 7th graders (8th graders are auto-assigned to 8th/Mixed)
+                const gradeStr = (student.gradeLevel || '').toString().trim();
+                const gradeNum = gradeStr.match(/\d+/) ? gradeStr.match(/\d+/)[0] : '';
+                const canModify = gradeNum === '6' || gradeNum === '7';
+
+                if (canModify) {
+                  html += '<button onclick="modifyNoeticSignUp(\'' + student.mcpsId + '\', \'' + escapeHtml(student.name) + '\', \'' + gradeStr + '\')" style="background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; margin-right: 8px;">';
+                  html += 'Modify';
+                  html += '</button>';
+                }
                 html += '<button onclick="dropNoeticSignUp(\'' + student.mcpsId + '\')" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer;">';
                 html += 'Drop';
                 html += '</button>';
@@ -1059,6 +1067,14 @@
                 html += '<div style="margin-bottom: 12px; text-align: center;">';
                 html += '<span style="color: #666; font-size: 0.85rem;">ARML Tracking: ' + armlStatus + '</span>';
                 html += '</div>';
+
+                // Display cumulative individual round score if ARML tracking is on
+                if (mathLeagueData.armlTracked && mathLeagueData.cumulativeIndividualScore !== null && mathLeagueData.cumulativeIndividualScore !== undefined) {
+                    html += '<div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 15px; margin-bottom: 15px; text-align: center;">';
+                    html += '<div style="font-weight: bold; color: #92400e; margin-bottom: 8px; font-size: 1.1rem;">Cumulative Individual Round Score</div>';
+                    html += '<div style="font-size: 1.3rem; color: #92400e; font-weight: bold;">' + mathLeagueData.cumulativeIndividualScore + '</div>';
+                    html += '</div>';
+                }
             }
 
             // Display MOEMS fee payment status if available
@@ -1486,52 +1502,120 @@
         }
 
         function showNoeticGradeDialog(mcpsId, studentName, grade) {
-            const message = `<div style="text-align: left; line-height: 1.8;">
-                <p style="margin-bottom: 15px;"><strong>Which team would you like to join?</strong></p>
+            // Create a custom dialog
+            const dialog = document.createElement('div');
+            dialog.id = 'noeticTeamDialog';
+            dialog.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+            dialog.innerHTML = `
+                <div style="background: white; border-radius: 12px; padding: 25px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                    <div style="text-align: left; line-height: 1.8;">
+                        <p style="margin-bottom: 12px; font-size: 1.1rem; font-weight: bold;">Which team would you like to join?</p>
+                        <p style="margin-bottom: 15px; color: #666; font-size: 0.9rem;"><a href="https://drive.google.com/file/d/1gdpfFGSZN5yXnI_FVlb96B30hrY9uwD5/view?usp=drive_link" target="_blank" style="color: #dc2626; font-weight: bold; text-decoration: none;">📄 View sample problems</a> to help you decide</p>
 
-                <div style="background: #eff6ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px; margin-bottom: 12px; cursor: pointer;" onclick="selectGradeAndSubmit('${mcpsId}', '${studentName}', '${grade}', 'own')">
-                    <div style="font-weight: bold; color: #1e40af; margin-bottom: 4px;">Your Grade Level (${grade})</div>
-                    <div style="color: #1e40af; font-size: 0.9rem;">Answer ${grade}th grade level questions</div>
+                        <div style="background: #eff6ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#e0edff'" onmouseout="this.style.background='#eff6ff'" onclick="selectGradeAndSubmit('${mcpsId}', '${studentName}', '${grade}', 'own'); document.getElementById('noeticTeamDialog').remove();">
+                            <div style="font-weight: bold; color: #1e40af; margin-bottom: 4px;">Your Grade Level (${grade})</div>
+                            <div style="color: #1e40af; font-size: 0.9rem;">Answer ${grade}th grade level questions</div>
+                        </div>
+
+                        <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#fde68a'" onmouseout="this.style.background='#fef3c7'" onclick="selectGradeAndSubmit('${mcpsId}', '${studentName}', '${grade}', 'mixed'); document.getElementById('noeticTeamDialog').remove();">
+                            <div style="font-weight: bold; color: #92400e; margin-bottom: 4px;">8th/Mixed Team</div>
+                            <div style="color: #92400e; font-size: 0.9rem; margin-bottom: 8px;">Answer 8th grade level questions</div>
+                            <div style="color: #78350f; font-size: 0.85rem; font-style: italic;">⚠ You will compete at the 8th grade level</div>
+                        </div>
+
+                        <button onclick="document.getElementById('noeticTeamDialog').remove();" style="background: #e5e7eb; color: #333; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 12px;">Cancel</button>
+                    </div>
                 </div>
+            `;
+            document.body.appendChild(dialog);
+        }
 
-                <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 12px; cursor: pointer;" onclick="selectGradeAndSubmit('${mcpsId}', '${studentName}', '${grade}', 'mixed')">
-                    <div style="font-weight: bold; color: #92400e; margin-bottom: 4px;">8th/Mixed Team</div>
-                    <div style="color: #92400e; font-size: 0.9rem; margin-bottom: 8px;">Answer 8th grade level questions</div>
-                    <div style="color: #78350f; font-size: 0.85rem; font-style: italic;">⚠ You will compete at the 8th grade level</div>
-                </div>
-            </div>`;
+        function showNoeticGradeDialogForModify(mcpsId, studentName, grade) {
+            // Global variable to track selected grade preference for modify dialog
+            let selectedPreferenceForModify = null;
 
-            if (confirm(`Sign up for Noetic Learning Math Contest?\n\nContests Date: April 10, 2026\nFormat: 20 problems, 45-50 minutes, no calculator\n\nClick OK to see team options.`)) {
-                // Use alert with custom styling via showMessage
-                const html = document.createElement('div');
-                html.innerHTML = message;
+            // Create a custom dialog
+            const dialog = document.createElement('div');
+            dialog.id = 'noeticModifyDialog';
+            dialog.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+            dialog.innerHTML = `
+                <div style="background: white; border-radius: 12px; padding: 25px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                    <div style="text-align: left; line-height: 1.8;">
+                        <p style="margin-bottom: 12px; font-size: 1.1rem; font-weight: bold;">Change Team Assignment</p>
+                        <p style="margin-bottom: 15px; color: #666; font-size: 0.9rem;"><a href="https://drive.google.com/file/d/1gdpfFGSZN5yXnI_FVlb96B30hrY9uwD5/view?usp=drive_link" target="_blank" style="color: #dc2626; font-weight: bold; text-decoration: none;">📄 View sample problems</a> to help you decide</p>
 
-                // Create a custom dialog
-                const dialog = document.createElement('div');
-                dialog.id = 'noeticTeamDialog';
-                dialog.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;';
-                dialog.innerHTML = `
-                    <div style="background: white; border-radius: 12px; padding: 25px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-                        <div style="text-align: left; line-height: 1.8;">
-                            <p style="margin-bottom: 15px; font-size: 1.1rem; font-weight: bold;">Which team would you like to join?</p>
+                        <div id="ownGradeOptionModify" style="background: #eff6ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s;" onclick="selectTeamForModify('own', '${mcpsId}', '${studentName}', '${grade}');">
+                            <div style="font-weight: bold; color: #1e40af; margin-bottom: 4px;">Your Grade Level (${grade})</div>
+                            <div style="color: #1e40af; font-size: 0.9rem;">Answer ${grade}th grade level questions</div>
+                        </div>
 
-                            <div style="background: #eff6ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#e0edff'" onmouseout="this.style.background='#eff6ff'" onclick="selectGradeAndSubmit('${mcpsId}', '${studentName}', '${grade}', 'own'); document.getElementById('noeticTeamDialog').remove();">
-                                <div style="font-weight: bold; color: #1e40af; margin-bottom: 4px;">Your Grade Level (${grade})</div>
-                                <div style="color: #1e40af; font-size: 0.9rem;">Answer ${grade}th grade level questions</div>
-                            </div>
+                        <div id="mixedGradeOptionModify" style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 12px; cursor: pointer; transition: all 0.2s;" onclick="selectTeamForModify('mixed', '${mcpsId}', '${studentName}', '${grade}');">
+                            <div style="font-weight: bold; color: #92400e; margin-bottom: 4px;">8th/Mixed Team</div>
+                            <div style="color: #92400e; font-size: 0.9rem; margin-bottom: 8px;">Answer 8th grade level questions</div>
+                            <div style="color: #78350f; font-size: 0.85rem; font-style: italic;">⚠ You will compete at the 8th grade level</div>
+                        </div>
 
-                            <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#fde68a'" onmouseout="this.style.background='#fef3c7'" onclick="selectGradeAndSubmit('${mcpsId}', '${studentName}', '${grade}', 'mixed'); document.getElementById('noeticTeamDialog').remove();">
-                                <div style="font-weight: bold; color: #92400e; margin-bottom: 4px;">8th/Mixed Team</div>
-                                <div style="color: #92400e; font-size: 0.9rem; margin-bottom: 8px;">Answer 8th grade level questions</div>
-                                <div style="color: #78350f; font-size: 0.85rem; font-style: italic;">⚠ You will compete at the 8th grade level</div>
-                            </div>
-
-                            <button onclick="document.getElementById('noeticTeamDialog').remove();" style="background: #e5e7eb; color: #333; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 12px;">Cancel</button>
+                        <div style="display: flex; gap: 10px; margin-top: 15px;">
+                            <button onclick="document.getElementById('noeticModifyDialog').remove();" style="background: #e5e7eb; color: #333; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1;">Cancel</button>
+                            <button id="confirmModifyBtn" onclick="confirmModifyTeamSelection('${mcpsId}', '${studentName}', '${grade}');" style="background: #dc2626; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1; opacity: 0.5; cursor: not-allowed;" disabled>Confirm</button>
                         </div>
                     </div>
-                `;
-                document.body.appendChild(dialog);
+                </div>
+            `;
+            document.body.appendChild(dialog);
+        }
+
+        function selectTeamForModify(preference, mcpsId, studentName, grade) {
+            // Update global selection
+            window.selectedModifyPreference = preference;
+
+            // Update UI to show selection
+            const ownOption = document.getElementById('ownGradeOptionModify');
+            const mixedOption = document.getElementById('mixedGradeOptionModify');
+            const confirmBtn = document.getElementById('confirmModifyBtn');
+
+            ownOption.style.border = preference === 'own' ? '3px solid #1e40af' : '2px solid #3b82f6';
+            ownOption.style.background = preference === 'own' ? '#dbeafe' : '#eff6ff';
+
+            mixedOption.style.border = preference === 'mixed' ? '3px solid #92400e' : '2px solid #f59e0b';
+            mixedOption.style.background = preference === 'mixed' ? '#fcd34d' : '#fef3c7';
+
+            // Enable confirm button
+            confirmBtn.disabled = false;
+            confirmBtn.style.opacity = '1';
+            confirmBtn.style.cursor = 'pointer';
+        }
+
+        function confirmModifyTeamSelection(mcpsId, studentName, grade) {
+            const preference = window.selectedModifyPreference;
+            if (!preference) {
+                showMessage('Please select a team', true);
+                return;
             }
+
+            document.getElementById('noeticModifyDialog').remove();
+            submitNoeticModifyChange(mcpsId, preference);
+        }
+
+        function submitNoeticModifyChange(mcpsId, gradePreference) {
+            showMessage('Updating team assignment...', false);
+
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success) {
+                        showMessage(result.message, false);
+                        setTimeout(() => {
+                            lookupStudent();
+                        }, 1500);
+                    } else {
+                        showMessage(result.message, true);
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    showMessage('Error updating team assignment. Please try again.', true);
+                    console.error('Modify error:', error);
+                })
+                .updateNoeticGradePreference(mcpsId, gradePreference);
         }
 
         function selectGradeAndSubmit(mcpsId, studentName, grade, gradePreference) {
@@ -1569,32 +1653,49 @@
                 return;
             }
 
-            if (confirm('Change your team assignment?')) {
-                showNoeticGradeDialog(mcpsId, studentName, gradeNum);
-            }
+            showNoeticGradeDialogForModify(mcpsId, studentName, gradeNum);
         }
 
         function dropNoeticSignUp(mcpsId) {
-            if (confirm('Are you sure you want to drop the Noetic Learning Math Contest sign-up?')) {
-                showMessage('Dropping sign-up...', false);
+            // Create a custom confirmation dialog
+            const dialog = document.createElement('div');
+            dialog.id = 'noeticDropConfirmDialog';
+            dialog.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+            dialog.innerHTML = `
+                <div style="background: white; border-radius: 12px; padding: 25px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                    <div style="text-align: center; line-height: 1.8;">
+                        <p style="margin-bottom: 15px; font-size: 1.1rem; font-weight: bold;">Drop Noetic Learning Sign-up?</p>
+                        <p style="color: #666; margin-bottom: 20px;">Are you sure you want to drop the Noetic Learning Math Contest sign-up? You can re-register until March 1, 2026.</p>
 
-                google.script.run
-                    .withSuccessHandler(function(result) {
-                        if (result.success) {
-                            showMessage(result.message, false);
-                            setTimeout(() => {
-                                lookupStudent();
-                            }, 1500);
-                        } else {
-                            showMessage(result.message, true);
-                        }
-                    })
-                    .withFailureHandler(function(error) {
-                        showMessage('Error dropping sign-up. Please try again.', true);
-                        console.error('Drop error:', error);
-                    })
-                    .dropNoeticSignUp(mcpsId);
-            }
+                        <div style="display: flex; gap: 10px; justify-content: center;">
+                            <button onclick="document.getElementById('noeticDropConfirmDialog').remove();" style="background: #e5e7eb; color: #333; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1;">Cancel</button>
+                            <button onclick="confirmDropNoeticSignUp('${mcpsId}'); document.getElementById('noeticDropConfirmDialog').remove();" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1;">Drop</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(dialog);
+        }
+
+        function confirmDropNoeticSignUp(mcpsId) {
+            showMessage('Dropping sign-up...', false);
+
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success) {
+                        showMessage(result.message, false);
+                        setTimeout(() => {
+                            lookupStudent();
+                        }, 1500);
+                    } else {
+                        showMessage(result.message, true);
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    showMessage('Error dropping sign-up. Please try again.', true);
+                    console.error('Drop error:', error);
+                })
+                .dropNoeticSignUp(mcpsId);
         }
 
         function escapeHtml(text) {
