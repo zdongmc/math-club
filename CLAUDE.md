@@ -46,8 +46,13 @@ Located in `math-club-attendance/` directory:
   - `checkFormCompletion()` - Checks which required forms student has completed
   - `getMathcountsResults()` - Retrieves MATHCOUNTS competition results by MCPS ID
   - `getMoemsResults()` - Retrieves MOEMS contest results by MCPS ID (hidden in UI)
-  - `getMathLeagueResults()` - Retrieves Math League team, ARML tracking, and meet scores by MCPS ID
+  - `getMathLeagueResults()` - Retrieves Math League team, ARML tracking, meet scores, and cumulative individual round score by MCPS ID
   - `getMathKangarooResults()` - Retrieves Math Kangaroo registration status by student name (case-insensitive)
+  - `getNoeticResults()` - Retrieves Noetic Learning Math Contest sign-up status and grade preference by MCPS ID
+  - `getNoeticSignUpCounts()` - Returns count of sign-ups by grade level (6th, 7th, 8th/Mixed)
+  - `signUpForNoetic()` - Creates new Noetic Learning sign-up with grade preference selection
+  - `updateNoeticGradePreference()` - Updates existing sign-up's grade preference (6th/7th graders only)
+  - `dropNoeticSignUp()` - Removes student from Noetic Learning sign-up list
   - Connects to Google Sheets with student data
 - `Checkin.html` - Parent-facing web interface
   - MCPS ID lookup form (accepts variable-length numeric IDs)
@@ -66,6 +71,17 @@ Located in `math-club-attendance/` directory:
   - **Math Kangaroo**: Always displayed for all students. Shows either:
     - If registered: Green checkmark with "Registered for Math Kangaroo", competition date (March 19, 2026), and Math Kangaroo ID
     - If not registered: Yellow alert with complete registration instructions including invitation code (MDCLARK0003001@2026math), fees ($18 by Dec 31, $35 late), and competition date
+  - **Noetic Learning Math Contest**: Shows contest information and sign-up status with custom dialogs (no browser popups):
+    - Before deadline (March 1, 2026): Shows "Sign Up" button for unsigned-up students
+    - After sign-up: Shows "✓ Signed Up" with team assignment, Modify button (for 6th/7th graders only), and Drop button
+    - 8th graders automatically assigned to 8th/Mixed team (no option to change)
+    - Sign-up modal: Custom dialog with two team options and Confirm button (no browser confirm popup)
+    - Modify modal: Shows team options with selection highlighting, Confirm button enabled only after selection, Cancel button
+    - Drop confirmation: Custom modal saying "You can re-register until March 1, 2026" (not permanent)
+    - Displays live sign-up counts by grade level within contest information box
+  - **Math League (ARML Tracking)**: For students with ARML Tracking enabled:
+    - Displays cumulative individual round score from column M below ARML tracking status
+    - Score shown in amber box with label "Cumulative Individual Round Score"
 - `appsscript.json` - Apps Script configuration (must have `"access": "ANYONE_ANONYMOUS"` for public access)
 - `.clasp.json` - Clasp CLI configuration for deployment
 
@@ -105,6 +121,13 @@ Located in `math-club-attendance/` directory:
 - **Math Kangaroo** - Math Kangaroo registration
   - Columns: A=Name, B=MK ID (Math Kangaroo assigned ID, not MCPS ID)
   - Used for: Retrieving Math Kangaroo registration status by student name (case-insensitive)
+- **Noetic Learning** - Noetic Learning Math Contest sign-ups
+  - Columns: A=Timestamp, B=MCPS ID, C=Student Name, D=Grade, E=Grade Preference (own/mixed), F-H=Reserved
+  - Grade Preference (Column E): "own" for own grade level, "mixed" for 8th/Mixed team
+  - 8th graders: Automatically set to "mixed" (cannot change)
+  - 6th/7th graders: Can choose "own" or "mixed" (can modify before March 1)
+  - Sign-up status: Column B MCPS ID indicates signed up; missing = not signed up
+  - Used for: Retrieving sign-up status, grade preference, and sign-up counts by grade level
 
 **Student Lookup Process:**
 When an MCPS ID is entered, the system searches in this order:
