@@ -553,6 +553,7 @@ function getMathLeagueResults(mcpsId) {
         const meet3Individual = parseMeetScore(row[9]);      // Column J (index 9)
         const meet4Team = (row[10] || '').toString().trim(); // Column K (index 10)
         const meet4Individual = parseMeetScore(row[11]);     // Column L (index 11)
+        const cumulativeIndividualScore = parseMeetScore(row[12]); // Column M (index 12)
 
         const meetTeams = [meet1Team, meet2Team, meet3Team, meet4Team];
         const meetScores = [meet1Individual, meet2Individual, meet3Individual, meet4Individual];
@@ -623,6 +624,7 @@ function getMathLeagueResults(mcpsId) {
         return {
           team: currentTeam, // Most recent team for backward compatibility
           armlTracked: isArmlTracked,
+          cumulativeIndividualScore: cumulativeIndividualScore,
           meetScores: meetScores,
           teamResults: teamResults
         };
