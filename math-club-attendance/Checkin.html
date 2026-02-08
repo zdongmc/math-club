@@ -1272,7 +1272,10 @@
                             html += '<div class="date-status waitlisted">Waitlisted</div>';
                             html += '</div>';
                         } else {
-                            signedUp = details.includes(meet.name);
+                            // For Meet #4, check team assignment from Math League sheet (column K)
+                            // If it says "NA", student is not signed up
+                            const meet4Team = mathLeagueData && mathLeagueData.teamResults && mathLeagueData.teamResults[meetIndex] && mathLeagueData.teamResults[meetIndex].team;
+                            signedUp = meet4Team && meet4Team.toUpperCase() !== 'NA' && meet4Team.length > 0;
                             const status = signedUp ? 'Signed Up' : 'Not Signed Up';
                             const statusClass = signedUp ? 'yes' : 'no';
                             const itemClass = signedUp ? 'signed-up' : 'not-signed-up';
