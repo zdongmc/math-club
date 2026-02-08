@@ -1255,11 +1255,13 @@
                     const isIndividualOnly = meetTeamAssignment && meetTeamAssignment.toLowerCase() === 'individual';
                     const didNotAttend = meetTeamAssignment && meetTeamAssignment.toUpperCase() === 'NA';
 
-                    if (didNotAttend) {
+                    // For meets 1-3, show "Did Not Attend" if team assignment is NA
+                    // For meet 4, skip team display and let sign-up status show "Not Signed Up" instead
+                    if (didNotAttend && meetIndex < 3) {
                         html += '<div style="background: #fee; border: 2px solid #dc2626; border-radius: 8px; padding: 10px; margin-bottom: 10px; text-align: center;">';
                         html += '<div style="font-weight: bold; color: #dc2626; font-size: 1rem;">Did Not Attend</div>';
                         html += '</div>';
-                    } else if (meetTeamAssignment && !isIndividualOnly) {
+                    } else if (meetTeamAssignment && !isIndividualOnly && !didNotAttend) {
                         html += '<div style="background: #fef3c7; border: 2px solid #fbbf24; border-radius: 8px; padding: 10px; margin-bottom: 10px; text-align: center;">';
                         html += '<div style="font-weight: bold; color: #92400e; font-size: 1rem;">Team ' + escapeHtml(meetTeamAssignment) + '</div>';
                         html += '</div>';
@@ -1292,8 +1294,8 @@
                     }
 
                     // Show results for Meet #1, Meet #2, and Meet #3 (meetIndex 0-2)
-                    // Show results if student has a team/individual assignment for this meet
-                    const hasAssignmentForMeet = meetTeamAssignment && meetTeamAssignment.length > 0;
+                    // Show results if student has a team/individual assignment for this meet (but not if NA)
+                    const hasAssignmentForMeet = meetTeamAssignment && meetTeamAssignment.length > 0 && !didNotAttend;
                     if (hasAssignmentForMeet && !isWaitlisted && meetIndex <= 2) {
                         // Individual results (if available)
                         if (mathLeagueData && mathLeagueData.meetScores && mathLeagueData.meetScores[meetIndex] !== undefined) {
