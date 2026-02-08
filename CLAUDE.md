@@ -59,14 +59,20 @@ Located in `math-club-attendance/` directory:
   - Shows required forms completion status with links to complete missing forms
   - **Club Meetings** section: Displays attendance dates with total meeting count summary (e.g., "5 meetings attended")
   - **Competitions** section: Shows all competition sign-ups and results
-  - **MATHCOUNTS**: Shows School Competition date, displays competition results (Sprint/Target/Individual scores, rank, chapter advancement status). For students advancing to Chapter Competition, displays $40 fee payment status: green checkmark if paid, or yellow alert with payment link if not paid (only shown if column M is not "NA")
+  - **MATHCOUNTS**: Shows both School and Chapter level competition results:
+    - **School Level**: Sprint/Target/Individual scores, school rank, chapter advancement status
+    - **Chapter Level** (if student advanced): Sprint/Target/Individual scores, Team Round score, Team Score, State advancement status
+    - Fee payment status: green checkmark if paid, or yellow alert with payment link ($40 for chapter fee, only shown if advancing)
   - **MOEMS**: Displays 5 individual contests with Yes/No status. For signed-up contests, shows contest results (score out of 5 or "Did Not Attend" or "Score Pending"). Displays total score (out of 25) if available. Shows fee payment status: green checkmark if paid, or yellow alert with payment link ($5 or $25 based on fee amount) if not paid
   - **Math League**: Organized by meets (Meet #1-4). Each meet shows:
-    - Sign-up status (Signed Up/Not Signed Up)
-    - Individual results (score out of 6 or "Did Not Attend")
-    - Team results (Team Score/12, Relay 1/8, Relay 2/8, Team Individual Score, Team Total/64)
-    - Team assignment displayed at top (separate from ARML tracking)
-    - ARML tracking status shown as smaller note below team assignment
+    - Team assignment at top: Team name (e.g., "Team A"), "Individual Round Only", or "Did Not Attend" (if NA in column K)
+    - Sign-up status: Only shown for Meet #4 (future meet):
+      - If team assignment is "NA": Shows "Not Signed Up"
+      - If team assignment has a value: Shows "Signed Up"
+    - Individual results: Only shown for Meets 1-3 (score out of 6 or "Did Not Attend" if student didn't attend)
+    - Team results: Shows Team Score/12, Relay 1/8, Relay 2/8, Team Individual Score, Team Total/64 (only if team attended)
+    - ARML tracking status shown below team assignment
+    - Cumulative individual round score shown in amber box (for students with ARML Tracking enabled)
   - **AMC 8**: Shows competition date (January 23, 2026)
   - **Math Kangaroo**: Always displayed for all students. Shows either:
     - If registered: Green checkmark with "Registered for Math Kangaroo", competition date (March 19, 2026), and Math Kangaroo ID
@@ -114,10 +120,14 @@ Located in `math-club-attendance/` directory:
   - Students are assigned teams per meet (not a single team for all meets)
   - Used for: Retrieving team assignments per meet, ARML tracking status, individual meet scores, and team meet scores by MCPS ID
 - **MATHCOUNTS** - MATHCOUNTS competition results
-  - Columns: A=Name, B=ID, G=Sprint Round, H=Target Round, I=Individual Score, J=Rank, K=Chapter Advancement, M=Fee Required, N=Fee Paid
+  - School Level columns: A=Name, B=ID, G=Sprint Round, H=Target Round, I=Individual Score, J=Rank, K=Chapter Advancement
+  - Chapter Level columns: O=Chapter Sprint Round, P=Chapter Target Round, Q=Chapter Individual Score, R=Chapter Team Round, S=Chapter Team Score, T=State Advancement
+  - Chapter Team Round (Column R): Out of 20 points
+  - Chapter Team Score (Column S): Out of 64 points, retrieved from row 2 (team results row)
   - Fee Required (Column M): "$40" or "NA" (if NA, fee info not displayed)
   - Fee Paid (Column N): "Yes"/"Y"/"Paid"/TRUE = paid, anything else = not paid
-  - Used for: Retrieving MATHCOUNTS results and fee payment status by MCPS ID
+  - Chapter Advancement (Column K): Team name, individual placement, or "Not able to attend" - determines if chapter results are displayed
+  - Used for: Retrieving MATHCOUNTS results, chapter competition results, and fee payment status by MCPS ID
 - **Math Kangaroo** - Math Kangaroo registration
   - Columns: A=Name, B=MK ID (Math Kangaroo assigned ID, not MCPS ID)
   - Used for: Retrieving Math Kangaroo registration status by student name (case-insensitive)
