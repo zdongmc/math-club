@@ -672,15 +672,15 @@ function getMathcountsResults(mcpsId) {
           const chapterTarget = row[15] !== undefined && row[15] !== '' ? parseFloat(row[15]) : null;  // Column P (index 15)
           const chapterIndividual = row[16] !== undefined && row[16] !== '' ? parseFloat(row[16]) : null; // Column Q (index 16)
 
-          // Team scores (from row 2 - index 1, columns O and S)
+          // Team scores (from row 2 - index 1, columns R and S)
           // Only include if student is on the team (chapterStatus contains "Team")
           let chapterTeamRound = null;
           let chapterTeamScore = null;
           const isOnTeam = chapterStatus && chapterStatus.toLowerCase().includes('team');
           if (isOnTeam && data.length > 1) {
             const row2 = data[1];
-            chapterTeamRound = row2[14] !== undefined && row2[14] !== '' ? parseFloat(row2[14]) : null; // O2 value
-            chapterTeamScore = row2[18] !== undefined && row2[18] !== '' ? parseFloat(row2[18]) : null;  // S2 value
+            chapterTeamRound = row2[17] !== undefined && row2[17] !== '' ? parseFloat(row2[17]) : null; // Column R (index 17)
+            chapterTeamScore = row2[18] !== undefined && row2[18] !== '' ? parseFloat(row2[18]) : null;  // Column S (index 18)
           }
 
           chapterResults = {
@@ -692,7 +692,7 @@ function getMathcountsResults(mcpsId) {
             maxSprint: 30,
             maxTarget: 16,
             maxIndividual: 46,
-            maxTeamRound: 12,
+            maxTeamRound: 20,
             maxTeamScore: 64
           };
         }
