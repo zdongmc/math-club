@@ -832,8 +832,9 @@
                 if (comp.name === 'MATHCOUNTS') {
                     // Show results if available (competition already happened - no sign-up status needed)
                     if (mathcounts && mathcounts.sprintScore !== null) {
+                        // School Level Competition Results
                         html += '<div style="margin-top: 15px; background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 15px;">';
-                        html += '<div style="font-weight: bold; color: #1e40af; margin-bottom: 10px; font-size: 1.1rem;">📊 Competition Results</div>';
+                        html += '<div style="font-weight: bold; color: #1e40af; margin-bottom: 10px; font-size: 1.1rem;">📊 School Level Competition Results</div>';
                         html += '<div style="display: grid; gap: 8px;">';
                         html += '<div class="info-row" style="border: none; padding: 5px 0;">';
                         html += '<span class="info-label">Sprint Round</span>';
@@ -883,6 +884,53 @@
 
                         html += '</div>';
                         html += '</div>';
+
+                        // Chapter Level Competition Results (if student advanced and has results)
+                        if (mathcounts.chapterResults) {
+                            html += '<div style="margin-top: 15px; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 15px;">';
+                            html += '<div style="font-weight: bold; color: #92400e; margin-bottom: 10px; font-size: 1.1rem;">🏆 Chapter Level Competition Results</div>';
+                            html += '<div style="display: grid; gap: 8px;">';
+                            if (mathcounts.chapterResults.sprintScore !== null) {
+                                html += '<div class="info-row" style="border: none; padding: 5px 0;">';
+                                html += '<span class="info-label">Sprint Round</span>';
+                                html += `<span class="info-value"><strong>${mathcounts.chapterResults.sprintScore}</strong> / ${mathcounts.chapterResults.maxSprint}</span>`;
+                                html += '</div>';
+                            }
+                            if (mathcounts.chapterResults.targetScore !== null) {
+                                html += '<div class="info-row" style="border: none; padding: 5px 0;">';
+                                html += '<span class="info-label">Target Round</span>';
+                                html += `<span class="info-value"><strong>${mathcounts.chapterResults.targetScore}</strong> / ${mathcounts.chapterResults.maxTarget}</span>`;
+                                html += '</div>';
+                            }
+                            if (mathcounts.chapterResults.individualScore !== null) {
+                                html += '<div class="info-row" style="border: none; padding: 5px 0;">';
+                                html += '<span class="info-label">Individual Score</span>';
+                                html += `<span class="info-value"><strong>${mathcounts.chapterResults.individualScore}</strong> / ${mathcounts.chapterResults.maxIndividual}</span>`;
+                                html += '</div>';
+                            }
+                            if (mathcounts.chapterResults.teamRound !== null) {
+                                html += '<div class="info-row" style="border: none; padding: 5px 0;">';
+                                html += '<span class="info-label">Team Round</span>';
+                                html += `<span class="info-value"><strong>${mathcounts.chapterResults.teamRound}</strong> / ${mathcounts.chapterResults.maxTeamRound}</span>`;
+                                html += '</div>';
+                            }
+                            if (mathcounts.chapterResults.teamScore !== null) {
+                                html += '<div class="info-row" style="border: none; padding: 5px 0;">';
+                                html += '<span class="info-label">Team Score</span>';
+                                html += `<span class="info-value"><strong>${mathcounts.chapterResults.teamScore}</strong> / ${mathcounts.chapterResults.maxTeamScore}</span>`;
+                                html += '</div>';
+                            }
+                            html += '</div>';
+
+                            // State advancement status
+                            if (mathcounts.stateAdvancement) {
+                                html += '<div style="margin-top: 10px; padding: 12px; background: #fcd34d; border: 2px solid #f59e0b; border-radius: 8px; text-align: center;">';
+                                html += '<div style="color: #92400e; font-weight: bold; font-size: 1.1rem;">🌟 ' + escapeHtml(mathcounts.stateAdvancement) + '</div>';
+                                html += '</div>';
+                            }
+
+                            html += '</div>';
+                        }
                     } else {
                         // No results in system
                         html += '<div style="margin-top: 10px; padding: 10px; background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 8px; text-align: center;">';

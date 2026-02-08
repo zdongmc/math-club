@@ -648,18 +648,51 @@ function getMathcountsResults(mcpsId) {
     const data = sheet.getDataRange().getValues();
 
     // Look for student by MCPS ID in column B
-    // Columns: A=Name, B=ID, G=Sprint Round, H=Target Round, I=Individual Score, J=Rank, K=Chapter Advancement, M=Fee Required, N=Fee Paid
+    // School Competition: A=Name, B=ID, G=Sprint Round, H=Target Round, I=Individual Score, J=Rank, K=Chapter Advancement
+    // Chapter Competition: O=Chapter Sprint Round, P=Chapter Target Round, Q=Chapter Individual Score, S=Chapter Team Score, T=State advancement
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
       const studentId = (row[1] || '').toString().trim(); // Column B (index 1)
 
       if (studentId === mcpsId.toString().trim()) {
-        // Columns: G=Sprint Round, H=Target Round, I=Individual Score, J=Rank, K=Chapter Advancement
+        // School Competition Results
         const sprintScore = row[6] !== undefined && row[6] !== '' ? parseFloat(row[6]) : null;
         const targetScore = row[7] !== undefined && row[7] !== '' ? parseFloat(row[7]) : null;
         const individualScore = row[8] !== undefined && row[8] !== '' ? parseFloat(row[8]) : null;
         const rank = row[9] !== undefined && row[9] !== '' ? parseInt(row[9]) : null;
         const chapterStatus = row[10] !== undefined && row[10] !== '' ? row[10].toString().trim() : null;
+
+        // Check if student can attend chapter competition
+        const canAttendChapter = chapterStatus && chapterStatus !== 'Not able to attend';
+
+        // Chapter Competition Results (only if advancing and able to attend)
+        let chapterResults = null;
+        if (canAttendChapter) {
+          const chapterSprint = row[14] !== undefined && row[14] !== '' ? parseFloat(row[14]) : null; // Column O (index 14)
+          const chapterTarget = row[15] !== undefined && row[15] !== '' ? parseFloat(row[15]) : null;  // Column P (index 15)
+          const chapterIndividual = row[16] !== undefined && row[16] !== '' ? parseFloat(row[16]) : null; // Column Q (index 16)
+
+          // Team scores (from header row - row 1 which is index 0)
+          const headerRow = data[0];
+          const chapterTeamRound = headerRow[14] !== undefined && headerRow[14] !== '' ? parseFloat(headerRow[14]) : null; // O2 value
+          const chapterTeamScore = headerRow[18] !== undefined && headerRow[18] !== '' ? parseFloat(headerRow[18]) : null;  // S2 value
+
+          chapterResults = {
+            sprintScore: chapterSprint,
+            targetScore: chapterTarget,
+            individualScore: chapterIndividual,
+            teamRound: chapterTeamRound,
+            teamScore: chapterTeamScore,
+            maxSprint: 30,
+            maxTarget: 16,
+            maxIndividual: 46,
+            maxTeamRound: 12,
+            maxTeamScore: 64
+          };
+        }
+
+        // State competition advancement
+        const stateAdvancement = row[19] !== undefined && row[19] !== '' ? row[19].toString().trim() : null; // Column T (index 19)
 
         // Column M (index 12) = Fee Required, Column N (index 13) = Fee Paid
         const feeRequired = row[12] !== undefined && row[12] !== '' ? row[12].toString().trim().toUpperCase() : null;
@@ -688,6 +721,8 @@ function getMathcountsResults(mcpsId) {
           individualScore: individualScore,
           rank: rank,
           chapterStatus: chapterStatus,
+          chapterResults: chapterResults,
+          stateAdvancement: stateAdvancement,
           feeInfo: feeInfo,
           maxSprint: 30,
           maxTarget: 16,
