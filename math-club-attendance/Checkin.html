@@ -1250,11 +1250,16 @@
                     html += '<div style="margin-top: 15px; background: #f8f9fa; border: 2px solid #d1d5db; border-radius: 10px; padding: 15px;">';
                     html += '<div style="font-weight: bold; color: #333; margin-bottom: 12px; font-size: 1.15rem;">' + escapeHtml(meet.name) + ' - ' + escapeHtml(meet.date) + '</div>';
 
-                    // Display team assignment for this meet (skip if "Individual" - student only took individual round)
+                    // Display team assignment for this meet
                     const meetTeamAssignment = mathLeagueData && mathLeagueData.teamResults && mathLeagueData.teamResults[meetIndex] && mathLeagueData.teamResults[meetIndex].team;
                     const isIndividualOnly = meetTeamAssignment && meetTeamAssignment.toLowerCase() === 'individual';
+                    const didNotAttend = meetTeamAssignment && meetTeamAssignment.toUpperCase() === 'NA';
 
-                    if (meetTeamAssignment && !isIndividualOnly) {
+                    if (didNotAttend) {
+                        html += '<div style="background: #fee; border: 2px solid #dc2626; border-radius: 8px; padding: 10px; margin-bottom: 10px; text-align: center;">';
+                        html += '<div style="font-weight: bold; color: #dc2626; font-size: 1rem;">Did Not Attend</div>';
+                        html += '</div>';
+                    } else if (meetTeamAssignment && !isIndividualOnly) {
                         html += '<div style="background: #fef3c7; border: 2px solid #fbbf24; border-radius: 8px; padding: 10px; margin-bottom: 10px; text-align: center;">';
                         html += '<div style="font-weight: bold; color: #92400e; font-size: 1rem;">Team ' + escapeHtml(meetTeamAssignment) + '</div>';
                         html += '</div>';
