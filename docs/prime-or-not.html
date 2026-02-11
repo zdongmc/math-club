@@ -633,6 +633,10 @@
                 </div>
 
                 <div id="leaderboardSubmission" class="leaderboard-submission">
+                    <div class="setting-group" style="max-width: 400px; margin: 0 auto 15px auto;">
+                        <label for="resultPlayerName" style="font-size: 1rem;">Your Name:</label>
+                        <input type="text" id="resultPlayerName" placeholder="Enter your name to submit" maxlength="50">
+                    </div>
                     <button class="btn" id="submitScoreBtn" onclick="submitToLeaderboard()">Submit to Leaderboard</button>
                     <div id="submissionStatus" class="submission-status"></div>
                 </div>
@@ -944,6 +948,10 @@
             // Reset leaderboard submission button
             resetLeaderboardButton();
 
+            // Sync player name from settings to results screen
+            const settingsName = document.getElementById('playerName').value.trim();
+            document.getElementById('resultPlayerName').value = settingsName;
+
             // Mark that a game has been played
             gameState.hasPlayedGame = true;
 
@@ -991,16 +999,20 @@
 
         // Submit score to leaderboard
         async function submitToLeaderboard() {
-            const playerName = document.getElementById('playerName').value.trim();
+            const playerName = document.getElementById('resultPlayerName').value.trim();
             const submitBtn = document.getElementById('submitScoreBtn');
             const statusDiv = document.getElementById('submissionStatus');
 
             // Validate player name
             if (!playerName) {
-                statusDiv.textContent = 'Please enter your name in the settings before submitting!';
+                statusDiv.textContent = 'Please enter your name above to submit your score!';
                 statusDiv.className = 'submission-status error';
+                document.getElementById('resultPlayerName').focus();
                 return;
             }
+
+            // Sync name back to settings screen
+            document.getElementById('playerName').value = playerName;
 
             // Check if API URL is configured
             if (!LEADERBOARD_API_URL || LEADERBOARD_API_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
