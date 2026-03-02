@@ -29,6 +29,15 @@ Located in `docs/` directory (GitHub Pages source):
   - **AMC 8 Resources**: Message to Parents, Past AMC 8 Problems, AMC 8 Mock Tests
   - **Math Kangaroo Resources**: Sample Questions, Math Kangaroo Scoring, Math Kangaroo Awards
   - **MCPS Math League Resources**: FAQ and meet information
+- `materials.html` - Comprehensive competition materials library with collapsible sections for each competition
+  - **MOEMS Resources**: Message to Parents, Sample Test, Problem of the Week, vocabulary materials
+  - **MATHCOUNTS Resources**: Message to Parents, Info Slides, Sprint/Target/Team Round samples, Answer Key, practice materials, AoPS trainer
+  - **AMC 8 Resources**: Past problems, mock tests, official website links
+  - **Math Kangaroo Resources**: Sample Questions, Scoring guide, Awards information
+  - **MCPS Math League Resources**: FAQ, Meet Information, Past competitions archive
+  - **Purple Comet Math Meet Resources**: Past contest problems and answers, official website
+  - **Noetic Learning Math Contest Resources**: Sample problems, official website, practice puzzles
+  - **MBMT Resources**: Competition archive with past problems and solutions
 - `competitions.html` - Competition details, schedules, and external resource links
   - Competition table with official sites and practice resources
   - Calendar view of all competition dates
