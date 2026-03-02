@@ -974,6 +974,7 @@
                     html += '📄 Download Score Report';
                     html += '</a>';
                 }
+                html += '<div style="margin-top: 12px;"><a href="https://drive.google.com/file/d/1K1NPJQZfVUE228Bd7ebggr3yKHe2YUZi/view?usp=sharing" target="_blank" style="color: #1e40af; text-decoration: none; font-weight: 600;">📊 Question Analysis Report</a></div>';
             } else {
                 // No score recorded
                 html += '<div style="text-align: center; color: #666; padding: 10px;">';
@@ -1056,46 +1057,149 @@
               html += '<div style="background: #d1fae5; border: 2px solid #059669; border-radius: 8px; padding: 15px; margin-top: 15px; text-align: center;">';
               html += '<div style="color: #047857; font-weight: bold; font-size: 1.1rem; margin-bottom: 8px;">✓ Signed Up</div>';
               const preference = noetic.gradePreference === 'own' ? 'Your Grade Level' : '8th/Mixed Team';
-              html += '<div style="color: #065f46; font-size: 0.95rem; margin-bottom: 12px;">Team: ' + preference + '</div>';
-              if (beforeDeadline) {
-                // Only show Modify button for 6th and 7th graders (8th graders are auto-assigned to 8th/Mixed)
-                const gradeStr = (student.gradeLevel || '').toString().trim();
-                const gradeNum = gradeStr.match(/\d+/) ? gradeStr.match(/\d+/)[0] : '';
-                const canModify = gradeNum === '6' || gradeNum === '7';
-
-                if (canModify) {
-                  html += '<button onclick="modifyNoeticSignUp(\'' + student.mcpsId + '\', \'' + escapeHtml(student.name) + '\', \'' + gradeStr + '\')" style="background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; margin-right: 8px;">';
-                  html += 'Modify';
-                  html += '</button>';
-                }
-                html += '<button onclick="dropNoeticSignUp(\'' + student.mcpsId + '\')" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer;">';
-                html += 'Drop';
-                html += '</button>';
-              }
+              html += '<div style="color: #065f46; font-size: 0.95rem; margin-bottom: 15px;">Team: ' + preference + '</div>';
+              html += '<div style="background: rgba(255,255,255,0.7); border: 1px solid #059669; border-radius: 6px; padding: 10px; margin-top: 12px; font-size: 0.9rem; color: #065f46;">';
+              html += '<strong>💳 Payment:</strong> Contest fees will be collected via SchoolCash Online';
               html += '</div>';
-            } else if (beforeDeadline) {
-              // Not signed up, before deadline - show button
-              html += '<div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 15px; margin-top: 15px; text-align: center;">';
-              html += '<div style="color: #92400e; font-weight: bold; font-size: 1.1rem; margin-bottom: 10px;">Ready to Sign Up?</div>';
-              html += '<button onclick="signUpForNoetic(\'' + student.mcpsId + '\', \'' + escapeHtml(student.name) + '\', \'' + (student.gradeLevel || '') + '\')" style="background: #dc2626; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer;">';
-              html += 'Sign Up for Noetic Learning';
-              html += '</button>';
               html += '</div>';
             } else {
-              // After deadline
+              // Not signed up - registration closed
               html += '<div style="background: #f3f4f6; border: 2px solid #d1d5db; border-radius: 8px; padding: 15px; margin-top: 15px; text-align: center;">';
-              html += '<div style="color: #6b7280; font-size: 0.95rem;">Registration deadline has passed</div>';
+              html += '<div style="color: #6b7280; font-weight: bold; font-size: 1rem; margin-bottom: 8px;">Registration Closed</div>';
+              html += '<div style="color: #6b7280; font-size: 0.95rem;">Registration deadline: Sunday, March 1, 2026</div>';
               html += '</div>';
             }
 
-            // Registration info
-            html += '<div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 15px; margin-top: 15px; text-align: center;">';
-            html += '<div style="color: #92400e; font-weight: bold; margin-bottom: 8px;">Registration Information</div>';
-            html += '<div style="color: #78350f; font-size: 0.9rem; line-height: 1.6;">';
-            html += '<p style="margin-bottom: 8px;"><strong>Registration closes: Sunday, March 1, 2026</strong></p>';
-            html += '<p style="margin-bottom: 0;">Contest fees will be collected via SchoolCash Online during the first week of March</p>';
             html += '</div>';
             html += '</div>';
+
+            // Purple Comet Math Meet Section
+            const purpleComet = result.purpleComet || null;
+            html += '<h2 class="section-title">☄️ Purple Comet Math Meet</h2>';
+            html += '<div class="info-card">';
+            html += '<div style="padding: 15px;">';
+
+            // Competition info
+            html += '<div style="color: #666; font-size: 0.95rem; margin-bottom: 10px;">Competition Date: <strong>Friday, April 17, 2026 (3:15 - 4:30 PM)</strong> | Free | Teams of 1-6 | 20 problems, 60 minutes</div>';
+            html += '<div style="margin-bottom: 15px;"><a href="https://purplecomet.org" target="_blank" style="color: #dc2626; text-decoration: none; font-weight: 600;">Visit purplecomet.org →</a></div>';
+
+            const pcDeadline = new Date('2026-04-01T23:59:59');
+            const pcBeforeDeadline = new Date() < pcDeadline;
+
+            // Store purpleComet data globally for modals
+            window.pcData = purpleComet;
+            window.pcStudentInfo = { mcpsId: student.mcpsId, name: student.name, grade: student.gradeLevel || '' };
+
+            if (pcBeforeDeadline) {
+              var isOnTeam = purpleComet && purpleComet.myTeam;
+              var pcPendingInvites = (purpleComet && purpleComet.pendingInvites && !isOnTeam) ? purpleComet.pendingInvites : [];
+
+              // Pending invites notification (only when not on a team)
+              if (pcPendingInvites.length > 0) {
+                html += '<div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 12px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">';
+                html += '<div style="color: #92400e; font-weight: 600;">📩 You have ' + pcPendingInvites.length + ' pending invitation' + (pcPendingInvites.length !== 1 ? 's' : '') + '</div>';
+                html += '<button onclick="showPCInvitesModal()" style="background: #f59e0b; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer;">View Invites</button>';
+                html += '</div>';
+              }
+
+              if (isOnTeam) {
+                // Student is on a team — compact team card with inline members
+                const myTeam = purpleComet.myTeam;
+                const typeBadge = myTeam.teamType === 'open'
+                  ? '<span style="background: #059669; color: white; padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 8px;">Open</span>'
+                  : '<span style="background: #6366f1; color: white; padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 8px;">Invite Only</span>';
+
+                html += '<div style="background: #d1fae5; border: 2px solid #059669; border-radius: 8px; padding: 15px; margin-bottom: 12px;">';
+                html += '<div style="font-weight: bold; color: #047857; font-size: 1.15rem; margin-bottom: 10px;">' + escapeHtml(myTeam.teamName) + typeBadge + '</div>';
+
+                const activeMembers = myTeam.members.filter(function(m) { return m.role === 'creator' || m.role === 'member'; });
+                const invitedMembers = myTeam.members.filter(function(m) { return m.role === 'invited'; });
+
+                html += '<div style="margin-bottom: 10px;">';
+                html += '<div style="font-weight: 600; color: #065f46; margin-bottom: 6px;">Members (' + activeMembers.length + '/6)</div>';
+                activeMembers.forEach(function(m) {
+                  const roleLabel = m.role === 'creator' ? ' <span style="color: #b45309; font-size: 0.8rem;">(owner)</span>' : '';
+                  html += '<div style="padding: 4px 0; color: #065f46;">' + escapeHtml(m.name) + ' <span style="color: #6b7280; font-size: 0.85rem;">' + escapeHtml(m.grade) + '</span>' + roleLabel + '</div>';
+                });
+                if (invitedMembers.length > 0) {
+                  html += '<div style="margin-top: 8px; font-weight: 600; color: #065f46; margin-bottom: 4px;">Pending Invites</div>';
+                  invitedMembers.forEach(function(m) {
+                    html += '<div style="padding: 4px 0; color: #9ca3af; font-style: italic; display: flex; align-items: center; gap: 8px;">';
+                    html += '<span>' + escapeHtml(m.name) + ' <span style="font-size: 0.85rem;">(invited)</span></span>';
+                    if (myTeam.role === 'creator') {
+                      html += '<button onclick="revokePCInvite(\'' + escapeHtml(student.mcpsId) + '\', \'' + escapeHtml(m.mcpsId) + '\', \'' + escapeHtml(m.name) + '\')" style="background: none; border: none; color: #dc2626; cursor: pointer; font-size: 1rem; padding: 0 4px;" title="Revoke invitation">✕</button>';
+                    }
+                    html += '</div>';
+                  });
+                }
+                html += '</div>';
+
+                // Competition login credentials
+                if (myTeam.loginName || myTeam.password) {
+                  html += '<div style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 6px; padding: 12px; margin: 12px 0; margin-bottom: 10px;">';
+                  html += '<div style="font-weight: 600; color: #92400e; margin-bottom: 8px;">🔐 Competition Login</div>';
+                  if (myTeam.loginName) {
+                    html += '<div style="padding: 4px 0; color: #78350f;"><span style="font-weight: 500;">Username:</span> <code style="background: white; padding: 2px 6px; border-radius: 3px; font-family: monospace;">' + escapeHtml(myTeam.loginName) + '</code></div>';
+                  }
+                  if (myTeam.password) {
+                    html += '<div style="padding: 4px 0; color: #78350f;"><span style="font-weight: 500;">Password:</span> <code style="background: white; padding: 2px 6px; border-radius: 3px; font-family: monospace;">' + escapeHtml(myTeam.password) + '</code></div>';
+                  }
+                  html += '<div style="margin-top: 10px;"><a href="https://purplecomet.org/teams/login" target="_blank" style="color: #b45309; text-decoration: none; font-weight: 600;">Go to Team Login →</a></div>';
+                  html += '<div style="margin-top: 8px; font-size: 0.9rem; color: #78350f; line-height: 1.4;">To access practice contests, contact Prof. Jojo at <strong>zdongmc@gmail.com</strong>.</div>';
+                  html += '</div>';
+                }
+
+                // Action buttons
+                html += '<div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">';
+                if (myTeam.role === 'creator' && activeMembers.length < 6) {
+                  html += '<button onclick="showPurpleCometInviteModal(\'' + escapeHtml(student.mcpsId) + '\', \'' + escapeHtml(myTeam.teamName) + '\')" style="background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer;">Invite Students</button>';
+                }
+                if (!myTeam.loginName && !myTeam.password) {
+                  html += '<button onclick="leavePurpleCometTeam(\'' + escapeHtml(student.mcpsId) + '\', \'' + escapeHtml(myTeam.teamName) + '\')" style="background: #9ca3af; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer;">Leave Team</button>';
+                }
+                html += '</div>';
+                html += '</div>';
+
+              } else {
+                // Student is not on a team
+                var pcPendingCount = pcPendingInvites.length;
+                html += '<div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">';
+                html += '<button onclick="showCreatePurpleCometTeamModal(\'' + escapeHtml(student.mcpsId) + '\', \'' + escapeHtml(student.name) + '\', \'' + escapeHtml(student.gradeLevel || '') + '\', ' + pcPendingCount + ')" style="background: #dc2626; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer;">Create a Team</button>';
+                html += '</div>';
+              }
+
+              // Browse All Teams button
+              html += '<button onclick="showBrowseTeamsModal()" style="background: white; color: #333; border: 2px solid #d1d5db; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.9rem;">Browse All Teams</button>';
+
+            } else {
+              // After deadline
+              if (purpleComet && purpleComet.myTeam) {
+                const myTeam = purpleComet.myTeam;
+                const typeBadge = myTeam.teamType === 'open'
+                  ? '<span style="background: #059669; color: white; padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 8px;">Open</span>'
+                  : '<span style="background: #6366f1; color: white; padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 8px;">Invite Only</span>';
+
+                html += '<div style="background: #d1fae5; border: 2px solid #059669; border-radius: 8px; padding: 15px; margin-bottom: 12px;">';
+                html += '<div style="font-weight: bold; color: #047857; font-size: 1.15rem; margin-bottom: 10px;">' + escapeHtml(myTeam.teamName) + typeBadge + '</div>';
+
+                const activeMembers = myTeam.members.filter(function(m) { return m.role === 'creator' || m.role === 'member'; });
+                html += '<div style="font-weight: 600; color: #065f46; margin-bottom: 6px;">Members (' + activeMembers.length + '/6)</div>';
+                activeMembers.forEach(function(m) {
+                  const roleLabel = m.role === 'creator' ? ' <span style="color: #b45309; font-size: 0.8rem;">(owner)</span>' : '';
+                  html += '<div style="padding: 4px 0; color: #065f46;">' + escapeHtml(m.name) + ' <span style="color: #6b7280; font-size: 0.85rem;">' + escapeHtml(m.grade) + '</span>' + roleLabel + '</div>';
+                });
+                html += '</div>';
+              } else {
+                html += '<div style="background: #f3f4f6; border: 2px solid #d1d5db; border-radius: 8px; padding: 15px; margin-bottom: 12px; text-align: center;">';
+                html += '<div style="color: #6b7280; font-size: 0.95rem;">Team formation deadline has passed (April 1, 2026)</div>';
+                html += '</div>';
+              }
+
+              // Browse All Teams button (read-only after deadline)
+              if (purpleComet && purpleComet.allTeams && purpleComet.allTeams.length > 0) {
+                html += '<button onclick="showBrowseTeamsModal()" style="background: white; color: #333; border: 2px solid #d1d5db; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.9rem;">Browse All Teams</button>';
+              }
+            }
 
             html += '</div>';
             html += '</div>';
@@ -1172,9 +1276,9 @@
                     html += '<div style="margin-top: 15px; background: #f8f9fa; border: 2px solid #d1d5db; border-radius: 10px; padding: 15px;">';
                     html += '<div style="font-weight: bold; color: #333; margin-bottom: 12px; font-size: 1.15rem;">' + escapeHtml(contest.name) + ' - ' + escapeHtml(contest.date) + '</div>';
 
-                    // Sign-up status - only show for future contests (Contest #4 and #5, index 3-4)
+                    // Sign-up status - only show for future contests (Contest #5, index 4)
                     let signedUp = false;
-                    if (contestIndex >= 3) {
+                    if (contestIndex >= 4) {
                         if (isWaitlisted) {
                             html += '<div class="competition-date-item waitlisted" style="margin-bottom: 10px;">';
                             html += '<div class="date-status waitlisted">Waitlisted</div>';
@@ -1191,8 +1295,8 @@
                         }
                     }
 
-                    // Show results for Contest #1, Contest #2, and Contest #3 (contestIndex 0-2)
-                    if (contestIndex <= 2) {
+                    // Show results for Contest #1 through Contest #4 (contestIndex 0-3)
+                    if (contestIndex <= 3) {
                         // Contest results (if available)
                         if (moemsData && moemsData.contests && moemsData.contests[contestIndex]) {
                             const contestResult = moemsData.contests[contestIndex];
@@ -1256,9 +1360,8 @@
                     const isIndividualOnly = meetTeamAssignment && meetTeamAssignment.toLowerCase() === 'individual';
                     const didNotAttend = meetTeamAssignment && meetTeamAssignment.toUpperCase() === 'NA';
 
-                    // For meets 1-3, show "Did Not Attend" if team assignment is NA
-                    // For meet 4, skip team display and let sign-up status show "Not Signed Up" instead
-                    if (didNotAttend && meetIndex < 3) {
+                    // Show "Did Not Attend" if team assignment is NA
+                    if (didNotAttend && meetIndex < 4) {
                         html += '<div style="background: #fee; border: 2px solid #dc2626; border-radius: 8px; padding: 10px; margin-bottom: 10px; text-align: center;">';
                         html += '<div style="font-weight: bold; color: #dc2626; font-size: 1rem;">Did Not Attend</div>';
                         html += '</div>';
@@ -1272,32 +1375,10 @@
                         html += '</div>';
                     }
 
-                    // Sign-up status - only show for future meets (Meet #4, index 3)
-                    let signedUp = false;
-                    if (meetIndex >= 3) {
-                        if (isWaitlisted) {
-                            html += '<div class="competition-date-item waitlisted" style="margin-bottom: 10px;">';
-                            html += '<div class="date-status waitlisted">Waitlisted</div>';
-                            html += '</div>';
-                        } else {
-                            // For Meet #4, check team assignment from Math League sheet (column K)
-                            // If it says "NA", student is not signed up
-                            const meet4Team = mathLeagueData && mathLeagueData.teamResults && mathLeagueData.teamResults[meetIndex] && mathLeagueData.teamResults[meetIndex].team;
-                            signedUp = meet4Team && meet4Team.toUpperCase() !== 'NA' && meet4Team.length > 0;
-                            const status = signedUp ? 'Signed Up' : 'Not Signed Up';
-                            const statusClass = signedUp ? 'yes' : 'no';
-                            const itemClass = signedUp ? 'signed-up' : 'not-signed-up';
-
-                            html += '<div class="competition-date-item ' + itemClass + '" style="margin-bottom: 10px;">';
-                            html += '<div class="date-status ' + statusClass + '">' + status + '</div>';
-                            html += '</div>';
-                        }
-                    }
-
-                    // Show results for Meet #1, Meet #2, and Meet #3 (meetIndex 0-2)
+                    // Show results for all meets
                     // Show results if student has a team/individual assignment for this meet (but not if NA)
                     const hasAssignmentForMeet = meetTeamAssignment && meetTeamAssignment.length > 0 && !didNotAttend;
-                    if (hasAssignmentForMeet && !isWaitlisted && meetIndex <= 2) {
+                    if (hasAssignmentForMeet && meetIndex <= 3) {
                         // Individual results (if available)
                         if (mathLeagueData && mathLeagueData.meetScores && mathLeagueData.meetScores[meetIndex] !== undefined) {
                             const meetScore = mathLeagueData.meetScores[meetIndex];
@@ -1758,6 +1839,602 @@
                     console.error('Drop error:', error);
                 })
                 .dropNoeticSignUp(mcpsId);
+        }
+
+        // ==================== Purple Comet Functions ====================
+
+        // ===== Purple Comet: View Invites Modal =====
+        function showPCInvitesModal() {
+            var pc = window.pcData;
+            var si = window.pcStudentInfo;
+            if (!pc || !pc.pendingInvites || pc.pendingInvites.length === 0) return;
+
+            var dialog = document.createElement('div');
+            dialog.id = 'pcInvitesModal';
+            dialog.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+
+            var content = '<div style="background: white; border-radius: 12px; padding: 25px; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-height: 80vh; overflow-y: auto;">';
+            content += '<div style="font-size: 1.2rem; font-weight: bold; color: #333; margin-bottom: 15px; text-align: center;">Pending Invitations</div>';
+
+            pc.pendingInvites.forEach(function(invite) {
+                var teamInfo = pc.allTeams.find(function(t) { return t.teamName === invite.teamName; });
+                content += '<div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 15px; margin-bottom: 12px;">';
+                content += '<div style="font-weight: bold; color: #92400e; margin-bottom: 8px;">Team "' + escapeHtml(invite.teamName) + '"</div>';
+                if (teamInfo && teamInfo.members && teamInfo.members.length > 0) {
+                    content += '<div style="color: #78350f; font-size: 0.9rem; margin-bottom: 10px;">Members (' + teamInfo.memberCount + '/6): ';
+                    content += teamInfo.members.map(function(m) { return escapeHtml(m.name); }).join(', ');
+                    content += '</div>';
+                }
+                content += '<div style="display: flex; gap: 10px;">';
+                content += '<button onclick="acceptPurpleCometInvite(\'' + escapeHtml(si.mcpsId) + '\', \'' + escapeHtml(si.name) + '\', \'' + escapeHtml(si.grade) + '\', \'' + escapeHtml(invite.teamName) + '\')" style="background: #059669; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer;">Accept</button>';
+                content += '<button onclick="rejectPurpleCometInvite(\'' + escapeHtml(si.mcpsId) + '\', \'' + escapeHtml(invite.teamName) + '\')" style="background: #9ca3af; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer;">Decline</button>';
+                content += '</div>';
+                content += '</div>';
+            });
+
+            content += '<div style="text-align: center; margin-top: 10px;"><button onclick="document.getElementById(\'pcInvitesModal\').remove();" style="background: #e5e7eb; color: #333; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer;">Close</button></div>';
+            content += '</div>';
+
+            dialog.innerHTML = content;
+            document.body.appendChild(dialog);
+        }
+
+        // ===== Purple Comet: Browse All Teams Modal =====
+        function showBrowseTeamsModal() {
+            var pc = window.pcData;
+            var si = window.pcStudentInfo;
+            var isOnTeam = pc && pc.myTeam;
+            var teams = (pc && pc.allTeams) ? pc.allTeams.slice() : [];
+            var pcDeadline = new Date('2026-04-01T23:59:59');
+            var pcBeforeDeadline = new Date() < pcDeadline;
+
+            // Sort: open not-full first, then invite-only not-full, then full
+            // Secondary: most open spaces first, then alphabetical
+            teams.sort(function(a, b) {
+                var aFull = a.isFull ? 1 : 0;
+                var bFull = b.isFull ? 1 : 0;
+                if (aFull !== bFull) return aFull - bFull;
+                if (!a.isFull && !b.isFull) {
+                    // Open before invite-only
+                    var aOpen = a.teamType === 'open' ? 0 : 1;
+                    var bOpen = b.teamType === 'open' ? 0 : 1;
+                    if (aOpen !== bOpen) return aOpen - bOpen;
+                }
+                // Most open spaces first
+                var aSpaces = 6 - a.memberCount;
+                var bSpaces = 6 - b.memberCount;
+                if (aSpaces !== bSpaces) return bSpaces - aSpaces;
+                // Alphabetical
+                return a.teamName.localeCompare(b.teamName);
+            });
+
+            var dialog = document.createElement('div');
+            dialog.id = 'pcBrowseTeamsModal';
+            dialog.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+
+            var content = '<div style="background: white; border-radius: 12px; padding: 25px; max-width: 550px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-height: 80vh; overflow-y: auto;">';
+            content += '<div style="font-size: 1.2rem; font-weight: bold; color: #333; margin-bottom: 15px; text-align: center;">All Teams (' + teams.length + ')</div>';
+
+            if (teams.length === 0) {
+                content += '<div style="text-align: center; color: #9ca3af; padding: 20px;">No teams have been created yet.</div>';
+            } else {
+                teams.forEach(function(team) {
+                    var typeBadge = team.teamType === 'open'
+                        ? '<span style="background: #059669; color: white; padding: 1px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: bold;">Open</span>'
+                        : '<span style="background: #6366f1; color: white; padding: 1px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: bold;">Invite Only</span>';
+
+                    var bgColor = team.isFull ? '#f9fafb' : '#fff';
+                    var opacity = team.isFull ? 'opacity: 0.7;' : '';
+
+                    content += '<div style="background: ' + bgColor + '; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; margin-bottom: 8px; ' + opacity + '">';
+                    content += '<div style="display: flex; align-items: center; justify-content: space-between;">';
+                    content += '<div style="flex: 1;">';
+                    content += '<span style="font-weight: 600; color: #333;">' + escapeHtml(team.teamName) + '</span> ' + typeBadge;
+                    if (team.isFull) {
+                        content += ' <span style="background: #e5e7eb; color: #9ca3af; padding: 1px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: bold;">Full</span>';
+                    }
+                    content += '</div>';
+
+                    // Join button: only for students not on a team, open teams, not full, before deadline
+                    if (!isOnTeam && pcBeforeDeadline && !team.isFull && team.teamType === 'open') {
+                        content += '<button onclick="joinPurpleCometTeam(\'' + escapeHtml(si.mcpsId) + '\', \'' + escapeHtml(si.name) + '\', \'' + escapeHtml(si.grade) + '\', \'' + escapeHtml(team.teamName) + '\')" style="background: #059669; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.85rem; margin-left: 8px;">Join</button>';
+                    }
+
+                    content += '</div>';
+
+                    // Member list
+                    content += '<div style="color: #6b7280; font-size: 0.85rem; margin-top: 4px;">' + team.memberCount + '/6 members';
+                    if (team.members && team.members.length > 0) {
+                        content += ': ' + team.members.map(function(m) { return escapeHtml(m.name); }).join(', ');
+                    }
+                    content += '</div>';
+                    content += '</div>';
+                });
+            }
+
+            content += '<div style="text-align: center; margin-top: 10px;"><button onclick="document.getElementById(\'pcBrowseTeamsModal\').remove();" style="background: #e5e7eb; color: #333; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer;">Close</button></div>';
+            content += '</div>';
+
+            dialog.innerHTML = content;
+            document.body.appendChild(dialog);
+        }
+
+        // ===== Purple Comet: Create Team Modal =====
+        function showCreatePurpleCometTeamModal(mcpsId, studentName, grade, pendingInviteCount) {
+            const dialog = document.createElement('div');
+            dialog.id = 'pcCreateTeamDialog';
+            dialog.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+
+            let inviteWarning = '';
+            if (pendingInviteCount > 0) {
+                inviteWarning = '<div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 12px; margin-bottom: 15px; text-align: center;"><div style="color: #92400e; font-size: 0.9rem;">⚠ You have <strong>' + pendingInviteCount + '</strong> pending team invitation' + (pendingInviteCount !== 1 ? 's' : '') + '. Creating your own team will automatically decline ' + (pendingInviteCount !== 1 ? 'all of them' : 'it') + '.</div></div>';
+            }
+
+            dialog.innerHTML = `
+                <div style="background: white; border-radius: 12px; padding: 25px; max-width: 450px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                    <div style="font-size: 1.2rem; font-weight: bold; color: #333; margin-bottom: 15px; text-align: center;">Create a Purple Comet Team</div>
+
+                    ${inviteWarning}
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">Team Name</label>
+                        <input type="text" id="pcTeamNameInput" maxlength="30" placeholder="Enter team name (1-30 characters)" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; box-sizing: border-box;">
+                        <div style="color: #9ca3af; font-size: 0.8rem; margin-top: 4px;">Letters, numbers, spaces, hyphens, underscores only</div>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">Team Type</label>
+                        <div id="pcTeamTypeOpen" onclick="selectPCTeamType('open')" style="background: #f0fdf4; border: 2px solid #86efac; border-radius: 8px; padding: 12px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s;">
+                            <div style="font-weight: bold; color: #059669;">Open Team</div>
+                            <div style="color: #6b7280; font-size: 0.85rem;">Anyone can join freely</div>
+                        </div>
+                        <div id="pcTeamTypeInvite" onclick="selectPCTeamType('invite')" style="background: #eef2ff; border: 2px solid #a5b4fc; border-radius: 8px; padding: 12px; cursor: pointer; transition: all 0.2s;">
+                            <div style="font-weight: bold; color: #6366f1;">Invite Only</div>
+                            <div style="color: #6b7280; font-size: 0.85rem;">You invite teammates</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="document.getElementById('pcCreateTeamDialog').remove();" style="background: #e5e7eb; color: #333; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1;">Cancel</button>
+                        <button id="pcCreateConfirmBtn" onclick="confirmCreatePCTeam('${escapeHtml(mcpsId)}', '${escapeHtml(studentName)}', '${escapeHtml(grade)}')" style="background: #dc2626; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1; opacity: 0.5;" disabled>Create Team</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(dialog);
+            window.pcSelectedTeamType = null;
+        }
+
+        function selectPCTeamType(type) {
+            window.pcSelectedTeamType = type;
+            const openEl = document.getElementById('pcTeamTypeOpen');
+            const inviteEl = document.getElementById('pcTeamTypeInvite');
+            const btn = document.getElementById('pcCreateConfirmBtn');
+
+            openEl.style.border = type === 'open' ? '3px solid #059669' : '2px solid #86efac';
+            openEl.style.background = type === 'open' ? '#dcfce7' : '#f0fdf4';
+            inviteEl.style.border = type === 'invite' ? '3px solid #6366f1' : '2px solid #a5b4fc';
+            inviteEl.style.background = type === 'invite' ? '#e0e7ff' : '#eef2ff';
+
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        }
+
+        function confirmCreatePCTeam(mcpsId, studentName, grade) {
+            const teamName = document.getElementById('pcTeamNameInput').value.trim();
+            const teamType = window.pcSelectedTeamType;
+
+            if (!teamName) {
+                showMessage('Please enter a team name.', true);
+                return;
+            }
+            if (!teamType) {
+                showMessage('Please select a team type.', true);
+                return;
+            }
+
+            document.getElementById('pcCreateTeamDialog').remove();
+            showMessage('Creating team...', false);
+
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success) {
+                        showMessage(result.message, false);
+                        setTimeout(function() { lookupStudent(); }, 1500);
+                    } else {
+                        showMessage(result.message, true);
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    showMessage('Error creating team. Please try again.', true);
+                })
+                .createPurpleCometTeam(mcpsId, studentName, grade, teamName, teamType);
+        }
+
+        // ===== Purple Comet: Join Team =====
+        function joinPurpleCometTeam(mcpsId, studentName, grade, teamName) {
+            const dialog = document.createElement('div');
+            dialog.id = 'pcJoinConfirmDialog';
+            dialog.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+            dialog.innerHTML = `
+                <div style="background: white; border-radius: 12px; padding: 25px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                    <div style="text-align: center;">
+                        <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 15px;">Join team "${escapeHtml(teamName)}"?</p>
+                        <div style="display: flex; gap: 10px; justify-content: center;">
+                            <button onclick="document.getElementById('pcJoinConfirmDialog').remove();" style="background: #e5e7eb; color: #333; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1;">Cancel</button>
+                            <button onclick="confirmJoinPCTeam('${escapeHtml(mcpsId)}', '${escapeHtml(studentName)}', '${escapeHtml(grade)}', '${escapeHtml(teamName)}')" style="background: #059669; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1;">Join</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(dialog);
+        }
+
+        function confirmJoinPCTeam(mcpsId, studentName, grade, teamName) {
+            document.getElementById('pcJoinConfirmDialog').remove();
+            // Close browse modal if open
+            var browseModal = document.getElementById('pcBrowseTeamsModal');
+            if (browseModal) browseModal.remove();
+            showMessage('Joining team...', false);
+
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success) {
+                        showMessage(result.message, false);
+                        setTimeout(function() { lookupStudent(); }, 1500);
+                    } else {
+                        showMessage(result.message, true);
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    showMessage('Error joining team. Please try again.', true);
+                })
+                .joinPurpleCometTeam(mcpsId, studentName, grade, teamName);
+        }
+
+        // ===== Purple Comet: Invite Students Modal =====
+        function showPurpleCometInviteModal(creatorMcpsId, teamName) {
+            const dialog = document.createElement('div');
+            dialog.id = 'pcInviteDialog';
+            dialog.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+            dialog.innerHTML = `
+                <div style="background: white; border-radius: 12px; padding: 25px; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-height: 80vh; display: flex; flex-direction: column;">
+                    <div style="font-size: 1.2rem; font-weight: bold; color: #333; margin-bottom: 15px; text-align: center;">Invite Students to "${escapeHtml(teamName)}"</div>
+
+                    <!-- Grade filter -->
+                    <div style="margin-bottom: 10px;">
+                        <select id="pcInviteGradeFilter" onchange="filterPCInviteList()" style="padding: 8px 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 0.9rem; width: 100%; box-sizing: border-box;">
+                            <option value="all">All Grades</option>
+                            <option value="6">6th Grade</option>
+                            <option value="7">7th Grade</option>
+                            <option value="8">8th Grade</option>
+                        </select>
+                    </div>
+
+                    <!-- Student list -->
+                    <div style="flex: 1; overflow: hidden; display: flex; flex-direction: column;">
+                        <div id="pcStudentListLoading" style="text-align: center; padding: 20px; color: #666;"><span class="spinner"></span> Loading students...</div>
+                        <div id="pcStudentList" style="display: none; overflow-y: auto; max-height: 300px; border: 1px solid #e5e7eb; border-radius: 8px;"></div>
+                    </div>
+
+                    <!-- Selected students -->
+                    <div id="pcSelectedInvitees" style="margin-top: 10px; min-height: 40px;"></div>
+
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button onclick="document.getElementById('pcInviteDialog').remove(); window.pcInviteSelected = [];" style="background: #e5e7eb; color: #333; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1;">Cancel</button>
+                        <button id="pcSendInvitesBtn" onclick="sendPCInvitations('${escapeHtml(creatorMcpsId)}', '${escapeHtml(teamName)}')" style="background: #dc2626; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1; opacity: 0.5;" disabled>Send Invitations</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(dialog);
+
+            window.pcInviteSelected = [];
+            window.pcAvailableStudents = [];
+
+            // Load available students
+            google.script.run
+                .withSuccessHandler(function(students) {
+                    window.pcAvailableStudents = students;
+                    document.getElementById('pcStudentListLoading').style.display = 'none';
+                    renderPCInviteList(students);
+                })
+                .withFailureHandler(function(error) {
+                    document.getElementById('pcStudentListLoading').innerHTML = '<div style="color: #dc2626;">Error loading students.</div>';
+                })
+                .getAvailableStudents();
+        }
+
+        function renderPCInviteList(students) {
+            var listEl = document.getElementById('pcStudentList');
+            if (!listEl) return;
+            listEl.style.display = 'block';
+
+            if (students.length === 0) {
+                listEl.innerHTML = '<div style="text-align: center; padding: 20px; color: #9ca3af;">No available students found.</div>';
+                return;
+            }
+
+            var html = '';
+            students.forEach(function(s) {
+                var isSelected = window.pcInviteSelected.some(function(sel) { return sel.mcpsId === s.mcpsId; });
+                var bgStyle = isSelected ? 'background: #f0fdf4;' : '';
+                var checkHtml = isSelected ? '<span style="color: #059669; font-weight: bold;">✓</span>' : '';
+                html += '<div id="pcStudent_' + s.mcpsId + '" style="padding: 10px 12px; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; justify-content: space-between; cursor: pointer; ' + bgStyle + '" onclick="togglePCInviteStudent(\'' + escapeHtml(s.mcpsId) + '\', \'' + escapeHtml(s.name) + '\', \'' + escapeHtml(s.grade) + '\')">';
+                html += '<div><span style="font-weight: 500;">' + escapeHtml(s.name) + '</span> <span style="color: #9ca3af; font-size: 0.85rem;">' + escapeHtml(s.grade) + '</span></div>';
+                html += '<div id="pcCheck_' + s.mcpsId + '" style="width: 20px; height: 20px; border: 2px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center;">' + checkHtml + '</div>';
+                html += '</div>';
+            });
+            listEl.innerHTML = html;
+        }
+
+        function filterPCInviteList() {
+            var filter = document.getElementById('pcInviteGradeFilter').value;
+            var students = window.pcAvailableStudents;
+            if (filter !== 'all') {
+                students = students.filter(function(s) {
+                    return s.grade && s.grade.indexOf(filter) !== -1;
+                });
+            }
+            renderPCInviteList(students);
+        }
+
+        function togglePCInviteStudent(mcpsId, name, grade) {
+            const idx = window.pcInviteSelected.findIndex(function(s) { return s.mcpsId === mcpsId; });
+            const checkEl = document.getElementById('pcCheck_' + mcpsId);
+            const rowEl = document.getElementById('pcStudent_' + mcpsId);
+
+            if (idx >= 0) {
+                window.pcInviteSelected.splice(idx, 1);
+                if (checkEl) checkEl.innerHTML = '';
+                if (rowEl) rowEl.style.background = '';
+            } else {
+                window.pcInviteSelected.push({ mcpsId: mcpsId, name: name, grade: grade });
+                if (checkEl) checkEl.innerHTML = '<span style="color: #059669; font-weight: bold;">✓</span>';
+                if (rowEl) rowEl.style.background = '#f0fdf4';
+            }
+
+            updatePCInviteSelection();
+        }
+
+        function updatePCInviteSelection() {
+            const container = document.getElementById('pcSelectedInvitees');
+            const btn = document.getElementById('pcSendInvitesBtn');
+
+            if (window.pcInviteSelected.length === 0) {
+                container.innerHTML = '<div style="color: #9ca3af; font-size: 0.85rem; text-align: center;">No students selected</div>';
+                btn.disabled = true;
+                btn.style.opacity = '0.5';
+            } else {
+                let html = '<div style="font-weight: 600; color: #333; margin-bottom: 6px; font-size: 0.9rem;">Selected (' + window.pcInviteSelected.length + '):</div>';
+                window.pcInviteSelected.forEach(function(s) {
+                    html += '<span style="display: inline-block; background: #dbeafe; color: #1e40af; padding: 3px 10px; border-radius: 12px; font-size: 0.8rem; margin: 2px 4px 2px 0;">' + escapeHtml(s.name) + ' <span onclick="removePCInviteStudent(\'' + s.mcpsId + '\')" style="cursor: pointer; margin-left: 4px;">×</span></span>';
+                });
+                container.innerHTML = html;
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            }
+        }
+
+        function removePCInviteStudent(mcpsId) {
+            window.pcInviteSelected = window.pcInviteSelected.filter(function(s) { return s.mcpsId !== mcpsId; });
+            var checkEl = document.getElementById('pcCheck_' + mcpsId);
+            var rowEl = document.getElementById('pcStudent_' + mcpsId);
+            if (checkEl) checkEl.innerHTML = '';
+            if (rowEl) rowEl.style.background = '';
+            updatePCInviteSelection();
+        }
+
+        function sendPCInvitations(creatorMcpsId, teamName) {
+            if (window.pcInviteSelected.length === 0) return;
+
+            document.getElementById('pcInviteDialog').remove();
+            showMessage('Sending invitations...', false);
+
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success) {
+                        showMessage(result.message, false);
+                        setTimeout(function() { lookupStudent(); }, 1500);
+                    } else {
+                        showMessage(result.message, true);
+                    }
+                    window.pcInviteSelected = [];
+                })
+                .withFailureHandler(function(error) {
+                    showMessage('Error sending invitations. Please try again.', true);
+                    window.pcInviteSelected = [];
+                })
+                .inviteToPurpleCometTeam(creatorMcpsId, window.pcInviteSelected);
+        }
+
+        // ===== Purple Comet: Accept/Decline Invites =====
+        function acceptPurpleCometInvite(mcpsId, studentName, grade, teamName) {
+            // Close invites modal if open
+            var modal = document.getElementById('pcInvitesModal');
+            if (modal) modal.remove();
+            showMessage('Accepting invitation...', false);
+
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success) {
+                        showMessage(result.message, false);
+                        setTimeout(function() { lookupStudent(); }, 1500);
+                    } else {
+                        showMessage(result.message, true);
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    showMessage('Error accepting invitation. Please try again.', true);
+                })
+                .acceptPurpleCometInvite(mcpsId, studentName, grade, teamName);
+        }
+
+        function rejectPurpleCometInvite(mcpsId, teamName) {
+            const dialog = document.createElement('div');
+            dialog.id = 'pcRejectConfirmDialog';
+            dialog.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10001;';
+            dialog.innerHTML = `
+                <div style="background: white; border-radius: 12px; padding: 25px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                    <div style="text-align: center;">
+                        <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 15px;">Decline invitation from "${escapeHtml(teamName)}"?</p>
+                        <div style="display: flex; gap: 10px; justify-content: center;">
+                            <button onclick="document.getElementById('pcRejectConfirmDialog').remove();" style="background: #e5e7eb; color: #333; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1;">Cancel</button>
+                            <button onclick="confirmRejectPCInvite('${escapeHtml(mcpsId)}', '${escapeHtml(teamName)}')" style="background: #9ca3af; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1;">Decline</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(dialog);
+        }
+
+        function confirmRejectPCInvite(mcpsId, teamName) {
+            document.getElementById('pcRejectConfirmDialog').remove();
+            var modal = document.getElementById('pcInvitesModal');
+            if (modal) modal.remove();
+            showMessage('Declining invitation...', false);
+
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success) {
+                        showMessage(result.message, false);
+                        setTimeout(function() { lookupStudent(); }, 1500);
+                    } else {
+                        showMessage(result.message, true);
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    showMessage('Error declining invitation. Please try again.', true);
+                })
+                .rejectPurpleCometInvite(mcpsId, teamName);
+        }
+
+        // ===== Purple Comet: Revoke Invite =====
+        function revokePCInvite(creatorMcpsId, inviteeMcpsId, inviteeName) {
+            var dialog = document.createElement('div');
+            dialog.id = 'pcRevokeConfirmDialog';
+            dialog.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+            dialog.innerHTML = '<div style="background: white; border-radius: 12px; padding: 25px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);"><div style="text-align: center;"><p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 15px;">Revoke invitation for ' + escapeHtml(inviteeName) + '?</p><div style="display: flex; gap: 10px; justify-content: center;"><button onclick="document.getElementById(\'pcRevokeConfirmDialog\').remove();" style="background: #e5e7eb; color: #333; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1;">Cancel</button><button onclick="confirmRevokePCInvite(\'' + escapeHtml(creatorMcpsId) + '\', \'' + escapeHtml(inviteeMcpsId) + '\')" style="background: #dc2626; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1;">Revoke</button></div></div></div>';
+            document.body.appendChild(dialog);
+        }
+
+        function confirmRevokePCInvite(creatorMcpsId, inviteeMcpsId) {
+            document.getElementById('pcRevokeConfirmDialog').remove();
+            showMessage('Revoking invitation...', false);
+
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success) {
+                        showMessage(result.message, false);
+                        setTimeout(function() { lookupStudent(); }, 1500);
+                    } else {
+                        showMessage(result.message, true);
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    showMessage('Error revoking invitation. Please try again.', true);
+                })
+                .revokePurpleCometInvite(creatorMcpsId, inviteeMcpsId);
+        }
+
+        // ===== Purple Comet: Leave Team =====
+        function leavePurpleCometTeam(mcpsId, teamName) {
+            const dialog = document.createElement('div');
+            dialog.id = 'pcLeaveConfirmDialog';
+            dialog.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+            dialog.innerHTML = `
+                <div style="background: white; border-radius: 12px; padding: 25px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                    <div style="text-align: center;">
+                        <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 15px;">Leave team "${escapeHtml(teamName)}"?</p>
+                        <p style="color: #666; margin-bottom: 20px;">You can join another team before April 1, 2026.</p>
+                        <div style="display: flex; gap: 10px; justify-content: center;">
+                            <button onclick="document.getElementById('pcLeaveConfirmDialog').remove();" style="background: #e5e7eb; color: #333; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1;">Cancel</button>
+                            <button onclick="confirmLeavePCTeam('${escapeHtml(mcpsId)}')" style="background: #f59e0b; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1;">Leave</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(dialog);
+        }
+
+        function confirmLeavePCTeam(mcpsId, newCreatorMcpsId) {
+            var dialogEl = document.getElementById('pcLeaveConfirmDialog');
+            if (dialogEl) dialogEl.remove();
+            var pickerEl = document.getElementById('pcOwnerPickerDialog');
+            if (pickerEl) pickerEl.remove();
+            showMessage('Leaving team...', false);
+
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success) {
+                        showMessage(result.message, false);
+                        setTimeout(function() { lookupStudent(); }, 1500);
+                    } else if (result.needsNewCreator) {
+                        showOwnerPickerModal(mcpsId, result.members);
+                    } else {
+                        showMessage(result.message, true);
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    showMessage('Error leaving team. Please try again.', true);
+                })
+                .leavePurpleCometTeam(mcpsId, newCreatorMcpsId || null);
+        }
+
+        function showOwnerPickerModal(mcpsId, members) {
+            const dialog = document.createElement('div');
+            dialog.id = 'pcOwnerPickerDialog';
+            dialog.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+
+            let membersHtml = '';
+            members.forEach(function(m) {
+                membersHtml += '<div onclick="selectNewPCOwner(\'' + escapeHtml(m.mcpsId) + '\')" id="pcOwnerOption_' + escapeHtml(m.mcpsId) + '" style="padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s;">';
+                membersHtml += '<span style="font-weight: 600;">' + escapeHtml(m.name) + '</span>';
+                membersHtml += '</div>';
+            });
+
+            dialog.innerHTML = `
+                <div style="background: white; border-radius: 12px; padding: 25px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                    <div style="text-align: center;">
+                        <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 8px;">Choose New Team Owner</p>
+                        <p style="color: #666; margin-bottom: 15px; font-size: 0.9rem;">Select a teammate to take over as team owner before you leave.</p>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        ${membersHtml}
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="document.getElementById('pcOwnerPickerDialog').remove();" style="background: #e5e7eb; color: #333; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1;">Cancel</button>
+                        <button id="pcConfirmOwnerBtn" onclick="confirmNewOwnerAndLeave('${escapeHtml(mcpsId)}')" style="background: #f59e0b; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1; opacity: 0.5;" disabled>Confirm &amp; Leave</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(dialog);
+            window.pcSelectedNewOwner = null;
+        }
+
+        function selectNewPCOwner(mcpsId) {
+            window.pcSelectedNewOwner = mcpsId;
+            var options = document.querySelectorAll('[id^="pcOwnerOption_"]');
+            options.forEach(function(el) {
+                el.style.border = '2px solid #e5e7eb';
+                el.style.background = '';
+            });
+            var selected = document.getElementById('pcOwnerOption_' + mcpsId);
+            if (selected) {
+                selected.style.border = '3px solid #f59e0b';
+                selected.style.background = '#fef3c7';
+            }
+            var btn = document.getElementById('pcConfirmOwnerBtn');
+            if (btn) {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            }
+        }
+
+        function confirmNewOwnerAndLeave(mcpsId) {
+            if (!window.pcSelectedNewOwner) {
+                showMessage('Please select a new team owner.', true);
+                return;
+            }
+            confirmLeavePCTeam(mcpsId, window.pcSelectedNewOwner);
         }
 
         function escapeHtml(text) {

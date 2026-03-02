@@ -1199,6 +1199,760 @@ function dropNoeticSignUp(mcpsId) {
   }
 }
 
+// ==================== Purple Comet Math Meet ====================
+
+function getPurpleCometSheet() {
+  return getSpreadsheet().getSheetByName('Purple Comet');
+}
+
+function isPurpleCometDeadlinePassed() {
+  const now = new Date();
+  const deadline = new Date('2026-04-01T23:59:59');
+  return now > deadline;
+}
+
+function getPurpleCometResults(mcpsId) {
+  try {
+    const sheet = getPurpleCometSheet();
+    if (!sheet || sheet.getLastRow() <= 1) {
+      return {
+        myTeam: null,
+        pendingInvites: [],
+        allTeams: []
+      };
+    }
+
+    const data = sheet.getDataRange().getValues();
+    const mcpsIdStr = mcpsId.toString().trim();
+
+    // Build team map: teamName -> { teamType, rows: [{ mcpsId, name, grade, role, timestamp }] }
+    const teamMap = {};
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const teamName = (row[0] || '').toString().trim();
+      const rowMcpsId = (row[1] || '').toString().trim();
+      const studentName = (row[2] || '').toString().trim();
+      const grade = (row[3] || '').toString().trim();
+      const role = (row[4] || '').toString().trim().toLowerCase();
+      const teamType = (row[5] || '').toString().trim().toLowerCase();
+      const timestamp = row[6] || '';
+      const loginName = (row[7] || '').toString().trim();
+      const password = (row[8] || '').toString().trim();
+
+      if (!teamName) continue;
+
+      if (!teamMap[teamName]) {
+        teamMap[teamName] = { teamType: teamType, loginName: loginName, password: password, rows: [] };
+      }
+      teamMap[teamName].rows.push({
+        mcpsId: rowMcpsId,
+        name: studentName,
+        grade: grade,
+        role: role,
+        timestamp: timestamp
+      });
+    }
+
+    let myTeam = null;
+    const pendingInvites = [];
+
+    // Find student's team (creator or member) and pending invites
+    for (const [teamName, teamData] of Object.entries(teamMap)) {
+      for (const row of teamData.rows) {
+        if (row.mcpsId === mcpsIdStr) {
+          if (row.role === 'creator' || row.role === 'member') {
+            // Build members list for this team
+            const members = teamData.rows.map(r => ({
+              mcpsId: r.mcpsId,
+              name: r.name,
+              grade: r.grade,
+              role: r.role
+            }));
+            myTeam = {
+              teamName: teamName,
+              teamType: teamData.teamType,
+              role: row.role,
+              members: members,
+              loginName: teamData.loginName,
+              password: teamData.password
+            };
+          } else if (row.role === 'invited') {
+            pendingInvites.push({
+              teamName: teamName,
+              teamType: teamData.teamType
+            });
+          }
+        }
+      }
+    }
+
+    // Build allTeams list
+    const allTeams = [];
+    for (const [teamName, teamData] of Object.entries(teamMap)) {
+      const activeMembers = teamData.rows.filter(r => r.role === 'creator' || r.role === 'member');
+      allTeams.push({
+        teamName: teamName,
+        teamType: teamData.teamType,
+        memberCount: activeMembers.length,
+        isFull: activeMembers.length >= 6,
+        members: activeMembers.map(r => ({ name: r.name, grade: r.grade }))
+      });
+    }
+
+    return {
+      myTeam: myTeam,
+      pendingInvites: pendingInvites,
+      allTeams: allTeams
+    };
+  } catch (error) {
+    Logger.log('Error getting Purple Comet results: ' + error.toString());
+    return {
+      myTeam: null,
+      pendingInvites: [],
+      allTeams: []
+    };
+  }
+}
+
+function getAvailableStudents() {
+  try {
+    const competitionSheet = getCompetitionSignupSheet();
+    if (!competitionSheet || competitionSheet.getLastRow() <= 1) {
+      return [];
+    }
+
+    const competitionData = competitionSheet.getDataRange().getValues();
+
+    // Build roster from Form Responses 2, de-duplicated by MCPS ID (keep most recent)
+    const studentMap = {};
+    for (let i = 1; i < competitionData.length; i++) {
+      const row = competitionData[i];
+      const mcpsId = (row[2] || '').toString().trim();
+      const name = (row[1] || '').toString().trim();
+      const grade = (row[3] || '').toString().trim();
+      const timestamp = row[0];
+
+      if (!mcpsId || !name) continue;
+
+      if (!studentMap[mcpsId] || new Date(timestamp) > new Date(studentMap[mcpsId].timestamp)) {
+        studentMap[mcpsId] = { mcpsId: mcpsId, name: name, grade: grade, timestamp: timestamp };
+      }
+    }
+
+    // Get Purple Comet data to exclude students already on a team
+    const pcSheet = getPurpleCometSheet();
+    const onTeamIds = new Set();
+    if (pcSheet && pcSheet.getLastRow() > 1) {
+      const pcData = pcSheet.getDataRange().getValues();
+      for (let i = 1; i < pcData.length; i++) {
+        const role = (pcData[i][4] || '').toString().trim().toLowerCase();
+        const id = (pcData[i][1] || '').toString().trim();
+        if (role === 'creator' || role === 'member') {
+          onTeamIds.add(id);
+        }
+      }
+    }
+
+    // Filter out students on a team, sort alphabetically
+    const available = Object.values(studentMap)
+      .filter(s => !onTeamIds.has(s.mcpsId))
+      .map(s => ({ mcpsId: s.mcpsId, name: s.name, grade: s.grade }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    return available;
+  } catch (error) {
+    Logger.log('Error getting available students: ' + error.toString());
+    return [];
+  }
+}
+
+function createPurpleCometTeam(mcpsId, studentName, grade, teamName, teamType) {
+  try {
+    if (isPurpleCometDeadlinePassed()) {
+      return { success: false, message: 'The team formation deadline (April 1, 2026) has passed.' };
+    }
+
+    const mcpsIdStr = mcpsId.toString().trim();
+    teamName = (teamName || '').trim();
+    teamType = (teamType || '').trim().toLowerCase();
+
+    // Validate team name
+    if (!teamName || teamName.length < 1 || teamName.length > 30) {
+      return { success: false, message: 'Team name must be 1-30 characters.' };
+    }
+    if (!/^[a-zA-Z0-9 \-_]+$/.test(teamName)) {
+      return { success: false, message: 'Team name can only contain letters, numbers, spaces, hyphens, and underscores.' };
+    }
+
+    // Validate team type
+    if (teamType !== 'open' && teamType !== 'invite') {
+      return { success: false, message: 'Team type must be "open" or "invite".' };
+    }
+
+    let sheet = getPurpleCometSheet();
+    if (!sheet) {
+      // Create the sheet with headers
+      sheet = getSpreadsheet().insertSheet('Purple Comet');
+      const headers = ['Team Name', 'MCPS ID', 'Student Name', 'Grade', 'Role', 'Team Type', 'Timestamp'];
+      sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+      sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
+    }
+
+    // Check if student is already on a team
+    if (sheet.getLastRow() > 1) {
+      const data = sheet.getDataRange().getValues();
+      for (let i = 1; i < data.length; i++) {
+        const rowId = (data[i][1] || '').toString().trim();
+        const role = (data[i][4] || '').toString().trim().toLowerCase();
+        if (rowId === mcpsIdStr && (role === 'creator' || role === 'member')) {
+          return { success: false, message: 'You are already on a team. Leave your current team first.' };
+        }
+      }
+
+      // Check team name uniqueness (case-insensitive)
+      const teamNameLower = teamName.toLowerCase();
+      for (let i = 1; i < data.length; i++) {
+        const existingName = (data[i][0] || '').toString().trim().toLowerCase();
+        if (existingName === teamNameLower) {
+          return { success: false, message: 'A team with this name already exists. Please choose a different name.' };
+        }
+      }
+    }
+
+    // Delete any pending invites for this student (bottom-to-top)
+    if (sheet.getLastRow() > 1) {
+      const freshData = sheet.getDataRange().getValues();
+      const inviteRowsToDelete = [];
+      for (let i = 1; i < freshData.length; i++) {
+        const rowId = (freshData[i][1] || '').toString().trim();
+        const role = (freshData[i][4] || '').toString().trim().toLowerCase();
+        if (rowId === mcpsIdStr && role === 'invited') {
+          inviteRowsToDelete.push(i + 1);
+        }
+      }
+      inviteRowsToDelete.sort((a, b) => b - a);
+      for (const rowNum of inviteRowsToDelete) {
+        sheet.deleteRow(rowNum);
+      }
+    }
+
+    // Create the team
+    sheet.appendRow([teamName, mcpsIdStr, studentName, grade, 'creator', teamType, new Date()]);
+    Logger.log('Purple Comet team created: ' + teamName + ' by ' + studentName + ' (' + mcpsIdStr + ')');
+
+    return { success: true, message: 'Team "' + teamName + '" created successfully!' };
+  } catch (error) {
+    Logger.log('Error creating Purple Comet team: ' + error.toString());
+    return { success: false, message: 'An error occurred. Please try again.' };
+  }
+}
+
+function joinPurpleCometTeam(mcpsId, studentName, grade, teamName) {
+  try {
+    if (isPurpleCometDeadlinePassed()) {
+      return { success: false, message: 'The team formation deadline (April 1, 2026) has passed.' };
+    }
+
+    const mcpsIdStr = mcpsId.toString().trim();
+    const sheet = getPurpleCometSheet();
+    if (!sheet || sheet.getLastRow() <= 1) {
+      return { success: false, message: 'Team not found.' };
+    }
+
+    const data = sheet.getDataRange().getValues();
+
+    // Check student not already on a team
+    for (let i = 1; i < data.length; i++) {
+      const rowId = (data[i][1] || '').toString().trim();
+      const role = (data[i][4] || '').toString().trim().toLowerCase();
+      if (rowId === mcpsIdStr && (role === 'creator' || role === 'member')) {
+        return { success: false, message: 'You are already on a team.' };
+      }
+    }
+
+    // Find the team and validate
+    let teamFound = false;
+    let teamType = '';
+    let activeCount = 0;
+    let inviteRowToDelete = -1;
+
+    for (let i = 1; i < data.length; i++) {
+      const rowTeam = (data[i][0] || '').toString().trim();
+      if (rowTeam.toLowerCase() === teamName.toLowerCase()) {
+        teamFound = true;
+        teamType = (data[i][5] || '').toString().trim().toLowerCase();
+        const role = (data[i][4] || '').toString().trim().toLowerCase();
+        if (role === 'creator' || role === 'member') {
+          activeCount++;
+        }
+        // Check if student has a pending invite for this team
+        const rowId = (data[i][1] || '').toString().trim();
+        if (rowId === mcpsIdStr && role === 'invited') {
+          inviteRowToDelete = i + 1; // 1-based row number
+        }
+      }
+    }
+
+    if (!teamFound) {
+      return { success: false, message: 'Team not found.' };
+    }
+    if (teamType !== 'open') {
+      return { success: false, message: 'This team is invite-only. You must be invited to join.' };
+    }
+    if (activeCount >= 6) {
+      return { success: false, message: 'This team is full (6/6 members).' };
+    }
+
+    // Collect all rows to delete: invite for this team + all student's other invites
+    const rowsToDelete = [];
+    if (inviteRowToDelete > 0) {
+      rowsToDelete.push(inviteRowToDelete);
+    }
+    for (let i = 1; i < data.length; i++) {
+      const rowId = (data[i][1] || '').toString().trim();
+      const role = (data[i][4] || '').toString().trim().toLowerCase();
+      if (rowId === mcpsIdStr && role === 'invited' && (i + 1) !== inviteRowToDelete) {
+        rowsToDelete.push(i + 1);
+      }
+    }
+
+    // If team will be full after joining, also delete all team's remaining invites
+    if (activeCount + 1 >= 6) {
+      for (let i = 1; i < data.length; i++) {
+        const rowTeam = (data[i][0] || '').toString().trim();
+        const rowId = (data[i][1] || '').toString().trim();
+        const role = (data[i][4] || '').toString().trim().toLowerCase();
+        if (rowTeam.toLowerCase() === teamName.toLowerCase() && role === 'invited' && rowId !== mcpsIdStr) {
+          const rowNum = i + 1;
+          if (rowsToDelete.indexOf(rowNum) === -1) {
+            rowsToDelete.push(rowNum);
+          }
+        }
+      }
+    }
+
+    // Delete rows bottom-to-top
+    rowsToDelete.sort((a, b) => b - a);
+    for (const rowNum of rowsToDelete) {
+      sheet.deleteRow(rowNum);
+    }
+
+    // Add member row
+    sheet.appendRow([teamName, mcpsIdStr, studentName, grade, 'member', teamType, new Date()]);
+    Logger.log('Purple Comet team joined: ' + teamName + ' by ' + studentName);
+
+    return { success: true, message: 'Successfully joined team "' + teamName + '"!' };
+  } catch (error) {
+    Logger.log('Error joining Purple Comet team: ' + error.toString());
+    return { success: false, message: 'An error occurred. Please try again.' };
+  }
+}
+
+function inviteToPurpleCometTeam(creatorMcpsId, invitees) {
+  try {
+    if (isPurpleCometDeadlinePassed()) {
+      return { success: false, message: 'The team formation deadline (April 1, 2026) has passed.' };
+    }
+
+    const creatorIdStr = creatorMcpsId.toString().trim();
+    const sheet = getPurpleCometSheet();
+    if (!sheet || sheet.getLastRow() <= 1) {
+      return { success: false, message: 'You are not on a team.' };
+    }
+
+    const data = sheet.getDataRange().getValues();
+
+    // Find creator's team
+    let creatorTeam = null;
+    for (let i = 1; i < data.length; i++) {
+      const rowId = (data[i][1] || '').toString().trim();
+      const role = (data[i][4] || '').toString().trim().toLowerCase();
+      if (rowId === creatorIdStr && role === 'creator') {
+        creatorTeam = (data[i][0] || '').toString().trim();
+        break;
+      }
+    }
+
+    if (!creatorTeam) {
+      return { success: false, message: 'Only the team creator can send invitations.' };
+    }
+
+    // Check if team is already full
+    let teamActiveCount = 0;
+    for (let i = 1; i < data.length; i++) {
+      const rowTeam = (data[i][0] || '').toString().trim();
+      const role = (data[i][4] || '').toString().trim().toLowerCase();
+      if (rowTeam.toLowerCase() === creatorTeam.toLowerCase() && (role === 'creator' || role === 'member')) {
+        teamActiveCount++;
+      }
+    }
+    if (teamActiveCount >= 6) {
+      return { success: false, message: 'Your team is full (6/6 members). No more invitations can be sent.' };
+    }
+
+    // Build set of existing invitees and members for this team
+    const existingInviteIds = new Set();
+    const existingMemberIds = new Set();
+    const onAnyTeamIds = new Set();
+
+    for (let i = 1; i < data.length; i++) {
+      const rowTeam = (data[i][0] || '').toString().trim();
+      const rowId = (data[i][1] || '').toString().trim();
+      const role = (data[i][4] || '').toString().trim().toLowerCase();
+
+      if (role === 'creator' || role === 'member') {
+        onAnyTeamIds.add(rowId);
+      }
+
+      if (rowTeam.toLowerCase() === creatorTeam.toLowerCase()) {
+        if (role === 'invited') {
+          existingInviteIds.add(rowId);
+        }
+        if (role === 'creator' || role === 'member') {
+          existingMemberIds.add(rowId);
+        }
+      }
+    }
+
+    // Validate each invitee
+    const errors = [];
+    const validInvitees = [];
+    for (const invitee of invitees) {
+      const invId = invitee.mcpsId.toString().trim();
+      if (onAnyTeamIds.has(invId)) {
+        errors.push(invitee.name + ' is already on a team.');
+      } else if (existingInviteIds.has(invId)) {
+        errors.push(invitee.name + ' has already been invited to this team.');
+      } else {
+        validInvitees.push(invitee);
+        existingInviteIds.add(invId); // Prevent duplicate invites in same batch
+      }
+    }
+
+    if (validInvitees.length === 0 && errors.length > 0) {
+      return { success: false, message: errors.join(' ') };
+    }
+
+    // Get team type from existing data
+    let teamType = 'invite';
+    for (let i = 1; i < data.length; i++) {
+      if ((data[i][0] || '').toString().trim().toLowerCase() === creatorTeam.toLowerCase()) {
+        teamType = (data[i][5] || '').toString().trim().toLowerCase();
+        break;
+      }
+    }
+
+    // Append invite rows
+    const timestamp = new Date();
+    for (const invitee of validInvitees) {
+      sheet.appendRow([creatorTeam, invitee.mcpsId.toString().trim(), invitee.name, invitee.grade || '', 'invited', teamType, timestamp]);
+    }
+
+    let message = validInvitees.length + ' invitation' + (validInvitees.length !== 1 ? 's' : '') + ' sent!';
+    if (errors.length > 0) {
+      message += ' Note: ' + errors.join(' ');
+    }
+
+    Logger.log('Purple Comet invitations sent for team: ' + creatorTeam + ' - ' + validInvitees.length + ' invitees');
+    return { success: true, message: message };
+  } catch (error) {
+    Logger.log('Error inviting to Purple Comet team: ' + error.toString());
+    return { success: false, message: 'An error occurred. Please try again.' };
+  }
+}
+
+function acceptPurpleCometInvite(mcpsId, studentName, grade, teamName) {
+  try {
+    if (isPurpleCometDeadlinePassed()) {
+      return { success: false, message: 'The team formation deadline (April 1, 2026) has passed.' };
+    }
+
+    const mcpsIdStr = mcpsId.toString().trim();
+    const sheet = getPurpleCometSheet();
+    if (!sheet || sheet.getLastRow() <= 1) {
+      return { success: false, message: 'Invitation not found.' };
+    }
+
+    const data = sheet.getDataRange().getValues();
+
+    // Check student not already on a team
+    for (let i = 1; i < data.length; i++) {
+      const rowId = (data[i][1] || '').toString().trim();
+      const role = (data[i][4] || '').toString().trim().toLowerCase();
+      if (rowId === mcpsIdStr && (role === 'creator' || role === 'member')) {
+        return { success: false, message: 'You are already on a team.' };
+      }
+    }
+
+    // Find the invite and check team capacity
+    let inviteRowIndex = -1;
+    let activeCount = 0;
+    let teamType = '';
+    const otherInviteRows = []; // Other pending invites for this student
+
+    for (let i = 1; i < data.length; i++) {
+      const rowTeam = (data[i][0] || '').toString().trim();
+      const rowId = (data[i][1] || '').toString().trim();
+      const role = (data[i][4] || '').toString().trim().toLowerCase();
+
+      if (rowTeam.toLowerCase() === teamName.toLowerCase()) {
+        if (role === 'creator' || role === 'member') {
+          activeCount++;
+        }
+        if (rowId === mcpsIdStr && role === 'invited') {
+          inviteRowIndex = i + 1;
+          teamType = (data[i][5] || '').toString().trim().toLowerCase();
+        }
+      }
+
+      // Track other pending invites for this student (on different teams)
+      if (rowId === mcpsIdStr && role === 'invited' && rowTeam.toLowerCase() !== teamName.toLowerCase()) {
+        otherInviteRows.push(i + 1);
+      }
+    }
+
+    if (inviteRowIndex === -1) {
+      return { success: false, message: 'Invitation not found.' };
+    }
+
+    if (activeCount >= 6) {
+      return { success: false, message: 'This team is now full (6/6 members). You cannot join.' };
+    }
+
+    // Collect rows to delete: this invite + student's other invites
+    const allRowsToDelete = [inviteRowIndex, ...otherInviteRows];
+
+    // If team will be full after accepting, also delete all team's remaining invites
+    if (activeCount + 1 >= 6) {
+      for (let i = 1; i < data.length; i++) {
+        const rowTeam = (data[i][0] || '').toString().trim();
+        const rowId = (data[i][1] || '').toString().trim();
+        const role = (data[i][4] || '').toString().trim().toLowerCase();
+        if (rowTeam.toLowerCase() === teamName.toLowerCase() && role === 'invited' && rowId !== mcpsIdStr) {
+          const rowNum = i + 1;
+          if (allRowsToDelete.indexOf(rowNum) === -1) {
+            allRowsToDelete.push(rowNum);
+          }
+        }
+      }
+    }
+
+    // Delete bottom-to-top
+    allRowsToDelete.sort((a, b) => b - a);
+    for (const rowNum of allRowsToDelete) {
+      sheet.deleteRow(rowNum);
+    }
+
+    // Append as member
+    sheet.appendRow([teamName, mcpsIdStr, studentName, grade, 'member', teamType, new Date()]);
+
+    Logger.log('Purple Comet invite accepted: ' + studentName + ' joined ' + teamName);
+    return { success: true, message: 'You have joined team "' + teamName + '"!' };
+  } catch (error) {
+    Logger.log('Error accepting Purple Comet invite: ' + error.toString());
+    return { success: false, message: 'An error occurred. Please try again.' };
+  }
+}
+
+function rejectPurpleCometInvite(mcpsId, teamName) {
+  try {
+    if (isPurpleCometDeadlinePassed()) {
+      return { success: false, message: 'The team formation deadline (April 1, 2026) has passed.' };
+    }
+
+    const mcpsIdStr = mcpsId.toString().trim();
+    const sheet = getPurpleCometSheet();
+    if (!sheet || sheet.getLastRow() <= 1) {
+      return { success: false, message: 'Invitation not found.' };
+    }
+
+    const data = sheet.getDataRange().getValues();
+
+    for (let i = 1; i < data.length; i++) {
+      const rowTeam = (data[i][0] || '').toString().trim();
+      const rowId = (data[i][1] || '').toString().trim();
+      const role = (data[i][4] || '').toString().trim().toLowerCase();
+
+      if (rowTeam.toLowerCase() === teamName.toLowerCase() && rowId === mcpsIdStr && role === 'invited') {
+        sheet.deleteRow(i + 1);
+        Logger.log('Purple Comet invite rejected: ' + mcpsIdStr + ' declined ' + teamName);
+        return { success: true, message: 'Invitation declined.' };
+      }
+    }
+
+    return { success: false, message: 'Invitation not found.' };
+  } catch (error) {
+    Logger.log('Error rejecting Purple Comet invite: ' + error.toString());
+    return { success: false, message: 'An error occurred. Please try again.' };
+  }
+}
+
+function revokePurpleCometInvite(creatorMcpsId, inviteeMcpsId) {
+  try {
+    if (isPurpleCometDeadlinePassed()) {
+      return { success: false, message: 'The team formation deadline (April 1, 2026) has passed.' };
+    }
+
+    const creatorIdStr = creatorMcpsId.toString().trim();
+    const inviteeIdStr = inviteeMcpsId.toString().trim();
+    const sheet = getPurpleCometSheet();
+    if (!sheet || sheet.getLastRow() <= 1) {
+      return { success: false, message: 'Team not found.' };
+    }
+
+    const data = sheet.getDataRange().getValues();
+
+    // Find creator's team
+    let creatorTeam = null;
+    for (let i = 1; i < data.length; i++) {
+      const rowId = (data[i][1] || '').toString().trim();
+      const role = (data[i][4] || '').toString().trim().toLowerCase();
+      if (rowId === creatorIdStr && role === 'creator') {
+        creatorTeam = (data[i][0] || '').toString().trim();
+        break;
+      }
+    }
+
+    if (!creatorTeam) {
+      return { success: false, message: 'Only the team creator can revoke invitations.' };
+    }
+
+    // Find and delete the invite row
+    for (let i = 1; i < data.length; i++) {
+      const rowTeam = (data[i][0] || '').toString().trim();
+      const rowId = (data[i][1] || '').toString().trim();
+      const role = (data[i][4] || '').toString().trim().toLowerCase();
+
+      if (rowTeam.toLowerCase() === creatorTeam.toLowerCase() && rowId === inviteeIdStr && role === 'invited') {
+        sheet.deleteRow(i + 1);
+        Logger.log('Purple Comet invite revoked: ' + creatorIdStr + ' revoked invite for ' + inviteeIdStr + ' from ' + creatorTeam);
+        return { success: true, message: 'Invitation revoked.' };
+      }
+    }
+
+    return { success: false, message: 'Invitation not found.' };
+  } catch (error) {
+    Logger.log('Error revoking Purple Comet invite: ' + error.toString());
+    return { success: false, message: 'An error occurred. Please try again.' };
+  }
+}
+
+function leavePurpleCometTeam(mcpsId, newCreatorMcpsId) {
+  try {
+    if (isPurpleCometDeadlinePassed()) {
+      return { success: false, message: 'The team formation deadline (April 1, 2026) has passed.' };
+    }
+
+    const mcpsIdStr = mcpsId.toString().trim();
+    const sheet = getPurpleCometSheet();
+    if (!sheet || sheet.getLastRow() <= 1) {
+      return { success: false, message: 'You are not on a team.' };
+    }
+
+    const data = sheet.getDataRange().getValues();
+
+    // Find student's row and team info
+    let studentRowIndex = -1;
+    let studentRole = '';
+    let teamName = '';
+
+    for (let i = 1; i < data.length; i++) {
+      const rowId = (data[i][1] || '').toString().trim();
+      const role = (data[i][4] || '').toString().trim().toLowerCase();
+      if (rowId === mcpsIdStr && (role === 'creator' || role === 'member')) {
+        studentRowIndex = i + 1;
+        studentRole = role;
+        teamName = (data[i][0] || '').toString().trim();
+        break;
+      }
+    }
+
+    if (studentRowIndex === -1) {
+      return { success: false, message: 'You are not on a team.' };
+    }
+
+    // Find other active members and invite rows for this team
+    const otherActiveMembers = [];
+    const teamInviteRows = [];
+
+    for (let i = 1; i < data.length; i++) {
+      const rowTeam = (data[i][0] || '').toString().trim();
+      const rowId = (data[i][1] || '').toString().trim();
+      const role = (data[i][4] || '').toString().trim().toLowerCase();
+
+      if (rowTeam.toLowerCase() === teamName.toLowerCase() && rowId !== mcpsIdStr) {
+        if (role === 'creator' || role === 'member') {
+          otherActiveMembers.push({ rowIndex: i + 1, mcpsId: rowId, name: (data[i][2] || '').toString().trim() });
+        } else if (role === 'invited') {
+          teamInviteRows.push(i + 1);
+        }
+      }
+    }
+
+    if (studentRole === 'creator') {
+      if (otherActiveMembers.length > 0) {
+        // Creator must choose a new owner
+        if (!newCreatorMcpsId) {
+          // Return the list of members so the frontend can ask the creator to pick
+          return {
+            success: false,
+            needsNewCreator: true,
+            members: otherActiveMembers.map(function(m) { return { mcpsId: m.mcpsId, name: m.name }; }),
+            message: 'Please choose a new team owner before leaving.'
+          };
+        }
+
+        // Validate the chosen new creator is an active member of this team
+        const newCreatorIdStr = newCreatorMcpsId.toString().trim();
+        const chosenMember = otherActiveMembers.find(function(m) { return m.mcpsId === newCreatorIdStr; });
+        if (!chosenMember) {
+          return { success: false, message: 'Selected student is not an active member of this team.' };
+        }
+
+        // Promote chosen member to creator
+        sheet.getRange(chosenMember.rowIndex, 5).setValue('creator');
+      } else {
+        // No other active members - dissolve team (delete invites too)
+        const allRowsToDelete = [studentRowIndex, ...teamInviteRows].sort((a, b) => b - a);
+        for (const rowNum of allRowsToDelete) {
+          sheet.deleteRow(rowNum);
+        }
+        Logger.log('Purple Comet team dissolved: ' + teamName);
+        return { success: true, message: 'You have left and team "' + teamName + '" has been dissolved.' };
+      }
+    }
+
+    // Delete the student's row
+    sheet.deleteRow(studentRowIndex);
+    Logger.log('Purple Comet team left: ' + mcpsIdStr + ' left ' + teamName);
+    return { success: true, message: 'You have left team "' + teamName + '".' };
+  } catch (error) {
+    Logger.log('Error leaving Purple Comet team: ' + error.toString());
+    return { success: false, message: 'An error occurred. Please try again.' };
+  }
+}
+
+function testPurpleComet() {
+  Logger.log('=== Testing Purple Comet Functions ===');
+
+  // Test sheet access
+  const sheet = getPurpleCometSheet();
+  Logger.log('Sheet exists: ' + (sheet !== null));
+
+  // Test deadline check
+  Logger.log('Deadline passed: ' + isPurpleCometDeadlinePassed());
+
+  // Test get results (with a test ID)
+  const results = getPurpleCometResults('999999');
+  Logger.log('Results for 999999: ' + JSON.stringify(results));
+
+  // Test available students
+  const available = getAvailableStudents();
+  Logger.log('Available students count: ' + available.length);
+
+  Logger.log('=== Purple Comet Tests Complete ===');
+}
+
 function checkFormCompletion(mcpsId, studentName) {
   try {
     const forms = {
@@ -1559,6 +2313,18 @@ function lookupStudentByMcpsId(mcpsId) {
       noeticResults = null;
     }
 
+    // Get Purple Comet results
+    let purpleComet = null;
+    try {
+      Logger.log('Getting Purple Comet results for: ' + mcpsIdStr);
+      purpleComet = getPurpleCometResults(mcpsIdStr);
+      if (purpleComet) {
+        Logger.log('Purple Comet results retrieved: myTeam=' + (purpleComet.myTeam ? purpleComet.myTeam.teamName : 'none') + ', pendingInvites=' + purpleComet.pendingInvites.length + ', allTeams=' + purpleComet.allTeams.length);
+      }
+    } catch (err) {
+      Logger.log('Error getting Purple Comet results: ' + err.toString());
+    }
+
     const result = {
       success: true,
       student: studentInfo,
@@ -1570,7 +2336,8 @@ function lookupStudentByMcpsId(mcpsId) {
       mathLeague: mathLeagueResults,
       mathKangaroo: mathKangarooResults,
       amc8: amc8Results,
-      noetic: noeticResults
+      noetic: noeticResults,
+      purpleComet: purpleComet
     };
 
     try {

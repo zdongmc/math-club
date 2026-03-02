@@ -53,6 +53,17 @@ Located in `math-club-attendance/` directory:
   - `signUpForNoetic()` - Creates new Noetic Learning sign-up with grade preference selection
   - `updateNoeticGradePreference()` - Updates existing sign-up's grade preference (6th/7th graders only)
   - `dropNoeticSignUp()` - Removes student from Noetic Learning sign-up list
+  - `getPurpleCometSheet()` - Returns the "Purple Comet" sheet object
+  - `isPurpleCometDeadlinePassed()` - Returns true if current date > April 1, 2026
+  - `getPurpleCometResults(mcpsId)` - Returns myTeam, pendingInvites, and allTeams data for a student
+  - `getAvailableStudents()` - Returns roster of students not on a Purple Comet team (from Form Responses 2)
+  - `createPurpleCometTeam(mcpsId, studentName, grade, teamName, teamType)` - Creates a new team with student as creator
+  - `joinPurpleCometTeam(mcpsId, studentName, grade, teamName)` - Joins an open team as member
+  - `inviteToPurpleCometTeam(creatorMcpsId, invitees)` - Sends invitations to multiple students
+  - `acceptPurpleCometInvite(mcpsId, studentName, grade, teamName)` - Accepts invite, cleans up other invites
+  - `rejectPurpleCometInvite(mcpsId, teamName)` - Declines a pending invitation
+  - `leavePurpleCometTeam(mcpsId, newCreatorMcpsId)` - Leaves team; if creator, must specify new owner (or team dissolves if solo)
+  - `revokePurpleCometInvite(creatorMcpsId, inviteeMcpsId)` - Creator revokes a pending invitation
   - Connects to Google Sheets with student data
 - `Checkin.html` - Parent-facing web interface
   - MCPS ID lookup form (accepts variable-length numeric IDs)
@@ -65,11 +76,8 @@ Located in `math-club-attendance/` directory:
     - Fee payment status: green checkmark if paid, or yellow alert with payment link ($40 for chapter fee, only shown if advancing)
   - **MOEMS**: Displays 5 individual contests with Yes/No status. For signed-up contests, shows contest results (score out of 5 or "Did Not Attend" or "Score Pending"). Displays total score (out of 25) if available. Shows fee payment status: green checkmark if paid, or yellow alert with payment link ($5 or $25 based on fee amount) if not paid
   - **Math League**: Organized by meets (Meet #1-4). Each meet shows:
-    - Team assignment at top: Team name (e.g., "Team A"), "Individual Round Only", or "Did Not Attend" (if NA in column K)
-    - Sign-up status: Only shown for Meet #4 (future meet):
-      - If team assignment is "NA": Shows "Not Signed Up"
-      - If team assignment has a value: Shows "Signed Up"
-    - Individual results: Only shown for Meets 1-3 (score out of 6 or "Did Not Attend" if student didn't attend)
+    - Team assignment at top: Team name (e.g., "Team A"), "Individual Round Only", or "Did Not Attend" (if NA)
+    - Individual results: Score out of 6 or "Did Not Attend" if student didn't attend
     - Team results: Shows Team Score/12, Relay 1/8, Relay 2/8, Team Individual Score, Team Total/64 (only if team attended)
     - ARML tracking status shown below team assignment
     - Cumulative individual round score shown in amber box (for students with ARML Tracking enabled)
@@ -77,14 +85,29 @@ Located in `math-club-attendance/` directory:
   - **Math Kangaroo**: Always displayed for all students. Shows either:
     - If registered: Green checkmark with "Registered for Math Kangaroo", competition date (March 19, 2026), and Math Kangaroo ID
     - If not registered: Yellow alert with complete registration instructions including invitation code (MDCLARK0003001@2026math), fees ($18 by Dec 31, $35 late), and competition date
-  - **Noetic Learning Math Contest**: Shows contest information and sign-up status with custom dialogs (no browser popups):
-    - Before deadline (March 1, 2026): Shows "Sign Up" button for unsigned-up students
-    - After sign-up: Shows "✓ Signed Up" with team assignment, Modify button (for 6th/7th graders only), and Drop button
-    - 8th graders automatically assigned to 8th/Mixed team (no option to change)
-    - Sign-up modal: Custom dialog with two team options and Confirm button (no browser confirm popup)
-    - Modify modal: Shows team options with selection highlighting, Confirm button enabled only after selection, Cancel button
-    - Drop confirmation: Custom modal saying "You can re-register until March 1, 2026" (not permanent)
-    - Displays live sign-up counts by grade level within contest information box
+  - **Noetic Learning Math Contest**: Shows contest information and sign-up status (registration closed as of March 1, 2026):
+    - **Contest Date**: Friday, April 10, 2026 (3:15 - 4:15 PM)
+    - **Registration Status**:
+      - If registered: Shows "✓ Signed Up" with team assignment (Your Grade Level or 8th/Mixed Team)
+      - If not registered: Shows "Registration Closed" message
+    - **Payment Information**: For registered students, displays message that contest fees will be collected via SchoolCash Online
+    - Note: Sign-up buttons, modify buttons, and drop buttons are no longer available (registration deadline passed)
+  - **Purple Comet Math Meet**: Team formation system for the free online team competition (April 17, 2026, 3:15-4:30 PM):
+    - Deadline: April 1, 2026 (all actions locked after)
+    - Teams of 1-6 students; open (anyone can join) or invite-only (creator invites by browsing)
+    - Role system: `creator` (team owner, active member), `member` (active member), `invited` (pending invitation)
+    - Compact main screen: invite notification bar, inline team card, Browse All Teams button
+    - Pending invites: notification with count + "View Invites" button → modal with Accept/Decline (only shown when not on a team)
+    - If on a team: green card with inline member list, `✕` revoke buttons on invited members (creator only), Invite Students button (creator, hidden when full), Leave Team button
+    - If not on a team: "Create a Team" button
+    - "Browse All Teams" button → modal sorted: open not-full → invite-only not-full → full; secondary sort by most open spaces then alphabetical
+    - Create modal: team name input + team type toggle (Open / Invite Only), warns about declining pending invites
+    - Invite modal: student list from `getAvailableStudents()` with grade filter dropdown, checkbox selection
+    - Leave team: if creator with other members, must pick new owner via owner picker modal; if solo, team dissolves
+    - Revoke: creator can revoke pending invites via `✕` button with confirmation
+    - Invite cleanup: all student invites deleted when joining any team (create/join/accept); all team invites deleted when team becomes full (6 members)
+    - After deadline: read-only team card + Browse All Teams (no action buttons)
+    - All actions use `google.script.run` calls with `showMessage()` feedback and `lookupStudent()` refresh
   - **Math League (ARML Tracking)**: For students with ARML Tracking enabled:
     - Displays cumulative individual round score from column M below ARML tracking status
     - Score shown in amber box with label "Cumulative Individual Round Score"
@@ -135,9 +158,22 @@ Located in `math-club-attendance/` directory:
   - Columns: A=Timestamp, B=MCPS ID, C=Student Name, D=Grade, E=Grade Preference (own/mixed), F-H=Reserved
   - Grade Preference (Column E): "own" for own grade level, "mixed" for 8th/Mixed team
   - 8th graders: Automatically set to "mixed" (cannot change)
-  - 6th/7th graders: Can choose "own" or "mixed" (can modify before March 1)
+  - 6th/7th graders: Previously could choose "own" or "mixed" (registration closed as of March 1, 2026)
   - Sign-up status: Column B MCPS ID indicates signed up; missing = not signed up
   - Used for: Retrieving sign-up status, grade preference, and sign-up counts by grade level
+- **Purple Comet** - Purple Comet Math Meet team formation
+  - Columns: A=Team Name, B=MCPS ID, C=Student Name, D=Grade, E=Role, F=Team Type, G=Timestamp
+  - Role (Column E): "creator" (team creator, active member), "member" (active member), "invited" (pending invitation)
+  - Team Type (Column F): "open" (anyone can join) or "invite" (creator invites teammates) — denormalized to every row
+  - Active member count = rows with role "creator" or "member" (excludes "invited")
+  - Team size limit: 6 active members; inviting blocked when team is full; outstanding invites deleted when team becomes full
+  - Team name: 1-30 chars, alphanumeric + spaces/hyphens/underscores, unique (case-insensitive)
+  - Deadline: April 1, 2026 (all mutations blocked after)
+  - Backend functions: `getPurpleCometSheet()`, `isPurpleCometDeadlinePassed()`, `getPurpleCometResults(mcpsId)`, `getAvailableStudents()`, `createPurpleCometTeam(mcpsId, studentName, grade, teamName, teamType)`, `joinPurpleCometTeam(mcpsId, studentName, grade, teamName)`, `inviteToPurpleCometTeam(creatorMcpsId, invitees)`, `acceptPurpleCometInvite(mcpsId, studentName, grade, teamName)`, `rejectPurpleCometInvite(mcpsId, teamName)`, `revokePurpleCometInvite(creatorMcpsId, inviteeMcpsId)`, `leavePurpleCometTeam(mcpsId, newCreatorMcpsId)`
+  - Creator transfer: When creator leaves with other active members, must choose new owner; if no members remain, team dissolves (invites deleted)
+  - Invite cleanup: All student's pending invites deleted when they join any team (create/join/accept); all team's invites deleted when team reaches 6 active members
+  - `getAvailableStudents()`: Reads Form Responses 2 for roster, excludes students with active team membership, sorted alphabetically
+  - Used for: Team creation, joining, invitations, and team management for Purple Comet Math Meet
 
 **Student Lookup Process:**
 When an MCPS ID is entered, the system searches in this order:
@@ -537,9 +573,8 @@ Located in `mathdetective/` directory (with copies in `docs/`):
 - Date columns contain `true` values or timestamp strings like "time - meeting type"
 - Competition sign-ups parsed from "Form Responses 2" sheet by MCPS ID
 - Always displays all 4 competitions (signed up or not)
-- **MOEMS**: Shows 5 individual contests (Nov 21, Dec 19, Jan 9, Feb 6, Mar 6). Sign-up status (Yes/No) only shown for future contests (Contests 4-5). For signed-up contests, displays results in blue box (score out of 5, "Score Pending", or "Did Not Attend"). Shows total score in gold box if available.
+- **MOEMS**: Shows 5 individual contests (Nov 21, Dec 19, Jan 9, Feb 6, Mar 6). Sign-up status (Yes/No) only shown for future contests (Contest 5). For signed-up contests, displays results in blue box (score out of 5, "Score Pending", or "Did Not Attend"). Shows total score in gold box if available.
 - **Math League**: Organized by meets in gray containers. Shows team assignment and ARML tracking at top. Each meet (Nov 14, Dec 12, Jan 20, Feb 13) displays:
-  - Sign-up status badge (only for future meets - Meet #4)
   - Individual results in blue box if available (score out of 6 or "Did Not Attend")
   - Team results in gold box if available (Team Score/12, Relay 1/8, Relay 2/8, Team Individual Score, Team Total/64)
   - **Individual-only students**: If team column says "Individual", shows "Individual Round Only" label and only displays individual score (no team results)
