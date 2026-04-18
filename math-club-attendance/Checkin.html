@@ -931,6 +931,33 @@
 
                             html += '</div>';
                         }
+
+                        // State Level Competition Results (if student advanced to state and has results)
+                        if (mathcounts.stateResults) {
+                            html += '<div style="margin-top: 15px; background: #f5f3ff; border: 2px solid #7c3aed; border-radius: 8px; padding: 15px;">';
+                            html += '<div style="font-weight: bold; color: #5b21b6; margin-bottom: 10px; font-size: 1.1rem;">🏅 State Level Competition Results</div>';
+                            html += '<div style="display: grid; gap: 8px;">';
+                            if (mathcounts.stateResults.sprintScore !== null) {
+                                html += '<div class="info-row" style="border: none; padding: 5px 0;">';
+                                html += '<span class="info-label">Sprint Round</span>';
+                                html += `<span class="info-value"><strong>${mathcounts.stateResults.sprintScore}</strong> / ${mathcounts.stateResults.maxSprint}</span>`;
+                                html += '</div>';
+                            }
+                            if (mathcounts.stateResults.targetScore !== null) {
+                                html += '<div class="info-row" style="border: none; padding: 5px 0;">';
+                                html += '<span class="info-label">Target Round</span>';
+                                html += `<span class="info-value"><strong>${mathcounts.stateResults.targetScore}</strong> / ${mathcounts.stateResults.maxTarget}</span>`;
+                                html += '</div>';
+                            }
+                            if (mathcounts.stateResults.individualScore !== null) {
+                                html += '<div class="info-row" style="border: none; padding: 5px 0;">';
+                                html += '<span class="info-label">Individual Score</span>';
+                                html += `<span class="info-value"><strong>${mathcounts.stateResults.individualScore}</strong> / ${mathcounts.stateResults.maxIndividual}</span>`;
+                                html += '</div>';
+                            }
+                            html += '</div>';
+                            html += '</div>';
+                        }
                     } else {
                         // No results in system
                         html += '<div style="margin-top: 10px; padding: 10px; background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 8px; text-align: center;">';
@@ -989,15 +1016,17 @@
             html += '<h2 class="section-title">&#129432; Math Kangaroo</h2>';
 
             if (mathKangaroo && mathKangaroo.registered) {
-                // Registered - show confirmation
+                // Contest completed
                 html += '<div class="info-card">';
-                html += '<div style="text-align: center; padding: 15px;">';
-                html += '<div style="font-weight: bold; color: #059669; font-size: 1.1rem; margin-bottom: 8px;">&#10003; Registered for Math Kangaroo</div>';
-                html += '<div style="color: #666; font-size: 0.95rem; margin-bottom: 8px;">Competition Date: <strong>March 19, 2026</strong></div>';
-                html += '<div style="margin: 12px 0;"><a href="https://drive.google.com/file/d/1MUPCvhUJ9QoROuMkjXwy2R8oXT9LyRaY/view?usp=drive_link" target="_blank" style="color: #dc2626; text-decoration: none; font-weight: 600;">📄 Letter to Parents</a></div>';
+                html += '<div style="padding: 15px;">';
+                html += '<div style="background: #d1fae5; border: 2px solid #059669; border-radius: 8px; padding: 15px;">';
+                html += '<div style="font-weight: bold; color: #047857; font-size: 1.1rem; margin-bottom: 4px; text-align: center;">&#10003; Contest Completed</div>';
                 if (mathKangaroo.mkId) {
-                    html += '<div style="color: #666; font-size: 0.95rem;">Math Kangaroo ID: <strong>' + escapeHtml(mathKangaroo.mkId) + '</strong></div>';
+                    html += '<div style="color: #065f46; font-size: 0.95rem; margin-bottom: 12px; text-align: center;">Math Kangaroo ID: <strong>' + escapeHtml(mathKangaroo.mkId) + '</strong></div>';
                 }
+                html += '<div style="background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px; margin-bottom: 10px; font-size: 0.9rem; color: #1e40af;">&#128197; The <strong>answer key</strong> will be available on <strong>April 20, 2026</strong> at <a href="https://www.mathkangaroo.us" target="_blank" style="color: #1e40af; font-weight: bold;">mathkangaroo.us</a></div>';
+                html += '<div style="background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px; font-size: 0.9rem; color: #1e40af;">&#128197; <strong>Results and rankings</strong> will be available on <strong>May 1, 2026</strong> in your parent account at <a href="https://www.mathkangaroo.us" target="_blank" style="color: #1e40af; font-weight: bold;">mathkangaroo.us</a></div>';
+                html += '</div>';
                 html += '</div>';
                 html += '</div>';
             } else {
@@ -1014,53 +1043,42 @@
             html += '<div class="info-card">';
             html += '<div style="padding: 15px;">';
 
-            // Competition date
-            html += '<div style="color: #666; font-size: 0.95rem; margin-bottom: 15px;">Contest Date: <strong>Friday, April 10, 2026 (3:15 - 4:15 PM)</strong></div>';
-
-            // Website link
-            html += '<div style="margin-bottom: 15px;"><a href="https://www.noetic-learning.com/mathcontest/" target="_blank" style="color: #dc2626; text-decoration: none; font-weight: 600; display: inline-block;">Visit Noetic Learning →</a></div>';
-
-            // Sample problems link
-            html += '<div style="margin-bottom: 15px;"><a href="https://drive.google.com/file/d/1gdpfFGSZN5yXnI_FVlb96B30hrY9uwD5/view?usp=drive_link" target="_blank" style="color: #1e40af; text-decoration: none; font-weight: 600; display: inline-block;">📄 View Sample Problems →</a></div>';
-
-            // Contest format and cost information
-            html += '<div style="background: #f0f9ff; border: 2px solid #bfdbfe; border-radius: 8px; padding: 15px; margin-bottom: 15px;">';
-            html += '<div style="font-weight: bold; color: #1e40af; margin-bottom: 10px;">Contest Format</div>';
-            html += '<div style="color: #666; font-size: 0.9rem; line-height: 1.6;">';
-            html += '<p style="margin-bottom: 8px;">• <strong>20 problems</strong>, 45-50 minutes, no calculator</p>';
-            html += '<p style="margin-bottom: 8px;">• Questions vary by grade level (6th, 7th, 8th)</p>';
-            html += '<p style="margin-bottom: 8px;">• Team format: If a team has mixed grades, all students answer the highest grade level questions</p>';
-            html += '<p style="margin-bottom: 12px;">• <strong>Cost:</strong> $99 per team (up to 30 students)</p>';
-            html += '<p style="margin-bottom: 0;"><a href="https://drive.google.com/file/d/1gdpfFGSZN5yXnI_FVlb96B30hrY9uwD5/view?usp=drive_link" target="_blank" style="color: #1e40af; font-weight: bold; text-decoration: none;">📄 View Sample Problems</a> – Check these before deciding your team choice</p>';
-
-            // Current sign-ups by grade - moved under Contest Format
-            if (noetic && noetic.signUpCounts) {
-              const counts = noetic.signUpCounts;
-              html += '<hr style="border: none; border-top: 1px solid #bfdbfe; margin: 12px 0;">';
-              html += '<div style="margin-top: 12px;">';
-              html += '<div style="font-weight: 600; color: #1e40af; margin-bottom: 8px;">Current Sign-ups</div>';
-              html += '<p style="margin-bottom: 5px;">• 6th Grade: ' + (counts.by6th || 0) + ' student' + ((counts.by6th || 0) !== 1 ? 's' : '') + '</p>';
-              html += '<p style="margin-bottom: 5px;">• 7th Grade: ' + (counts.by7th || 0) + ' student' + ((counts.by7th || 0) !== 1 ? 's' : '') + '</p>';
-              html += '<p style="margin-bottom: 0;">• 8th/Mixed: ' + (counts.byMixed || 0) + ' student' + ((counts.byMixed || 0) !== 1 ? 's' : '') + '</p>';
-              html += '</div>';
-            }
-
-            html += '</div>';
-
-            // Sign-up status and buttons
-            const today = new Date();
-            const deadline = new Date('2026-03-01T23:59:59');
-            const beforeDeadline = today < deadline;
-
             if (noetic && noetic.signedUp) {
-              // Already signed up
-              html += '<div style="background: #d1fae5; border: 2px solid #059669; border-radius: 8px; padding: 15px; margin-top: 15px; text-align: center;">';
-              html += '<div style="color: #047857; font-weight: bold; font-size: 1.1rem; margin-bottom: 8px;">✓ Signed Up</div>';
-              const preference = noetic.gradePreference === 'own' ? 'Your Grade Level' : '8th/Mixed Team';
-              html += '<div style="color: #065f46; font-size: 0.95rem; margin-bottom: 15px;">Team: ' + preference + '</div>';
-              html += '<div style="background: rgba(255,255,255,0.7); border: 1px solid #059669; border-radius: 6px; padding: 10px; margin-top: 12px; font-size: 0.9rem; color: #065f46;">';
-              html += '<strong>💳 Payment:</strong> Contest fees will be collected via SchoolCash Online';
+              // Contest completed
+              html += '<div style="background: #d1fae5; border: 2px solid #059669; border-radius: 8px; padding: 15px;">';
+              html += '<div style="color: #047857; font-weight: bold; font-size: 1.1rem; margin-bottom: 4px; text-align: center;">✓ Contest Completed</div>';
+              html += '<div style="color: #065f46; font-size: 0.95rem; margin-bottom: 12px; text-align: center;">📅 Results will be available on <strong>April 27, 2026</strong> at <a href="https://www.noetic-learning.com/mathcontest/results.jsp" target="_blank" style="color: #047857;">noetic-learning.com</a></div>';
+
+              // Login credentials
+              html += '<div style="background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px; margin-bottom: 12px; text-align: left;">';
+              html += '<div style="font-weight: bold; color: #1e40af; margin-bottom: 8px; font-size: 0.95rem;">Login Credentials</div>';
+              if (noetic.username || noetic.password) {
+                if (noetic.username) {
+                  html += '<div style="color: #374151; font-size: 0.95rem; margin-bottom: 4px;">Username: <strong>' + escapeHtml(noetic.username) + '</strong></div>';
+                }
+                if (noetic.password) {
+                  html += '<div style="color: #374151; font-size: 0.95rem; margin-bottom: 10px;">Password: <strong>' + escapeHtml(noetic.password) + '</strong></div>';
+                }
+              } else {
+                html += '<div style="color: #6b7280; font-size: 0.9rem; margin-bottom: 10px;">Credentials not yet available.</div>';
+              }
+              html += '<a href="https://www.noetic-learning.com/mathcontest/studentLogin.jsp" target="_blank" style="display: inline-block; background: #1e40af; color: white; text-decoration: none; padding: 8px 14px; border-radius: 6px; font-size: 0.9rem; font-weight: bold;">🔑 Student Login Page →</a>';
               html += '</div>';
+
+              // Past contest practice
+              html += '<div style="background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 14px;">';
+              html += '<div style="font-weight: bold; color: #1e40af; margin-bottom: 4px;">📝 Past Contest Practice</div>';
+              html += '<div style="color: #374151; font-size: 0.85rem; margin-bottom: 10px;">Password to open each file: <strong>noetic</strong></div>';
+              html += '<div style="display: flex; flex-direction: column; gap: 6px;">';
+              html += '<a href="https://drive.google.com/file/d/1vK0FAIoNV2axHqmqh6XafHTqdamORwt3/view" target="_blank" style="color: #1e40af; font-size: 0.9rem; text-decoration: none;">📄 2022 Grade 8</a>';
+              html += '<a href="https://drive.google.com/file/d/1Xc9G6-Dhc3vu_wDlKqtTDiL81GJfZA1J/view" target="_blank" style="color: #1e40af; font-size: 0.9rem; text-decoration: none;">📄 2022 Grade 7</a>';
+              html += '<a href="https://drive.google.com/file/d/16JVY6nJWfomjXq4FSJz3Ln_SEXOZ1Da8/view" target="_blank" style="color: #1e40af; font-size: 0.9rem; text-decoration: none;">📄 2022 Grade 6</a>';
+              html += '<a href="https://drive.google.com/file/d/1WGn16DUuGbX1YYP3qO-o3LpdyzOT4ire/view" target="_blank" style="color: #1e40af; font-size: 0.9rem; text-decoration: none;">📄 2021 Grade 8</a>';
+              html += '<a href="https://drive.google.com/file/d/1EI2durBf4141Ca5atuq4pe8URMRhVgQT/view" target="_blank" style="color: #1e40af; font-size: 0.9rem; text-decoration: none;">📄 2021 Grade 7</a>';
+              html += '<a href="https://drive.google.com/file/d/1AYUIBTd0IuOvHfIj6YFTApewGnbs5Cjn/view" target="_blank" style="color: #1e40af; font-size: 0.9rem; text-decoration: none;">📄 2021 Grade 6</a>';
+              html += '</div>';
+              html += '</div>';
+
               html += '</div>';
             } else {
               // Not signed up - registration closed
@@ -1191,7 +1209,7 @@
                 html += '</div>';
               } else {
                 html += '<div style="background: #f3f4f6; border: 2px solid #d1d5db; border-radius: 8px; padding: 15px; margin-bottom: 12px; text-align: center;">';
-                html += '<div style="color: #6b7280; font-size: 0.95rem;">Team formation deadline has passed (April 1, 2026)</div>';
+                html += '<div style="color: #6b7280; font-size: 0.95rem;">Team formation deadline has passed (April 17, 2026)</div>';
                 html += '</div>';
               }
 
@@ -1199,6 +1217,92 @@
               if (purpleComet && purpleComet.allTeams && purpleComet.allTeams.length > 0) {
                 html += '<button onclick="showBrowseTeamsModal()" style="background: white; color: #333; border: 2px solid #d1d5db; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.9rem;">Browse All Teams</button>';
               }
+            }
+
+            html += '</div>';
+            html += '</div>';
+
+            // Carderock Math Contest Section
+            const carderock = result.carderock || null;
+            html += '<h2 class="section-title">🔱 Carderock Math Contest</h2>';
+            html += '<div class="info-card">';
+            html += '<div style="padding: 15px;">';
+
+            html += '<div style="color: #666; font-size: 0.95rem; margin-bottom: 10px;">Competition Date: <strong>Friday, May 1, 2026 (7:30 AM – 2:30 PM)</strong></div>';
+            html += '<div style="color: #666; font-size: 0.95rem; margin-bottom: 10px;">Format: MATHCOUNTS-style | 8 spots (2 teams of 4) | Off-site</div>';
+            html += '<div style="margin-bottom: 15px;"><a href="https://www.navsea.navy.mil/Home/Warfare-Centers/NSWC-Carderock/STEM/Carderock-Math-Contest/" target="_blank" style="color: #dc2626; text-decoration: none; font-weight: 600;">Visit Carderock Math Contest →</a></div>';
+
+            const cdBeforeDeadline = new Date() < new Date('2026-04-13T23:59:59');
+            const cdFull = carderock && carderock.totalSignUps >= 8;
+
+            if (carderock && carderock.signedUp) {
+              // Signed up
+              html += '<div style="background: #d1fae5; border: 2px solid #059669; border-radius: 8px; padding: 15px; margin-bottom: 12px;">';
+              html += '<div style="color: #047857; font-weight: bold; font-size: 1.1rem; margin-bottom: 8px;">✓ Signed Up</div>';
+
+              if (carderock.status) {
+                const statusColor = carderock.status === 'Selected' ? '#047857' : '#92400e';
+                const statusBg = carderock.status === 'Selected' ? '#d1fae5' : '#fef3c7';
+                const statusBorder = carderock.status === 'Selected' ? '#059669' : '#f59e0b';
+                html += '<div style="background: ' + statusBg + '; border: 2px solid ' + statusBorder + '; border-radius: 6px; padding: 8px 16px; display: inline-block; font-weight: bold; color: ' + statusColor + '; margin-bottom: 12px;">Status: ' + escapeHtml(carderock.status) + (carderock.team ? ' — ' + escapeHtml(carderock.team) : '') + '</div>';
+              }
+
+              if (cdBeforeDeadline) {
+                html += '<div style="margin-top: 4px;">';
+                html += '<button onclick="dropCarderockSignUp(\'' + escapeHtml(student.mcpsId) + '\')" style="background: none; border: none; color: #6b7280; font-size: 0.85rem; cursor: pointer; text-decoration: underline;">Remove my interest</button>';
+                html += '</div>';
+              }
+
+              html += '</div>';
+
+              // Photo release form (required for students)
+              html += '<div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 15px; margin-bottom: 12px;">';
+              html += '<div style="color: #92400e; font-weight: bold; font-size: 1rem; margin-bottom: 8px;">📸 Photo Release Form Required</div>';
+              html += '<div style="color: #78350f; font-size: 0.9rem; margin-bottom: 10px;">All participating students (17 and under) must have a parent or guardian complete the photo release form. Any students with incomplete forms will not be included in photography.</div>';
+              html += '<a href="https://forms.osi.apps.mil/r/KwtJzuPtBD" target="_blank" style="display: inline-block; background: #d97706; color: white; text-decoration: none; padding: 8px 18px; border-radius: 6px; font-weight: bold; font-size: 0.9rem;">Complete Photo Release Form →</a>';
+              html += '</div>';
+
+              // Day of event rules
+              html += '<div style="background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 8px; padding: 15px; margin-bottom: 12px;">';
+              html += '<div style="color: #1e293b; font-weight: bold; font-size: 1rem; margin-bottom: 10px;">📋 Day of Event — Important Rules</div>';
+              html += '<ul style="color: #374151; font-size: 0.9rem; margin: 0; padding-left: 20px; line-height: 1.7;">';
+              html += '<li><strong>No phone use except calls</strong> — cameras, microphone, and all recording features are strictly banned on base.</li>';
+              html += '<li>All visitors must <strong>stay with the tour guide at ALL TIMES</strong> — no wandering, lingering behind, or moving ahead.</li>';
+              html += '<li>Drivers must have vehicle registration and proof of insurance available at all times.</li>';
+              html += '<li>Wear <strong>comfortable shoes</strong> — there will be a lot of walking!</li>';
+              html += '</ul>';
+              html += '</div>';
+
+              // Permission slip section
+              if (carderock.permissionSlipLink) {
+                html += '<div style="background: #d1fae5; border: 2px solid #059669; border-radius: 8px; padding: 15px; margin-bottom: 12px;">';
+                html += '<div style="color: #047857; font-weight: bold; font-size: 1rem; margin-bottom: 8px;">✓ Permission Slip Received</div>';
+                html += '<a href="' + escapeHtml(carderock.permissionSlipLink) + '" target="_blank" style="display: inline-block; background: #059669; color: white; text-decoration: none; padding: 8px 18px; border-radius: 6px; font-weight: bold; font-size: 0.9rem;">View Submitted Permission Slip →</a>';
+                html += '</div>';
+              } else {
+                html += '<div style="background: #eff6ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 15px; margin-bottom: 12px;">';
+                html += '<div style="color: #1e40af; font-weight: bold; font-size: 1rem; margin-bottom: 8px;">📋 Permission Slip Required</div>';
+                html += '<div style="color: #1e3a8a; font-size: 0.9rem; margin-bottom: 10px;">Please download, complete, and return the permission slip to <strong>Prof. Jojo</strong> by <strong>Monday, April 13, 2026</strong>. You may email the completed form to <a href="mailto:zdongmc@gmail.com" style="color: #1d4ed8;">zdongmc@gmail.com</a> or hand it in directly.</div>';
+                html += '<a href="https://drive.google.com/file/d/1Hy2FSg6hkvSfC6McYHBr-Ue-BqFbLRwq/view?usp=sharing" target="_blank" style="display: inline-block; background: #1d4ed8; color: white; text-decoration: none; padding: 8px 18px; border-radius: 6px; font-weight: bold; font-size: 0.9rem;">Download Permission Slip →</a>';
+                html += '</div>';
+              }
+
+            } else if (cdBeforeDeadline && !cdFull) {
+              // Not signed up, interest open
+              const totalStr = carderock ? carderock.totalSignUps + ' of 8 spots filled' : '0 of 8 spots filled';
+              html += '<div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 12px; margin-bottom: 15px; font-size: 0.9rem; color: #78350f;">';
+              html += '<strong>Interest period reopened — 4 additional spots available!</strong> Closes Monday, April 13, 2026 or when full.';
+              html += '</div>';
+              html += '<div style="background: #f9fafb; border: 2px solid #d1d5db; border-radius: 8px; padding: 15px; margin-bottom: 12px; text-align: center;">';
+              html += '<div style="color: #6b7280; font-size: 0.9rem; margin-bottom: 12px;">' + totalStr + '</div>';
+              html += '<button onclick="signUpForCarderock(\'' + escapeHtml(student.mcpsId) + '\', \'' + escapeHtml(student.name) + '\', \'' + escapeHtml(student.gradeLevel || '') + '\')" style="background: #dc2626; color: white; border: none; padding: 10px 24px; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer;">Indicate Interest</button>';
+              html += '</div>';
+            } else {
+              // After deadline or full, not signed up
+              html += '<div style="background: #f3f4f6; border: 2px solid #d1d5db; border-radius: 8px; padding: 15px; text-align: center;">';
+              html += '<div style="color: #6b7280; font-weight: bold; margin-bottom: 4px;">Not Signed Up</div>';
+              html += '<div style="color: #9ca3af; font-size: 0.9rem;">' + (cdFull ? 'All 8 spots filled' : 'Interest period closed April 13, 2026') + '</div>';
+              html += '</div>';
             }
 
             html += '</div>';
@@ -1223,6 +1327,14 @@
                 html += '<div style="margin-bottom: 12px; text-align: center;">';
                 html += '<span style="color: #666; font-size: 0.85rem;">ARML Tracking: ' + armlStatus + '</span>';
                 html += '</div>';
+
+                // Display ARML Qualifier score if present
+                if (mathLeagueData.armlQualifierScore !== null && mathLeagueData.armlQualifierScore !== undefined) {
+                    html += '<div style="background: #e0e7ff; border: 2px solid #6366f1; border-radius: 8px; padding: 15px; margin-bottom: 15px; text-align: center;">';
+                    html += '<div style="font-weight: bold; color: #4f46e5; margin-bottom: 8px; font-size: 1.1rem;">ARML Qualifier Score</div>';
+                    html += '<div style="font-size: 1.3rem; color: #4f46e5; font-weight: bold;">' + mathLeagueData.armlQualifierScore + '</div>';
+                    html += '</div>';
+                }
 
                 // Display cumulative individual round score if ARML tracking is on
                 if (mathLeagueData.armlTracked && mathLeagueData.cumulativeIndividualScore !== null && mathLeagueData.cumulativeIndividualScore !== undefined) {
@@ -1276,55 +1388,33 @@
                     html += '<div style="margin-top: 15px; background: #f8f9fa; border: 2px solid #d1d5db; border-radius: 10px; padding: 15px;">';
                     html += '<div style="font-weight: bold; color: #333; margin-bottom: 12px; font-size: 1.15rem;">' + escapeHtml(contest.name) + ' - ' + escapeHtml(contest.date) + '</div>';
 
-                    // Sign-up status - only show for future contests (Contest #5, index 4)
-                    let signedUp = false;
-                    if (contestIndex >= 4) {
-                        if (isWaitlisted) {
-                            html += '<div class="competition-date-item waitlisted" style="margin-bottom: 10px;">';
-                            html += '<div class="date-status waitlisted">Waitlisted</div>';
-                            html += '</div>';
-                        } else {
-                            signedUp = details.includes(contest.name);
-                            const status = signedUp ? 'Signed Up' : 'Not Signed Up';
-                            const statusClass = signedUp ? 'yes' : 'no';
-                            const itemClass = signedUp ? 'signed-up' : 'not-signed-up';
+                    // Contest results (if available)
+                    if (moemsData && moemsData.contests && moemsData.contests[contestIndex]) {
+                        const contestResult = moemsData.contests[contestIndex];
 
-                            html += '<div class="competition-date-item ' + itemClass + '" style="margin-bottom: 10px;">';
-                            html += '<div class="date-status ' + statusClass + '">' + status + '</div>';
-                            html += '</div>';
-                        }
-                    }
+                        if (contestResult.attended) {
+                            html += '<div style="margin-top: 10px; background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px;">';
+                            html += '<div style="font-weight: bold; color: #1e40af; margin-bottom: 8px; font-size: 1rem;">Contest Results</div>';
 
-                    // Show results for Contest #1 through Contest #4 (contestIndex 0-3)
-                    if (contestIndex <= 3) {
-                        // Contest results (if available)
-                        if (moemsData && moemsData.contests && moemsData.contests[contestIndex]) {
-                            const contestResult = moemsData.contests[contestIndex];
-
-                            if (contestResult.attended) {
-                                html += '<div style="margin-top: 10px; background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px;">';
-                                html += '<div style="font-weight: bold; color: #1e40af; margin-bottom: 8px; font-size: 1rem;">Contest Results</div>';
-
-                                if (contestResult.score !== null && contestResult.score !== undefined) {
-                                    // Score has been entered
-                                    html += '<div class="info-row" style="border: none; padding: 5px 0;">';
-                                    html += '<span class="info-label">Score</span>';
-                                    html += '<span class="info-value"><strong>' + contestResult.score + '</strong> / ' + moemsData.maxContestScore + '</span>';
-                                    html += '</div>';
-                                } else {
-                                    // Score pending
-                                    html += '<div style="padding: 8px; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; text-align: center;">';
-                                    html += '<span style="color: #92400e; font-weight: bold;">Score Pending</span>';
-                                    html += '</div>';
-                                }
-
+                            if (contestResult.score !== null && contestResult.score !== undefined) {
+                                // Score has been entered
+                                html += '<div class="info-row" style="border: none; padding: 5px 0;">';
+                                html += '<span class="info-label">Score</span>';
+                                html += '<span class="info-value"><strong>' + contestResult.score + '</strong> / ' + moemsData.maxContestScore + '</span>';
                                 html += '</div>';
-                            } else if (!contestResult.attended && contestResult.score === null) {
-                                // Did not attend (marked as "NA" in sheet)
-                                html += '<div style="margin-top: 10px; background: #fee; border: 2px solid #dc2626; border-radius: 8px; padding: 12px;">';
-                                html += '<div style="font-weight: bold; color: #dc2626; text-align: center;">Did Not Attend</div>';
+                            } else {
+                                // Score pending
+                                html += '<div style="padding: 8px; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; text-align: center;">';
+                                html += '<span style="color: #92400e; font-weight: bold;">Score Pending</span>';
                                 html += '</div>';
                             }
+
+                            html += '</div>';
+                        } else if (!contestResult.attended && contestResult.score === null) {
+                            // Did not attend (marked as "NA" in sheet)
+                            html += '<div style="margin-top: 10px; background: #fee; border: 2px solid #dc2626; border-radius: 8px; padding: 12px;">';
+                            html += '<div style="font-weight: bold; color: #dc2626; text-align: center;">Did Not Attend</div>';
+                            html += '</div>';
                         }
                     }
 
@@ -1336,9 +1426,20 @@
                     html += '<div style="margin-top: 20px; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 10px; padding: 15px;">';
                     html += '<div style="font-weight: bold; color: #92400e; margin-bottom: 8px; font-size: 1.1rem;">Total Score</div>';
                     html += '<div class="info-row" style="border: none; padding: 5px 0;">';
-                    html += '<span class="info-label">Combined Score</span>';
+                    html += '<span class="info-label">Individual Score</span>';
                     html += '<span class="info-value"><strong style="font-size: 1.2rem;">' + moemsData.totalScore + '</strong> / ' + moemsData.maxTotalScore + '</span>';
                     html += '</div>';
+                    if (moemsData.team) {
+                        html += '<div class="info-row" style="border: none; padding: 5px 0;">';
+                        html += '<span class="info-label">Team</span>';
+                        html += '<span class="info-value"><strong>' + escapeHtml(moemsData.team) + '</strong></span>';
+                        html += '</div>';
+                        if (moemsData.usedInTeamScore) {
+                            html += '<div style="margin-top: 8px; background: rgba(255,255,255,0.6); border: 1px solid #f59e0b; border-radius: 6px; padding: 8px 10px; font-size: 0.875rem; color: #78350f;">&#10003; This student\'s score is included in the team score (top 10 scores per team)</div>';
+                        } else {
+                            html += '<div style="margin-top: 8px; background: rgba(255,255,255,0.6); border: 1px solid #f59e0b; border-radius: 6px; padding: 8px 10px; font-size: 0.875rem; color: #78350f;">This student\'s score was not counted in the team score (top 10 scores per team)</div>';
+                        }
+                    }
                     html += '</div>';
                 }
             } else if (competitionName === 'MCPS Math League') {
@@ -1841,6 +1942,26 @@
                 .dropNoeticSignUp(mcpsId);
         }
 
+        function submitNoeticPermission(mcpsId, permission) {
+            showMessage('Saving response...', false);
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success) {
+                        lookupStudent(mcpsId);
+                    } else {
+                        showMessage(result.message || 'Error saving response. Please try again.', true);
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    showMessage('Error: ' + error.message, true);
+                })
+                .submitNoeticPermission(mcpsId, permission);
+        }
+
+        function resetNoeticPermission(mcpsId) {
+            submitNoeticPermission(mcpsId, '');
+        }
+
         // ==================== Purple Comet Functions ====================
 
         // ===== Purple Comet: View Invites Modal =====
@@ -2100,16 +2221,6 @@
                 <div style="background: white; border-radius: 12px; padding: 25px; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-height: 80vh; display: flex; flex-direction: column;">
                     <div style="font-size: 1.2rem; font-weight: bold; color: #333; margin-bottom: 15px; text-align: center;">Invite Students to "${escapeHtml(teamName)}"</div>
 
-                    <!-- Grade filter -->
-                    <div style="margin-bottom: 10px;">
-                        <select id="pcInviteGradeFilter" onchange="filterPCInviteList()" style="padding: 8px 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 0.9rem; width: 100%; box-sizing: border-box;">
-                            <option value="all">All Grades</option>
-                            <option value="6">6th Grade</option>
-                            <option value="7">7th Grade</option>
-                            <option value="8">8th Grade</option>
-                        </select>
-                    </div>
-
                     <!-- Student list -->
                     <div style="flex: 1; overflow: hidden; display: flex; flex-direction: column;">
                         <div id="pcStudentListLoading" style="text-align: center; padding: 20px; color: #666;"><span class="spinner"></span> Loading students...</div>
@@ -2158,8 +2269,8 @@
                 var isSelected = window.pcInviteSelected.some(function(sel) { return sel.mcpsId === s.mcpsId; });
                 var bgStyle = isSelected ? 'background: #f0fdf4;' : '';
                 var checkHtml = isSelected ? '<span style="color: #059669; font-weight: bold;">✓</span>' : '';
-                html += '<div id="pcStudent_' + s.mcpsId + '" style="padding: 10px 12px; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; justify-content: space-between; cursor: pointer; ' + bgStyle + '" onclick="togglePCInviteStudent(\'' + escapeHtml(s.mcpsId) + '\', \'' + escapeHtml(s.name) + '\', \'' + escapeHtml(s.grade) + '\')">';
-                html += '<div><span style="font-weight: 500;">' + escapeHtml(s.name) + '</span> <span style="color: #9ca3af; font-size: 0.85rem;">' + escapeHtml(s.grade) + '</span></div>';
+                html += '<div id="pcStudent_' + s.mcpsId + '" style="padding: 10px 12px; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; justify-content: space-between; cursor: pointer; ' + bgStyle + '" onclick="togglePCInviteStudent(\'' + escapeHtml(s.mcpsId) + '\', \'' + escapeHtml(s.name) + '\')">';
+                html += '<div><span style="font-weight: 500;">' + escapeHtml(s.name) + '</span></div>';
                 html += '<div id="pcCheck_' + s.mcpsId + '" style="width: 20px; height: 20px; border: 2px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center;">' + checkHtml + '</div>';
                 html += '</div>';
             });
@@ -2167,17 +2278,10 @@
         }
 
         function filterPCInviteList() {
-            var filter = document.getElementById('pcInviteGradeFilter').value;
-            var students = window.pcAvailableStudents;
-            if (filter !== 'all') {
-                students = students.filter(function(s) {
-                    return s.grade && s.grade.indexOf(filter) !== -1;
-                });
-            }
-            renderPCInviteList(students);
+            renderPCInviteList(window.pcAvailableStudents);
         }
 
-        function togglePCInviteStudent(mcpsId, name, grade) {
+        function togglePCInviteStudent(mcpsId, name) {
             const idx = window.pcInviteSelected.findIndex(function(s) { return s.mcpsId === mcpsId; });
             const checkEl = document.getElementById('pcCheck_' + mcpsId);
             const rowEl = document.getElementById('pcStudent_' + mcpsId);
@@ -2187,7 +2291,7 @@
                 if (checkEl) checkEl.innerHTML = '';
                 if (rowEl) rowEl.style.background = '';
             } else {
-                window.pcInviteSelected.push({ mcpsId: mcpsId, name: name, grade: grade });
+                window.pcInviteSelected.push({ mcpsId: mcpsId, name: name });
                 if (checkEl) checkEl.innerHTML = '<span style="color: #059669; font-weight: bold;">✓</span>';
                 if (rowEl) rowEl.style.background = '#f0fdf4';
             }
@@ -2344,7 +2448,7 @@
                 <div style="background: white; border-radius: 12px; padding: 25px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
                     <div style="text-align: center;">
                         <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 15px;">Leave team "${escapeHtml(teamName)}"?</p>
-                        <p style="color: #666; margin-bottom: 20px;">You can join another team before April 1, 2026.</p>
+                        <p style="color: #666; margin-bottom: 20px;">You can join another team before April 17, 2026.</p>
                         <div style="display: flex; gap: 10px; justify-content: center;">
                             <button onclick="document.getElementById('pcLeaveConfirmDialog').remove();" style="background: #e5e7eb; color: #333; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1;">Cancel</button>
                             <button onclick="confirmLeavePCTeam('${escapeHtml(mcpsId)}')" style="background: #f59e0b; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1;">Leave</button>
@@ -2441,6 +2545,113 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        // ==================== Carderock Functions ====================
+
+        function signUpForCarderock(mcpsId, studentName, grade) {
+            // Show acknowledgement modal before allowing sign-up
+            const modal = document.createElement('div');
+            modal.id = 'carderockAckModal';
+            modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px;box-sizing:border-box;';
+            modal.innerHTML = `
+                <div style="background:white;border-radius:12px;padding:24px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+                    <div style="font-size:1.2rem;font-weight:bold;color:#b91c1c;margin-bottom:16px;">⚠ U.S. Navy Base Access Requirements</div>
+                    <p style="color:#374151;font-size:0.9rem;margin-bottom:14px;">The Carderock Math Contest is held at the <strong>Naval Surface Warfare Center, Carderock Division (NSWCCD)</strong> — a U.S. Navy installation. All attendees must comply with the following:</p>
+
+                    <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:14px;margin-bottom:10px;">
+                        <div style="font-weight:bold;color:#991b1b;margin-bottom:6px;">🔍 Background Check</div>
+                        <p style="color:#374151;font-size:0.875rem;margin:0;">All participants — students and chaperones — must submit to a background check per NSWCCD policy. Instructions will be provided after registration is finalized.</p>
+                    </div>
+
+                    <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:14px;margin-bottom:10px;">
+                        <div style="font-weight:bold;color:#991b1b;margin-bottom:6px;">🌐 Chaperone Citizenship Requirement</div>
+                        <p style="color:#374151;font-size:0.875rem;margin:0;">Parent volunteers serving as drivers or chaperones <strong>must not be foreign nationals</strong>. Students who are foreign nationals are permitted to compete.</p>
+                    </div>
+
+                    <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:14px;margin-bottom:10px;">
+                        <div style="font-weight:bold;color:#991b1b;margin-bottom:6px;">📷 No Photography</div>
+                        <p style="color:#374151;font-size:0.875rem;margin:0;">Absolutely no personal photography is permitted on base — for anyone. A base photographer will be present; photos will be shared through the contest organizers after the event.</p>
+                    </div>
+
+                    <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:14px;margin-bottom:10px;">
+                        <div style="font-weight:bold;color:#991b1b;margin-bottom:6px;">💻 No Laptops or Tablets</div>
+                        <p style="color:#374151;font-size:0.875rem;margin:0;">No one — students or adults — may bring laptops or tablets onto the base.</p>
+                    </div>
+
+                    <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:14px;margin-bottom:16px;">
+                        <div style="font-weight:bold;color:#991b1b;margin-bottom:6px;">📅 Roster Deadline</div>
+                        <p style="color:#374151;font-size:0.875rem;margin:0;">The base access list must be finalized <strong>one week before the contest (by April 24, 2026)</strong>. No substitutions or additions can be made after that date.</p>
+                    </div>
+
+                    <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:18px;">
+                        <input type="checkbox" id="carderockAckCheck" style="margin-top:3px;width:18px;height:18px;flex-shrink:0;cursor:pointer;">
+                        <span style="color:#374151;font-size:0.9rem;">I have read and understand the base access requirements listed above.</span>
+                    </label>
+
+                    <div style="display:flex;gap:10px;">
+                        <button onclick="document.getElementById('carderockAckModal').remove();" style="flex:1;background:#e5e7eb;color:#374151;border:none;padding:10px;border-radius:8px;font-weight:bold;cursor:pointer;">Cancel</button>
+                        <button id="carderockAckConfirmBtn" onclick="confirmCarderockSignUp('${mcpsId}','${studentName.replace(/'/g,"\\'")}','${grade}')" style="flex:1;background:#9ca3af;color:white;border:none;padding:10px;border-radius:8px;font-weight:bold;cursor:not-allowed;" disabled>Indicate Interest</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // Enable confirm button only when checkbox is checked
+            document.getElementById('carderockAckCheck').addEventListener('change', function() {
+                const btn = document.getElementById('carderockAckConfirmBtn');
+                btn.disabled = !this.checked;
+                btn.style.background = this.checked ? '#dc2626' : '#9ca3af';
+                btn.style.cursor = this.checked ? 'pointer' : 'not-allowed';
+            });
+        }
+
+        function confirmCarderockSignUp(mcpsId, studentName, grade) {
+            // Gray out button and show loading spinner instead of closing modal immediately
+            const confirmBtn = document.getElementById('carderockAckConfirmBtn');
+            const cancelBtn = confirmBtn.parentElement.querySelector('button:first-child');
+            confirmBtn.disabled = true;
+            confirmBtn.style.background = '#9ca3af';
+            confirmBtn.style.cursor = 'not-allowed';
+            confirmBtn.innerHTML = '⏳ Submitting...';
+            if (cancelBtn) { cancelBtn.disabled = true; cancelBtn.style.opacity = '0.5'; cancelBtn.style.cursor = 'not-allowed'; }
+            document.getElementById('carderockAckCheck').disabled = true;
+
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    document.getElementById('carderockAckModal').remove();
+                    if (result.success) {
+                        showMessage(result.message, false);
+                        setTimeout(function() { lookupStudent(); }, 1500);
+                    } else {
+                        showMessage(result.message || 'Error. Please try again.', true);
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    document.getElementById('carderockAckModal').remove();
+                    showMessage('Error. Please try again.', true);
+                    console.error('Carderock sign-up error:', error);
+                })
+                .signUpForCarderock(mcpsId, studentName, grade);
+        }
+
+        function dropCarderockSignUp(mcpsId) {
+            if (!confirm('Remove your interest in the Carderock Math Contest?')) return;
+            showMessage('Removing...', false);
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success) {
+                        showMessage(result.message, false);
+                        setTimeout(function() { lookupStudent(); }, 1500);
+                    } else {
+                        showMessage(result.message || 'Error. Please try again.', true);
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    showMessage('Error. Please try again.', true);
+                    console.error('Carderock drop error:', error);
+                })
+                .dropCarderockSignUp(mcpsId);
         }
     </script>
 </body>

@@ -27,6 +27,24 @@ function doGet(e) {
       .setMimeType(ContentService.MimeType.JSON);
   }
 
+  // Handle Carderock sign-up action
+  if (e && e.parameter && e.parameter.action === 'signUpCarderock') {
+    const mcpsId = e.parameter.mcpsId;
+    const studentName = e.parameter.studentName;
+    const grade = e.parameter.grade;
+    const result = signUpForCarderock(mcpsId, studentName, grade);
+    return ContentService.createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  // Handle Carderock drop action
+  if (e && e.parameter && e.parameter.action === 'dropCarderock') {
+    const mcpsId = e.parameter.mcpsId;
+    const result = dropCarderockSignUp(mcpsId);
+    return ContentService.createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
   // Default: Return HTML page
   return HtmlService.createTemplateFromFile('Checkin')
     .evaluate()
@@ -522,11 +540,24 @@ function getMathLeagueResults(mcpsId) {
         const armlTracking = (row[3] || '').toString().trim(); // Column D (index 3)
 
         // Parse ARML tracking - check for "Yes", "Y", "TRUE", or true
-        const isArmlTracked = armlTracking &&
-          (armlTracking.toLowerCase() === 'yes' ||
-           armlTracking.toLowerCase() === 'y' ||
-           armlTracking.toLowerCase() === 'true' ||
-           armlTracking === true);
+        // Also check if it's a number (ARML Qualifier score)
+        let isArmlTracked = false;
+        let armlQualifierScore = null;
+
+        if (armlTracking) {
+          const numValue = parseFloat(armlTracking);
+          if (!isNaN(numValue) && armlTracking !== '') {
+            // It's a number - treat as qualifier score and set tracked to true
+            armlQualifierScore = numValue;
+            isArmlTracked = true;
+          } else if (armlTracking.toLowerCase() === 'yes' ||
+                     armlTracking.toLowerCase() === 'y' ||
+                     armlTracking.toLowerCase() === 'true' ||
+                     armlTracking === true) {
+            // It's an explicit "yes" - set tracked to true
+            isArmlTracked = true;
+          }
+        }
 
         // Helper function to parse meet score
         function parseMeetScore(val) {
@@ -624,6 +655,7 @@ function getMathLeagueResults(mcpsId) {
         return {
           team: currentTeam, // Most recent team for backward compatibility
           armlTracked: isArmlTracked,
+          armlQualifierScore: armlQualifierScore,
           cumulativeIndividualScore: cumulativeIndividualScore,
           meetScores: meetScores,
           teamResults: teamResults
@@ -700,6 +732,24 @@ function getMathcountsResults(mcpsId) {
         // State competition advancement
         const stateAdvancement = row[19] !== undefined && row[19] !== '' ? row[19].toString().trim() : null; // Column T (index 19)
 
+        // State Level Results (columns U, V, W = indices 20, 21, 22)
+        let stateResults = null;
+        if (stateAdvancement) {
+          const stateSprint = row[20] !== undefined && row[20] !== '' ? parseFloat(row[20]) : null; // Column U (index 20)
+          const stateTarget = row[21] !== undefined && row[21] !== '' ? parseFloat(row[21]) : null; // Column V (index 21)
+          const stateIndividual = row[22] !== undefined && row[22] !== '' ? parseFloat(row[22]) : null; // Column W (index 22)
+          if (stateSprint !== null || stateTarget !== null || stateIndividual !== null) {
+            stateResults = {
+              sprintScore: stateSprint,
+              targetScore: stateTarget,
+              individualScore: stateIndividual,
+              maxSprint: 30,
+              maxTarget: 16,
+              maxIndividual: 46
+            };
+          }
+        }
+
         // Column M (index 12) = Fee Required, Column N (index 13) = Fee Paid
         const feeRequired = row[12] !== undefined && row[12] !== '' ? row[12].toString().trim().toUpperCase() : null;
         const feePaid = row[13] !== undefined && row[13] !== '' ? row[13].toString().trim() : null;
@@ -729,6 +779,7 @@ function getMathcountsResults(mcpsId) {
           chapterStatus: chapterStatus,
           chapterResults: chapterResults,
           stateAdvancement: stateAdvancement,
+          stateResults: stateResults,
           feeInfo: feeInfo,
           maxSprint: 30,
           maxTarget: 16,
@@ -769,6 +820,8 @@ function getMoemsResults(mcpsId) {
         const total = row[8]; // Column I (index 8)
         const fee = row[9]; // Column J (index 9)
         const feePaid = row[10]; // Column K (index 10)
+        const team = row[11] ? row[11].toString().trim() : null; // Column L (index 11)
+        const usedInTeamScore = row[12] ? row[12].toString().trim() : null; // Column M (index 12)
 
         // Helper function to parse contest value
         // Returns: { attended: boolean, score: number|null }
@@ -838,7 +891,9 @@ function getMoemsResults(mcpsId) {
           maxContestScore: 5,
           maxTotalScore: 25,
           fee: feeAmount,
-          feePaid: isPaid
+          feePaid: isPaid,
+          team: team,
+          usedInTeamScore: usedInTeamScore
         };
       }
     }
@@ -861,17 +916,21 @@ function getMathKangarooResults(studentName) {
     const cleanStudentName = (studentName || '').toString().trim().toLowerCase();
 
     // Look for student by name in column A
-    // Columns: A=Name, B=MK ID
+    // Columns: A=Name, B=MK ID, C=(unused), D=Username, E=Password
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
       const name = (row[0] || '').toString().trim().toLowerCase();
 
       if (name === cleanStudentName) {
         const mkId = row[1] !== undefined && row[1] !== '' ? row[1].toString().trim() : null;
+        const username = row[3] !== undefined && row[3] !== '' ? row[3].toString().trim() : null;
+        const password = row[4] !== undefined && row[4] !== '' ? row[4].toString().trim() : null;
 
         return {
           registered: true,
-          mkId: mkId
+          mkId: mkId,
+          username: username,
+          password: password
         };
       }
     }
@@ -982,17 +1041,20 @@ function getNoeticResults(mcpsId) {
 
     const data = sheet.getDataRange().getValues();
 
-    // Columns: A=Name, B=MCPS ID, C=Grade, D=Timestamp, E=Score, F=PDF, G=Fee Paid, H=Grade Preference
+    // Columns: A=Name, B=MCPS ID, C=Grade, D=Timestamp, E=Grade Preference, F=Contest Grade Level, G=Publish Permission, H=Username, I=Password, J=Score, K=PDF Link
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
       const studentId = (row[1] || '').toString().trim();
 
       if (studentId === mcpsId.toString().trim()) {
         const signUpDate = row[3] || null;
-        const score = row[4] !== undefined && row[4] !== '' ? parseInt(row[4]) : null;
-        const pdfLink = (row[5] || '').toString().trim() || null;
-        const feePaid = row[6] ? (row[6].toString().toLowerCase() === 'true' || row[6] === true) : false;
-        const gradePreference = (row[7] || '').toString().trim().toLowerCase();
+        const gradePreference = (row[4] || '').toString().trim().toLowerCase();
+        const contestGrade = (row[5] || '').toString().trim();
+        const publishPermission = (row[6] || '').toString().trim().toLowerCase() || null;
+        const username = (row[7] || '').toString().trim() || null;
+        const password = (row[8] || '').toString().trim() || null;
+        const score = row[9] !== undefined && row[9] !== '' ? parseInt(row[9]) : null;
+        const pdfLink = (row[10] || '').toString().trim() || null;
 
         // Get current sign-up counts for display
         const counts = getNoeticSignUpCounts();
@@ -1000,10 +1062,13 @@ function getNoeticResults(mcpsId) {
         return {
           signedUp: true,
           signUpDate: signUpDate,
+          gradePreference: gradePreference,
+          contestGrade: contestGrade,
+          publishPermission: publishPermission,
+          username: username,
+          password: password,
           score: score,
           pdfLink: pdfLink,
-          feePaid: feePaid,
-          gradePreference: gradePreference,
           maxScore: 20,
           signUpCounts: counts
         };
@@ -1199,6 +1264,155 @@ function dropNoeticSignUp(mcpsId) {
   }
 }
 
+function submitNoeticPermission(mcpsId, permission) {
+  try {
+    const sheet = getNoeticSheet();
+    if (!sheet) {
+      return { success: false, message: 'Noetic sheet not found. Please contact the math coach.' };
+    }
+
+    const mcpsIdStr = mcpsId.toString().trim();
+    const permissionValue = permission === 'yes' ? 'yes' : (permission === 'no' ? 'no' : '');
+
+    const data = sheet.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      const studentId = (data[i][1] || '').toString().trim();
+      if (studentId === mcpsIdStr) {
+        sheet.getRange(i + 1, 7).setValue(permissionValue); // Column G
+        Logger.log('Noetic permission recorded: ' + mcpsIdStr + ' -> ' + permissionValue);
+        return { success: true, permission: permissionValue };
+      }
+    }
+
+    return { success: false, message: 'Student not found in Noetic roster.' };
+  } catch (error) {
+    Logger.log('Error submitting Noetic permission: ' + error.toString());
+    return { success: false, message: 'An error occurred. Please try again.' };
+  }
+}
+
+// ==================== Carderock Math Contest ====================
+
+function getCarderockSheet() {
+  return getSpreadsheet().getSheetByName('Carderock');
+}
+
+function isCarderockDeadlinePassed() {
+  return new Date() > new Date('2026-04-13T23:59:59');
+}
+
+function getCarderockResults(mcpsId) {
+  try {
+    const sheet = getCarderockSheet();
+    if (!sheet || sheet.getLastRow() <= 1) {
+      return { signedUp: false, totalSignUps: 0 };
+    }
+
+    const data = sheet.getDataRange().getValues();
+    const mcpsIdStr = mcpsId.toString().trim();
+
+    let totalSignUps = 0;
+    let studentRow = null;
+
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const id = (row[1] || '').toString().trim();
+      if (id) totalSignUps++;
+      if (id === mcpsIdStr) studentRow = row;
+    }
+
+    if (!studentRow) {
+      return { signedUp: false, totalSignUps: totalSignUps };
+    }
+
+    const rawDate = studentRow[3];
+    const signUpDate = rawDate ? (rawDate instanceof Date ? rawDate.toLocaleDateString() : rawDate.toString()) : null;
+
+    return {
+      signedUp: true,
+      signUpDate: signUpDate,
+      status: (studentRow[4] || '').toString().trim() || null,
+      team: (studentRow[5] || '').toString().trim() || null,
+      permissionSlipLink: (studentRow[6] || '').toString().trim() || null,
+      totalSignUps: totalSignUps
+    };
+  } catch (error) {
+    Logger.log('Error getting Carderock results: ' + error.toString());
+    return null;
+  }
+}
+
+function signUpForCarderock(mcpsId, studentName, grade) {
+  try {
+    const sheet = getCarderockSheet();
+    if (!sheet) {
+      return { success: false, message: 'Carderock sheet not found. Please contact the math coach.' };
+    }
+
+    const mcpsIdStr = mcpsId.toString().trim();
+
+    if (isCarderockDeadlinePassed()) {
+      return { success: false, message: 'The interest deadline (April 13, 2026) has passed.' };
+    }
+
+    // Check if already signed up, and count total sign-ups
+    let totalSignUps = 0;
+    if (sheet.getLastRow() > 1) {
+      const data = sheet.getDataRange().getValues();
+      for (let i = 1; i < data.length; i++) {
+        if ((data[i][1] || '').toString().trim()) totalSignUps++;
+        const id = (data[i][1] || '').toString().trim();
+        if (id === mcpsIdStr) {
+          return { success: false, message: 'You are already on the interest list.' };
+        }
+      }
+    }
+
+    if (totalSignUps >= 8) {
+      return { success: false, message: 'All 8 spots are filled. Interest is now closed.' };
+    }
+
+    sheet.appendRow([studentName, mcpsIdStr, grade, new Date(), '', '']);
+    Logger.log('Carderock sign-up added: ' + mcpsIdStr);
+    return { success: true, message: 'Successfully added to the Carderock interest list!' };
+
+  } catch (error) {
+    Logger.log('Error signing up for Carderock: ' + error.toString());
+    return { success: false, message: 'An error occurred. Please try again or contact the math coach.' };
+  }
+}
+
+function dropCarderockSignUp(mcpsId) {
+  try {
+    const sheet = getCarderockSheet();
+    if (!sheet) {
+      return { success: false, message: 'Carderock sheet not found. Please contact the math coach.' };
+    }
+
+    const mcpsIdStr = mcpsId.toString().trim();
+
+    if (isCarderockDeadlinePassed()) {
+      return { success: false, message: 'The interest deadline (April 13, 2026) has passed. Please contact the math coach to make changes.' };
+    }
+
+    const data = sheet.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      const id = (data[i][1] || '').toString().trim();
+      if (id === mcpsIdStr) {
+        sheet.deleteRow(i + 1);
+        Logger.log('Carderock sign-up dropped: ' + mcpsIdStr);
+        return { success: true, message: 'Removed from the Carderock interest list.' };
+      }
+    }
+
+    return { success: false, message: 'Sign-up not found. Please contact the math coach.' };
+
+  } catch (error) {
+    Logger.log('Error dropping Carderock sign-up: ' + error.toString());
+    return { success: false, message: 'An error occurred. Please try again or contact the math coach.' };
+  }
+}
+
 // ==================== Purple Comet Math Meet ====================
 
 function getPurpleCometSheet() {
@@ -1207,7 +1421,7 @@ function getPurpleCometSheet() {
 
 function isPurpleCometDeadlinePassed() {
   const now = new Date();
-  const deadline = new Date('2026-04-01T23:59:59');
+  const deadline = new Date('2026-04-17T23:59:59');
   return now > deadline;
 }
 
@@ -1316,27 +1530,22 @@ function getPurpleCometResults(mcpsId) {
 
 function getAvailableStudents() {
   try {
-    const competitionSheet = getCompetitionSignupSheet();
-    if (!competitionSheet || competitionSheet.getLastRow() <= 1) {
+    const attendanceSheet = getAttendanceSheet();
+    if (!attendanceSheet || attendanceSheet.getLastRow() < 3) {
       return [];
     }
 
-    const competitionData = competitionSheet.getDataRange().getValues();
+    // Row 1 is header, row 2 is attendance count — student data starts at row 3
+    const data = attendanceSheet.getRange(3, 1, attendanceSheet.getLastRow() - 2, 2).getValues();
 
-    // Build roster from Form Responses 2, de-duplicated by MCPS ID (keep most recent)
+    // Build roster from Attendance Records (col A = name, col B = student ID)
     const studentMap = {};
-    for (let i = 1; i < competitionData.length; i++) {
-      const row = competitionData[i];
-      const mcpsId = (row[2] || '').toString().trim();
-      const name = (row[1] || '').toString().trim();
-      const grade = (row[3] || '').toString().trim();
-      const timestamp = row[0];
+    for (let i = 0; i < data.length; i++) {
+      const name = (data[i][0] || '').toString().trim();
+      const mcpsId = (data[i][1] || '').toString().trim();
 
       if (!mcpsId || !name) continue;
-
-      if (!studentMap[mcpsId] || new Date(timestamp) > new Date(studentMap[mcpsId].timestamp)) {
-        studentMap[mcpsId] = { mcpsId: mcpsId, name: name, grade: grade, timestamp: timestamp };
-      }
+      studentMap[mcpsId] = { mcpsId: mcpsId, name: name };
     }
 
     // Get Purple Comet data to exclude students already on a team
@@ -1356,7 +1565,7 @@ function getAvailableStudents() {
     // Filter out students on a team, sort alphabetically
     const available = Object.values(studentMap)
       .filter(s => !onTeamIds.has(s.mcpsId))
-      .map(s => ({ mcpsId: s.mcpsId, name: s.name, grade: s.grade }))
+      .map(s => ({ mcpsId: s.mcpsId, name: s.name }))
       .sort((a, b) => a.name.localeCompare(b.name));
 
     return available;
@@ -2287,6 +2496,10 @@ function lookupStudentByMcpsId(mcpsId) {
       const sheet = getNoeticSheet();
       let isSignedUp = false;
       let gradePreference = null;
+      let contestGrade = null;
+      let publishPermission = null;
+      let noeticUsername = null;
+      let noeticPassword = null;
 
       if (sheet && sheet.getLastRow() > 1) {
         const data = sheet.getDataRange().getValues();
@@ -2296,7 +2509,11 @@ function lookupStudentByMcpsId(mcpsId) {
 
           if (studentId === mcpsIdStr) {
             isSignedUp = true;
-            gradePreference = (row[7] || '').toString().trim().toLowerCase();
+            gradePreference = (row[4] || '').toString().trim().toLowerCase();
+            contestGrade = (row[5] || '').toString().trim();
+            publishPermission = (row[6] || '').toString().trim().toLowerCase() || null;
+            noeticUsername = (row[7] || '').toString().trim() || null;
+            noeticPassword = (row[8] || '').toString().trim() || null;
             break;
           }
         }
@@ -2305,9 +2522,13 @@ function lookupStudentByMcpsId(mcpsId) {
       noeticResults = {
         signUpCounts: signUpCounts,
         signedUp: isSignedUp,
-        gradePreference: gradePreference
+        gradePreference: gradePreference,
+        contestGrade: contestGrade,
+        publishPermission: publishPermission,
+        username: noeticUsername,
+        password: noeticPassword
       };
-      Logger.log('Noetic results: signedUp=' + isSignedUp + ', preference=' + gradePreference);
+      Logger.log('Noetic results: signedUp=' + isSignedUp + ', preference=' + gradePreference + ', contestGrade=' + contestGrade);
     } catch (err) {
       Logger.log('Error getting Noetic results: ' + err.toString());
       noeticResults = null;
@@ -2325,6 +2546,15 @@ function lookupStudentByMcpsId(mcpsId) {
       Logger.log('Error getting Purple Comet results: ' + err.toString());
     }
 
+    // Get Carderock results
+    let carderockResults = null;
+    try {
+      Logger.log('Getting Carderock results for: ' + mcpsIdStr);
+      carderockResults = getCarderockResults(mcpsIdStr);
+    } catch (err) {
+      Logger.log('Error getting Carderock results: ' + err.toString());
+    }
+
     const result = {
       success: true,
       student: studentInfo,
@@ -2337,7 +2567,8 @@ function lookupStudentByMcpsId(mcpsId) {
       mathKangaroo: mathKangarooResults,
       amc8: amc8Results,
       noetic: noeticResults,
-      purpleComet: purpleComet
+      purpleComet: purpleComet,
+      carderock: carderockResults
     };
 
     try {
