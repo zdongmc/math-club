@@ -124,7 +124,7 @@ Located in `math-club-attendance/` directory:
     - Leave team: if creator with other members, must pick new owner via owner picker modal; if solo, team dissolves
     - Revoke: creator can revoke pending invites via `✕` button with confirmation
     - Invite cleanup: all student invites deleted when joining any team (create/join/accept); all team invites deleted when team becomes full (6 members)
-    - After contest date (April 17): purple "Contest Complete" banner + read-only team card + submission PDF link (if Column J populated) + score report link (if Column K populated) + Browse All Teams (no action buttons); students not on a team see "Not on a team"
+    - After contest date (April 17): purple "Contest Complete" banner + read-only team card + submission PDF link (if Column J populated) + score report link (if Column K populated) + results grid with team score/overall/country/state rank (if Columns M–P populated) + certificate link (if Column L populated) + Browse All Teams (no action buttons); students not on a team see "Not on a team"
     - All actions use `google.script.run` calls with `showMessage()` feedback and `lookupStudent()` refresh
   - **Carderock Math Contest**: Interest sign-up for off-site field trip competition (May 1, 2026, 8 spots max / 2 teams of 4):
     - Deadline: April 13, 2026 (interest period closes after, or when all 8 spots filled)
