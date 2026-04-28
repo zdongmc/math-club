@@ -1452,11 +1452,26 @@ function getPurpleCometResults(mcpsId) {
       const timestamp = row[6] || '';
       const loginName = (row[7] || '').toString().trim();
       const password = (row[8] || '').toString().trim();
+      const submissionLink = (row[9] || '').toString().trim();
+      const scoreReportLink = (row[10] || '').toString().trim();
+      const certificateLink = (row[11] || '').toString().trim();
+      const teamScore = (row[12] !== undefined && row[12] !== '') ? row[12].toString().trim() : '';
+      const overallRank = (row[13] !== undefined && row[13] !== '') ? row[13].toString().trim() : '';
+      const countryRank = (row[14] !== undefined && row[14] !== '') ? row[14].toString().trim() : '';
+      const stateRank = (row[15] !== undefined && row[15] !== '') ? row[15].toString().trim() : '';
 
       if (!teamName) continue;
 
       if (!teamMap[teamName]) {
-        teamMap[teamName] = { teamType: teamType, loginName: loginName, password: password, rows: [] };
+        teamMap[teamName] = { teamType: teamType, loginName: loginName, password: password, submissionLink: submissionLink, scoreReportLink: scoreReportLink, certificateLink: certificateLink, teamScore: teamScore, overallRank: overallRank, countryRank: countryRank, stateRank: stateRank, rows: [] };
+      } else {
+        if (submissionLink && !teamMap[teamName].submissionLink) teamMap[teamName].submissionLink = submissionLink;
+        if (scoreReportLink && !teamMap[teamName].scoreReportLink) teamMap[teamName].scoreReportLink = scoreReportLink;
+        if (certificateLink && !teamMap[teamName].certificateLink) teamMap[teamName].certificateLink = certificateLink;
+        if (teamScore && !teamMap[teamName].teamScore) teamMap[teamName].teamScore = teamScore;
+        if (overallRank && !teamMap[teamName].overallRank) teamMap[teamName].overallRank = overallRank;
+        if (countryRank && !teamMap[teamName].countryRank) teamMap[teamName].countryRank = countryRank;
+        if (stateRank && !teamMap[teamName].stateRank) teamMap[teamName].stateRank = stateRank;
       }
       teamMap[teamName].rows.push({
         mcpsId: rowMcpsId,
@@ -1488,7 +1503,14 @@ function getPurpleCometResults(mcpsId) {
               role: row.role,
               members: members,
               loginName: teamData.loginName,
-              password: teamData.password
+              password: teamData.password,
+              submissionLink: teamData.submissionLink,
+              scoreReportLink: teamData.scoreReportLink,
+              certificateLink: teamData.certificateLink,
+              teamScore: teamData.teamScore,
+              overallRank: teamData.overallRank,
+              countryRank: teamData.countryRank,
+              stateRank: teamData.stateRank
             };
           } else if (row.role === 'invited') {
             pendingInvites.push({
@@ -2500,6 +2522,7 @@ function lookupStudentByMcpsId(mcpsId) {
       let publishPermission = null;
       let noeticUsername = null;
       let noeticPassword = null;
+      let noeticScore = null;
 
       if (sheet && sheet.getLastRow() > 1) {
         const data = sheet.getDataRange().getValues();
@@ -2514,6 +2537,7 @@ function lookupStudentByMcpsId(mcpsId) {
             publishPermission = (row[6] || '').toString().trim().toLowerCase() || null;
             noeticUsername = (row[7] || '').toString().trim() || null;
             noeticPassword = (row[8] || '').toString().trim() || null;
+            noeticScore = (row[9] !== undefined && row[9] !== '') ? parseInt(row[9]) : null;
             break;
           }
         }
@@ -2526,7 +2550,8 @@ function lookupStudentByMcpsId(mcpsId) {
         contestGrade: contestGrade,
         publishPermission: publishPermission,
         username: noeticUsername,
-        password: noeticPassword
+        password: noeticPassword,
+        score: noeticScore
       };
       Logger.log('Noetic results: signedUp=' + isSignedUp + ', preference=' + gradePreference + ', contestGrade=' + contestGrade);
     } catch (err) {
