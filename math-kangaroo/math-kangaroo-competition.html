@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Kangaroo Practice Competition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 160px 1fr;
+            gap: 10px;
+            padding: 10px;
+            height: 100vh;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* ── Question panels ── */
+        .level {
+            background: white;
+            padding: 16px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        .level.level-56 { border-top: 4px solid #2196F3; }
+        .level.level-78 { border-top: 4px solid #FF6F00; }
+
+        .level-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .level-56 .level-title { color: #2196F3; }
+        .level-78 .level-title { color: #FF6F00; }
+
+        /* ── Year groups ── */
+        .year-group {
+            margin-bottom: 12px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            border-left: 4px solid #ddd;
+        }
+
+        .year-group.locked-correct   { border-left-color: #4caf50; background: #f1faf2; }
+        .year-group.locked-partial   { border-left-color: #ff9800; background: #fff8f0; }
+        .year-group.locked-incorrect { border-left-color: #f44336; background: #fff5f5; }
+
+        .year-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #444;
+            margin-bottom: 8px;
+        }
+
+        /* ── Point rows ── */
+        .point-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .pt-label {
+            width: 34px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #888;
+            flex-shrink: 0;
+            text-align: right;
+        }
+
+        .answer-options {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .option { display: flex; align-items: center; gap: 4px; }
+        .option input[type="radio"] { cursor: pointer; }
+        .option label { cursor: pointer; font-size: 13px; }
+
+        .row-result {
+            font-size: 11px;
+            font-weight: bold;
+            width: 110px;
+            flex-shrink: 0;
+            text-align: left;
+        }
+
+        .row-result.correct   { color: #4caf50; }
+        .row-result.incorrect { color: #f44336; }
+
+        /* ── Lock button ── */
+        .lock-btn {
+            display: block;
+            width: 100%;
+            margin-top: 8px;
+            padding: 6px 0;
+            font-size: 13px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #4caf50;
+            color: white;
+            transition: background 0.2s;
+        }
+
+        .lock-btn:hover    { background: #45a049; }
+        .lock-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+        .year-group.locked-correct .lock-btn,
+        .year-group.locked-partial .lock-btn,
+        .year-group.locked-incorrect .lock-btn {
+            display: none;
+        }
+
+        .locked-inputs { pointer-events: none; opacity: 0.6; }
+
+        /* ── Score panel ── */
+        .score-panel {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 12px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .panel-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: #555;
+            text-align: center;
+            margin-bottom: 8px;
+            white-space: nowrap;
+        }
+
+        /* ── Race track ── */
+        .race-track {
+            flex: 1;
+            position: relative;
+            background: #f0f0f8;
+            border-radius: 8px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .milestone {
+            position: absolute;
+            left: 0;
+            right: 0;
+            display: flex;
+            align-items: flex-end;
+            z-index: 1;
+            pointer-events: none;
+            transition: bottom 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .milestone-label {
+            width: 26px;
+            font-size: 9px;
+            color: #aaa;
+            font-weight: bold;
+            text-align: right;
+            padding-right: 3px;
+            flex-shrink: 0;
+            line-height: 1;
+            padding-bottom: 1px;
+        }
+
+        .milestone-line {
+            flex: 1;
+            height: 1px;
+            background: rgba(0, 0, 0, 0.12);
+        }
+
+        .milestone.finish .milestone-label {
+            color: #bba000;
+            font-size: 10px;
+            padding-bottom: 2px;
+        }
+        .milestone.finish .milestone-line { background: #ffd700; height: 2px; }
+
+        /* ── Lanes ── */
+        .lanes {
+            position: absolute;
+            bottom: 0;
+            top: 0;
+            left: 30px;
+            right: 6px;
+            display: flex;
+            gap: 6px;
+        }
+
+        .lane { flex: 1; position: relative; }
+
+        .lane-bg {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
+        }
+
+        .lane-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 0%;
+            border-radius: 4px 4px 0 0;
+            transition: height 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .lane-56 .lane-fill { background: linear-gradient(to top, #1565C0, #64B5F6); }
+        .lane-78 .lane-fill { background: linear-gradient(to top, #E65100, #FFB74D); }
+
+        .lane-racer {
+            position: absolute;
+            left: 50%;
+            bottom: 0%;
+            transform: translateX(-50%);
+            font-size: 20px;
+            line-height: 1;
+            z-index: 3;
+            transition: bottom 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes kangaroo-jump {
+            0%   { transform: translateX(-50%) scale(1)   translateY(0); }
+            30%  { transform: translateX(-50%) scale(1.4) translateY(-12px); }
+            65%  { transform: translateX(-50%) scale(0.9) translateY(2px); }
+            100% { transform: translateX(-50%) scale(1)   translateY(0); }
+        }
+
+        .lane-racer.bounce { animation: kangaroo-jump 0.5s ease; }
+
+        /* ── Flash ── */
+        .level-up-flash {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 215, 0, 0.96);
+            color: #333;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 11px;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 10;
+            white-space: nowrap;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        @keyframes flash-up {
+            0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            20%  { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+            70%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -80%); }
+        }
+
+        .level-up-flash.show { animation: flash-up 1.5s ease forwards; }
+
+        /* ── Score labels ── */
+        .score-labels {
+            display: flex;
+            width: 100%;
+            margin-top: 8px;
+            gap: 4px;
+        }
+
+        .score-label { flex: 1; text-align: center; }
+        .score-label .level-name { font-size: 10px; font-weight: bold; opacity: 0.8; }
+        .score-label .score-num  { font-size: 16px; font-weight: bold; }
+        .score-label.label-56 { color: #1565C0; }
+        .score-label.label-78 { color: #E65100; }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <div class="level level-56" id="level-56"></div>
+
+        <div class="score-panel">
+            <div class="panel-title">🦘 Race!</div>
+            <div class="race-track" id="race-track">
+                <div class="milestone finish" id="m-finish" style="bottom: calc(100% - 2px)">
+                    <span class="milestone-label" id="m-finish-label">🏁</span>
+                    <div class="milestone-line"></div>
+                </div>
+                <div class="milestone" id="m-75" style="bottom: 75%">
+                    <span class="milestone-label" id="m-75-label"></span>
+                    <div class="milestone-line"></div>
+                </div>
+                <div class="milestone" id="m-50" style="bottom: 50%">
+                    <span class="milestone-label" id="m-50-label"></span>
+                    <div class="milestone-line"></div>
+                </div>
+                <div class="milestone" id="m-25" style="bottom: 25%">
+                    <span class="milestone-label" id="m-25-label"></span>
+                    <div class="milestone-line"></div>
+                </div>
+                <div class="lanes">
+                    <div class="lane lane-56">
+                        <div class="lane-bg"></div>
+                        <div class="lane-fill" id="fill-56"></div>
+                        <div class="lane-racer" id="racer-56">🦘</div>
+                    </div>
+                    <div class="lane lane-78">
+                        <div class="lane-bg"></div>
+                        <div class="lane-fill" id="fill-78"></div>
+                        <div class="lane-racer" id="racer-78">🦘</div>
+                    </div>
+                </div>
+                <div class="level-up-flash" id="level-up-flash"></div>
+            </div>
+            <div class="score-labels">
+                <div class="score-label label-56">
+                    <div class="level-name">5/6</div>
+                    <div class="score-num" id="score-56">—</div>
+                </div>
+                <div class="score-label label-78">
+                    <div class="level-name">7/8</div>
+                    <div class="score-num" id="score-78">—</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="level level-78" id="level-78"></div>
+    </div>
+
+    <script>
+        const ANSWER_KEY = {
+            2016: { '5/6': ['C', 'C', 'B'], '7/8': ['C', 'E', 'E'] },
+            2017: { '5/6': ['E', 'D', 'D'], '7/8': ['C', 'E', 'C'] },
+            2018: { '5/6': ['D', 'C', 'C'], '7/8': ['E', 'C', 'C'] },
+            2019: { '5/6': ['E', 'C', 'D'], '7/8': ['D', 'C', 'B'] },
+            2020: { '5/6': ['E', 'A', 'E'], '7/8': ['A', 'A', 'A'] },
+            2021: { '5/6': ['D', 'D', 'B'], '7/8': ['A', 'C', 'B'] },
+            2022: { '5/6': ['D', 'D', 'D'], '7/8': ['B', 'C', 'A'] },
+            2023: { '5/6': ['D', 'B', 'E'], '7/8': ['A', 'E', 'E'] },
+            2024: { '5/6': ['B', 'C', 'E'], '7/8': ['D', 'B', 'B'] },
+            2025: { '5/6': ['B', 'C', 'A'], '7/8': ['B', 'B', 'A'] }
+        };
+
+        const POINTS = [3, 4, 5];
+        const YEAR_PTS = POINTS.reduce((a, b) => a + b, 0); // 12 per year
+        const YEARS = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025];
+        const LEVELS = ['5/6', '7/8'];
+
+        let answers = {};
+        const attempted = { '5/6': 0, '7/8': 0 };
+        const currentScore = { '5/6': 0, '7/8': 0 };
+        const prevScores = { '5/6': 0, '7/8': 0 };
+
+        LEVELS.forEach(level => {
+            answers[level] = {};
+            YEARS.forEach(year => {
+                answers[level][year] = {};
+                POINTS.forEach(points => { answers[level][year][points] = null; });
+            });
+        });
+
+        function initializeUI() {
+            LEVELS.forEach(level => {
+                const container = document.getElementById(`level-${level.replace('/', '')}`);
+
+                const title = document.createElement('div');
+                title.className = 'level-title';
+                title.textContent = `Level ${level}`;
+                container.appendChild(title);
+
+                YEARS.forEach(year => {
+                    const groupDiv = document.createElement('div');
+                    groupDiv.className = 'year-group';
+                    groupDiv.id = `group-${level.replace('/', '')}-${year}`;
+
+                    const yearTitle = document.createElement('div');
+                    yearTitle.className = 'year-title';
+                    yearTitle.textContent = year;
+                    groupDiv.appendChild(yearTitle);
+
+                    POINTS.forEach(points => {
+                        const questionId = `${level}-${year}-${points}`;
+
+                        const rowDiv = document.createElement('div');
+                        rowDiv.className = 'point-row';
+                        rowDiv.id = `row-${questionId}`;
+
+                        const ptLabel = document.createElement('div');
+                        ptLabel.className = 'pt-label';
+                        ptLabel.textContent = `${points} pt`;
+                        rowDiv.appendChild(ptLabel);
+
+                        const optionsDiv = document.createElement('div');
+                        optionsDiv.className = 'answer-options';
+
+                        ['A', 'B', 'C', 'D', 'E'].forEach(option => {
+                            const optionDiv = document.createElement('div');
+                            optionDiv.className = 'option';
+
+                            const input = document.createElement('input');
+                            input.type = 'radio';
+                            input.name = questionId;
+                            input.value = option;
+                            input.id = `${questionId}-${option}`;
+
+                            const label = document.createElement('label');
+                            label.htmlFor = `${questionId}-${option}`;
+                            label.textContent = option;
+
+                            optionDiv.appendChild(input);
+                            optionDiv.appendChild(label);
+                            optionsDiv.appendChild(optionDiv);
+                        });
+
+                        rowDiv.appendChild(optionsDiv);
+
+                        const resultSpan = document.createElement('span');
+                        resultSpan.className = 'row-result';
+                        resultSpan.id = `result-${questionId}`;
+                        rowDiv.appendChild(resultSpan);
+
+                        groupDiv.appendChild(rowDiv);
+                    });
+
+                    const lockBtn = document.createElement('button');
+                    lockBtn.className = 'lock-btn';
+                    lockBtn.textContent = 'Lock In Answers';
+                    lockBtn.onclick = () => lockYear(level, year);
+                    groupDiv.appendChild(lockBtn);
+
+                    container.appendChild(groupDiv);
+                });
+            });
+        }
+
+        function lockYear(level, year) {
+            const missing = POINTS.filter(points => {
+                const questionId = `${level}-${year}-${points}`;
+                return !document.querySelector(`input[name="${questionId}"]:checked`);
+            });
+
+            if (missing.length > 0) {
+                alert('Please select answers for all three questions before locking in.');
+                return;
+            }
+
+            let numCorrect = 0;
+
+            POINTS.forEach(points => {
+                const questionId = `${level}-${year}-${points}`;
+                const userAnswer = document.querySelector(`input[name="${questionId}"]:checked`).value;
+                const correctAnswer = ANSWER_KEY[year][level][POINTS.indexOf(points)];
+                const isCorrect = userAnswer === correctAnswer;
+
+                answers[level][year][points] = { answer: userAnswer, correct: isCorrect };
+                if (isCorrect) numCorrect++;
+
+                const resultSpan = document.getElementById(`result-${questionId}`);
+                if (isCorrect) {
+                    resultSpan.className = 'row-result correct';
+                    resultSpan.textContent = '✓ Correct';
+                } else {
+                    resultSpan.className = 'row-result incorrect';
+                    resultSpan.textContent = `✗ Answer: ${correctAnswer}`;
+                }
+
+                document.getElementById(`row-${questionId}`).classList.add('locked-inputs');
+            });
+
+            const groupDiv = document.getElementById(`group-${level.replace('/', '')}-${year}`);
+            if (numCorrect === 3)      groupDiv.classList.add('locked-correct');
+            else if (numCorrect === 0) groupDiv.classList.add('locked-incorrect');
+            else                       groupDiv.classList.add('locked-partial');
+
+            attempted[level] += YEAR_PTS;
+
+            const ctx = getAudio();
+            if (numCorrect === 3)      soundCorrect(ctx);
+            else if (numCorrect > 0)   soundPartial(ctx);
+            else                       soundWrong(ctx);
+
+            updateScores(numCorrect === 3);
+        }
+
+        function updateScores(perfectYear) {
+            LEVELS.forEach(level => {
+                let score = 0;
+                YEARS.forEach(year => {
+                    POINTS.forEach(points => {
+                        if (answers[level][year][points] && answers[level][year][points].correct) {
+                            score += points;
+                        }
+                    });
+                });
+                currentScore[level] = score;
+                const att = attempted[level];
+                document.getElementById(`score-${level.replace('/', '')}`).textContent =
+                    att > 0 ? `${score}/${att}` : '—';
+            });
+
+            const maxAttempted = Math.max(attempted['5/6'], attempted['7/8']);
+            updateMilestones(maxAttempted);
+
+            LEVELS.forEach(level => {
+                updateRace(level, currentScore[level], maxAttempted, perfectYear);
+            });
+        }
+
+        function updateMilestones(max) {
+            if (max === 0) return;
+            document.getElementById('m-finish-label').textContent = max;
+            document.getElementById('m-75-label').textContent = Math.round(max * 0.75);
+            document.getElementById('m-50-label').textContent = Math.round(max * 0.50);
+            document.getElementById('m-25-label').textContent = Math.round(max * 0.25);
+        }
+
+        function updateRace(level, score, maxAttempted, perfectYear) {
+            const id = level.replace('/', '');
+            const prev = prevScores[level];
+            const pct = maxAttempted > 0 ? (score / maxAttempted) * 100 : 0;
+
+            document.getElementById(`fill-${id}`).style.height = `${pct}%`;
+            const racer = document.getElementById(`racer-${id}`);
+            racer.style.bottom = `${pct}%`;
+
+            if (score > prev || (maxAttempted > 0 && prev === 0)) {
+                racer.classList.remove('bounce');
+                void racer.offsetWidth;
+                racer.classList.add('bounce');
+            }
+
+            if (perfectYear && score > prev) {
+                const flash = document.getElementById('level-up-flash');
+                const isPerfectAll = score === maxAttempted && maxAttempted === YEARS.length * YEAR_PTS;
+                flash.textContent = isPerfectAll ? '🏆 Perfect Score!' : '🎉 Perfect Year!';
+                flash.classList.remove('show');
+                void flash.offsetWidth;
+                flash.classList.add('show');
+                if (isPerfectAll) soundPerfectAll(getAudio());
+            }
+
+            prevScores[level] = score;
+        }
+
+        // ── Audio ──
+        let audioCtx = null;
+
+        function getAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            return audioCtx;
+        }
+
+        function playNote(ctx, freq, startTime, duration, volume = 0.28, type = 'sine') {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, startTime);
+            gain.gain.setValueAtTime(volume, startTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+            osc.start(startTime);
+            osc.stop(startTime + duration);
+        }
+
+        function playBoing(ctx, offset = 0) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            const t = ctx.currentTime + offset;
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(280, t);
+            osc.frequency.linearRampToValueAtTime(520, t + 0.08);
+            osc.frequency.exponentialRampToValueAtTime(180, t + 0.35);
+            gain.gain.setValueAtTime(0.25, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+            osc.start(t);
+            osc.stop(t + 0.35);
+        }
+
+        function soundCorrect(ctx) {
+            // C5 → E5 → G5 fanfare + boing
+            const t = ctx.currentTime;
+            playNote(ctx, 523, t,        0.18); // C5
+            playNote(ctx, 659, t + 0.13, 0.18); // E5
+            playNote(ctx, 784, t + 0.26, 0.35); // G5
+            playBoing(ctx, 0.1);
+        }
+
+        function soundPartial(ctx) {
+            // Single ding + small boing
+            playNote(ctx, 523, ctx.currentTime, 0.22);
+            playBoing(ctx, 0.05);
+        }
+
+        function soundWrong(ctx) {
+            // Descending sad tones
+            const t = ctx.currentTime;
+            playNote(ctx, 311, t,        0.2, 0.22, 'sawtooth'); // Eb4
+            playNote(ctx, 233, t + 0.15, 0.35, 0.22, 'sawtooth'); // Bb3
+        }
+
+        function soundPerfectAll(ctx) {
+            // Extended fanfare: C5 E5 G5 C6
+            const t = ctx.currentTime;
+            playNote(ctx, 523,  t,        0.15);
+            playNote(ctx, 659,  t + 0.12, 0.15);
+            playNote(ctx, 784,  t + 0.24, 0.15);
+            playNote(ctx, 1047, t + 0.36, 0.9, 0.35);
+            playBoing(ctx, 0.15);
+            playBoing(ctx, 0.45);
+        }
+
+        window.addEventListener('load', initializeUI);
+    </script>
+</body>
+</html>
