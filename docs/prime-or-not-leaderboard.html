@@ -207,7 +207,7 @@
         </div>
 
         <div class="actions">
-            <a href="prime-or-not.html" class="btn">Play Game</a>
+            <a id="playGameBtn" href="prime-or-not.html" class="btn">Play Game</a>
         </div>
     </div>
 
@@ -297,6 +297,7 @@
                 `;
 
                 loadRangeLeaderboard(0);
+                updatePlayBtn(0);
             } catch (e) {
                 div.innerHTML = `<div class="loading-message">Could not load ranges: ${e.message}</div>`;
             }
@@ -309,6 +310,15 @@
                 btn.classList.toggle('active', i === idx)
             );
             loadRangeLeaderboard(idx);
+            updatePlayBtn(idx);
+        }
+
+        function updatePlayBtn(idx) {
+            const r = availableRanges[idx];
+            if (!r) return;
+            const idParam = myMcpsId ? `&mcpsId=${myMcpsId}` : '';
+            document.getElementById('playGameBtn').href =
+                `prime-or-not.html?min=${r.min}&max=${r.max}${idParam}`;
         }
 
         async function loadRangeLeaderboard(idx) {
