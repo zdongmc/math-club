@@ -2981,6 +2981,17 @@ function checkInStudent(mcpsId) {
 const PON_SHEET_ID   = '19P1KPhQXMMsYEgx8dpmhZQynegf5iygu4nqLMNXU4ss';
 const PON_SHEET_NAME = 'Leaderboard';
 const CERT_TOTAL     = 9;   // total certificates available
+const CERT_LINKS = [
+  'https://drive.google.com/file/d/1r0QiBV3TddRgcbBGRS-GgPhWoxfjP3sc/view?usp=drive_link', // 1
+  'https://drive.google.com/file/d/1VPJ5SOTgP5XoUVPh7k7dITav7bFtaR2m/view?usp=drive_link', // 2
+  'https://drive.google.com/file/d/1A1zGglHuf0zZnPKqKFR5Bu12JwhgNa00/view?usp=drive_link', // 3
+  'https://drive.google.com/file/d/1bdgEG1dxiFKkLzbybRPx-CLutkbp7ELN/view?usp=drive_link', // 4
+  'https://drive.google.com/file/d/1CYOZ253VypsP6eQ18ItzbGFlj7TuHn5r/view?usp=drive_link', // 5
+  'https://drive.google.com/file/d/1eonvNDty-9kzzhb1WrW_4B4rMdbj_dxt/view?usp=drive_link', // 6
+  'https://drive.google.com/file/d/1wyAHJ4u7XME27KEqOJ30Py9z2cX0j4OI/view?usp=drive_link', // 7
+  'https://drive.google.com/file/d/1R5S3T4qr1GekAoq_fSI9EdxpxskoZ7z3/view?usp=drive_link', // 8
+  'https://drive.google.com/file/d/1T6GtA-r6oNtIySdd-jltY70a2s4jpcB-/view?usp=drive_link', // 9
+];
 
 /**
  * Get or create the "Cert Winners 2026" sheet.
@@ -2991,8 +3002,8 @@ function getCertWinnersSheet() {
   let sheet = ss.getSheetByName('Cert Winners 2026');
   if (!sheet) {
     sheet = ss.insertSheet('Cert Winners 2026');
-    sheet.getRange(1, 1, 1, 4).setValues([['Name', 'MCPS ID', 'Win Timestamp', 'Entries At Win']]);
-    sheet.getRange(1, 1, 1, 4).setFontWeight('bold');
+    sheet.getRange(1, 1, 1, 6).setValues([['Name', 'MCPS ID', 'Win Timestamp', 'Entries At Win', 'Cert #', 'Cert Link']]);
+    sheet.getRange(1, 1, 1, 6).setFontWeight('bold');
     sheet.setFrozenRows(1);
   }
   return sheet;
@@ -3092,7 +3103,13 @@ function getDrawingStatus(mcpsId) {
     const winnersData   = winnersSheet.getLastRow() > 1
       ? winnersSheet.getDataRange().getValues().slice(1)
       : [];
-    const alreadyWon     = winnersData.some(r => (r[1] || '').toString().trim() === idStr);
+    const winnerIndex    = winnersData.findIndex(r => (r[1] || '').toString().trim() === idStr);
+    const winnerRow      = winnerIndex >= 0 ? winnersData[winnerIndex] : null;
+    const alreadyWon     = !!winnerRow;
+    const certNum        = winnerRow ? (parseInt(winnerRow[4]) || (winnerIndex + 1)) : null;
+    const certLink       = winnerRow
+      ? ((winnerRow[5] || '').toString().trim() || CERT_LINKS[certNum - 1] || null)
+      : null;
     const certsDrawn     = winnersData.length;
     const certsRemaining = Math.max(0, CERT_TOTAL - certsDrawn);
 
@@ -3118,6 +3135,7 @@ function getDrawingStatus(mcpsId) {
       eligible:         true,
       name:             name || findStudentNameByMcpsId(idStr),
       alreadyWon,
+      certLink,
       certsRemaining,
       entries:          baseEntry + ponEntries,
       baseEntry,
@@ -3150,9 +3168,10 @@ function getCertDrawPool() {
     const certsRemaining = Math.max(0, CERT_TOTAL - certsDrawn);
 
     const winners = winnersData.map(r => ({
-      name:  (r[0] || '').toString().trim(),
-      mcpsId:(r[1] || '').toString().trim(),
-      wonAt: r[2] ? new Date(r[2]).toLocaleString() : ''
+      name:     (r[0] || '').toString().trim(),
+      mcpsId:   (r[1] || '').toString().trim(),
+      wonAt:    r[2] ? new Date(r[2]).toLocaleString() : '',
+      certLink: (r[5] || '').toString().trim() || null
     }));
 
     // --- PON leaderboard (no eligibility filter — all MCPS ID holders compete) ---
@@ -3220,10 +3239,15 @@ function recordCertWinner(mcpsId, entriesAtWin) {
       return { success: false, error: 'no_certs_remaining' };
     }
 
-    const name = findStudentNameByMcpsId(idStr) || idStr;
-    getCertWinnersSheet().appendRow([name, idStr, new Date(), entriesAtWin || 0]);
+    const name     = findStudentNameByMcpsId(idStr) || idStr;
+    const certNum  = certsDrawn + 1;
+    const certLink = CERT_LINKS[certsDrawn] || null;
+    getCertWinnersSheet().appendRow([name, idStr, new Date(), entriesAtWin || 0, certNum, certLink]);
 
-    return getCertDrawPool();
+    const poolData   = getCertDrawPool();
+    poolData.certLink   = certLink;
+    poolData.certNumber = certNum;
+    return poolData;
 
   } catch (err) {
     Logger.log('recordCertWinner error: ' + err.message);
