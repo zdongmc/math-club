@@ -26,6 +26,7 @@
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             padding: 40px;
+            animation: fadeIn 0.5s ease;
         }
 
         .header {
@@ -44,38 +45,6 @@
             color: #666;
         }
 
-        .leaderboard-range {
-            text-align: center;
-            font-size: 1.3rem;
-            color: #666;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f9fafb;
-            border-radius: 10px;
-            border: 2px solid #e5e7eb;
-        }
-
-        .leaderboard-range strong {
-            color: #dc2626;
-            font-size: 1.5rem;
-        }
-
-        .leaderboard-content {
-            background: #f9fafb;
-            border-radius: 15px;
-            border: 1px solid #e5e7eb;
-            margin-bottom: 30px;
-            max-height: 600px;
-            overflow-y: auto;
-        }
-
-        .loading-message {
-            text-align: center;
-            padding: 60px 40px;
-            color: #666;
-            font-size: 1.2rem;
-        }
-
         .leaderboard-table {
             width: 100%;
             border-collapse: collapse;
@@ -84,7 +53,7 @@
         .leaderboard-table th {
             background: linear-gradient(135deg, #dc2626, #991b1b);
             color: white;
-            padding: 15px;
+            padding: 12px 15px;
             text-align: left;
             font-weight: bold;
             position: sticky;
@@ -93,11 +62,11 @@
         }
 
         .leaderboard-table td {
-            padding: 12px 15px;
+            padding: 10px 15px;
             border-bottom: 1px solid #e5e7eb;
         }
 
-        .leaderboard-table tr:hover {
+        .leaderboard-table tr:hover td {
             background: #f3f4f6;
         }
 
@@ -121,17 +90,9 @@
             font-weight: bold;
         }
 
-        .rank-badge.gold {
-            color: #ffd700;
-        }
-
-        .rank-badge.silver {
-            color: #c0c0c0;
-        }
-
-        .rank-badge.bronze {
-            color: #cd7f32;
-        }
+        .rank-badge.gold   { color: #ffd700; }
+        .rank-badge.silver { color: #c0c0c0; }
+        .rank-badge.bronze { color: #cd7f32; }
 
         .btn {
             background: linear-gradient(135deg, #dc2626, #991b1b);
@@ -153,118 +114,14 @@
             box-shadow: 0 5px 15px rgba(220, 38, 38, 0.4);
         }
 
-        .btn:active {
-            transform: translateY(0);
-        }
-
         .actions {
             text-align: center;
             margin-top: 20px;
         }
 
-        .refresh-note {
-            text-align: center;
-            color: #666;
-            font-size: 0.9rem;
-            margin-top: 15px;
-            font-style: italic;
-        }
-
-        /* Range Selector */
-        .range-selector {
-            background: #f9fafb;
-            border-radius: 15px;
-            border: 2px solid #e5e7eb;
-            padding: 25px;
-            margin-bottom: 30px;
-        }
-
-        .range-selector h3 {
-            color: #dc2626;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 1.3rem;
-        }
-
-        .range-inputs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .input-group label {
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #333;
-        }
-
-        .input-group input {
-            padding: 10px 15px;
-            border: 2px solid #e5e7eb;
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: #dc2626;
-            box-shadow: 0 0 5px rgba(220, 38, 38, 0.3);
-        }
-
-        .quick-ranges {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .quick-range-btn {
-            background: white;
-            border: 2px solid #e5e7eb;
-            padding: 10px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: bold;
-            color: #666;
-        }
-
-        .quick-range-btn:hover {
-            border-color: #dc2626;
-            color: #dc2626;
-            transform: translateY(-2px);
-        }
-
-        .load-btn-container {
-            text-align: center;
-        }
-
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .container {
-            animation: fadeIn 0.5s ease;
-        }
-
-        @media (max-width: 600px) {
-            .range-inputs {
-                grid-template-columns: 1fr;
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         /* Drawing Standings */
@@ -341,6 +198,44 @@
             padding: 20px;
             font-style: italic;
         }
+
+        /* Per-range leaderboard sections */
+        .range-section {
+            margin-bottom: 28px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .range-section-title {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            color: white;
+            padding: 12px 18px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .range-section-body {
+            background: #f9fafb;
+            overflow-x: auto;
+        }
+        .range-section-empty {
+            padding: 20px;
+            text-align: center;
+            color: #9ca3af;
+            font-style: italic;
+        }
+        .all-ranges-header {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #dc2626;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+        .loading-message {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.1rem;
+        }
     </style>
 </head>
 <body>
@@ -353,46 +248,15 @@
         <!-- Drawing Standings -->
         <div class="drawing-section">
             <h3>🏆 Summer Certificate Drawing Standings</h3>
-            <p class="drawing-subtitle">The #1 holder for each range earns a raffle entry. Top 9 eligible students win a Noetic Summer Certificate!</p>
+            <p class="drawing-subtitle">The #1 holder for each range earns a raffle entry. 9 winners will be drawn by raffle!</p>
             <div id="drawingContent"><div class="drawing-loading">Loading standings…</div></div>
-            <div class="drawing-refresh"><button onclick="loadDrawingStandings()">↻ Refresh</button></div>
+            <div class="drawing-refresh"><button onclick="loadAll()">↻ Refresh</button></div>
         </div>
 
-        <div class="range-selector">
-            <h3>Select Number Range</h3>
-
-            <div class="range-inputs">
-                <div class="input-group">
-                    <label for="minNumber">Minimum Number:</label>
-                    <input type="number" id="minNumber" value="1" min="1">
-                </div>
-                <div class="input-group">
-                    <label for="maxNumber">Maximum Number:</label>
-                    <input type="number" id="maxNumber" value="20" min="2">
-                </div>
-            </div>
-
-            <div class="quick-ranges">
-                <button class="quick-range-btn" onclick="setRange(1, 20)">1-20</button>
-                <button class="quick-range-btn" onclick="setRange(1, 50)">1-50</button>
-                <button class="quick-range-btn" onclick="setRange(1, 100)">1-100</button>
-                <button class="quick-range-btn" onclick="setRange(1, 200)">1-200</button>
-                <button class="quick-range-btn" onclick="setRange(50, 150)">50-150</button>
-                <button class="quick-range-btn" onclick="setRange(100, 300)">100-300</button>
-            </div>
-
-            <div class="load-btn-container">
-                <button class="btn" onclick="updateLeaderboard()">Load Leaderboard</button>
-            </div>
-        </div>
-
-        <div class="leaderboard-range" id="leaderboardRange">
-            Range: <strong id="currentRange">Loading...</strong><br>
-            <span id="totalQuestionsDisplay" style="font-size: 1rem; color: #999;"></span>
-        </div>
-
-        <div id="leaderboardContent" class="leaderboard-content">
-            <div class="loading-message">Loading leaderboard...</div>
+        <!-- All Range Leaderboards -->
+        <div class="all-ranges-header">📊 Leaderboards by Range</div>
+        <div id="allRangesContent">
+            <div class="loading-message">Loading leaderboards…</div>
         </div>
 
         <div class="actions">
@@ -401,13 +265,18 @@
     </div>
 
     <script>
-        // Google Apps Script deployment URL for leaderboard
         const LEADERBOARD_API_URL = 'https://script.google.com/macros/s/AKfycbwddZFUQ7G0s4NrXfvbUQcSR2wTAPQ3_q0YQthV6Hok5gOQztPt14nMeXMwAcCEkguV/exec';
-
-        // MCPS ID of viewer (if they came from the game logged in)
         const myMcpsId = new URLSearchParams(window.location.search).get('mcpsId') || '';
 
-        // Load and display the drawing standings
+        const PRESET_RANGES = [
+            [1, 20], [1, 50], [1, 100], [1, 200], [50, 150], [100, 300]
+        ];
+
+        async function loadAll() {
+            loadDrawingStandings();
+            loadAllRanges();
+        }
+
         async function loadDrawingStandings() {
             const div = document.getElementById('drawingContent');
             div.innerHTML = '<div class="drawing-loading">Loading standings…</div>';
@@ -429,9 +298,8 @@
                     const leaderName = r.leader ? escapeHtml(r.leader.name) : '—';
                     const accuracy = r.leader ? `${r.leader.accuracy}%` : '—';
                     const time = r.leader ? escapeHtml(r.leader.timeDisplay) : '—';
-                    const minQ = r.minQuestions;
                     rows += `<tr${isMe ? ' class="my-row"' : ''}>
-                        <td>${escapeHtml(r.label)} <span style="font-size:0.8em;color:#999">(min ${minQ}q)</span></td>
+                        <td>${escapeHtml(r.label)} <span style="font-size:0.8em;color:#999">(min ${r.minQuestions}q)</span></td>
                         <td>${leaderName}</td>
                         <td>${accuracy}</td>
                         <td>${time}</td>
@@ -450,178 +318,71 @@
             }
         }
 
-        // Get range from URL parameters
-        function getUrlParams() {
-            const params = new URLSearchParams(window.location.search);
-            const min = parseInt(params.get('min')) || 1;
-            const max = parseInt(params.get('max')) || 20;
-            const total = params.get('total') ? parseInt(params.get('total')) : (max - min + 1);
-            return { min, max, total };
-        }
-
-        // Initialize input fields from URL params
-        function initializeInputs() {
-            const { min, max } = getUrlParams();
-            document.getElementById('minNumber').value = min;
-            document.getElementById('maxNumber').value = max;
-        }
-
-        // Set range from quick preset
-        function setRange(min, max) {
-            document.getElementById('minNumber').value = min;
-            document.getElementById('maxNumber').value = max;
-        }
-
-        // Update leaderboard with new range
-        function updateLeaderboard() {
-            const min = parseInt(document.getElementById('minNumber').value);
-            const max = parseInt(document.getElementById('maxNumber').value);
-
-            if (min < 1 || max < 2 || min >= max) {
-                alert('Please enter a valid range. Minimum must be at least 1, maximum must be at least 2, and minimum must be less than maximum.');
-                return;
-            }
-
-            // Default to all numbers in range if not specified
-            const total = max - min + 1;
-
-            // Update URL without reloading page
-            const newUrl = `${window.location.pathname}?min=${min}&max=${max}&total=${total}`;
-            window.history.pushState({}, '', newUrl);
-
-            // Load new leaderboard data
-            loadLeaderboard(min, max, total);
-        }
-
-        // Load and display leaderboard
-        async function loadLeaderboard(min, max, total) {
-            const contentDiv = document.getElementById('leaderboardContent');
-            const rangeSpan = document.getElementById('currentRange');
-            const totalDisplay = document.getElementById('totalQuestionsDisplay');
-
-            rangeSpan.textContent = `${min}-${max}`;
-            totalDisplay.textContent = `(${total} questions)`;
-            contentDiv.innerHTML = '<div class="loading-message">Loading leaderboard...</div>';
-
-            // Check if API URL is configured
-            if (!LEADERBOARD_API_URL || LEADERBOARD_API_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
-                contentDiv.innerHTML = '<div class="loading-message">Leaderboard not configured. Please contact the administrator.</div>';
-                return;
-            }
-
+        async function loadAllRanges() {
+            const div = document.getElementById('allRangesContent');
+            div.innerHTML = '<div class="loading-message">Loading leaderboards…</div>';
             try {
-                const url = `${LEADERBOARD_API_URL}?action=getLeaderboard&min=${min}&max=${max}&total=${total}&limit=50`;
-                console.log('Fetching leaderboard from:', url);
+                const fetches = PRESET_RANGES.map(([min, max]) =>
+                    fetch(`${LEADERBOARD_API_URL}?action=getLeaderboard&min=${min}&max=${max}&total=${max - min + 1}&limit=50`)
+                        .then(r => r.json())
+                        .then(data => ({ min, max, data }))
+                        .catch(() => ({ min, max, data: { success: false } }))
+                );
+                const results = await Promise.all(fetches);
 
-                const response = await fetch(url);
-                console.log('Response status:', response.status);
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                let html = '';
+                for (const { min, max, data } of results) {
+                    const scores = data.success ? (data.scores || []) : [];
+                    if (scores.length === 0) continue;
+                    html += buildRangeSection(min, max, scores);
                 }
 
-                const data = await response.json();
-                console.log('Leaderboard data:', data);
-
-                if (data.success && data.scores && data.scores.length > 0) {
-                    displayLeaderboardTable(data.scores);
-                } else if (data.success) {
-                    contentDiv.innerHTML = '<div class="loading-message">No scores yet for this range and question count.<br><br>Be the first to play!</div>';
-                } else {
-                    contentDiv.innerHTML = `<div class="loading-message">Error: ${data.error || 'Unknown error'}</div>`;
-                }
-
-            } catch (error) {
-                console.error('Error loading leaderboard:', error);
-                contentDiv.innerHTML = `<div class="loading-message">Error loading leaderboard: ${error.message}<br><br>Please check the browser console for details.</div>`;
+                div.innerHTML = html || '<div class="loading-message">No scores found yet — be the first to play!</div>';
+            } catch (e) {
+                div.innerHTML = `<div class="loading-message">Could not load leaderboards: ${e.message}</div>`;
             }
         }
 
-        // Display leaderboard table
-        function displayLeaderboardTable(scores) {
-            const contentDiv = document.getElementById('leaderboardContent');
-
-            let tableHTML = `
-                <table class="leaderboard-table">
-                    <thead>
-                        <tr>
-                            <th>Rank</th>
-                            <th>Player</th>
-                            <th>Accuracy</th>
-                            <th>Time</th>
-                            <th>Correct</th>
-                            <th>Incorrect</th>
-                            <th title="Score counts for the Noetic Summer Certificate Drawing">🎰 Drawing</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            scores.forEach((score, index) => {
-                const rank = index + 1;
-                let rankClass = '';
-                let rankDisplay = rank;
-
-                if (rank === 1) {
-                    rankClass = 'gold';
-                    rankDisplay = '🥇 ' + rank;
-                } else if (rank === 2) {
-                    rankClass = 'silver';
-                    rankDisplay = '🥈 ' + rank;
-                } else if (rank === 3) {
-                    rankClass = 'bronze';
-                    rankDisplay = '🥉 ' + rank;
-                }
-
-                const drawingCell = score.countsForDrawing
-                    ? '<span style="color:#16a34a;font-weight:bold;" title="Counts for the drawing">✓</span>'
-                    : '<span style="color:#9ca3af;" title="Play with your MCPS ID to count">—</span>';
-
-                tableHTML += `
-                    <tr>
-                        <td><span class="rank-badge ${rankClass}">${rankDisplay}</span></td>
-                        <td>${escapeHtml(score.playerName)}</td>
-                        <td>${score.accuracy}%</td>
-                        <td>${score.timeDisplay}</td>
-                        <td>${score.correct}</td>
-                        <td>${score.incorrect}</td>
-                        <td style="text-align:center;">${drawingCell}</td>
-                    </tr>
-                `;
+        function buildRangeSection(min, max, scores) {
+            let rows = '';
+            scores.forEach((score, i) => {
+                const rank = i + 1;
+                let rankClass = '', rankDisplay = rank;
+                if (rank === 1) { rankClass = 'gold';   rankDisplay = '🥇 1'; }
+                else if (rank === 2) { rankClass = 'silver'; rankDisplay = '🥈 2'; }
+                else if (rank === 3) { rankClass = 'bronze'; rankDisplay = '🥉 3'; }
+                const isMe = myMcpsId && score.mcpsId === myMcpsId;
+                rows += `<tr${isMe ? ' style="background:#ecfdf5;"' : ''}>
+                    <td><span class="rank-badge ${rankClass}">${rankDisplay}</span></td>
+                    <td>${escapeHtml(score.playerName)}${isMe ? ' <strong style="color:#166534">(You)</strong>' : ''}</td>
+                    <td>${score.accuracy}%</td>
+                    <td>${score.timeDisplay}</td>
+                    <td>${score.correct}</td>
+                    <td>${score.incorrect}</td>
+                </tr>`;
             });
 
-            tableHTML += `
-                    </tbody>
-                </table>
-            `;
-
-            contentDiv.innerHTML = tableHTML;
+            return `<div class="range-section">
+                <div class="range-section-title">Range ${min}–${max}</div>
+                <div class="range-section-body">
+                    <table class="leaderboard-table">
+                        <thead><tr>
+                            <th>Rank</th><th>Player</th><th>Accuracy</th>
+                            <th>Time</th><th>Correct</th><th>Incorrect</th>
+                        </tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+            </div>`;
         }
 
-        // Escape HTML to prevent XSS
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
 
-        // Initialize page on load
-        window.addEventListener('DOMContentLoaded', () => {
-            initializeInputs();
-            const { min, max, total } = getUrlParams();
-            loadLeaderboard(min, max, total);
-            loadDrawingStandings();
-        });
-
-        // Handle Enter key in input fields
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('minNumber').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') updateLeaderboard();
-            });
-            document.getElementById('maxNumber').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') updateLeaderboard();
-            });
-        });
+        window.addEventListener('DOMContentLoaded', loadAll);
     </script>
 </body>
 </html>
