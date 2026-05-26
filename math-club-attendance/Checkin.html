@@ -1115,9 +1115,7 @@
             html += '</div>';
 
             // Summer Certificate Drawing placeholder (filled by separate async call)
-            if (noetic && noetic.signedUp) {
-              html += '<div id="summerDrawingSection"><div style="padding:16px; text-align:center; color:#92400e; font-style:italic;">Loading drawing status…</div></div>';
-            }
+            html += '<div id="summerDrawingSection"><div style="padding:16px; text-align:center; color:#92400e; font-style:italic;">Loading drawing status…</div></div>';
 
             // Purple Comet Math Meet Section
             const purpleComet = result.purpleComet || null;
@@ -1423,8 +1421,8 @@
             document.getElementById('studentResults').innerHTML = html;
             document.getElementById('resultsSection').classList.add('show');
 
-            // Async: load summer drawing status for Noetic-signed-up students
-            if (noetic && noetic.signedUp) {
+            // Async: load summer drawing status for all students
+            {
               const lookupId = student.mcpsId;
               google.script.run
                 .withSuccessHandler(function(ds) { showDrawingStatus(ds, lookupId); })
@@ -1447,7 +1445,7 @@
           const el = document.getElementById('summerDrawingSection');
           if (!el) return;
 
-          if (!ds || !ds.eligible) { el.innerHTML = ''; return; }
+          if (!ds || !ds.eligible) { el.innerHTML = ''; return; } // error only
 
           const ponUrl = 'https://zdongmc.github.io/math-club/prime-or-not.html';
 
@@ -1464,12 +1462,30 @@
             html += '<div style="background:#f3f4f6;border:2px solid #d1d5db;border-radius:10px;padding:18px;text-align:center;">';
             html += '<div style="color:#6b7280;font-weight:bold;">All 9 certificates have been drawn. Great playing this season!</div>';
             html += '</div>';
+          } else if (ds.entries === 0) {
+            // No entries yet (non-Noetic, no range led)
+            html += '<div style="background:#fef3c7;border:2px solid #f59e0b;border-radius:10px;padding:16px;text-align:center;margin-bottom:14px;">';
+            html += '<div style="color:#92400e;font-size:0.95rem;font-weight:bold;margin-bottom:6px;">You have no entries yet — but you can earn one!</div>';
+            html += '<div style="color:#78350f;font-size:0.88rem;">Hold the #1 score on any qualifying Prime or Not range to earn a raffle entry.</div>';
+            html += '</div>';
+            html += '<div style="margin-top:14px;text-align:center;">';
+            html += `<a href="${ponUrl}" target="_blank" `;
+            html += 'style="display:inline-block;background:linear-gradient(135deg,#f59e0b,#d97706);color:#78350f;text-decoration:none;padding:10px 24px;border-radius:20px;font-weight:bold;font-size:0.95rem;">';
+            html += '&#127922; Play Prime or Not to earn entries →</a>';
+            html += '</div>';
+            html += '<div style="color:#78350f;font-size:0.82rem;text-align:center;margin-top:10px;">';
+            html += ds.certsRemaining + ' certificate' + (ds.certsRemaining !== 1 ? 's' : '') + ' remaining | Drawing at each of the last 4 meetings';
+            html += '</div>';
           } else {
             // Entry count banner
             html += '<div style="background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #f59e0b;border-radius:10px;padding:16px;text-align:center;margin-bottom:14px;">';
             html += '<div style="color:#92400e;font-size:0.85rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Your Raffle Entries</div>';
             html += '<div style="color:#78350f;font-size:2.4rem;font-weight:bold;line-height:1;">' + ds.entries + '</div>';
-            html += '<div style="color:#92400e;font-size:0.85rem;margin-top:4px;">1 base + ' + ds.ponEntries + ' range' + (ds.ponEntries !== 1 ? 's' : '') + ' led on Prime or Not</div>';
+            if (ds.baseEntry > 0) {
+              html += '<div style="color:#92400e;font-size:0.85rem;margin-top:4px;">1 Noetic base entry + ' + ds.ponEntries + ' range' + (ds.ponEntries !== 1 ? 's' : '') + ' led on Prime or Not</div>';
+            } else {
+              html += '<div style="color:#92400e;font-size:0.85rem;margin-top:4px;">' + ds.ponEntries + ' range' + (ds.ponEntries !== 1 ? 's' : '') + ' led on Prime or Not</div>';
+            }
             html += '</div>';
 
             // Range standings table (if any)

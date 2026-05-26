@@ -3060,46 +3060,31 @@ function getPONDrawingLeaderboard_() {
 }
 
 /**
- * Check whether a student is eligible for the drawing and compute their entries.
- *
- * Eligibility: Noetic sign-up + current grade <= 7 (grade 8 ages out of the summer program).
- * Base entry:  1 (just for being an eligible Noetic 6th/7th grader).
- * PON entries: 1 per range where this student currently holds the #1 spot.
- *
- * Returns:
- * {
- *   eligible, alreadyWon, certsRemaining,
- *   entries, baseEntry:1, ponEntries,
- *   rangeStatus: [{label, minQuestions, rank, leader, leaderName, accuracy, timeDisplay}],
- *   name
- * }
+ * Return a student's drawing status. All students are eligible (anyone can win).
+ * Base entry: 1 for Noetic participants, 0 for everyone else.
+ * PON entries: 1 per range where this student currently holds the #1 spot (no eligibility filter).
  */
 function getDrawingStatus(mcpsId) {
   try {
     const idStr = (mcpsId || '').toString().trim();
     if (!idStr) return { eligible: false };
 
-    // --- Noetic eligibility ---
+    // --- Noetic check (for base entry only) ---
     const noeticSheet = getNoeticSheet();
-    if (!noeticSheet || noeticSheet.getLastRow() <= 1) return { eligible: false };
+    let noeticSignedUp = false;
+    let name = null;
 
-    const noeticData = noeticSheet.getDataRange().getValues();
-    let signedUp = false;
-    let grade    = null;
-    let name     = null;
-
-    for (let i = 1; i < noeticData.length; i++) {
-      const row = noeticData[i];
-      if ((row[1] || '').toString().trim() === idStr) {
-        signedUp = true;
-        grade    = parseInt(row[2]) || null;
-        name     = (row[0] || '').toString().trim() || null;
-        break;
+    if (noeticSheet && noeticSheet.getLastRow() > 1) {
+      const noeticData = noeticSheet.getDataRange().getValues();
+      for (let i = 1; i < noeticData.length; i++) {
+        const row   = noeticData[i];
+        const rowId = (row[1] || '').toString().trim();
+        if (rowId === idStr) {
+          noeticSignedUp = true;
+          name = (row[0] || '').toString().trim() || null;
+          break;
+        }
       }
-    }
-
-    if (!signedUp || grade === null || grade > 7) {
-      return { eligible: false };
     }
 
     // --- Already won? ---
@@ -3107,35 +3092,37 @@ function getDrawingStatus(mcpsId) {
     const winnersData   = winnersSheet.getLastRow() > 1
       ? winnersSheet.getDataRange().getValues().slice(1)
       : [];
-    const alreadyWon    = winnersData.some(r => (r[1] || '').toString().trim() === idStr);
-    const certsDrawn    = winnersData.length;
+    const alreadyWon     = winnersData.some(r => (r[1] || '').toString().trim() === idStr);
+    const certsDrawn     = winnersData.length;
     const certsRemaining = Math.max(0, CERT_TOTAL - certsDrawn);
 
-    // --- PON leaderboard ---
+    // --- PON leaderboard (no eligibility filter — all score holders compete) ---
     const ponRanges = getPONDrawingLeaderboard_();
 
+    const baseEntry = noeticSignedUp ? 1 : 0;
     let ponEntries  = 0;
     const rangeStatus = ponRanges.map(r => {
       const isLeader = r.leader && r.leader.mcpsId === idStr;
       if (isLeader) ponEntries++;
       return {
-        label:       r.label,
+        label:        r.label,
         minQuestions: r.minQuestions,
-        leader:      isLeader,
-        leaderName:  r.leader ? r.leader.name : null,
-        accuracy:    r.leader ? r.leader.accuracy : null,
-        timeDisplay: r.leader ? r.leader.timeDisplay : null
+        leader:       isLeader,
+        leaderName:   r.leader ? r.leader.name : null,
+        accuracy:     r.leader ? r.leader.accuracy : null,
+        timeDisplay:  r.leader ? r.leader.timeDisplay : null
       };
     });
 
     return {
-      eligible:        true,
-      name:            name || findStudentNameByMcpsId(idStr),
+      eligible:         true,
+      name:             name || findStudentNameByMcpsId(idStr),
       alreadyWon,
       certsRemaining,
-      entries:         1 + ponEntries,
-      baseEntry:       1,
+      entries:          baseEntry + ponEntries,
+      baseEntry,
       ponEntries,
+      noeticParticipant: noeticSignedUp,
       rangeStatus
     };
 
@@ -3146,14 +3133,10 @@ function getDrawingStatus(mcpsId) {
 }
 
 /**
- * Return the full draw pool: all eligible students (Noetic + grade ≤7 + not yet won)
- * with their current entry counts. Used by CertDraw.html.
- *
- * Returns:
- * {
- *   success, certsRemaining, certsDrawn, winners:[{name,mcpsId,wonAt}],
- *   pool:[{name, mcpsId, entries, rangesLed:[label,...]}]
- * }
+ * Return the full draw pool. Anyone can win:
+ * - Noetic participants: 1 base entry + 1 per PON range led (no grade filter)
+ * - Non-Noetic students: 1 entry per PON range led (no base entry)
+ * Prior winners are excluded. Returns students with ≥1 entry.
  */
 function getCertDrawPool() {
   try {
@@ -3172,24 +3155,7 @@ function getCertDrawPool() {
       wonAt: r[2] ? new Date(r[2]).toLocaleString() : ''
     }));
 
-    // --- Eligible Noetic students (grade ≤7, not already won) ---
-    const noeticSheet = getNoeticSheet();
-    if (!noeticSheet || noeticSheet.getLastRow() <= 1) {
-      return { success: true, certsRemaining, certsDrawn, winners, pool: [] };
-    }
-
-    const noeticData = noeticSheet.getDataRange().getValues().slice(1);
-    const eligible   = [];
-    for (const row of noeticData) {
-      const mcpsId = (row[1] || '').toString().trim();
-      if (!mcpsId) continue;
-      const grade = parseInt(row[2]) || null;
-      if (!grade || grade > 7) continue;
-      if (wonIds.has(mcpsId)) continue;
-      eligible.push({ name: (row[0] || '').toString().trim(), mcpsId });
-    }
-
-    // --- PON leaderboard ---
+    // --- PON leaderboard (no eligibility filter — all MCPS ID holders compete) ---
     const ponRanges  = getPONDrawingLeaderboard_();
     const rangeLeads = {}; // mcpsId -> [label, ...]
     for (const r of ponRanges) {
@@ -3200,13 +3166,36 @@ function getCertDrawPool() {
       }
     }
 
-    const pool = eligible
-      .map(s => ({
+    // --- Noetic participants (any grade, not already won) — base entry = 1 ---
+    const noeticSheet = getNoeticSheet();
+    const noeticIds   = new Set();
+    const studentMap  = {}; // mcpsId -> { name, baseEntry }
+
+    if (noeticSheet && noeticSheet.getLastRow() > 1) {
+      const noeticData = noeticSheet.getDataRange().getValues().slice(1);
+      for (const row of noeticData) {
+        const mcpsId = (row[1] || '').toString().trim();
+        if (!mcpsId || wonIds.has(mcpsId)) continue;
+        noeticIds.add(mcpsId);
+        studentMap[mcpsId] = { name: (row[0] || '').toString().trim(), baseEntry: 1 };
+      }
+    }
+
+    // --- Non-Noetic PON range leaders — base entry = 0 ---
+    for (const mcpsId of Object.keys(rangeLeads)) {
+      if (noeticIds.has(mcpsId) || wonIds.has(mcpsId)) continue;
+      const name = findStudentNameByMcpsId(mcpsId) || mcpsId;
+      studentMap[mcpsId] = { name, baseEntry: 0 };
+    }
+
+    const pool = Object.entries(studentMap)
+      .map(([mcpsId, s]) => ({
         name:      s.name,
-        mcpsId:    s.mcpsId,
-        rangesLed: rangeLeads[s.mcpsId] || [],
-        entries:   1 + (rangeLeads[s.mcpsId] ? rangeLeads[s.mcpsId].length : 0)
+        mcpsId,
+        rangesLed: rangeLeads[mcpsId] || [],
+        entries:   s.baseEntry + (rangeLeads[mcpsId] ? rangeLeads[mcpsId].length : 0)
       }))
+      .filter(s => s.entries > 0)
       .sort((a, b) => b.entries - a.entries || a.name.localeCompare(b.name));
 
     return { success: true, certsRemaining, certsDrawn, winners, pool };
