@@ -65,11 +65,11 @@ Student self-serve check-in used at the start of each club meeting. Teacher open
 - `checkInStudent(mcpsId)` — records attendance for today; sets checkbox to `TRUE`, stores check-in time in cell note; returns `{success, name, totalCount, alreadyCheckedIn}`
 
 **Noetic Summer Certificate Drawing:**
-- `getDrawingStatus(mcpsId)` — returns entry count for any student; `baseEntry` is 1 for Noetic participants, 0 otherwise; `ponEntries` = number of PON ranges where this student currently holds #1; `eligible: true` for all valid IDs
-- `getCertDrawPool()` — full draw pool for teacher interface: Noetic participants (base=1, any grade) + non-Noetic students who lead a PON range (base=0); excludes prior winners; returns `{success, certsRemaining, certsDrawn, winners, pool}`
-- `recordCertWinner(mcpsId, entriesAtWin)` — appends to "Cert Winners 2026" sheet; returns updated pool state
+- `getDrawingStatus(mcpsId)` — returns `{eligible, alreadyWon, certLink, certsRemaining, entries, baseEntry, ponEntries, noeticParticipant, rangeStatus}`; `baseEntry` is 1 for Noetic participants, 0 otherwise; `certLink` is the Google Drive PDF link if this student has already won
+- `getCertDrawPool()` — full draw pool: Noetic participants (base=1, any grade) + non-Noetic PON leaders (base=0); excludes prior winners; returns `{success, certsRemaining, certsDrawn, winners, pool}`; each winner includes `certLink`
+- `recordCertWinner(mcpsId, entriesAtWin)` — appends to "Cert Winners 2026" sheet with cert number (col E) and Drive link (col F); returns updated pool state plus `certLink` and `certNumber`
 - `getCertWinnersSheet()` — get/create "Cert Winners 2026" sheet
-- `getPONDrawingLeaderboard_()` — internal; opens PON sheet via `SpreadsheetApp.openById(PON_SHEET_ID)`; finds #1 per qualifying range (rangeSize ≥ 20, totalQuestions ≥ Math.min(rangeSize, 50)); no eligibility filter — all MCPS ID holders compete
+- `getPONDrawingLeaderboard_()` — internal; opens PON sheet via `SpreadsheetApp.openById(PON_SHEET_ID)`; finds #1 per qualifying range (rangeSize ≥ 20, totalQuestions ≥ 20); no eligibility filter — all MCPS ID holders compete
 - `lookupStudentForPON` GET action — `?action=lookupStudentForPON&id=<mcpsId>` returns `{success, name}` or `{success:false, error:'not_found'}`; called by the Prime or Not game frontend for MCPS ID login
 
 **Carderock:**
@@ -133,7 +133,7 @@ MCPS ID lookup form (variable-length numeric IDs, validated with `/^\d+$/`).
 - Noetic participants: gold entry-count banner showing `baseEntry (1) + ponEntries`; per-range standings table (⭐ = ranges where they currently lead); link to Prime or Not game
 - Non-Noetic with entries: same banner but `baseEntry = 0`; entry count = ranges led only
 - Non-Noetic with 0 entries: amber "no entries yet" message + play button
-- Already won: green trophy banner
+- Already won: green trophy banner + green "📄 View Your Certificate" button linking to their Google Drive PDF (from `certLink`)
 - All certs drawn: gray "all certificates drawn" message
 
 **Carderock** (deadline April 13, 2026; 8 spots max):
@@ -149,7 +149,9 @@ Served at `[production URL]?certdraw=1`. Teacher-only projected drawing screen (
 
 **Top bar:** certificates remaining pill + eligible student count + total entry count.
 
-**Slot machine card:** "Draw a Winner" button → fetches live pool from `getCertDrawPool()` → builds weighted array (each student appears once per entry) → slot-machine animation (names cycle fast → decelerate → land on winner) → "Confirm Winner" button → calls `recordCertWinner()`.
+**Spinning wheel:** "Spin the Wheel" button → fetches live pool from `getCertDrawPool()` → pre-picks winner (weighted random, proportional to entries) → canvas wheel spins ≥ 2 full rotations with tick sounds (pitch rises/falls with speed) → decelerates and lands on winner → ascending fanfare plays → winner banner pops in → "Confirm Winner" button → calls `recordCertWinner()` → status bar shows cert number + clickable Drive link.
+
+**Wheel rendering:** each student's slice is proportional to their entry count; color-coded dots in pool table match slice colors; first name displayed on each slice; labels clipped to their wedge.
 
 **Entry pool table:** Student | Entries | Ranges Leading — sorted by entries desc.
 
@@ -212,8 +214,8 @@ Lookup is by student name, case-insensitive.
 No header row in sheet — code starts at row 1. Sign-up blocked if totalSignUps >= 8 or after April 13, 2026.
 
 ### Cert Winners 2026
-`A=Name, B=MCPS ID, C=Win Timestamp, D=Entries At Win`  
-Created automatically by `getCertWinnersSheet()` on first use. Max 9 rows (CERT_TOTAL). Winners are excluded from `getCertDrawPool()`.
+`A=Name, B=MCPS ID, C=Win Timestamp, D=Entries At Win, E=Cert #, F=Cert Link`  
+Created automatically by `getCertWinnersSheet()` on first use. Max 9 rows (CERT_TOTAL). Winners are excluded from `getCertDrawPool()`. Cert links are Google Drive PDF URLs; cert number = draw order (1 = first winner). To undo a winner, delete the row manually.
 
 ### Prime or Not (external sheet, read-only from portal)
 Sheet ID: `19P1KPhQXMMsYEgx8dpmhZQynegf5iygu4nqLMNXU4ss`  

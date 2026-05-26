@@ -155,16 +155,17 @@ Script ID: `1we0rmj2d9JFEhogb0b1Ag82MMarJCKkdfVG92cmVe3GTv8HkORT6Lme_`
 
 **MCPS ID login:** Optional. On submit, calls the parent portal `?action=lookupStudentForPON&id=...` endpoint to validate and auto-fill the player name. "Play as Guest" skips login; guest scores still submit to the leaderboard but don't count for the drawing. MCPS ID is stored in `gameState.mcpsId` and passed to `submitScore()`.
 
-**Quick range presets:** 1-20, 1-50, 1-100, 1-200, 50-150, 100-300
+**Quick range presets:** 1-20, 21-40, 41-60, 61-80, 81-100 (non-overlapping decades)  
+**Default question count:** 20 (pre-filled, editable). Custom ranges count for the drawing — play any range with 20+ questions.
 
 **Leaderboard:** Top 50 scores filtered by range + question count. Sorted by accuracy desc, then time asc.  
-**Drawing Standings section** (top of leaderboard page): live per-range leaders for the Noetic Summer Certificate Drawing. Highlights the viewer's rows when `?mcpsId=` URL param is present. Shows entry count for eligible students.
+**Drawing Standings section** (top of leaderboard page): live per-range leaders for the Noetic Summer Certificate Drawing. Highlights the viewer's rows when `?mcpsId=` URL param is present. Shows entry count for eligible students. Leaderboard table shows a 🎰 Drawing column (✓ = has MCPS ID, counts for drawing).
 
 **Backend (`prime-leaderboard/Code.js`):**
 - `submitScore(data)` — stores score with millisecond precision; `data.mcpsId` (nullable) written to col K
-- `getLeaderboard()` — sorted scores
+- `getLeaderboard()` — sorted scores; each row includes `countsForDrawing` (bool, col K non-empty)
 - `getAvailableRanges()` — unique ranges with scores
-- `getDrawingLeaderboard()` — per-range #1 leaders among rows with non-empty col K; rangeSize ≥ 20, totalQuestions ≥ Math.min(rangeSize, 50)
+- `getDrawingLeaderboard()` — per-range #1 leaders among rows with non-empty col K; rangeSize ≥ 20, totalQuestions ≥ 20
 - `lookupStudentForPON(mcpsId)` — validates MCPS ID against parent portal sheet; returns `{success, name}`
 
 **Google Sheet:** https://docs.google.com/spreadsheets/d/19P1KPhQXMMsYEgx8dpmhZQynegf5iygu4nqLMNXU4ss  
