@@ -158,13 +158,18 @@ Script ID: `1we0rmj2d9JFEhogb0b1Ag82MMarJCKkdfVG92cmVe3GTv8HkORT6Lme_`
 **Quick range presets:** 1-20, 21-40, 41-60, 61-80, 81-100 (non-overlapping decades)  
 **Default question count:** 20 (pre-filled, editable). Custom ranges count for the drawing — play any range with 20+ questions.
 
-**Leaderboard:** Top 50 scores filtered by range + question count. Sorted by accuracy desc, then time asc.  
-**Drawing Standings section** (top of leaderboard page): live per-range leaders for the Noetic Summer Certificate Drawing. Highlights the viewer's rows when `?mcpsId=` URL param is present. Shows entry count for eligible students. Leaderboard table shows a 🎰 Drawing column (✓ = has MCPS ID, counts for drawing).
+**URL params accepted by the game:** `?min=` and `?max=` pre-fill range settings on the settings screen. `?mcpsId=` pre-fills student ID. "View Leaderboard" from settings/results links to the leaderboard with `?mcpsId=` only (no range params).
+
+**Leaderboard page (`prime-or-not-leaderboard.html`) — two sections:**
+- **Drawing Standings** (top): one row per qualifying range showing current #1 leader, accuracy, time, and a ▶ Play button that opens the game pre-filled with that range. Viewer's rows highlighted when `?mcpsId=` present; entry count shown.
+- **Leaderboards by Range** (bottom): pill tabs, one per range with any recorded scores (from `getRanges` API). Clicking a tab loads all players for that range sorted accuracy desc, time asc (no question-count filter). **Play Game** button at bottom pre-fills the selected tab's range.
+
+**Ranking:** accuracy primary, time tiebreaker only.
 
 **Backend (`prime-leaderboard/Code.js`):**
 - `submitScore(data)` — stores score with millisecond precision; `data.mcpsId` (nullable) written to col K
-- `getLeaderboard()` — sorted scores; each row includes `countsForDrawing` (bool, col K non-empty)
-- `getAvailableRanges()` — unique ranges with scores
+- `getLeaderboard(min, max)` — all scores for a range; omit `total` to include all session lengths; sorted accuracy desc, time asc
+- `getRanges` (action) — all unique `{min, max, label}` pairs that have any scores
 - `getDrawingLeaderboard()` — per-range #1 leaders among rows with non-empty col K; rangeSize ≥ 20, totalQuestions ≥ 20
 - `lookupStudentForPON(mcpsId)` — validates MCPS ID against parent portal sheet; returns `{success, name}`
 

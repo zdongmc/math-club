@@ -65,7 +65,7 @@ Student self-serve check-in used at the start of each club meeting. Teacher open
 - `checkInStudent(mcpsId)` — records attendance for today; sets checkbox to `TRUE`, stores check-in time in cell note; returns `{success, name, totalCount, alreadyCheckedIn}`
 
 **Noetic Summer Certificate Drawing:**
-- `getDrawingStatus(mcpsId)` — returns `{eligible, alreadyWon, certLink, certsRemaining, entries, baseEntry, ponEntries, noeticParticipant, rangeStatus}`; `baseEntry` is 1 for Noetic participants, 0 otherwise; `certLink` is the Google Drive PDF link if this student has already won
+- `getDrawingStatus(mcpsId)` — returns `{eligible, alreadyWon, certLink, certsRemaining, entries, baseEntry, ponEntries, noeticParticipant, rangeStatus}`; `baseEntry` is 1 for Noetic participants, 0 otherwise; `certLink` is the Google Drive PDF link if this student has already won. Falls back to `CERT_LINKS[position]` when col F is missing (handles winners recorded before the cert link column was added)
 - `getCertDrawPool()` — full draw pool: Noetic participants (base=1, any grade) + non-Noetic PON leaders (base=0); excludes prior winners; returns `{success, certsRemaining, certsDrawn, winners, pool}`; each winner includes `certLink`
 - `recordCertWinner(mcpsId, entriesAtWin)` — appends to "Cert Winners 2026" sheet with cert number (col E) and Drive link (col F); returns updated pool state plus `certLink` and `certNumber`
 - `getCertWinnersSheet()` — get/create "Cert Winners 2026" sheet
