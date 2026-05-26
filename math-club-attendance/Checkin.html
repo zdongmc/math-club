@@ -1024,8 +1024,8 @@
                 if (mathKangaroo.mkId) {
                     html += '<div style="color: #065f46; font-size: 0.95rem; margin-bottom: 12px; text-align: center;">Math Kangaroo ID: <strong>' + escapeHtml(mathKangaroo.mkId) + '</strong></div>';
                 }
-                html += '<div style="background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px; margin-bottom: 10px; font-size: 0.9rem; color: #1e40af;">&#128197; The <strong>answer key</strong> will be available on <strong>April 20, 2026</strong> at <a href="https://www.mathkangaroo.us" target="_blank" style="color: #1e40af; font-weight: bold;">mathkangaroo.us</a></div>';
-                html += '<div style="background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px; font-size: 0.9rem; color: #1e40af;">&#128197; <strong>Results and rankings</strong> will be available on <strong>May 1, 2026</strong> in your parent account at <a href="https://www.mathkangaroo.us" target="_blank" style="color: #1e40af; font-weight: bold;">mathkangaroo.us</a></div>';
+                html += '<div style="background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px; margin-bottom: 10px; font-size: 0.9rem; color: #1e40af;">&#128196; <a href="https://drive.google.com/file/d/1sMZngPy-xXo0-FBr0yQ_Bm-NJcl-OWI1/view" target="_blank" style="color: #1e40af; font-weight: bold;">View the 2026 Answer Key</a></div>';
+                html += '<div style="background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px; font-size: 0.9rem; color: #1e40af;">&#127942; <strong>Results and rankings</strong> are available in your parent account at <a href="https://www.mathkangaroo.us" target="_blank" style="color: #1e40af; font-weight: bold;">mathkangaroo.us</a></div>';
                 html += '</div>';
                 html += '</div>';
                 html += '</div>';
@@ -1056,6 +1056,21 @@
                 html += '<div style="color: #065f46; font-size: 0.95rem; margin-bottom: 12px; text-align: center;">Score pending — check <a href="https://www.noetic-learning.com/mathcontest/results.jsp" target="_blank" style="color: #047857;">noetic-learning.com</a> for results.</div>';
               }
 
+              // Awards
+              if (noetic.honorableMention || noetic.nationalHonorRoll || noetic.teamWinner) {
+                html += '<div style="margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;">';
+                if (noetic.teamWinner) {
+                  html += '<div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 20px; padding: 6px 14px; color: #92400e; font-weight: bold; font-size: 0.9rem;">🏆 Team Winner</div>';
+                }
+                if (noetic.nationalHonorRoll) {
+                  html += '<div style="background: #ede9fe; border: 2px solid #7c3aed; border-radius: 20px; padding: 6px 14px; color: #4c1d95; font-weight: bold; font-size: 0.9rem;">🌟 National Honor Roll</div>';
+                }
+                if (noetic.honorableMention) {
+                  html += '<div style="background: #d1fae5; border: 2px solid #059669; border-radius: 20px; padding: 6px 14px; color: #065f46; font-weight: bold; font-size: 0.9rem;">🎖️ Honorable Mention</div>';
+                }
+                html += '</div>';
+              }
+
               // Login credentials
               html += '<div style="background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px; margin-bottom: 12px; text-align: left;">';
               html += '<div style="font-weight: bold; color: #1e40af; margin-bottom: 8px; font-size: 0.95rem;">Login Credentials</div>';
@@ -1070,6 +1085,7 @@
                 html += '<div style="color: #6b7280; font-size: 0.9rem; margin-bottom: 10px;">Credentials not yet available.</div>';
               }
               html += '<a href="https://www.noetic-learning.com/mathcontest/student_login.jsp" target="_blank" style="display: inline-block; background: #1e40af; color: white; text-decoration: none; padding: 8px 14px; border-radius: 6px; font-size: 0.9rem; font-weight: bold;">🔑 Student Login Page →</a>';
+              html += '<div style="color: #374151; font-size: 0.85rem; margin-top: 10px;">Your graded test and certificate are available after logging in to the Noetic student portal.</div>';
               html += '</div>';
 
               // Past contest practice
@@ -1097,6 +1113,11 @@
 
             html += '</div>';
             html += '</div>';
+
+            // Summer Certificate Drawing placeholder (filled by separate async call)
+            if (noetic && noetic.signedUp) {
+              html += '<div id="summerDrawingSection"><div style="padding:16px; text-align:center; color:#92400e; font-style:italic;">Loading drawing status…</div></div>';
+            }
 
             // Purple Comet Math Meet Section
             const purpleComet = result.purpleComet || null;
@@ -1401,12 +1422,94 @@
 
             document.getElementById('studentResults').innerHTML = html;
             document.getElementById('resultsSection').classList.add('show');
+
+            // Async: load summer drawing status for Noetic-signed-up students
+            if (noetic && noetic.signedUp) {
+              const lookupId = student.mcpsId;
+              google.script.run
+                .withSuccessHandler(function(ds) { showDrawingStatus(ds, lookupId); })
+                .withFailureHandler(function() {
+                  const el = document.getElementById('summerDrawingSection');
+                  if (el) el.innerHTML = '';
+                })
+                .getDrawingStatus(lookupId);
+            }
+
             } catch (error) {
                 console.error('Error rendering results:', error);
                 console.error('Error stack:', error.stack);
                 showMessage('Error rendering results: ' + error.message, true);
                 document.getElementById('resultsSection').classList.remove('show');
             }
+        }
+
+        function showDrawingStatus(ds, mcpsId) {
+          const el = document.getElementById('summerDrawingSection');
+          if (!el) return;
+
+          if (!ds || !ds.eligible) { el.innerHTML = ''; return; }
+
+          const ponUrl = 'https://zdongmc.github.io/math-club/prime-or-not.html';
+
+          let html = '<h2 class="section-title">&#9728;&#65039; Noetic Summer Certificate Drawing</h2>';
+          html += '<div class="info-card"><div style="padding:15px;">';
+
+          if (ds.alreadyWon) {
+            html += '<div style="background:#d1fae5;border:2px solid #059669;border-radius:10px;padding:18px;text-align:center;">';
+            html += '<div style="font-size:2rem;margin-bottom:6px;">🏆</div>';
+            html += '<div style="color:#047857;font-weight:bold;font-size:1.15rem;">You won a Noetic Summer Certificate!</div>';
+            html += '<div style="color:#065f46;font-size:0.9rem;margin-top:6px;">Congratulations — keep an eye out for details from Prof. Jojo.</div>';
+            html += '</div>';
+          } else if (ds.certsRemaining === 0) {
+            html += '<div style="background:#f3f4f6;border:2px solid #d1d5db;border-radius:10px;padding:18px;text-align:center;">';
+            html += '<div style="color:#6b7280;font-weight:bold;">All 9 certificates have been drawn. Great playing this season!</div>';
+            html += '</div>';
+          } else {
+            // Entry count banner
+            html += '<div style="background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #f59e0b;border-radius:10px;padding:16px;text-align:center;margin-bottom:14px;">';
+            html += '<div style="color:#92400e;font-size:0.85rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Your Raffle Entries</div>';
+            html += '<div style="color:#78350f;font-size:2.4rem;font-weight:bold;line-height:1;">' + ds.entries + '</div>';
+            html += '<div style="color:#92400e;font-size:0.85rem;margin-top:4px;">1 base + ' + ds.ponEntries + ' range' + (ds.ponEntries !== 1 ? 's' : '') + ' led on Prime or Not</div>';
+            html += '</div>';
+
+            // Range standings table (if any)
+            if (ds.rangeStatus && ds.rangeStatus.length > 0) {
+              html += '<div style="font-weight:bold;color:#333;margin-bottom:8px;">Prime or Not Standings (qualifying ranges):</div>';
+              html += '<table style="width:100%;border-collapse:collapse;font-size:0.88rem;">';
+              html += '<thead><tr style="background:#f59e0b;color:#78350f;">';
+              html += '<th style="padding:7px 10px;text-align:left;">Range</th>';
+              html += '<th style="padding:7px 10px;text-align:left;">Leader</th>';
+              html += '<th style="padding:7px 10px;text-align:right;">Accuracy</th>';
+              html += '</tr></thead><tbody>';
+              for (const r of ds.rangeStatus) {
+                const rowBg = r.leader ? '#ecfdf5' : 'white';
+                const leadMark = r.leader ? '⭐ You' : escapeHtml(r.leaderName || '—');
+                const acc = r.accuracy !== null ? r.accuracy + '%' : '—';
+                html += `<tr style="background:${rowBg};border-bottom:1px solid #fde68a;">`;
+                html += `<td style="padding:7px 10px;font-weight:${r.leader?'bold':'normal'};color:${r.leader?'#166534':'#333'};">${escapeHtml(r.label)} <span style="font-size:0.78em;color:#999;">(min ${r.minQuestions}q)</span></td>`;
+                html += `<td style="padding:7px 10px;font-weight:${r.leader?'bold':'normal'};color:${r.leader?'#166534':'#333'};">${leadMark}</td>`;
+                html += `<td style="padding:7px 10px;text-align:right;">${acc}</td>`;
+                html += '</tr>';
+              }
+              html += '</tbody></table>';
+              html += '<div style="color:#666;font-size:0.8rem;margin-top:6px;">★ = ranges where you are the current leader</div>';
+            } else {
+              html += '<div style="color:#92400e;font-size:0.92rem;margin-bottom:10px;">No one has played a qualifying round yet — be the first to set a record!</div>';
+            }
+
+            html += '<div style="margin-top:14px;text-align:center;">';
+            html += `<a href="${ponUrl}" target="_blank" `;
+            html += 'style="display:inline-block;background:linear-gradient(135deg,#f59e0b,#d97706);color:#78350f;text-decoration:none;padding:10px 24px;border-radius:20px;font-weight:bold;font-size:0.95rem;">';
+            html += '&#127922; Play Prime or Not to earn entries →</a>';
+            html += '</div>';
+
+            html += '<div style="color:#78350f;font-size:0.82rem;text-align:center;margin-top:10px;">';
+            html += ds.certsRemaining + ' certificate' + (ds.certsRemaining !== 1 ? 's' : '') + ' remaining | Drawing at each of the last 4 meetings';
+            html += '</div>';
+          }
+
+          html += '</div></div>';
+          el.innerHTML = html;
         }
 
         function parseCompetitionDates(competitionName, details, isWaitlisted, team, moemsData, mathLeagueData) {

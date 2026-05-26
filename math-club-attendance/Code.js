@@ -45,6 +45,31 @@ function doGet(e) {
       .setMimeType(ContentService.MimeType.JSON);
   }
 
+  // Prime or Not student name lookup (called by Prime or Not game frontend)
+  if (e && e.parameter && e.parameter.action === 'lookupStudentForPON') {
+    const mcpsId = (e.parameter.id || '').toString().trim();
+    const name = mcpsId ? findStudentNameByMcpsId(mcpsId) : null;
+    const result = name
+      ? { success: true, name }
+      : { success: false, error: 'not_found' };
+    return ContentService.createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  // Teacher certificate drawing interface
+  if (e && e.parameter && e.parameter.certdraw === '1') {
+    return HtmlService.createHtmlOutputFromFile('CertDraw')
+      .setTitle('Certificate Drawing — Teacher View')
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  }
+
+  // Kiosk check-in page
+  if (e && e.parameter && e.parameter.kiosk === '1') {
+    return HtmlService.createHtmlOutputFromFile('Kiosk')
+      .setTitle('Math Club Check-In')
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  }
+
   // Default: Return HTML page
   return HtmlService.createTemplateFromFile('Checkin')
     .evaluate()
@@ -386,18 +411,9 @@ function getStudentAttendanceCounts() {
 
       if (!studentName) continue;
 
-      let attendanceCount = 0;
-
-      // Check each date column (starting from column 2, skipping Name and ID columns)
-      for (let j = 2; j < row.length && j < headers.length; j++) {
-        const cellValue = row[j];
-        // Count non-empty cells as attendance
-        if (cellValue && cellValue.toString().trim() !== '') {
-          attendanceCount++;
-        }
-      }
-
-      attendanceCounts[studentName] = attendanceCount;
+      // Column C (index 2) now contains the pre-computed total attendance count
+      const total = parseInt(row[2], 10);
+      attendanceCounts[studentName] = isNaN(total) ? 0 : total;
     }
 
     return attendanceCounts;
@@ -1041,7 +1057,7 @@ function getNoeticResults(mcpsId) {
 
     const data = sheet.getDataRange().getValues();
 
-    // Columns: A=Name, B=MCPS ID, C=Grade, D=Timestamp, E=Grade Preference, F=Contest Grade Level, G=Publish Permission, H=Username, I=Password, J=Score, K=PDF Link
+    // Columns: A=Name, B=MCPS ID, C=Grade, D=Timestamp, E=Grade Preference, F=Contest Grade Level, G=Publish Permission, H=Username, I=Password, J=Score, K=Honorable Mention, L=National Honor Roll, M=Team Winner
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
       const studentId = (row[1] || '').toString().trim();
@@ -1054,7 +1070,9 @@ function getNoeticResults(mcpsId) {
         const username = (row[7] || '').toString().trim() || null;
         const password = (row[8] || '').toString().trim() || null;
         const score = row[9] !== undefined && row[9] !== '' ? parseInt(row[9]) : null;
-        const pdfLink = (row[10] || '').toString().trim() || null;
+        const honorableMention = !!row[10];
+        const nationalHonorRoll = !!row[11];
+        const teamWinner = !!row[12];
 
         // Get current sign-up counts for display
         const counts = getNoeticSignUpCounts();
@@ -1068,7 +1086,9 @@ function getNoeticResults(mcpsId) {
           username: username,
           password: password,
           score: score,
-          pdfLink: pdfLink,
+          honorableMention: honorableMention,
+          nationalHonorRoll: nationalHonorRoll,
+          teamWinner: teamWinner,
           maxScore: 20,
           signUpCounts: counts
         };
@@ -2523,6 +2543,9 @@ function lookupStudentByMcpsId(mcpsId) {
       let noeticUsername = null;
       let noeticPassword = null;
       let noeticScore = null;
+      let noeticHonorableMention = false;
+      let noeticNationalHonorRoll = false;
+      let noeticTeamWinner = false;
 
       if (sheet && sheet.getLastRow() > 1) {
         const data = sheet.getDataRange().getValues();
@@ -2538,6 +2561,9 @@ function lookupStudentByMcpsId(mcpsId) {
             noeticUsername = (row[7] || '').toString().trim() || null;
             noeticPassword = (row[8] || '').toString().trim() || null;
             noeticScore = (row[9] !== undefined && row[9] !== '') ? parseInt(row[9]) : null;
+            noeticHonorableMention = !!row[10];
+            noeticNationalHonorRoll = !!row[11];
+            noeticTeamWinner = !!row[12];
             break;
           }
         }
@@ -2551,7 +2577,10 @@ function lookupStudentByMcpsId(mcpsId) {
         publishPermission: publishPermission,
         username: noeticUsername,
         password: noeticPassword,
-        score: noeticScore
+        score: noeticScore,
+        honorableMention: noeticHonorableMention,
+        nationalHonorRoll: noeticNationalHonorRoll,
+        teamWinner: noeticTeamWinner
       };
       Logger.log('Noetic results: signedUp=' + isSignedUp + ', preference=' + gradePreference + ', contestGrade=' + contestGrade);
     } catch (err) {
@@ -2644,8 +2673,11 @@ function getStudentAttendanceHistory(studentName) {
     const studentRow = data[studentRowIndex];
     const attendedDates = [];
 
-    // Check each date column (starting from column 2, skipping Name and ID)
-    for (let j = 2; j < headers.length; j++) {
+    // Column C (index 2) is the pre-computed total; date columns start at D (index 3)
+    const totalFromSheet = parseInt(studentRow[2], 10);
+
+    // Check each date column (starting from column 3, skipping Name, ID, and Total)
+    for (let j = 3; j < headers.length; j++) {
       const cellValue = studentRow[j];
       if (cellValue && cellValue.toString().trim() !== '' && cellValue.toString().trim().toLowerCase() !== 'false') {
         // Handle different cell formats
@@ -2686,7 +2718,7 @@ function getStudentAttendanceHistory(studentName) {
     }
 
     return {
-      totalMeetings: attendedDates.length,
+      totalMeetings: isNaN(totalFromSheet) ? attendedDates.length : totalFromSheet,
       dates: attendedDates
     };
 
@@ -2790,5 +2822,422 @@ function getStudentCompetitionSignups(mcpsId) {
       { name: 'MOEMS', details: '', status: 'Not Signed Up', signedUp: false, waitlisted: false },
       { name: 'AMC 8', details: '', status: 'Not Signed Up', signedUp: false, waitlisted: false }
     ];
+  }
+}
+
+// ── KIOSK CHECK-IN ────────────────────────────────────────────────────────────
+
+// Lightweight lookup — returns student name string or null. Checks sheets in the
+// same priority order as lookupStudentByMcpsId but fetches nothing extra.
+function findStudentNameByMcpsId(idStr) {
+  // 1. Form Responses 1 — email pattern
+  const reg = getRegistrationSheet();
+  if (reg && reg.getLastRow() > 1) {
+    const rows = reg.getDataRange().getValues();
+    for (let i = 1; i < rows.length; i++) {
+      const email = (rows[i][4] || '').toString();
+      const m = email.match(/(\d+)@mcpsmd\.net/);
+      if (m && m[1] === idStr) {
+        const first = (rows[i][1] || '').toString().trim();
+        const last  = (rows[i][2] || '').toString().trim();
+        if (first || last) return (first + ' ' + last).trim();
+      }
+    }
+  }
+  // 2. Attendance Records — col B
+  const att = getAttendanceSheet();
+  if (att && att.getLastRow() > 1) {
+    const rows = att.getDataRange().getValues();
+    for (let i = 1; i < rows.length; i++) {
+      if ((rows[i][1] || '').toString().trim() === idStr) {
+        const name = (rows[i][0] || '').toString().trim();
+        if (name) return name;
+      }
+    }
+  }
+  // 3. School List — col B (ID), cols C/D (last/first name)
+  const school = getSchoolListSheet();
+  if (school && school.getLastRow() > 1) {
+    const rows = school.getDataRange().getValues();
+    for (let i = 1; i < rows.length; i++) {
+      if ((rows[i][1] || '').toString().trim() === idStr) {
+        const last  = (rows[i][2] || '').toString().trim();
+        const first = (rows[i][3] || '').toString().trim();
+        if (first || last) return (first + ' ' + last).trim();
+      }
+    }
+  }
+  // 4. Form Responses 2 — col C (ID), col B (name)
+  const comp = getCompetitionSignupSheet();
+  if (comp && comp.getLastRow() > 1) {
+    const rows = comp.getDataRange().getValues();
+    for (let i = 1; i < rows.length; i++) {
+      if ((rows[i][2] || '').toString().trim() === idStr) {
+        const name = (rows[i][1] || '').toString().trim();
+        if (name) return name;
+      }
+    }
+  }
+  return null;
+}
+
+function checkInStudent(mcpsId) {
+  try {
+    const idStr = (mcpsId || '').toString().trim();
+
+    if (!idStr || !/^\d+$/.test(idStr)) {
+      return { success: false, error: 'invalid_id' };
+    }
+
+    // Lightweight multi-sheet name lookup (avoids fetching competition data)
+    const studentName = findStudentNameByMcpsId(idStr);
+    if (!studentName) {
+      return { success: false, error: 'not_found' };
+    }
+
+    const sheet = getAttendanceSheet();
+    const tz    = Session.getScriptTimeZone();
+
+    // Today's date as "M/D/YYYY" — matches existing column header format
+    const todayLabel = Utilities.formatDate(new Date(), tz, 'M/d/yyyy');
+
+    // Find or create today's date column
+    const headerRow  = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    let dateColIndex = -1; // 0-based
+    for (let i = 3; i < headerRow.length; i++) {
+      const h = headerRow[i] instanceof Date
+        ? Utilities.formatDate(headerRow[i], tz, 'M/d/yyyy')
+        : (headerRow[i] || '').toString().trim();
+      if (h === todayLabel) { dateColIndex = i; break; }
+    }
+    if (dateColIndex === -1) {
+      dateColIndex = headerRow.length; // append
+      sheet.getRange(1, dateColIndex + 1).setValue(todayLabel).setFontWeight('bold');
+      sheet.setColumnWidth(dateColIndex + 1, 110);
+    }
+
+    // Find student row (col A = name, col B = MCPS ID); create if missing
+    const data = sheet.getDataRange().getValues();
+    let studentRowIndex = -1; // 0-based in data array
+    for (let i = 1; i < data.length; i++) {
+      const rowName = (data[i][0] || '').toString().trim();
+      const rowId   = (data[i][1] || '').toString().trim();
+      if (rowId === idStr || rowName.toLowerCase() === studentName.toLowerCase()) {
+        studentRowIndex = i;
+        break;
+      }
+    }
+
+    let sheetRowNum; // 1-based sheet row
+    if (studentRowIndex === -1) {
+      // New student — append a row
+      sheetRowNum = sheet.getLastRow() + 1;
+      sheet.getRange(sheetRowNum, 1).setValue(studentName);
+      sheet.getRange(sheetRowNum, 2).setValue(idStr);
+      sheet.getRange(sheetRowNum, 3).setValue(0);
+    } else {
+      sheetRowNum = studentRowIndex + 1;
+      // Ensure MCPS ID is stored if it wasn't before
+      if (!(data[studentRowIndex][1] || '').toString().trim()) {
+        sheet.getRange(sheetRowNum, 2).setValue(idStr);
+      }
+    }
+
+    // Check if already checked in today
+    const existingCell = sheet.getRange(sheetRowNum, dateColIndex + 1).getValue();
+    if (existingCell && existingCell.toString().trim() !== '') {
+      // Compute total from sheet for accurate count
+      const rowData = sheet.getRange(sheetRowNum, 1, 1, sheet.getLastColumn()).getValues()[0];
+      const total = parseInt(rowData[2], 10) || 0;
+      return { success: true, name: studentName, totalCount: total, alreadyCheckedIn: true };
+    }
+
+    // Check the checkbox; store check-in time in cell note
+    const timeStamp = Utilities.formatDate(new Date(), tz, 'HH:mm');
+    const targetCell = sheet.getRange(sheetRowNum, dateColIndex + 1);
+    targetCell.setValue(true);
+    targetCell.setNote('Checked in: ' + timeStamp);
+
+    // Recount total from all date columns (col D onward = index 3+)
+    const updatedRow  = sheet.getRange(sheetRowNum, 1, 1, sheet.getLastColumn()).getValues()[0];
+    const updatedHdrs = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    let total = 0;
+    for (let j = 3; j < updatedHdrs.length; j++) {
+      const v = (updatedRow[j] || '').toString().trim();
+      if (v && v.toLowerCase() !== 'false') total++;
+    }
+    sheet.getRange(sheetRowNum, 3).setValue(total);
+
+    return { success: true, name: studentName, totalCount: total, alreadyCheckedIn: false };
+
+  } catch (err) {
+    Logger.log('checkInStudent error: ' + err.message);
+    return { success: false, error: 'server_error', message: err.message };
+  }
+}
+
+// ── NOETIC SUMMER CERTIFICATE DRAWING ────────────────────────────────────────
+
+const PON_SHEET_ID   = '19P1KPhQXMMsYEgx8dpmhZQynegf5iygu4nqLMNXU4ss';
+const PON_SHEET_NAME = 'Leaderboard';
+const CERT_TOTAL     = 9;   // total certificates available
+
+/**
+ * Get or create the "Cert Winners 2026" sheet.
+ * Columns: A=Name, B=MCPS ID, C=Win Timestamp, D=Entries At Win
+ */
+function getCertWinnersSheet() {
+  const ss = getSpreadsheet();
+  let sheet = ss.getSheetByName('Cert Winners 2026');
+  if (!sheet) {
+    sheet = ss.insertSheet('Cert Winners 2026');
+    sheet.getRange(1, 1, 1, 4).setValues([['Name', 'MCPS ID', 'Win Timestamp', 'Entries At Win']]);
+    sheet.getRange(1, 1, 1, 4).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+/**
+ * Compute drawing leaderboard from the Prime or Not Google Sheet.
+ * Returns: array of { min, max, label, minQuestions, leader: {name,mcpsId,accuracy,timeDisplay} | null }
+ *
+ * Rules (same as PON backend getDrawingLeaderboard):
+ * - Only rows with non-empty col K (MCPS ID)
+ * - rangeSize = max-min+1 >= 20
+ * - totalQuestions >= Math.min(rangeSize, 50)
+ * - Best = highest accuracy, then fastest time
+ */
+function getPONDrawingLeaderboard_() {
+  const ss    = SpreadsheetApp.openById(PON_SHEET_ID);
+  const sheet = ss.getSheetByName(PON_SHEET_NAME);
+  if (!sheet || sheet.getLastRow() <= 1) return [];
+
+  const data = sheet.getDataRange().getValues();
+  const rangeMap = {};
+
+  for (let i = 1; i < data.length; i++) {
+    const row    = data[i];
+    const mcpsId = (row[10] || '').toString().trim();
+    if (!mcpsId) continue;
+
+    const min       = Number(row[2]);
+    const max       = Number(row[3]);
+    const rangeSize = max - min + 1;
+    if (rangeSize < 20) continue;
+
+    const minQ   = Math.min(rangeSize, 50);
+    const totalQ = Number(row[4]);
+    if (totalQ < minQ) continue;
+
+    const accuracy = Number(row[7]);
+    const ms       = Number(row[8]);
+    const key      = `${min}-${max}`;
+
+    if (!rangeMap[key]) {
+      rangeMap[key] = { min, max, minQuestions: minQ, label: `${min}–${max}`, leader: null };
+    }
+
+    const cur    = rangeMap[key].leader;
+    const better = !cur
+      || accuracy > cur.accuracy
+      || (accuracy === cur.accuracy && ms < cur.totalMilliseconds);
+
+    if (better) {
+      rangeMap[key].leader = {
+        name: (row[1] || '').toString().trim(),
+        mcpsId,
+        accuracy,
+        timeDisplay: (row[9] || '').toString(),
+        totalMilliseconds: ms
+      };
+    }
+  }
+
+  return Object.values(rangeMap).sort((a, b) =>
+    a.min !== b.min ? a.min - b.min : a.max - b.max
+  );
+}
+
+/**
+ * Check whether a student is eligible for the drawing and compute their entries.
+ *
+ * Eligibility: Noetic sign-up + current grade <= 7 (grade 8 ages out of the summer program).
+ * Base entry:  1 (just for being an eligible Noetic 6th/7th grader).
+ * PON entries: 1 per range where this student currently holds the #1 spot.
+ *
+ * Returns:
+ * {
+ *   eligible, alreadyWon, certsRemaining,
+ *   entries, baseEntry:1, ponEntries,
+ *   rangeStatus: [{label, minQuestions, rank, leader, leaderName, accuracy, timeDisplay}],
+ *   name
+ * }
+ */
+function getDrawingStatus(mcpsId) {
+  try {
+    const idStr = (mcpsId || '').toString().trim();
+    if (!idStr) return { eligible: false };
+
+    // --- Noetic eligibility ---
+    const noeticSheet = getNoeticSheet();
+    if (!noeticSheet || noeticSheet.getLastRow() <= 1) return { eligible: false };
+
+    const noeticData = noeticSheet.getDataRange().getValues();
+    let signedUp = false;
+    let grade    = null;
+    let name     = null;
+
+    for (let i = 1; i < noeticData.length; i++) {
+      const row = noeticData[i];
+      if ((row[1] || '').toString().trim() === idStr) {
+        signedUp = true;
+        grade    = parseInt(row[2]) || null;
+        name     = (row[0] || '').toString().trim() || null;
+        break;
+      }
+    }
+
+    if (!signedUp || grade === null || grade > 7) {
+      return { eligible: false };
+    }
+
+    // --- Already won? ---
+    const winnersSheet  = getCertWinnersSheet();
+    const winnersData   = winnersSheet.getLastRow() > 1
+      ? winnersSheet.getDataRange().getValues().slice(1)
+      : [];
+    const alreadyWon    = winnersData.some(r => (r[1] || '').toString().trim() === idStr);
+    const certsDrawn    = winnersData.length;
+    const certsRemaining = Math.max(0, CERT_TOTAL - certsDrawn);
+
+    // --- PON leaderboard ---
+    const ponRanges = getPONDrawingLeaderboard_();
+
+    let ponEntries  = 0;
+    const rangeStatus = ponRanges.map(r => {
+      const isLeader = r.leader && r.leader.mcpsId === idStr;
+      if (isLeader) ponEntries++;
+      return {
+        label:       r.label,
+        minQuestions: r.minQuestions,
+        leader:      isLeader,
+        leaderName:  r.leader ? r.leader.name : null,
+        accuracy:    r.leader ? r.leader.accuracy : null,
+        timeDisplay: r.leader ? r.leader.timeDisplay : null
+      };
+    });
+
+    return {
+      eligible:        true,
+      name:            name || findStudentNameByMcpsId(idStr),
+      alreadyWon,
+      certsRemaining,
+      entries:         1 + ponEntries,
+      baseEntry:       1,
+      ponEntries,
+      rangeStatus
+    };
+
+  } catch (err) {
+    Logger.log('getDrawingStatus error: ' + err.message);
+    return { eligible: false, error: err.message };
+  }
+}
+
+/**
+ * Return the full draw pool: all eligible students (Noetic + grade ≤7 + not yet won)
+ * with their current entry counts. Used by CertDraw.html.
+ *
+ * Returns:
+ * {
+ *   success, certsRemaining, certsDrawn, winners:[{name,mcpsId,wonAt}],
+ *   pool:[{name, mcpsId, entries, rangesLed:[label,...]}]
+ * }
+ */
+function getCertDrawPool() {
+  try {
+    // --- Winners ---
+    const winnersSheet = getCertWinnersSheet();
+    const winnersData  = winnersSheet.getLastRow() > 1
+      ? winnersSheet.getDataRange().getValues().slice(1)
+      : [];
+    const wonIds         = new Set(winnersData.map(r => (r[1] || '').toString().trim()));
+    const certsDrawn     = winnersData.length;
+    const certsRemaining = Math.max(0, CERT_TOTAL - certsDrawn);
+
+    const winners = winnersData.map(r => ({
+      name:  (r[0] || '').toString().trim(),
+      mcpsId:(r[1] || '').toString().trim(),
+      wonAt: r[2] ? new Date(r[2]).toLocaleString() : ''
+    }));
+
+    // --- Eligible Noetic students (grade ≤7, not already won) ---
+    const noeticSheet = getNoeticSheet();
+    if (!noeticSheet || noeticSheet.getLastRow() <= 1) {
+      return { success: true, certsRemaining, certsDrawn, winners, pool: [] };
+    }
+
+    const noeticData = noeticSheet.getDataRange().getValues().slice(1);
+    const eligible   = [];
+    for (const row of noeticData) {
+      const mcpsId = (row[1] || '').toString().trim();
+      if (!mcpsId) continue;
+      const grade = parseInt(row[2]) || null;
+      if (!grade || grade > 7) continue;
+      if (wonIds.has(mcpsId)) continue;
+      eligible.push({ name: (row[0] || '').toString().trim(), mcpsId });
+    }
+
+    // --- PON leaderboard ---
+    const ponRanges  = getPONDrawingLeaderboard_();
+    const rangeLeads = {}; // mcpsId -> [label, ...]
+    for (const r of ponRanges) {
+      if (r.leader) {
+        const id = r.leader.mcpsId;
+        if (!rangeLeads[id]) rangeLeads[id] = [];
+        rangeLeads[id].push(r.label);
+      }
+    }
+
+    const pool = eligible
+      .map(s => ({
+        name:      s.name,
+        mcpsId:    s.mcpsId,
+        rangesLed: rangeLeads[s.mcpsId] || [],
+        entries:   1 + (rangeLeads[s.mcpsId] ? rangeLeads[s.mcpsId].length : 0)
+      }))
+      .sort((a, b) => b.entries - a.entries || a.name.localeCompare(b.name));
+
+    return { success: true, certsRemaining, certsDrawn, winners, pool };
+
+  } catch (err) {
+    Logger.log('getCertDrawPool error: ' + err.message);
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Record a certificate winner. Appends a row to "Cert Winners 2026".
+ * Returns updated pool state.
+ */
+function recordCertWinner(mcpsId, entriesAtWin) {
+  try {
+    const idStr = (mcpsId || '').toString().trim();
+    if (!idStr) return { success: false, error: 'missing_id' };
+
+    const certsDrawn = getCertWinnersSheet().getLastRow() - 1; // exclude header
+    if (certsDrawn >= CERT_TOTAL) {
+      return { success: false, error: 'no_certs_remaining' };
+    }
+
+    const name = findStudentNameByMcpsId(idStr) || idStr;
+    getCertWinnersSheet().appendRow([name, idStr, new Date(), entriesAtWin || 0]);
+
+    return getCertDrawPool();
+
+  } catch (err) {
+    Logger.log('recordCertWinner error: ' + err.message);
+    return { success: false, error: err.message };
   }
 }

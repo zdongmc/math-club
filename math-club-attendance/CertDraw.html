@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Summer Certificate Drawing</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #92400e 0%, #78350f 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      color: #333;
+    }
+
+    /* ── TOP BAR ── */
+    .top-bar {
+      background: rgba(0,0,0,0.25);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+    .top-bar-title { color: white; font-weight: bold; font-size: 1rem; opacity: 0.9; }
+    .top-bar .stats { color: rgba(255,255,255,0.75); font-size: 0.85rem; margin-left: auto; }
+    .top-bar .certs-pill {
+      background: #f59e0b; color: #78350f;
+      border-radius: 20px; padding: 4px 14px;
+      font-weight: bold; font-size: 0.9rem;
+    }
+
+    /* ── MAIN AREA ── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      gap: 20px;
+    }
+
+    /* ── SLOT MACHINE ── */
+    .slot-card {
+      background: white;
+      border-radius: 20px;
+      padding: 36px 48px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+      width: 100%;
+      max-width: 580px;
+      text-align: center;
+    }
+    .slot-label {
+      font-size: 0.85rem; font-weight: 700;
+      color: #9ca3af; text-transform: uppercase; letter-spacing: 2px;
+      margin-bottom: 16px;
+    }
+    .slot-display {
+      font-size: 2.2rem;
+      font-weight: bold;
+      color: #1f2937;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 14px 20px;
+      transition: border-color 0.2s;
+      background: #f9fafb;
+      overflow: hidden;
+    }
+    .slot-display.spinning { border-color: #f59e0b; background: #fffbeb; }
+    .slot-display.winner  { border-color: #16a34a; background: #f0fdf4; color: #15803d; }
+
+    .draw-btn {
+      margin-top: 20px;
+      width: 100%;
+      padding: 18px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #78350f;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .draw-btn:hover:not(:disabled) { opacity: 0.9; transform: scale(1.01); }
+    .draw-btn:active:not(:disabled) { transform: scale(0.99); }
+    .draw-btn:disabled { opacity: 0.4; cursor: default; }
+
+    .confirm-btn {
+      margin-top: 12px;
+      width: 100%;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: bold;
+      background: #16a34a;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      display: none;
+      transition: opacity 0.2s;
+    }
+    .confirm-btn:hover:not(:disabled) { opacity: 0.85; }
+    .confirm-btn:disabled { opacity: 0.4; cursor: default; }
+
+    /* ── POOL TABLE ── */
+    .pool-card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+      width: 100%;
+      max-width: 580px;
+    }
+    .pool-heading {
+      font-size: 0.8rem; font-weight: 700;
+      color: #9ca3af; text-transform: uppercase; letter-spacing: 1.5px;
+      margin-bottom: 12px;
+    }
+    .pool-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    .pool-table th {
+      text-align: left;
+      color: #6b7280;
+      font-weight: 600;
+      padding: 5px 8px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .pool-table td {
+      padding: 6px 8px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .pool-table tr.highlighted td { background: #fef9c3; font-weight: bold; }
+    .entry-pip {
+      display: inline-block;
+      background: #f59e0b; color: #78350f;
+      border-radius: 10px; padding: 1px 8px;
+      font-size: 0.8rem; font-weight: bold;
+    }
+
+    /* ── WINNERS ── */
+    .winners-card {
+      background: rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 16px 24px;
+      width: 100%;
+      max-width: 580px;
+      color: rgba(255,255,255,0.9);
+    }
+    .winners-heading {
+      font-size: 0.8rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px;
+      opacity: 0.7; margin-bottom: 10px;
+    }
+    .winner-chip {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px; padding: 4px 14px;
+      font-size: 0.88rem; margin: 3px 4px 3px 0;
+    }
+    .winner-chip.gold { background: rgba(245,158,11,0.4); border-color: #f59e0b; }
+
+    /* ── STATUS BAR ── */
+    .status-bar {
+      background: rgba(0,0,0,0.2);
+      padding: 10px 24px;
+      text-align: center;
+      color: rgba(255,255,255,0.8);
+      font-size: 0.88rem;
+      flex-shrink: 0;
+    }
+    .status-bar em { color: #fde68a; font-style: normal; font-weight: bold; }
+
+    /* spinner */
+    .spinner {
+      display: inline-block;
+      width: 20px; height: 20px;
+      border: 3px solid rgba(120,53,15,0.3);
+      border-top-color: #78350f;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle; margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <span class="top-bar-title">🎰 Noetic Summer Certificate Drawing</span>
+  <span class="certs-pill" id="certPill">Loading…</span>
+  <span class="stats" id="poolStats"></span>
+</div>
+
+<div class="main">
+
+  <!-- Slot machine card -->
+  <div class="slot-card">
+    <div class="slot-label">Current Draw</div>
+    <div class="slot-display" id="slotDisplay">Press Draw to begin</div>
+    <button class="draw-btn" id="drawBtn" onclick="startDraw()">🎰 Draw a Winner</button>
+    <button class="confirm-btn" id="confirmBtn" onclick="confirmWinner()">✅ Confirm Winner &amp; Continue</button>
+  </div>
+
+  <!-- Entry pool -->
+  <div class="pool-card">
+    <div class="pool-heading">Entry Pool</div>
+    <div id="poolContent"><div style="color:#9ca3af;font-size:0.9rem;">Loading…</div></div>
+  </div>
+
+  <!-- Previous winners -->
+  <div class="winners-card">
+    <div class="winners-heading">Winners This Season</div>
+    <div id="winnersContent"><em style="opacity:0.6">None yet</em></div>
+  </div>
+
+</div>
+
+<div class="status-bar" id="statusBar">
+  Drawing data will load automatically.
+</div>
+
+<script>
+  var pool         = [];       // [{name, mcpsId, entries, rangesLed}]
+  var currentWinner = null;    // {name, mcpsId, entries} of the student shown in slot
+  var spinTimer     = null;
+  var animFrame     = 0;
+
+  window.addEventListener('load', loadPool);
+
+  function loadPool() {
+    setStatus('Loading draw pool…');
+    google.script.run
+      .withSuccessHandler(renderPool)
+      .withFailureHandler(function(e) { setStatus('Error loading pool: ' + (e.message || e)); })
+      .getCertDrawPool();
+  }
+
+  function renderPool(data) {
+    if (!data || !data.success) {
+      setStatus('Error: ' + (data && data.error ? data.error : 'unknown'));
+      return;
+    }
+
+    pool = data.pool || [];
+
+    // Cert pill
+    var drawn = data.certsDrawn || 0;
+    var remaining = data.certsRemaining !== undefined ? data.certsRemaining : (9 - drawn);
+    document.getElementById('certPill').textContent =
+      remaining + ' cert' + (remaining !== 1 ? 's' : '') + ' remaining';
+    document.getElementById('poolStats').textContent =
+      pool.length + ' eligible student' + (pool.length !== 1 ? 's' : '') +
+      ' | ' + totalEntries(pool) + ' total entries';
+
+    // Pool table
+    var poolEl = document.getElementById('poolContent');
+    if (pool.length === 0) {
+      poolEl.innerHTML = '<div style="color:#9ca3af;font-size:0.9rem;">No eligible students with entries.</div>';
+    } else {
+      var rows = pool.map(function(s) {
+        var rangeText = s.rangesLed && s.rangesLed.length
+          ? s.rangesLed.join(', ')
+          : '(base entry only)';
+        return '<tr id="row-' + esc(s.mcpsId) + '">' +
+          '<td>' + esc(s.name) + '</td>' +
+          '<td><span class="entry-pip">' + s.entries + '</span></td>' +
+          '<td style="color:#666;font-size:0.82rem;">' + esc(rangeText) + '</td>' +
+          '</tr>';
+      }).join('');
+      poolEl.innerHTML =
+        '<table class="pool-table">' +
+        '<thead><tr><th>Student</th><th>Entries</th><th>Ranges Leading</th></tr></thead>' +
+        '<tbody>' + rows + '</tbody></table>';
+    }
+
+    // Winners
+    renderWinners(data.winners || []);
+
+    // Draw button state
+    document.getElementById('drawBtn').disabled = pool.length === 0 || remaining === 0;
+
+    setStatus(pool.length + ' students eligible | Draw when ready.');
+  }
+
+  function renderWinners(winners) {
+    var el = document.getElementById('winnersContent');
+    if (!winners || winners.length === 0) {
+      el.innerHTML = '<em style="opacity:0.6">None yet</em>';
+      return;
+    }
+    el.innerHTML = winners.map(function(w, i) {
+      var label = '#' + (i + 1) + ' ' + esc(w.name);
+      if (w.wonAt) label += ' <span style="opacity:0.6;font-size:0.78em;">(' + esc(w.wonAt) + ')</span>';
+      return '<span class="winner-chip gold">' + label + '</span>';
+    }).join('');
+  }
+
+  function totalEntries(p) {
+    return p.reduce(function(sum, s) { return sum + (s.entries || 1); }, 0);
+  }
+
+  // Build weighted pool array (each student appears entries times)
+  function buildWeightedPool() {
+    var weighted = [];
+    pool.forEach(function(s) {
+      for (var i = 0; i < (s.entries || 1); i++) {
+        weighted.push(s);
+      }
+    });
+    return weighted;
+  }
+
+  function startDraw() {
+    if (pool.length === 0) return;
+    currentWinner = null;
+
+    var drawBtn    = document.getElementById('drawBtn');
+    var confirmBtn = document.getElementById('confirmBtn');
+    var slotEl     = document.getElementById('slotDisplay');
+
+    drawBtn.disabled    = true;
+    confirmBtn.style.display = 'none';
+    slotEl.className    = 'slot-display spinning';
+
+    var weighted = buildWeightedPool();
+    var names    = weighted.map(function(s) { return s.name; });
+
+    // Pick the winner now (random index, weighted)
+    var winnerIdx = Math.floor(Math.random() * weighted.length);
+    currentWinner = weighted[winnerIdx];
+
+    // Slot animation: cycle through names fast → slow → land on winner
+    var totalMs  = 3200;
+    var startMs  = Date.now();
+    var nameIdx  = 0;
+
+    function tick() {
+      var elapsed  = Date.now() - startMs;
+      var progress = elapsed / totalMs;      // 0 → 1
+
+      if (progress >= 1) {
+        // Land on winner
+        slotEl.textContent = currentWinner.name;
+        slotEl.className   = 'slot-display winner';
+        confirmBtn.style.display = 'block';
+        highlightRow(currentWinner.mcpsId);
+        setStatus('🎉 Winner selected — ' + currentWinner.entries + ' entr' +
+          (currentWinner.entries !== 1 ? 'ies' : 'y') + '. Confirm to record.');
+        return;
+      }
+
+      // Ease-in speed: start fast (every 60ms) → slow to 400ms at end
+      var delay = 60 + Math.pow(progress, 2) * 340;
+
+      nameIdx = (nameIdx + 1) % names.length;
+      slotEl.textContent = names[nameIdx];
+
+      spinTimer = setTimeout(tick, delay);
+    }
+
+    tick();
+  }
+
+  function highlightRow(mcpsId) {
+    document.querySelectorAll('.pool-table tbody tr').forEach(function(tr) {
+      tr.classList.remove('highlighted');
+    });
+    var row = document.getElementById('row-' + mcpsId);
+    if (row) {
+      row.classList.add('highlighted');
+      row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  function confirmWinner() {
+    if (!currentWinner) return;
+    var btn = document.getElementById('confirmBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Recording…';
+    setStatus('Recording winner…');
+
+    google.script.run
+      .withSuccessHandler(function(data) {
+        btn.style.display = 'none';
+        document.getElementById('drawBtn').disabled = false;
+        document.getElementById('slotDisplay').textContent = 'Press Draw to begin';
+        document.getElementById('slotDisplay').className = 'slot-display';
+        currentWinner = null;
+        renderPool(data);
+        setStatus('Winner recorded! ' + (data.certsRemaining || 0) + ' certificates remaining.');
+      })
+      .withFailureHandler(function(e) {
+        btn.disabled = false;
+        btn.innerHTML = '✅ Confirm Winner & Continue';
+        setStatus('Error recording winner: ' + (e.message || e));
+      })
+      .recordCertWinner(currentWinner.mcpsId, currentWinner.entries);
+  }
+
+  function setStatus(msg) {
+    document.getElementById('statusBar').innerHTML = msg;
+  }
+
+  function esc(str) {
+    var d = document.createElement('div');
+    d.textContent = String(str || '');
+    return d.innerHTML;
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Club Check-In</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      color: #333;
+    }
+
+    /* ── TEACHER BAR ── */
+    .teacher-bar {
+      background: rgba(0,0,0,0.25);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+    .teacher-bar-title {
+      color: white;
+      font-weight: bold;
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+    .teacher-bar select {
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: none;
+      font-size: 0.88rem;
+      background: rgba(255,255,255,0.9);
+      color: #333;
+      cursor: pointer;
+    }
+    .teacher-bar .date-display {
+      color: rgba(255,255,255,0.75);
+      font-size: 0.85rem;
+      margin-left: auto;
+    }
+
+    /* ── MAIN KIOSK AREA ── */
+    .kiosk-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 20px;
+      gap: 28px;
+    }
+
+    .kiosk-card {
+      background: white;
+      border-radius: 20px;
+      padding: 40px 48px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.25);
+      width: 100%;
+      max-width: 520px;
+      text-align: center;
+    }
+
+    .kiosk-heading {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 24px;
+    }
+
+    .id-input {
+      width: 100%;
+      font-size: 2.6rem;
+      font-weight: bold;
+      text-align: center;
+      letter-spacing: 6px;
+      border: 3px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px 20px;
+      color: #111;
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: 'Courier New', monospace;
+    }
+    .id-input:focus { border-color: #dc2626; }
+    .id-input:disabled { background: #f9fafb; color: #9ca3af; }
+
+    .checkin-btn {
+      margin-top: 18px;
+      width: 100%;
+      padding: 16px;
+      font-size: 1.15rem;
+      font-weight: bold;
+      background: #dc2626;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .checkin-btn:hover:not(:disabled) { background: #b91c1c; }
+    .checkin-btn:active:not(:disabled) { transform: scale(0.98); }
+    .checkin-btn:disabled { background: #fca5a5; cursor: default; }
+
+    /* ── CONFIRMATION ── */
+    .confirmation {
+      width: 100%;
+      max-width: 520px;
+      border-radius: 16px;
+      padding: 28px 36px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+      transition: opacity 0.4s;
+    }
+    .confirmation.hidden { display: none; }
+    .confirmation.success { background: #f0fdf4; border: 3px solid #16a34a; }
+    .confirmation.already  { background: #fffbeb; border: 3px solid #d97706; }
+    .confirmation.error    { background: #fef2f2; border: 3px solid #dc2626; }
+
+    .conf-emoji { font-size: 3.2rem; margin-bottom: 8px; }
+    .conf-name  { font-size: 1.9rem; font-weight: bold; margin-bottom: 6px; }
+    .conf-name.success { color: #15803d; }
+    .conf-name.already  { color: #b45309; }
+    .conf-name.error    { color: #dc2626; }
+    .conf-detail { font-size: 1.05rem; color: #555; }
+
+    /* spinner */
+    .spinner {
+      display: inline-block;
+      width: 22px; height: 22px;
+      border: 3px solid rgba(255,255,255,0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── SESSION COUNTER ── */
+    .session-bar {
+      background: rgba(0,0,0,0.2);
+      padding: 10px 24px;
+      text-align: center;
+      color: rgba(255,255,255,0.85);
+      font-size: 0.92rem;
+      flex-shrink: 0;
+    }
+    .session-count { font-weight: bold; color: #fde68a; }
+  </style>
+</head>
+<body>
+
+<!-- Teacher bar -->
+<div class="teacher-bar">
+  <span class="teacher-bar-title">🎓 Math Club Check-In</span>
+  <span class="date-display" id="date-display"></span>
+</div>
+
+<!-- Kiosk main -->
+<div class="kiosk-main">
+  <div class="kiosk-card">
+    <div class="kiosk-heading">Enter Your Student ID</div>
+    <input id="id-input" class="id-input" type="text" inputmode="numeric"
+           pattern="\d*" maxlength="12" placeholder="_ _ _ _ _ _ _"
+           autocomplete="off" autocorrect="off" spellcheck="false">
+    <button class="checkin-btn" id="checkin-btn" onclick="doCheckIn()">Check In</button>
+  </div>
+
+  <div class="confirmation hidden" id="conf-box">
+    <div class="conf-emoji" id="conf-emoji"></div>
+    <div class="conf-name" id="conf-name"></div>
+    <div class="conf-detail" id="conf-detail"></div>
+  </div>
+</div>
+
+<!-- Session counter -->
+<div class="session-bar">
+  Checked in today: <span class="session-count" id="session-count">0</span> students
+</div>
+
+<script>
+  var sessionCount = 0;
+  var clearTimer = null;
+
+  // Date display
+  var today = new Date();
+  document.getElementById('date-display').textContent =
+    today.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
+
+  // Focus input on load and after any click on body
+  window.addEventListener('load', focusInput);
+  document.body.addEventListener('click', function(e) {
+    if (e.target !== document.getElementById('checkin-btn')) focusInput();
+  });
+
+  function focusInput() {
+    var inp = document.getElementById('id-input');
+    if (!inp.disabled) inp.focus();
+  }
+
+  document.getElementById('id-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') doCheckIn();
+  });
+
+  function doCheckIn() {
+    var mcpsId = document.getElementById('id-input').value.trim();
+    if (!mcpsId) { focusInput(); return; }
+    if (!/^\d+$/.test(mcpsId)) {
+      showResult('error', '❌', 'Invalid ID', 'Student IDs contain numbers only.');
+      return;
+    }
+
+    setLoading(true);
+    google.script.run
+      .withSuccessHandler(function(result) {
+        setLoading(false);
+        if (!result.success) {
+          if (result.error === 'not_found') {
+            showResult('error', '🤔', 'Not Found', 'Student ID not found. Please see your teacher.');
+          } else {
+            showResult('error', '⚠️', 'Error', result.message || 'Something went wrong. Please try again.');
+          }
+        } else if (result.alreadyCheckedIn) {
+          showResult('already', '👋', 'Hi, ' + result.name + '!', 'You\'re already checked in today.');
+        } else {
+          sessionCount++;
+          document.getElementById('session-count').textContent = sessionCount;
+          var n = result.totalCount;
+          var suffix = n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th';
+          showResult('success', '🎉', 'Welcome, ' + result.name + '!',
+            'This is your ' + n + suffix + ' club meeting.');
+        }
+      })
+      .withFailureHandler(function(err) {
+        setLoading(false);
+        showResult('error', '⚠️', 'Error', 'Could not connect. Please try again.');
+      })
+      .checkInStudent(mcpsId);
+  }
+
+  function setLoading(loading) {
+    var btn = document.getElementById('checkin-btn');
+    var inp = document.getElementById('id-input');
+    inp.disabled = loading;
+    btn.disabled = loading;
+    btn.innerHTML = loading ? '<span class="spinner"></span>Checking in…' : 'Check In';
+  }
+
+  function showResult(type, emoji, name, detail) {
+    if (clearTimer) clearTimeout(clearTimer);
+    document.getElementById('id-input').value = '';
+
+    var box  = document.getElementById('conf-box');
+    var nameEl = document.getElementById('conf-name');
+    box.className = 'confirmation ' + type;
+    document.getElementById('conf-emoji').textContent = emoji;
+    nameEl.textContent = name;
+    nameEl.className = 'conf-name ' + type;
+    document.getElementById('conf-detail').textContent = detail;
+
+    clearTimer = setTimeout(function() {
+      box.classList.add('hidden');
+      focusInput();
+    }, 4000);
+    focusInput();
+  }
+</script>
+</body>
+</html>
