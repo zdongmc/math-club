@@ -93,7 +93,8 @@ function getLeaderboard(minRange, maxRange, totalQuestions, limit = 50) {
         incorrect: row[6],
         accuracy: row[7],
         totalMilliseconds: row[8],
-        timeDisplay: row[9]
+        timeDisplay: row[9],
+        countsForDrawing: !!(row[10] || '').toString().trim()
       }))
       .sort((a, b) => {
         if (b.accuracy !== a.accuracy) return b.accuracy - a.accuracy;

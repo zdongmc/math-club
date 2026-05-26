@@ -551,6 +551,7 @@
                             <th>Time</th>
                             <th>Correct</th>
                             <th>Incorrect</th>
+                            <th title="Score counts for the Noetic Summer Certificate Drawing">🎰 Drawing</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -572,6 +573,10 @@
                     rankDisplay = '🥉 ' + rank;
                 }
 
+                const drawingCell = score.countsForDrawing
+                    ? '<span style="color:#16a34a;font-weight:bold;" title="Counts for the drawing">✓</span>'
+                    : '<span style="color:#9ca3af;" title="Play with your MCPS ID to count">—</span>';
+
                 tableHTML += `
                     <tr>
                         <td><span class="rank-badge ${rankClass}">${rankDisplay}</span></td>
@@ -580,6 +585,7 @@
                         <td>${score.timeDisplay}</td>
                         <td>${score.correct}</td>
                         <td>${score.incorrect}</td>
+                        <td style="text-align:center;">${drawingCell}</td>
                     </tr>
                 `;
             });
