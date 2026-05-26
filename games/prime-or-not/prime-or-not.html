@@ -1282,6 +1282,13 @@
             }
         });
 
+        // Pre-fill range from URL params (e.g. ?min=1&max=50)
+        (function applyUrlParams() {
+            const p = new URLSearchParams(window.location.search);
+            if (p.get('min')) document.getElementById('minNumber').value = p.get('min');
+            if (p.get('max')) document.getElementById('maxNumber').value = p.get('max');
+        })();
+
         // Enter key to start from settings
         document.getElementById('playerName').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') startGame();

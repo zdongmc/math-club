@@ -298,17 +298,22 @@
                     const leaderName = r.leader ? escapeHtml(r.leader.name) : '—';
                     const accuracy = r.leader ? `${r.leader.accuracy}%` : '—';
                     const time = r.leader ? escapeHtml(r.leader.timeDisplay) : '—';
+                    const idParam = myMcpsId ? `&mcpsId=${myMcpsId}` : '';
+                    const playBtn = r.leader
+                        ? `<a href="prime-or-not.html?min=${r.min}&max=${r.max}${idParam}" target="_blank" style="display:inline-block;background:#f59e0b;color:#78350f;font-weight:bold;font-size:0.8rem;padding:5px 12px;border-radius:12px;text-decoration:none;white-space:nowrap;">▶ Play</a>`
+                        : '';
                     rows += `<tr${isMe ? ' class="my-row"' : ''}>
                         <td>${escapeHtml(r.label)} <span style="font-size:0.8em;color:#999">(min ${r.minQuestions}q)</span></td>
                         <td>${leaderName}</td>
                         <td>${accuracy}</td>
                         <td>${time}</td>
+                        <td style="text-align:center;">${playBtn}</td>
                     </tr>`;
                 }
 
                 div.innerHTML = `
                     <table class="drawing-table">
-                        <thead><tr><th>Range</th><th>Current Leader</th><th>Accuracy</th><th>Time</th></tr></thead>
+                        <thead><tr><th>Range</th><th>Current Leader</th><th>Accuracy</th><th>Time</th><th></th></tr></thead>
                         <tbody>${rows}</tbody>
                     </table>
                     ${myMcpsId ? `<div class="drawing-entry-count">Your drawing entries: <strong>${myEntries + 1}</strong> (1 base + ${myEntries} range${myEntries !== 1 ? 's' : ''} led)</div>` : ''}
