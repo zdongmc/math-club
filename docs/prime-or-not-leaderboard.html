@@ -275,7 +275,7 @@
             const div = document.getElementById('allRangesContent');
             div.innerHTML = '<div class="loading-message">Loading ranges…</div>';
             try {
-                const resp = await fetch(`${LEADERBOARD_API_URL}?action=getAvailableRanges`);
+                const resp = await fetch(`${LEADERBOARD_API_URL}?action=getRanges`);
                 const data = await resp.json();
                 if (!data.success || !data.ranges || data.ranges.length === 0) {
                     div.innerHTML = '<div class="loading-message">No scores recorded yet — be the first to play!</div>';
