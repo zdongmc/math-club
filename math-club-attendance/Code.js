@@ -3005,7 +3005,7 @@ function getCertWinnersSheet() {
  * Rules (same as PON backend getDrawingLeaderboard):
  * - Only rows with non-empty col K (MCPS ID)
  * - rangeSize = max-min+1 >= 20
- * - totalQuestions >= Math.min(rangeSize, 50)
+ * - totalQuestions >= 20
  * - Best = highest accuracy, then fastest time
  */
 function getPONDrawingLeaderboard_() {
@@ -3026,7 +3026,7 @@ function getPONDrawingLeaderboard_() {
     const rangeSize = max - min + 1;
     if (rangeSize < 20) continue;
 
-    const minQ   = Math.min(rangeSize, 50);
+    const minQ   = 20;
     const totalQ = Number(row[4]);
     if (totalQ < minQ) continue;
 

@@ -174,7 +174,7 @@ function getDrawingLeaderboard() {
       const rangeSize = max - min + 1;
       if (rangeSize < 20) continue;
 
-      const minQRequired = Math.min(rangeSize, 50);
+      const minQRequired = 20;
       const totalQ = Number(row[4]);
       if (totalQ < minQRequired) continue;
 
