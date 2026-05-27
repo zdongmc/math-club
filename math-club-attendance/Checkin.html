@@ -655,6 +655,7 @@
     </div>
 
     <script>
+        var SURVEY_PREVIEW = <?= surveyPreview ?>;
         // Allow Enter key to submit
         document.getElementById('mcpsId').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
@@ -718,7 +719,7 @@
             showLoading(false);
 
             if (!result || !result.success) {
-                const surveyPreview = new URLSearchParams(window.location.search).get('surveyPreview') === '1';
+                const surveyPreview = !!SURVEY_PREVIEW;
                 if (surveyPreview) {
                     // Show survey form in isolation — ID not in student DB but preview still works
                     const mcpsIdVal = document.getElementById('mcpsId') ? document.getElementById('mcpsId').value.trim() : '';
@@ -805,7 +806,7 @@
             }
 
             // End-of-Year Survey
-            const surveyPreview = new URLSearchParams(window.location.search).get('surveyPreview') === '1';
+            const surveyPreview = !!SURVEY_PREVIEW;
             if (surveyPreview || (result.surveyStatus && result.surveyStatus.surveyOpen)) {
               html += buildSurveySection(result);
             }

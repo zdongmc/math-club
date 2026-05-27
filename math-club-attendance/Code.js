@@ -73,8 +73,9 @@ function doGet(e) {
   }
 
   // Default: Return HTML page
-  return HtmlService.createTemplateFromFile('Checkin')
-    .evaluate()
+  const checkinTemplate = HtmlService.createTemplateFromFile('Checkin');
+  checkinTemplate.surveyPreview = !!(e && e.parameter && e.parameter.surveyPreview === '1');
+  return checkinTemplate.evaluate()
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
