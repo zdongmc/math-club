@@ -77,6 +77,13 @@ Student self-serve check-in used at the start of each club meeting. Teacher open
 - `getCarderockResults(mcpsId)` — Returns signedUp, signUpDate (string), status, team, permissionSlipLink, totalSignUps
 - `signUpForCarderock(mcpsId, studentName, grade)`, `dropCarderockSignUp(mcpsId)`
 
+**End-of-Year Survey:**
+- `const SURVEY_OPEN = false` — flip to `true` in Code.js and redeploy to open survey to all students
+- `getSurveySheet()` — get/create "Survey 2026" sheet with 31-column header
+- `getSurveyStatus(mcpsId)` — returns `{surveyOpen, parentSubmitted, studentSubmitted}`; included in `lookupStudentByMcpsId` response as `surveyStatus`
+- `submitSurveyResponse(mcpsId, role, answers)` — validates role ('parent'/'student'), duplicate-checks by (MCPS ID + role), appends row; returns `{success, message}`
+- `getSurveySummary()` — returns `{total, parentCount, studentCount, tallies}` with tallies for all key multiple-choice fields; used by CertDraw Survey tab
+
 ## Student Lookup Process
 
 MCPS ID is entered → system searches these sheets **in order**, stops at first match:
@@ -136,6 +143,18 @@ MCPS ID lookup form (variable-length numeric IDs, validated with `/^\d+$/`).
 - Already won: green trophy banner + green "📄 View Your Certificate" button linking to their Google Drive PDF (from `certLink`)
 - All certs drawn: gray "all certificates drawn" message
 
+**📋 End of Year Survey** (shown when `SURVEY_OPEN = true` in Code.js, or always when `?surveyPreview=1`):
+- Appears right after Required Forms
+- Parent / Student role toggle — each role submits independently; one submission per (MCPS ID + role) enforced server-side
+- Default tab: Parent; auto-switches to Student if parent already submitted but student hasn't
+- **6th/7th graders:** returning Yes/No/Maybe; parent also asked about volunteering
+- **8th graders:** high school text field + coaching interest (Yes/Maybe/No); Yes/Maybe reveals WhatsApp phone field; parent asked about supporting child to help coach
+- All 7 contests (MATHCOUNTS, MOEMS, Math League, Math Kangaroo, AMC 8, Noetic, Purple Comet): if student participated → "compete again?" + optional comments; if not → "would you participate?"
+- Student-only: meeting format 1–5 slider (1=more competition prep, 3=current balance, 5=more games), favorite activity
+- Parent-only: communication frequency (Too much/About right/Not enough) + topics, snacks preference
+- Both roles: suggested competitions (free text), try-outs preference, general suggestions
+- Submit → server-side duplicate check → success refreshes portal via `lookupStudent()`
+
 **Carderock** (deadline April 13, 2026; 8 spots max):
 - Before deadline + not signed up: "Indicate Interest" → security acknowledgement modal (5 Navy base access cards)
 - Signed up: green "✓ Signed Up" card + amber photo release form + gray day-of-event rules + permission slip box
@@ -145,17 +164,21 @@ MCPS ID lookup form (variable-length numeric IDs, validated with `/^\d+$/`).
 
 ## Certificate Drawing Teacher Interface (`CertDraw.html`)
 
-Served at `[production URL]?certdraw=1`. Teacher-only projected drawing screen (brown/gold color scheme).
+Served at `[production URL]?certdraw=1`. Teacher-only projected drawing screen (brown/gold color scheme). Two tabs: **🎡 Drawing** (default) and **📋 Survey**.
 
 **Top bar:** certificates remaining pill + eligible student count + total entry count.
 
-**Spinning wheel:** "Spin the Wheel" button → fetches live pool from `getCertDrawPool()` → pre-picks winner (weighted random, proportional to entries) → canvas wheel spins ≥ 2 full rotations with tick sounds (pitch rises/falls with speed) → decelerates and lands on winner → ascending fanfare plays → winner banner pops in → "Confirm Winner" button → calls `recordCertWinner()` → status bar shows cert number + clickable Drive link.
+**Drawing tab:**
+- "Spin the Wheel" button → fetches live pool from `getCertDrawPool()` → pre-picks winner (weighted random, proportional to entries) → canvas wheel spins ≥ 2 full rotations with tick sounds (pitch rises/falls with speed) → decelerates and lands on winner → ascending fanfare plays → winner banner pops in → "Confirm Winner" button → calls `recordCertWinner()` → status bar shows cert number + clickable Drive link.
+- Wheel rendering: each student's slice proportional to entry count; color-coded dots in pool table match slice colors; first name on each slice; labels clipped to wedge.
+- Entry pool table: Student | Entries | Ranges Leading — sorted by entries desc.
+- Winners list: previous winners shown as gold chips at bottom.
 
-**Wheel rendering:** each student's slice is proportional to their entry count; color-coded dots in pool table match slice colors; first name displayed on each slice; labels clipped to their wedge.
-
-**Entry pool table:** Student | Entries | Ranges Leading — sorted by entries desc.
-
-**Winners list:** previous winners shown as gold chips at bottom.
+**Survey tab:**
+- Loads `getSurveySummary()` lazily on first open; Refresh button re-fetches.
+- Shows total / parent / student response counts.
+- Bar-chart tally cards for: returning, try-outs, snacks, meeting format (1–5), communication frequency, volunteer interest, coaching interest (8th graders), coaching support (8th grade parents).
+- Second grid: "Would compete again?" tally for all 7 competitions.
 
 ## `doGet()` URL Routing
 
@@ -168,6 +191,7 @@ Served at `[production URL]?certdraw=1`. Teacher-only projected drawing screen (
 | `?action=dropCarderock&...` | Carderock drop |
 | `?certdraw=1` | Serves `CertDraw.html` |
 | `?kiosk=1` | Serves `Kiosk.html` |
+| `?surveyPreview=1` | Serves `Checkin.html` with survey section visible regardless of `SURVEY_OPEN` flag — for teacher preview only |
 | *(default)* | Serves `Checkin.html` (parent portal) |
 
 ## Data Sources (Google Sheets)
