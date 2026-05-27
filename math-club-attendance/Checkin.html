@@ -794,7 +794,7 @@
 
             // End-of-Year Survey
             const surveyPreview = new URLSearchParams(window.location.search).get('surveyPreview') === '1';
-            if (result.surveyStatus && (result.surveyStatus.surveyOpen || surveyPreview)) {
+            if (surveyPreview || (result.surveyStatus && result.surveyStatus.surveyOpen)) {
               html += buildSurveySection(result);
             }
 
