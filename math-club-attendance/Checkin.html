@@ -792,6 +792,12 @@
                 `;
             }
 
+            // End-of-Year Survey
+            const surveyPreview = new URLSearchParams(window.location.search).get('surveyPreview') === '1';
+            if (result.surveyStatus && (result.surveyStatus.surveyOpen || surveyPreview)) {
+              html += buildSurveySection(result);
+            }
+
             html += `
                 <!-- Club Meetings -->
                 <h2 class="section-title">📅 Club Meetings</h2>
@@ -1417,12 +1423,6 @@
 
             html += '</div>';
             html += '</div>';
-
-            // End-of-Year Survey
-            const surveyPreview = new URLSearchParams(window.location.search).get('surveyPreview') === '1';
-            if (result.surveyStatus && (result.surveyStatus.surveyOpen || surveyPreview)) {
-              html += buildSurveySection(result);
-            }
 
             document.getElementById('studentResults').innerHTML = html;
             document.getElementById('resultsSection').classList.add('show');
