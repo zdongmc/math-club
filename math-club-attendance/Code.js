@@ -4,7 +4,7 @@ const COMPETITION_SIGNUP_SHEET_NAME = 'Form Responses 2';
 const ATTENDANCE_SHEET_NAME = 'Attendance Records';
 const SCHOOL_LIST_SHEET_NAME = 'School List';
 
-const SURVEY_OPEN = true;
+const SURVEY_OPEN = false;
 
 function doGet(e) {
   // Handle sign-up action

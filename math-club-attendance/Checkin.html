@@ -1419,7 +1419,8 @@
             html += '</div>';
 
             // End-of-Year Survey
-            if (result.surveyStatus && result.surveyStatus.surveyOpen) {
+            const surveyPreview = new URLSearchParams(window.location.search).get('surveyPreview') === '1';
+            if (result.surveyStatus && (result.surveyStatus.surveyOpen || surveyPreview)) {
               html += buildSurveySection(result);
             }
 
