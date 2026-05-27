@@ -718,6 +718,18 @@
             showLoading(false);
 
             if (!result || !result.success) {
+                const surveyPreview = new URLSearchParams(window.location.search).get('surveyPreview') === '1';
+                if (surveyPreview) {
+                    // Show survey form in isolation — ID not in student DB but preview still works
+                    const mcpsIdVal = document.getElementById('mcpsId') ? document.getElementById('mcpsId').value.trim() : '';
+                    const mockResult = {
+                        student: { mcpsId: mcpsIdVal, name: 'Preview', gradeLevel: '7' },
+                        surveyStatus: { surveyOpen: false, parentSubmitted: false, studentSubmitted: false }
+                    };
+                    document.getElementById('studentResults').innerHTML = buildSurveySection(mockResult);
+                    document.getElementById('resultsSection').classList.add('show');
+                    return;
+                }
                 const message = result && result.message ? result.message : 'An error occurred. Please try again.';
                 showMessage(message, true);
                 document.getElementById('resultsSection').classList.remove('show');
