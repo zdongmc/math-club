@@ -1418,6 +1418,11 @@
             html += '</div>';
             html += '</div>';
 
+            // End-of-Year Survey
+            if (result.surveyStatus && result.surveyStatus.surveyOpen) {
+              html += buildSurveySection(result);
+            }
+
             document.getElementById('studentResults').innerHTML = html;
             document.getElementById('resultsSection').classList.add('show');
 
@@ -1456,7 +1461,13 @@
             html += '<div style="background:#d1fae5;border:2px solid #059669;border-radius:10px;padding:18px;text-align:center;">';
             html += '<div style="font-size:2rem;margin-bottom:6px;">🏆</div>';
             html += '<div style="color:#047857;font-weight:bold;font-size:1.15rem;">You won a Noetic Summer Certificate!</div>';
-            html += '<div style="color:#065f46;font-size:0.9rem;margin-top:6px;">Congratulations — keep an eye out for details from Prof. Jojo.</div>';
+            if (ds.certLink) {
+              html += '<div style="margin-top:12px;">';
+              html += '<a href="' + ds.certLink + '" target="_blank" style="display:inline-block;background:#059669;color:white;font-weight:bold;padding:10px 22px;border-radius:8px;text-decoration:none;font-size:0.95rem;">📄 View Your Certificate</a>';
+              html += '</div>';
+            } else {
+              html += '<div style="color:#065f46;font-size:0.9rem;margin-top:6px;">Congratulations — keep an eye out for details from Prof. Jojo.</div>';
+            }
             html += '</div>';
           } else if (ds.certsRemaining === 0) {
             html += '<div style="background:#f3f4f6;border:2px solid #d1d5db;border-radius:10px;padding:18px;text-align:center;">';
@@ -2862,6 +2873,249 @@
                     console.error('Carderock drop error:', error);
                 })
                 .dropCarderockSignUp(mcpsId);
+        }
+
+        // ── End-of-Year Survey ─────────────────────────────────────────────────
+        function surveyQ(name, labelText, options) {
+            let s = '<div><div style="font-weight:bold;color:#374151;margin-bottom:6px;">' + labelText + '</div>';
+            s += '<div style="display:flex;flex-wrap:wrap;gap:8px;">';
+            for (const opt of options) {
+                s += '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:white;font-size:0.9rem;">';
+                s += '<input type="radio" name="' + name + '" value="' + opt.replace(/"/g, '&quot;') + '" style="width:auto;cursor:pointer;">';
+                s += opt + '</label>';
+            }
+            s += '</div></div>';
+            return s;
+        }
+
+        function surveyTextarea(fieldId, labelText) {
+            return '<div><div style="font-weight:bold;color:#374151;margin-bottom:6px;">' + labelText + '</div>'
+                + '<textarea id="' + fieldId + '" rows="2" style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:6px;font-family:inherit;font-size:0.9rem;resize:vertical;"></textarea></div>';
+        }
+
+        function surveyTextInput(fieldId, labelText) {
+            return '<div><div style="font-weight:bold;color:#374151;margin-bottom:6px;">' + labelText + '</div>'
+                + '<input type="text" id="' + fieldId + '" style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:6px;font-family:inherit;font-size:0.9rem;"></div>';
+        }
+
+        function surveyThankYouCard(role) {
+            return '<div style="background:#d1fae5;border:2px solid #6ee7b7;border-radius:10px;padding:24px;text-align:center;">'
+                + '<div style="font-size:2rem;margin-bottom:8px;">&#x2705;</div>'
+                + '<div style="font-size:1.1rem;font-weight:bold;color:#065f46;">Thank you for your feedback!</div>'
+                + '<div style="color:#047857;margin-top:6px;font-size:0.9rem;">' + (role === 'parent' ? 'Parent' : 'Student') + ' response recorded.</div>'
+                + '</div>';
+        }
+
+        function buildSurveySection(result) {
+            const student    = result.student;
+            const ss         = result.surveyStatus || {};
+            const parentDone  = !!ss.parentSubmitted;
+            const studentDone = !!ss.studentSubmitted;
+            const is8th      = (student.gradeLevel || '').toString() === '8';
+            const mcpsId     = escapeHtml(student.mcpsId);
+
+            const contests = [
+                { key: 'mathcounts',   label: 'MATHCOUNTS',   done: !!result.mathcounts },
+                { key: 'moems',        label: 'MOEMS',         done: !!result.moems },
+                { key: 'mathleague',   label: 'Math League',   done: !!result.mathLeague },
+                { key: 'mathkangaroo', label: 'Math Kangaroo', done: !!result.mathKangaroo },
+                { key: 'amc8',         label: 'AMC 8',         done: !!result.amc8 },
+                { key: 'noetic',       label: 'Noetic',        done: !!result.noetic },
+                { key: 'purplecomet',  label: 'Purple Comet',  done: !!result.purpleComet }
+            ];
+
+            // Default to Parent tab; switch to Student if parent already submitted but student hasn't
+            const defaultParent  = !(parentDone && !studentDone);
+            const activeStyle   = 'padding:8px 22px;border-radius:20px;border:2px solid #dc2626;background:#dc2626;color:white;font-weight:bold;cursor:pointer;font-size:0.95rem;';
+            const inactiveStyle = 'padding:8px 22px;border-radius:20px;border:2px solid #dc2626;background:white;color:#dc2626;font-weight:bold;cursor:pointer;font-size:0.95rem;';
+
+            let h = '';
+            h += '<h2 class="section-title">&#x1F4CB; End of Year Survey</h2>';
+            h += '<div style="background:#f8f9fa;border-radius:10px;padding:20px;margin-bottom:15px;">';
+            h += '<p style="color:#555;margin-bottom:16px;font-size:0.95rem;">Share your thoughts about this year\'s math club. Both students and parents can submit a separate response using the same student ID login.</p>';
+
+            // Role toggle
+            h += '<div style="display:flex;gap:10px;margin-bottom:20px;">';
+            h += '<button id="surveyTabParent" onclick="switchSurveyTab(\'parent\')" style="' + (defaultParent ? activeStyle : inactiveStyle) + '">&#x1F46A; Parent</button>';
+            h += '<button id="surveyTabStudent" onclick="switchSurveyTab(\'student\')" style="' + (!defaultParent ? activeStyle : inactiveStyle) + '">&#x1F393; Student</button>';
+            h += '</div>';
+
+            // ── Parent panel ──────────────────────────────────────────────────
+            h += '<div id="surveyPanelParent" style="' + (defaultParent ? '' : 'display:none;') + '">';
+            if (parentDone) {
+                h += surveyThankYouCard('parent');
+            } else {
+                h += '<div style="display:flex;flex-direction:column;gap:18px;">';
+                if (is8th) {
+                    h += surveyQ('sp_returnCoach', 'Would you support your child returning to help coach math club next year?', ['Yes', 'Maybe', 'No']);
+                    h += surveyTextarea('sp_coachNotes', 'Any notes about that? (optional)');
+                } else {
+                    h += surveyQ('sp_returning', 'Is your child planning to return to math club next year?', ['Yes', 'No', 'Maybe']);
+                    h += surveyQ('sp_volunteer', 'Would you be willing to volunteer to help with math club next year?', ['Yes, definitely', 'Maybe', 'No']);
+                }
+                for (const c of contests) {
+                    h += '<div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:14px;">';
+                    h += '<div style="font-weight:bold;color:#374151;margin-bottom:10px;">' + c.label + '</div>';
+                    if (c.done) {
+                        h += surveyQ('sp_' + c.key + '_again', 'Would you want your child to compete in ' + c.label + ' again next year?', ['Yes', 'No', 'Maybe']);
+                        h += surveyTextarea('sp_' + c.key + '_comments', 'Any comments? (optional)');
+                    } else {
+                        h += surveyQ('sp_' + c.key + '_again', 'Now that you know more about ' + c.label + ', would you have wanted your child to participate?', ['Yes', 'No', 'Maybe']);
+                    }
+                    h += '</div>';
+                }
+                h += surveyTextarea('sp_suggested', 'Are there any competitions you\'d suggest we add next year that we didn\'t offer this year?');
+                h += surveyQ('sp_commFreq', 'How would you rate the frequency of communication from Prof. Jojo?', ['Too much', 'About right', 'Not enough']);
+                h += surveyTextarea('sp_commTopics', 'What topics would you like more or less communication about? (optional)');
+                h += surveyQ('sp_snacks', 'How should we handle snacks?', ['Donation-based (as now)', 'Set fee collected from all participants', 'No preference']);
+                h += surveyQ('sp_tryouts', 'Should limited-seat competitions require try-outs?', ['Yes', 'No', 'No preference']);
+                h += surveyTextarea('sp_suggestions', 'Any other suggestions or feedback?');
+                h += '<div style="text-align:center;margin-top:8px;"><button onclick="submitSurvey(\'' + mcpsId + '\',\'parent\')" style="background:#dc2626;color:white;border:none;padding:12px 32px;border-radius:8px;font-size:1rem;font-weight:bold;cursor:pointer;">Submit Parent Response</button></div>';
+                h += '</div>';
+            }
+            h += '</div>'; // surveyPanelParent
+
+            // ── Student panel ─────────────────────────────────────────────────
+            h += '<div id="surveyPanelStudent" style="' + (!defaultParent ? '' : 'display:none;') + '">';
+            if (studentDone) {
+                h += surveyThankYouCard('student');
+            } else {
+                h += '<div style="display:flex;flex-direction:column;gap:18px;">';
+                if (is8th) {
+                    h += surveyTextInput('ss_highschool', 'Which high school will you be attending next year?');
+                    h += '<div><div style="font-weight:bold;color:#374151;margin-bottom:6px;">Would you be interested in returning to help coach math club?</div>';
+                    h += '<div style="display:flex;flex-wrap:wrap;gap:8px;">';
+                    for (const opt of ['Yes', 'Maybe', 'No']) {
+                        h += '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:white;font-size:0.9rem;">';
+                        h += '<input type="radio" name="ss_coaching" value="' + opt + '" onclick="onSurveyCoachingChange()" style="width:auto;cursor:pointer;">';
+                        h += opt + '</label>';
+                    }
+                    h += '</div></div>';
+                    h += '<div id="ss_phoneWrap" style="display:none;">';
+                    h += surveyTextInput('ss_phone', 'Your phone number (Prof. Jojo will reach you on WhatsApp):');
+                    h += '</div>';
+                } else {
+                    h += surveyQ('ss_returning', 'Are you planning to return to math club next year?', ['Yes', 'No', 'Maybe']);
+                }
+                for (const c of contests) {
+                    h += '<div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:14px;">';
+                    h += '<div style="font-weight:bold;color:#374151;margin-bottom:10px;">' + c.label + '</div>';
+                    if (c.done) {
+                        h += surveyQ('ss_' + c.key + '_again', 'Would you compete in ' + c.label + ' again next year?', ['Yes', 'No', 'Maybe']);
+                        h += surveyTextarea('ss_' + c.key + '_comments', 'Any comments? (optional)');
+                    } else {
+                        h += surveyQ('ss_' + c.key + '_again', 'Now that you know more about ' + c.label + ', would you want to participate if it\'s offered again?', ['Yes', 'No', 'Maybe']);
+                    }
+                    h += '</div>';
+                }
+                h += surveyTextarea('ss_suggested', 'Are there any competitions you\'d like us to add next year that we didn\'t offer this year?');
+                h += '<div>';
+                h += '<div style="font-weight:bold;color:#374151;margin-bottom:8px;">How should math club meetings be structured?</div>';
+                h += '<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin-bottom:6px;">';
+                h += '<div style="font-size:0.85rem;color:#6b7280;text-align:right;">More focused on competition prep (practice problems, drills, test strategies)</div>';
+                h += '<input type="range" id="ss_meetingFormat" min="1" max="5" value="3" oninput="document.getElementById(\'ss_meetingVal\').textContent=this.value" style="width:120px;">';
+                h += '<div style="font-size:0.85rem;color:#6b7280;">More time on games and activities not tied to specific competitions</div>';
+                h += '</div>';
+                h += '<div style="text-align:center;font-size:0.85rem;color:#555;">Value: <strong id="ss_meetingVal">3</strong> &nbsp;(1&nbsp;=&nbsp;more prep, 3&nbsp;=&nbsp;current balance, 5&nbsp;=&nbsp;more games)</div>';
+                h += '</div>';
+                h += surveyTextarea('ss_favorite', 'What was your favorite activity this year?');
+                h += surveyQ('ss_tryouts', 'Should limited-seat competitions require try-outs?', ['Yes', 'No', 'No preference']);
+                h += surveyTextarea('ss_suggestions', 'Any other suggestions or feedback?');
+                h += '<div style="text-align:center;margin-top:8px;"><button onclick="submitSurvey(\'' + mcpsId + '\',\'student\')" style="background:#dc2626;color:white;border:none;padding:12px 32px;border-radius:8px;font-size:1rem;font-weight:bold;cursor:pointer;">Submit Student Response</button></div>';
+                h += '</div>';
+            }
+            h += '</div>'; // surveyPanelStudent
+
+            h += '</div>'; // outer container
+            return h;
+        }
+
+        function switchSurveyTab(role) {
+            const isParent = role === 'parent';
+            const pPanel = document.getElementById('surveyPanelParent');
+            const sPanel = document.getElementById('surveyPanelStudent');
+            const pTab   = document.getElementById('surveyTabParent');
+            const sTab   = document.getElementById('surveyTabStudent');
+            if (pPanel) pPanel.style.display = isParent ? '' : 'none';
+            if (sPanel) sPanel.style.display = isParent ? 'none' : '';
+            const active   = 'padding:8px 22px;border-radius:20px;border:2px solid #dc2626;background:#dc2626;color:white;font-weight:bold;cursor:pointer;font-size:0.95rem;';
+            const inactive = 'padding:8px 22px;border-radius:20px;border:2px solid #dc2626;background:white;color:#dc2626;font-weight:bold;cursor:pointer;font-size:0.95rem;';
+            if (pTab) pTab.style.cssText = isParent ? active   : inactive;
+            if (sTab) sTab.style.cssText = isParent ? inactive : active;
+        }
+
+        function onSurveyCoachingChange() {
+            const checked = document.querySelector('input[name="ss_coaching"]:checked');
+            const wrap = document.getElementById('ss_phoneWrap');
+            if (wrap) wrap.style.display = (checked && (checked.value === 'Yes' || checked.value === 'Maybe')) ? '' : 'none';
+        }
+
+        function submitSurvey(mcpsId, role) {
+            const isParent = role === 'parent';
+            const pfx = isParent ? 'sp' : 'ss';
+
+            function radioVal(name) {
+                const el = document.querySelector('input[name="' + name + '"]:checked');
+                return el ? el.value : '';
+            }
+            function txtVal(id) {
+                const el = document.getElementById(id);
+                return el ? (el.value || '').trim() : '';
+            }
+
+            const a = {};
+            if (isParent) {
+                a.returning         = radioVal('sp_returning');
+                a.coachingInterest  = '';
+                a.whatsAppPhone     = '';
+                a.volunteerInterest = radioVal('sp_volunteer');
+                a.coachingSupport   = radioVal('sp_returnCoach');
+            } else {
+                const coaching = radioVal('ss_coaching');
+                a.returning         = radioVal('ss_returning') || txtVal('ss_highschool');
+                a.coachingInterest  = coaching;
+                a.whatsAppPhone     = (coaching === 'Yes' || coaching === 'Maybe') ? txtVal('ss_phone') : '';
+                a.volunteerInterest = '';
+                a.coachingSupport   = '';
+            }
+
+            const contestKeys = ['mathcounts', 'moems', 'mathleague', 'mathkangaroo', 'amc8', 'noetic', 'purplecomet'];
+            for (const c of contestKeys) {
+                a[c + '_again']    = radioVal(pfx + '_' + c + '_again');
+                a[c + '_comments'] = txtVal(pfx + '_' + c + '_comments');
+            }
+
+            const fmtEl = document.getElementById('ss_meetingFormat');
+            a.suggestedCompetitions = txtVal(pfx + '_suggested');
+            a.meetingFormat         = isParent ? '' : (fmtEl ? fmtEl.value : '');
+            a.favoriteActivity      = isParent ? '' : txtVal('ss_favorite');
+            a.tryOuts               = radioVal(pfx + '_tryouts');
+            a.commFrequency         = isParent ? radioVal('sp_commFreq') : '';
+            a.commTopics            = isParent ? txtVal('sp_commTopics') : '';
+            a.snacks                = isParent ? radioVal('sp_snacks') : '';
+            a.suggestions           = txtVal(pfx + '_suggestions');
+
+            const panel = document.getElementById(isParent ? 'surveyPanelParent' : 'surveyPanelStudent');
+            const btn   = panel ? panel.querySelector('button[onclick*="submitSurvey"]') : null;
+            if (btn) { btn.disabled = true; btn.textContent = '⏳ Submitting...'; }
+            showMessage('Submitting survey...', false);
+
+            google.script.run
+                .withSuccessHandler(function(res) {
+                    if (res.success) {
+                        showMessage(res.message, false);
+                        setTimeout(function() { lookupStudent(); }, 1500);
+                    } else {
+                        showMessage(res.message || 'Error. Please try again.', true);
+                        if (btn) { btn.disabled = false; btn.textContent = isParent ? 'Submit Parent Response' : 'Submit Student Response'; }
+                    }
+                })
+                .withFailureHandler(function(err) {
+                    showMessage('Error. Please try again.', true);
+                    console.error('Survey submit error:', err);
+                    if (btn) { btn.disabled = false; btn.textContent = isParent ? 'Submit Parent Response' : 'Submit Student Response'; }
+                })
+                .submitSurveyResponse(mcpsId, role, a);
         }
     </script>
 </body>

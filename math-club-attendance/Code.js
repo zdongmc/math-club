@@ -4,6 +4,8 @@ const COMPETITION_SIGNUP_SHEET_NAME = 'Form Responses 2';
 const ATTENDANCE_SHEET_NAME = 'Attendance Records';
 const SCHOOL_LIST_SHEET_NAME = 'School List';
 
+const SURVEY_OPEN = true;
+
 function doGet(e) {
   // Handle sign-up action
   if (e && e.parameter && e.parameter.action === 'signUpNoetic') {
@@ -2609,6 +2611,13 @@ function lookupStudentByMcpsId(mcpsId) {
       Logger.log('Error getting Carderock results: ' + err.toString());
     }
 
+    let surveyStatus = null;
+    try {
+      surveyStatus = getSurveyStatus(mcpsIdStr);
+    } catch (err) {
+      Logger.log('Error getting survey status: ' + err.toString());
+    }
+
     const result = {
       success: true,
       student: studentInfo,
@@ -2622,7 +2631,8 @@ function lookupStudentByMcpsId(mcpsId) {
       amc8: amc8Results,
       noetic: noeticResults,
       purpleComet: purpleComet,
-      carderock: carderockResults
+      carderock: carderockResults,
+      surveyStatus: surveyStatus
     };
 
     try {
@@ -3251,6 +3261,173 @@ function recordCertWinner(mcpsId, entriesAtWin) {
 
   } catch (err) {
     Logger.log('recordCertWinner error: ' + err.message);
+    return { success: false, error: err.message };
+  }
+}
+
+// ── END-OF-YEAR SURVEY 2026 ───────────────────────────────────────────────────
+
+const SURVEY_SHEET_NAME = 'Survey 2026';
+
+function getSurveySheet() {
+  const ss = getSpreadsheet();
+  let sheet = ss.getSheetByName(SURVEY_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(SURVEY_SHEET_NAME);
+    const headers = [
+      'Timestamp', 'MCPS ID', 'Student Name', 'Role',
+      'Returning', 'CoachingInterest', 'WhatsAppPhone',
+      'VolunteerInterest', 'CoachingSupport',
+      'MATHCOUNTS_Again', 'MATHCOUNTS_Comments',
+      'MOEMS_Again', 'MOEMS_Comments',
+      'MathLeague_Again', 'MathLeague_Comments',
+      'MathKangaroo_Again', 'MathKangaroo_Comments',
+      'AMC8_Again', 'AMC8_Comments',
+      'Noetic_Again', 'Noetic_Comments',
+      'PurpleComet_Again', 'PurpleComet_Comments',
+      'SuggestedCompetitions',
+      'MeetingFormat',
+      'FavoriteActivity',
+      'TryOuts',
+      'CommFrequency', 'CommTopics',
+      'Snacks',
+      'Suggestions'
+    ];
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+function getSurveyStatus(mcpsId) {
+  const idStr = (mcpsId || '').toString().trim();
+  if (!idStr) return { surveyOpen: SURVEY_OPEN, parentSubmitted: false, studentSubmitted: false };
+
+  const sheet = getSurveySheet();
+  let parentSubmitted = false;
+  let studentSubmitted = false;
+
+  if (sheet.getLastRow() > 1) {
+    const data = sheet.getDataRange().getValues().slice(1);
+    for (const row of data) {
+      const rowId   = (row[1] || '').toString().trim();
+      const rowRole = (row[3] || '').toString().trim().toLowerCase();
+      if (rowId === idStr) {
+        if (rowRole === 'parent')  parentSubmitted  = true;
+        if (rowRole === 'student') studentSubmitted = true;
+      }
+    }
+  }
+
+  return { surveyOpen: SURVEY_OPEN, parentSubmitted, studentSubmitted };
+}
+
+function submitSurveyResponse(mcpsId, role, answers) {
+  try {
+    if (!SURVEY_OPEN) return { success: false, message: 'The survey is currently closed.' };
+
+    const idStr   = (mcpsId || '').toString().trim();
+    const roleStr = (role   || '').toString().trim().toLowerCase();
+    if (!idStr)                                          return { success: false, message: 'Missing student ID.' };
+    if (roleStr !== 'parent' && roleStr !== 'student')   return { success: false, message: 'Invalid role.' };
+
+    const sheet = getSurveySheet();
+
+    // Duplicate check
+    if (sheet.getLastRow() > 1) {
+      const data = sheet.getDataRange().getValues().slice(1);
+      for (const row of data) {
+        if ((row[1] || '').toString().trim() === idStr &&
+            (row[3] || '').toString().trim().toLowerCase() === roleStr) {
+          return { success: false, message: 'A ' + role + ' response has already been submitted for this student.' };
+        }
+      }
+    }
+
+    const name = findStudentNameByMcpsId(idStr) || idStr;
+    const a    = answers || {};
+
+    sheet.appendRow([
+      new Date(), idStr, name, role,
+      a.returning          || '',
+      a.coachingInterest   || '',
+      a.whatsAppPhone      || '',
+      a.volunteerInterest  || '',
+      a.coachingSupport    || '',
+      a.mathcounts_again   || '', a.mathcounts_comments   || '',
+      a.moems_again        || '', a.moems_comments        || '',
+      a.mathleague_again   || '', a.mathleague_comments   || '',
+      a.mathkangaroo_again || '', a.mathkangaroo_comments || '',
+      a.amc8_again         || '', a.amc8_comments         || '',
+      a.noetic_again       || '', a.noetic_comments       || '',
+      a.purplecomet_again  || '', a.purplecomet_comments  || '',
+      a.suggestedCompetitions || '',
+      a.meetingFormat      || '',
+      a.favoriteActivity   || '',
+      a.tryOuts            || '',
+      a.commFrequency      || '', a.commTopics            || '',
+      a.snacks             || '',
+      a.suggestions        || ''
+    ]);
+
+    Logger.log('Survey response recorded: ' + idStr + ' / ' + role);
+    return { success: true, message: 'Thank you for your feedback!' };
+
+  } catch (err) {
+    Logger.log('submitSurveyResponse error: ' + err.message);
+    return { success: false, message: 'Server error: ' + err.message };
+  }
+}
+
+function getSurveySummary() {
+  try {
+    const sheet = getSurveySheet();
+    if (sheet.getLastRow() <= 1) {
+      return { success: true, total: 0, parentCount: 0, studentCount: 0, tallies: {} };
+    }
+
+    const data = sheet.getDataRange().getValues().slice(1);
+    let parentCount = 0, studentCount = 0;
+
+    const tally = (obj, val) => {
+      const k = (val || '').toString().trim() || '(blank)';
+      obj[k] = (obj[k] || 0) + 1;
+    };
+
+    const tallies = {
+      returning: {}, tryOuts: {}, snacks: {}, meetingFormat: {},
+      commFrequency: {}, volunteerInterest: {}, coachingInterest: {}, coachingSupport: {},
+      mathcounts_again: {}, moems_again: {}, mathleague_again: {},
+      mathkangaroo_again: {}, amc8_again: {}, noetic_again: {}, purplecomet_again: {}
+    };
+
+    for (const row of data) {
+      const role = (row[3] || '').toString().trim().toLowerCase();
+      if (role === 'parent')  parentCount++;
+      if (role === 'student') studentCount++;
+
+      tally(tallies.returning,          row[4]);
+      tally(tallies.coachingInterest,   row[5]);
+      tally(tallies.volunteerInterest,  row[7]);
+      tally(tallies.coachingSupport,    row[8]);
+      tally(tallies.mathcounts_again,   row[9]);
+      tally(tallies.moems_again,        row[11]);
+      tally(tallies.mathleague_again,   row[13]);
+      tally(tallies.mathkangaroo_again, row[15]);
+      tally(tallies.amc8_again,         row[17]);
+      tally(tallies.noetic_again,       row[19]);
+      tally(tallies.purplecomet_again,  row[21]);
+      tally(tallies.tryOuts,            row[26]);
+      tally(tallies.commFrequency,      row[27]);
+      tally(tallies.snacks,             row[29]);
+      const mf = parseInt(row[24]);
+      if (!isNaN(mf)) tally(tallies.meetingFormat, String(mf));
+    }
+
+    return { success: true, total: data.length, parentCount, studentCount, tallies };
+
+  } catch (err) {
+    Logger.log('getSurveySummary error: ' + err.message);
     return { success: false, error: err.message };
   }
 }
