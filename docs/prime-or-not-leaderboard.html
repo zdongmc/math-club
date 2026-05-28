@@ -213,6 +213,7 @@
 
     <script>
         const LEADERBOARD_API_URL = 'https://script.google.com/macros/s/AKfycbwddZFUQ7G0s4NrXfvbUQcSR2wTAPQ3_q0YQthV6Hok5gOQztPt14nMeXMwAcCEkguV/exec';
+        const PORTAL_URL = 'https://script.google.com/macros/s/AKfycbye0EfX9YL0Gg4Ih4OeN6sLcGAN57nPzVtk88rQYMrA8gyEE9Zlu-aLY9udIEskvIMJ/exec';
         const myMcpsId = new URLSearchParams(window.location.search).get('mcpsId') || '';
 
         let availableRanges = [];
@@ -228,9 +229,15 @@
             const div = document.getElementById('drawingContent');
             div.innerHTML = '<div class="drawing-loading">Loading standings…</div>';
             try {
-                const resp = await fetch(`${LEADERBOARD_API_URL}?action=getDrawingLeaderboard`);
-                const data = await resp.json();
+                const [lbResp, winnersResp] = await Promise.all([
+                    fetch(`${LEADERBOARD_API_URL}?action=getDrawingLeaderboard`),
+                    fetch(`${PORTAL_URL}?action=getCertWinners`)
+                ]);
+                const data = await lbResp.json();
+                const winnersData = await winnersResp.json();
                 if (!data.success) throw new Error(data.error || 'unknown');
+
+                const wonIds = new Set((winnersData.wonIds || []));
 
                 if (!data.ranges || data.ranges.length === 0) {
                     div.innerHTML = '<div class="drawing-loading">No qualifying scores yet — play with your MCPS ID to earn entries!</div>';
@@ -240,15 +247,15 @@
                 let myEntries = 0;
                 let rows = '';
                 for (const r of data.ranges) {
-                    const isMe = myMcpsId && r.leader && r.leader.mcpsId === myMcpsId;
+                    // Cascade past winners to find the eligible leader
+                    const eligibleLeader = r.leader && !wonIds.has(r.leader.mcpsId) ? r.leader : null;
+                    const isMe = myMcpsId && eligibleLeader && eligibleLeader.mcpsId === myMcpsId;
                     if (isMe) myEntries++;
-                    const leaderName = r.leader ? escapeHtml(r.leader.name) : '—';
-                    const accuracy  = r.leader ? `${r.leader.accuracy}%` : '—';
-                    const time      = r.leader ? escapeHtml(r.leader.timeDisplay) : '—';
+                    const leaderName = eligibleLeader ? escapeHtml(eligibleLeader.name) : (r.leader ? '🏆 ' + escapeHtml(r.leader.name) + ' <span style="font-size:0.8em;color:#6b7280">(won — open!)</span>' : '—');
+                    const accuracy  = eligibleLeader ? `${eligibleLeader.accuracy}%` : (r.leader ? `${r.leader.accuracy}%` : '—');
+                    const time      = eligibleLeader ? escapeHtml(eligibleLeader.timeDisplay) : (r.leader ? escapeHtml(r.leader.timeDisplay) : '—');
                     const idParam   = myMcpsId ? `&mcpsId=${myMcpsId}` : '';
-                    const playBtn   = r.leader
-                        ? `<a href="prime-or-not.html?min=${r.min}&max=${r.max}${idParam}" target="_blank" style="display:inline-block;background:#f59e0b;color:#78350f;font-weight:bold;font-size:0.8rem;padding:5px 12px;border-radius:12px;text-decoration:none;white-space:nowrap;">▶ Play</a>`
-                        : '';
+                    const playBtn   = `<a href="prime-or-not.html?min=${r.min}&max=${r.max}${idParam}" target="_blank" style="display:inline-block;background:#f59e0b;color:#78350f;font-weight:bold;font-size:0.8rem;padding:5px 12px;border-radius:12px;text-decoration:none;white-space:nowrap;">▶ Play</a>`;
                     rows += `<tr${isMe ? ' class="my-row"' : ''}>
                         <td>${escapeHtml(r.label)} <span style="font-size:0.8em;color:#999">(min ${r.minQuestions}q)</span></td>
                         <td>${leaderName}</td>
