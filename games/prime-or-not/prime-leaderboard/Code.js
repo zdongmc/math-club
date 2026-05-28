@@ -154,6 +154,14 @@ function getAvailableRanges() {
  */
 function getDrawingLeaderboard() {
   try {
+    // Fetch cert winners from parent portal (server-to-server avoids CORS)
+    let wonIds = new Set();
+    try {
+      const resp = UrlFetchApp.fetch(PORTAL_URL + '?action=getCertWinners', { muteHttpExceptions: true });
+      const parsed = JSON.parse(resp.getContentText());
+      if (parsed.success && parsed.wonIds) wonIds = new Set(parsed.wonIds);
+    } catch (e) { /* if unreachable, continue without cascading */ }
+
     const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(SHEET_NAME);
     const data = sheet.getDataRange().getValues();
 
@@ -168,6 +176,7 @@ function getDrawingLeaderboard() {
       const row = data[i];
       const mcpsId = (row[10] || '').toString().trim();
       if (!mcpsId) continue; // skip guest plays
+      if (wonIds.has(mcpsId)) continue; // cascade past winners
 
       const min = Number(row[2]);
       const max = Number(row[3]);
