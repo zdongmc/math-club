@@ -170,8 +170,10 @@ Script ID: `1we0rmj2d9JFEhogb0b1Ag82MMarJCKkdfVG92cmVe3GTv8HkORT6Lme_`
 - `submitScore(data)` — stores score with millisecond precision; `data.mcpsId` (nullable) written to col K
 - `getLeaderboard(min, max)` — all scores for a range; omit `total` to include all session lengths; sorted accuracy desc, time asc
 - `getRanges` (action) — all unique `{min, max, label}` pairs that have any scores
-- `getDrawingLeaderboard()` — per-range #1 leaders among rows with non-empty col K; rangeSize ≥ 20, totalQuestions ≥ 20
+- `getDrawingLeaderboard()` — per-range #1 leaders among rows with non-empty col K; rangeSize ≥ 20, totalQuestions ≥ 20; reads winner IDs from "Cert Winners" tab in the same Google Sheet (synced by `recordCertWinner` in the parent portal) and skips them so the leaderboard cascades to the next eligible player; bootstrap hardcodes the first 3 winners as a fallback
 - `lookupStudentForPON(mcpsId)` — validates MCPS ID against parent portal sheet; returns `{success, name}`
+
+**Winner cascade:** When a student wins the certificate drawing, `recordCertWinner` in the parent portal writes all winner IDs to a "Cert Winners" tab in the PON Google Sheet. `getDrawingLeaderboard` reads this tab and skips those IDs, cascading each range to the next best non-winner. This mirrors the same cascade in `getPONDrawingLeaderboard_` used by the CertDraw pool.
 
 **Google Sheet:** https://docs.google.com/spreadsheets/d/19P1KPhQXMMsYEgx8dpmhZQynegf5iygu4nqLMNXU4ss  
 Columns: `A=Timestamp, B=Player Name, C=Min, D=Max, E=Questions, F=Correct, G=Incorrect, H=Accuracy%, I=Total ms, J=Time Display, K=MCPS ID`  

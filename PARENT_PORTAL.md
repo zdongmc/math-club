@@ -66,10 +66,11 @@ Student self-serve check-in used at the start of each club meeting. Teacher open
 
 **Noetic Summer Certificate Drawing:**
 - `getDrawingStatus(mcpsId)` — returns `{eligible, alreadyWon, certLink, certsRemaining, entries, baseEntry, ponEntries, noeticParticipant, rangeStatus}`; `baseEntry` is 1 for Noetic participants, 0 otherwise; `certLink` is the Google Drive PDF link if this student has already won. Falls back to `CERT_LINKS[position]` when col F is missing (handles winners recorded before the cert link column was added)
-- `getCertDrawPool()` — full draw pool: Noetic participants (base=1, any grade) + non-Noetic PON leaders (base=0); excludes prior winners; returns `{success, certsRemaining, certsDrawn, winners, pool}`; each winner includes `certLink`
-- `recordCertWinner(mcpsId, entriesAtWin)` — appends to "Cert Winners 2026" sheet with cert number (col E) and Drive link (col F); returns updated pool state plus `certLink` and `certNumber`
+- `getCertDrawPool()` — full draw pool: Noetic participants (base=1, any grade) + non-Noetic PON leaders (base=0); excludes prior winners; passes `wonIds` to `getPONDrawingLeaderboard_` so winners cascade to the next eligible player per range
+- `recordCertWinner(mcpsId, entriesAtWin)` — appends to "Cert Winners 2026" sheet with cert number (col E) and Drive link (col F); syncs all winner IDs to "Cert Winners" tab in the PON spreadsheet so the public leaderboard cascades automatically; returns updated pool state plus `certLink` and `certNumber`
 - `getCertWinnersSheet()` — get/create "Cert Winners 2026" sheet
-- `getPONDrawingLeaderboard_()` — internal; opens PON sheet via `SpreadsheetApp.openById(PON_SHEET_ID)`; finds #1 per qualifying range (rangeSize ≥ 20, totalQuestions ≥ 20); no eligibility filter — all MCPS ID holders compete
+- `getPONDrawingLeaderboard_(excludeIds)` — internal; opens PON sheet via `SpreadsheetApp.openById(PON_SHEET_ID)`; finds #1 per qualifying range (rangeSize ≥ 20, totalQuestions ≥ 20); skips any MCPS ID in `excludeIds` (used to cascade past prior winners)
+- `getCertWinners` GET action — `?action=getCertWinners` returns `{success, wonIds:[...]}` array of winner MCPS IDs; public endpoint used by the leaderboard page
 - `lookupStudentForPON` GET action — `?action=lookupStudentForPON&id=<mcpsId>` returns `{success, name}` or `{success:false, error:'not_found'}`; called by the Prime or Not game frontend for MCPS ID login
 
 **Carderock:**
@@ -79,7 +80,7 @@ Student self-serve check-in used at the start of each club meeting. Teacher open
 
 **End-of-Year Survey:**
 - `const SURVEY_OPEN = false` — flip to `true` in Code.js and redeploy to open survey to all students
-- `getSurveySheet()` — get/create "Survey 2026" sheet with 31-column header
+- `getSurveySheet()` — get/create "Survey 2026" sheet; if sheet doesn't exist yet, creates it with the full column schema on first submission
 - `getSurveyStatus(mcpsId)` — returns `{surveyOpen, parentSubmitted, studentSubmitted}`; included in `lookupStudentByMcpsId` response as `surveyStatus`
 - `submitSurveyResponse(mcpsId, role, answers)` — validates role ('parent'/'student'), duplicate-checks by (MCPS ID + role), appends row; returns `{success, message}`
 - `getSurveySummary()` — returns `{total, parentCount, studentCount, tallies}` with tallies for all key multiple-choice fields; used by CertDraw Survey tab
@@ -147,12 +148,18 @@ MCPS ID lookup form (variable-length numeric IDs, validated with `/^\d+$/`).
 - Appears right after Required Forms
 - Parent / Student role toggle — each role submits independently; one submission per (MCPS ID + role) enforced server-side
 - Default tab: Parent; auto-switches to Student if parent already submitted but student hasn't
-- **6th/7th graders:** returning Yes/No/Maybe; parent also asked about volunteering
-- **8th graders:** high school text field + coaching interest (Yes/Maybe/No); Yes/Maybe reveals WhatsApp phone field; parent asked about supporting child to help coach
-- All 7 contests (MATHCOUNTS, MOEMS, Math League, Math Kangaroo, AMC 8, Noetic, Purple Comet): if student participated → "compete again?" + optional comments; if not → "would you participate?"
-- Student-only: meeting format 1–5 slider (1=more competition prep, 3=current balance, 5=more games), favorite activity
-- Parent-only: communication frequency (Too much/About right/Not enough) + topics, snacks preference
-- Both roles: suggested competitions (free text), try-outs preference, general suggestions
+- **8th grade detection:** `is8th = /^8/.test(gradeLevel)` — handles "8th grade", "8", "8th" etc.
+- **6th/7th graders:** returning Yes/No/Maybe; parent asked about volunteering (Yes/Maybe reveals WhatsApp phone field) + suggesting competitions
+- **8th graders:** student gets high school text field + coaching interest (Yes/Maybe/No, Yes/Maybe reveals phone); parent asked about supporting child to help coach
+- **Competition block — all 8 competitions** (MATHCOUNTS, MOEMS, MCPS Math League, Math Kangaroo, AMC 8, Noetic, Purple Comet, Carderock):
+  - Student participated → 1–5 star rating ("1=Not worth it, 5=Would do it every year") + optional feedback text
+  - Student did not participate → multiple choice why: Not interested / Schedule conflict / Missed sign-up / Felt unprepared / Other (open text)
+  - `done` flag: `!!result.mathcounts` etc.; Noetic uses `result.noetic.signedUp`; Purple Comet uses `result.purpleComet.myTeam`; Carderock uses `result.carderock.signedUp`
+  - Parent participated → time commitment (Yes/Somewhat/No) + cost if fee-based (Yes/It was a stretch/Cost was a barrier) + AMC 8 special forward-looking cost question + encourage (Yes/Maybe/No)
+  - Parent did not participate + fee-based only → cost factor question; free competitions skipped
+  - Fee-based: MATHCOUNTS, MOEMS, Math Kangaroo, Noetic, AMC 8 (school covered this year → forward-looking question)
+- **Student-only:** meeting format radio (More competition prep / Keep current balance / More games), favorite activity or competition, club size (Too small/About right/A bit large/Too large), coach attention (Yes plenty/Somewhat/No), coach ratio (Up to 15/16–25/26–35/More than 35), general suggestions
+- **Parent-only:** communication frequency + topics, snacks, club size, coach ratio, suggested competitions (free text), general suggestions
 - Submit → server-side duplicate check → success refreshes portal via `lookupStudent()`
 
 **Carderock** (deadline April 13, 2026; 8 spots max):
