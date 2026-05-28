@@ -149,18 +149,36 @@ MCPS ID lookup form (variable-length numeric IDs, validated with `/^\d+$/`).
 - Parent / Student role toggle — each role submits independently; one submission per (MCPS ID + role) enforced server-side
 - Default tab: Parent; auto-switches to Student if parent already submitted but student hasn't
 - **8th grade detection:** `is8th = /^8/.test(gradeLevel)` — handles "8th grade", "8", "8th" etc.
-- **6th/7th graders:** returning Yes/No/Maybe; parent asked about volunteering (Yes/Maybe reveals WhatsApp phone field) + suggesting competitions
-- **8th graders:** student gets high school text field + coaching interest (Yes/Maybe/No, Yes/Maybe reveals phone); parent asked about supporting child to help coach
-- **Competition block — all 8 competitions** (MATHCOUNTS, MOEMS, MCPS Math League, Math Kangaroo, AMC 8, Noetic, Purple Comet, Carderock):
-  - Student participated → 1–5 star rating ("1=Not worth it, 5=Would do it every year") + optional feedback text
-  - Student did not participate → multiple choice why: Not interested / Schedule conflict / Missed sign-up / Felt unprepared / Other (open text)
-  - `done` flag: `!!result.mathcounts` etc.; Noetic uses `result.noetic.signedUp`; Purple Comet uses `result.purpleComet.myTeam`; Carderock uses `result.carderock.signedUp`
-  - Parent participated → time commitment (Yes/Somewhat/No) + cost if fee-based (Yes/It was a stretch/Cost was a barrier) + AMC 8 special forward-looking cost question + encourage (Yes/Maybe/No)
-  - Parent did not participate + fee-based only → cost factor question; free competitions skipped
-  - Fee-based: MATHCOUNTS, MOEMS, Math Kangaroo, Noetic, AMC 8 (school covered this year → forward-looking question)
-- **Student-only:** meeting format radio (More competition prep / Keep current balance / More games), favorite activity or competition, club size (Too small/About right/A bit large/Too large), coach attention (Yes plenty/Somewhat/No), coach ratio (Up to 15/16–25/26–35/More than 35), general suggestions
-- **Parent-only:** communication frequency + topics, snacks, club size, coach ratio, suggested competitions (free text), general suggestions
+- **`SURVEY_PREVIEW`** is injected as a string (`'true'`/`'false'`) and compared with `=== 'true'` to avoid truthy-string bug
+
+**Student survey — question order:**
+1. Favorite activity or competition (open text)
+2. What would you change (open text)
+3. **Competition block** — all 8 competitions (MATHCOUNTS, MOEMS, MCPS Math League, Math Kangaroo, AMC 8, Noetic, Purple Comet, Carderock):
+   - `done` flag: `!!result.mathcounts` etc.; Noetic: `result.noetic.signedUp`; Purple Comet: `result.purpleComet.myTeam`; Carderock: `result.carderock.signedUp`
+   - Participated → 1–5 star rating + prep question (Yes/Somewhat/No) + optional feedback; MATHCOUNTS card also asks about chapter selection method; Math League card asks about team formation
+   - Not participated → why not (Not interested / Schedule conflict / Missed sign-up / Felt unprepared / Other open text)
+4. Math confidence (Much more confident → Less confident)
+5. Math enjoyment (Yes definitely → Less than before)
+6. Meeting format radio (More competition prep / Keep current balance / More games)
+7. Club size (Too small / About right / A bit large / Too large)
+8. Coach attention (Yes plenty / Somewhat / No)
+9. **Policy questions:** club membership try-out / competition sign-up gate / Carderock allocation
+10. **Looking ahead:** 6th/7th → returning Yes/No/Maybe; 8th → high school text + coaching interest (Yes/Maybe reveals WhatsApp phone)
+11. Words of wisdom (8th graders only, open text)
+12. General suggestions
+
+**Parent survey — question order:**
+1. **Overall experience:** overall satisfaction (⭐ 1–5) → child attitude → personalized time commitment (uses `result.attendance.dates.length` + competition list)
+2. **Competitions:** worthwhile checkboxes (participated) → wish participated checkboxes → suggest new → MATHCOUNTS selection method (if participated) → Math League team formation (if participated)
+3. **Information channels:** website usefulness → portal usefulness → WhatsApp communication frequency → communication topics
+4. **Planning:** expenses (t-shirt / printing / snacks / special events / celebration, each Yes/Maybe/No) → what would you change
+5. **Policy:** club membership try-out → competition sign-up gate → Carderock allocation → coach ratio
+6. **Looking ahead:** 8th → coach support; 6th/7th → returning + volunteer (Yes/Maybe reveals phone)
+7. **Wrap-up:** general suggestions → how they heard about math club (checkboxes)
+
 - Submit → server-side duplicate check → success refreshes portal via `lookupStudent()`
+- **Survey 2026 sheet schema:** Timestamp, MCPS ID, Student Name, Role, Returning, CoachingInterest, WhatsAppPhone, VolunteerInterest, VolunteerPhone, CoachingSupport, then per-competition student columns (Rating/Prep/Feedback/NotDone × 8), then general: SuggestedCompetitions, MeetingFormat, FavoriteActivity, WhatChange, MathConfidence, MathEnjoyment, ClubSize, CoachAttention, MATHCOUNTS_Selection, MathLeague_Teams, MembershipGate, CompGate, CarderockAlloc, WordsOfWisdom, Satisfaction, ChildAttitude, HowJoined, TimeCommitment, WorthwhileContests, WishParticipated, CoachRatio, WebsiteUsefulness, PortalUsefulness, Exp_TShirt/Printing/Snacks/Events/Celebration, CommFrequency, CommTopics, Suggestions
 
 **Carderock** (deadline April 13, 2026; 8 spots max):
 - Before deadline + not signed up: "Indicate Interest" → security acknowledgement modal (5 Navy base access cards)
