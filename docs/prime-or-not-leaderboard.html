@@ -112,30 +112,24 @@
             margin-bottom: 16px;
             text-align: center;
         }
-        .range-tabs {
+        .range-select-wrap {
             display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
+            align-items: center;
+            gap: 10px;
             margin-bottom: 20px;
-            justify-content: center;
         }
-        .range-tab {
-            background: #f3f4f6;
+        .range-select {
+            flex: 1;
+            padding: 8px 12px;
             border: 2px solid #e5e7eb;
-            border-radius: 20px;
-            padding: 7px 18px;
-            cursor: pointer;
+            border-radius: 8px;
+            font-size: 0.95rem;
             font-weight: bold;
-            color: #555;
-            font-size: 0.9rem;
-            transition: all 0.2s;
+            color: #374151;
+            background: white;
+            cursor: pointer;
         }
-        .range-tab:hover { border-color: #dc2626; color: #dc2626; }
-        .range-tab.active {
-            background: linear-gradient(135deg, #dc2626, #991b1b);
-            border-color: #dc2626;
-            color: white;
-        }
+        .range-select:focus { outline: none; border-color: #dc2626; }
         .range-table-wrap {
             background: #f9fafb;
             border: 1px solid #e5e7eb;
@@ -282,15 +276,26 @@
                     return;
                 }
 
-                availableRanges = data.ranges.sort((a, b) => a.min - b.min || a.max - b.max);
+                availableRanges = data.ranges
+                    .filter(r => (r.max - r.min + 1) >= 20)
+                    .sort((a, b) => a.min - b.min || a.max - b.max);
                 activeTabIdx = 0;
 
-                const tabs = availableRanges.map((r, i) =>
-                    `<button class="range-tab${i === 0 ? ' active' : ''}" onclick="selectTab(${i})">${r.label}</button>`
+                if (!availableRanges.length) {
+                    div.innerHTML = '<div class="loading-message">No qualifying scores yet — play a range of 20+ numbers with your MCPS ID!</div>';
+                    return;
+                }
+
+                const options = availableRanges.map((r, i) =>
+                    `<option value="${i}">${r.label}</option>`
                 ).join('');
 
                 div.innerHTML = `
-                    <div class="range-tabs">${tabs}</div>
+                    <div class="range-select-wrap">
+                        <select class="range-select" id="rangeSelect" onchange="selectTab(parseInt(this.value))">
+                            ${options}
+                        </select>
+                    </div>
                     <div class="range-table-wrap" id="rangeTableContent">
                         <div class="loading-message">Loading…</div>
                     </div>
@@ -306,9 +311,8 @@
         function selectTab(idx) {
             if (activeTabIdx === idx) return;
             activeTabIdx = idx;
-            document.querySelectorAll('.range-tab').forEach((btn, i) =>
-                btn.classList.toggle('active', i === idx)
-            );
+            const sel = document.getElementById('rangeSelect');
+            if (sel) sel.value = idx;
             loadRangeLeaderboard(idx);
             updatePlayBtn(idx);
         }
