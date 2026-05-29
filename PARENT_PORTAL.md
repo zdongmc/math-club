@@ -75,15 +75,31 @@ Student self-serve check-in used at the start of each club meeting. Teacher open
 
 **Carderock:**
 - `getCarderockSheet()`, `isCarderockDeadlinePassed()`
-- `getCarderockResults(mcpsId)` — Returns signedUp, signUpDate (string), status, team, permissionSlipLink, totalSignUps
+- `getCarderockResults(mcpsId)` — columns: A=Name, B=MCPS ID, C=Grade, D=Timestamp, E=PermissionSlipLink, F=Team, G=SprintScore, H=TargetScore, I=IndividualScore, J=TeamRoundScore, K=TeamScore, L=ScoreReportLink, M=IndividualRank, N=TeamRank; returns all fields plus `signedUp`, `signUpDate`, `totalSignUps`
 - `signUpForCarderock(mcpsId, studentName, grade)`, `dropCarderockSignUp(mcpsId)`
+- Portal display (post-contest): team badge + score tiles (Sprint/Target/Individual/Indiv.Rank/TeamRound/TeamScore/TeamRank) + Score Report link + Permission Slip link
 
 **End-of-Year Survey:**
-- `const SURVEY_OPEN = false` — flip to `true` in Code.js and redeploy to open survey to all students
-- `getSurveySheet()` — get/create "Survey 2026" sheet; if sheet doesn't exist yet, creates it with the full column schema on first submission
+- `const SURVEY_OPEN = true` — currently open; set to `false` and redeploy to close
+- `getSurveySheet()` — get/create "Survey 2026" sheet
 - `getSurveyStatus(mcpsId)` — returns `{surveyOpen, parentSubmitted, studentSubmitted}`; included in `lookupStudentByMcpsId` response as `surveyStatus`
-- `submitSurveyResponse(mcpsId, role, answers)` — validates role ('parent'/'student'), duplicate-checks by (MCPS ID + role), appends row; returns `{success, message}`
-- `getSurveySummary()` — returns `{total, parentCount, studentCount, tallies}` with tallies for all key multiple-choice fields; used by CertDraw Survey tab
+- `submitSurveyResponse(mcpsId, role, answers)` — validates role, duplicate-checks by (MCPS ID + role), appends row; returns `{success, message}`
+- `getSurveySummary()` — returns tallies for all multiple-choice fields; used by CertDraw Survey tab
+- **Survey bonus entries:** each submitted role (student or parent) adds +1 drawing entry for that student
+
+**Club Awards Voting:**
+- `const VOTING_OPEN = new Date() < new Date('2026-06-04T00:00:00-04:00')` — auto-closes midnight June 3 EDT
+- `const VOTING_PUBLISHED = new Date() >= new Date('2026-06-04T00:00:00-04:00')` — auto-publishes June 4
+- `getVotesSheet()` — get/create "Votes 2026" sheet (cols: Timestamp, VoterMcpsId, mvp, glue, calculator, darkhorse, rookie, leader, highschool)
+- `getVotingPool()` — returns `{open, sixth, seventh, eighth}` candidate arrays filtered by grade; uses Attendance Records (slice(2) to skip both header rows) + Form Responses 1/2 for grade enrichment
+- `getVotingStatus(mcpsId)` — returns `{votingOpen, hasVoted, currentPicks, votingPublished}`; `currentPicks` maps category key → `{mcpsId, name}` with names resolved from attendance
+- `submitVote(mcpsId, picks)` — gates on VOTING_OPEN; validates open-category uniqueness; updates existing row or appends new one (allows vote changes while voting is open)
+- `getVoteResults()` — tallies all votes per category; always available to CertDraw teacher view regardless of VOTING_PUBLISHED
+- `getStudentVotingTitle(mcpsId)` — returns `{title, emoji}` of winning category if VOTING_PUBLISHED; null otherwise
+- 7 categories defined in `VOTE_CATEGORIES` constant: MVP/Glue/Calculator/DarkHorse (open pool), Rookie (6th), Leader (7th), HighSchool (8th)
+- `lookupStudentByMcpsId` returns `votingStatus` and `votingTitle` alongside other data
+
+**MOEMS awards:** columns O=SilverPin (18–22), P=Patch (8–25), Q=HighAchievement (team 148–175); shown as badge chips in portal and year record
 
 ## Student Lookup Process
 
@@ -180,16 +196,27 @@ MCPS ID lookup form (variable-length numeric IDs, validated with `/^\d+$/`).
 - Submit → server-side duplicate check → success refreshes portal via `lookupStudent()`
 - **Survey 2026 sheet schema:** Timestamp, MCPS ID, Student Name, Role, Returning, CoachingInterest, WhatsAppPhone, VolunteerInterest, VolunteerPhone, CoachingSupport, then per-competition student columns (Rating/Prep/Feedback/NotDone × 8), then general: SuggestedCompetitions, MeetingFormat, FavoriteActivity, WhatChange, MathConfidence, MathEnjoyment, ClubSize, CoachAttention, MATHCOUNTS_Selection, MathLeague_Teams, MembershipGate, CompGate, CarderockAlloc, WordsOfWisdom, Satisfaction, ChildAttitude, HowJoined, TimeCommitment, WorthwhileContests, WishParticipated, CoachRatio, WebsiteUsefulness, PortalUsefulness, Exp_TShirt/Printing/Snacks/Events/Celebration, CommFrequency, CommTopics, Suggestions
 
-**Carderock** (deadline April 13, 2026; 8 spots max):
-- Before deadline + not signed up: "Indicate Interest" → security acknowledgement modal (5 Navy base access cards)
-- Signed up: green "✓ Signed Up" card + amber photo release form + gray day-of-event rules + permission slip box
-- Permission slip: green "✓ Received" if col G has link; otherwise blue "📋 Required" with blank download + return instructions
-- Status: "Selected" (green) or "Alternate" (amber) with optional team name
+**Carderock** (deadline April 13, 2026; 8 spots max; contest May 1, 2026):
+- Before deadline + not signed up: "Indicate Interest" → security acknowledgement modal
+- Post-contest (signed up): single green card showing team + score tiles (Sprint/Target/Individual/Indiv.Rank/TeamRound/TeamScore/TeamRank) + Score Report link + Permission Slip link
 - `signUpDate` stored as string (not Date) to avoid Apps Script serialization issues
+
+**☀️ Summer Certificate Drawing — survey bonus entries:**
+- Completing student survey: +1 drawing entry; completing parent survey: +1 more (max +2 per student)
+- `getCertDrawPool()` reads "Survey 2026" sheet and adds `surveyBonus` count to each pool entry
+- CertDraw pool table shows "survey ×1" or "survey ×2" in the entry breakdown column
+
+**🏅 Year Record Certificate** (`buildStudentYearRecord(result, contests)` in Checkin.html):
+- Shown on student tab when `studentDone = true` OR `VOTING_PREVIEW = true`
+- Sections: header (school name, 2025–2026) → student name/grade → achievement badges → voted title (if VOTING_PUBLISHED) → club meetings count → competition results → footer + print button
+- **Achievement badges:** 🌱 Founding Member (everyone), 📅 Regular Attendee (15+ meetings), ⭐ Dedicated Member (25+), 🎽 Competitor (1–3 competitions), 🏆 Multi-Sport (4–6), 🥇 Full Competitor (all 7 open competitions excluding Carderock)
+- **Voted title:** shown if `result.votingTitle` is non-null (requires VOTING_PUBLISHED = true)
+- **Print button:** opens a new window with only the year record HTML; `.no-print` elements (links) are stripped from print output
+- **`VOTING_PREVIEW`** template variable: `?votingPreview=1` shows voting form regardless of VOTING_OPEN
 
 ## Certificate Drawing Teacher Interface (`CertDraw.html`)
 
-Served at `[production URL]?certdraw=1`. Teacher-only projected drawing screen (brown/gold color scheme). Two tabs: **🎡 Drawing** (default) and **📋 Survey**.
+Served at `[production URL]?certdraw=1`. Teacher-only projected drawing screen (brown/gold color scheme). Three tabs: **🎡 Drawing** (default), **📋 Survey**, **🗳️ Votes**.
 
 **Top bar:** certificates remaining pill + eligible student count + total entry count.
 
