@@ -101,6 +101,12 @@ Student self-serve check-in used at the start of each club meeting. Teacher open
 
 **MOEMS awards:** columns O=SilverPin (18–22), P=Patch (8–25), Q=HighAchievement (team 148–175); shown as badge chips in portal and year record
 
+**AMC 8 sheet columns:** A=Name, B=MCPS ID, C=Grade, D=Score(/25), E=Registered (checkbox), F=PDF score report link, G=Young Women in Mathematics Award (any truthy value); YWM award shown as purple badge in portal and year record for Ella Shang and Joyce Shang (2026)
+
+**Math Kangaroo:** name-based lookup (col A); no scores available (individual accounts only); national/state winners released ~June 1 — add col F=Award if needed
+
+**Math League — regional recognition:** hardcoded in portal and year record — any student on a Varsity team (team name not starting with "JV") at Meet #3 (meetIndex 2) sees "🏆 Region 1 Meet #3 Winners" (Hallie Wells won Region 1 Meet #3 with avg 49.667)
+
 ## Student Lookup Process
 
 MCPS ID is entered → system searches these sheets **in order**, stops at first match:
