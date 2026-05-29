@@ -84,7 +84,7 @@ Student self-serve check-in used at the start of each club meeting. Teacher open
 - `getSurveySheet()` — get/create "Survey 2026" sheet
 - `getSurveyStatus(mcpsId)` — returns `{surveyOpen, parentSubmitted, studentSubmitted}`; included in `lookupStudentByMcpsId` response as `surveyStatus`
 - `submitSurveyResponse(mcpsId, role, answers)` — validates role, duplicate-checks by (MCPS ID + role), appends row; returns `{success, message}`
-- `getSurveySummary()` — returns tallies for all multiple-choice fields; used by CertDraw Survey tab
+- `getSurveySummary()` — returns tallies for all multiple-choice fields; used by `?survey=1` Survey Results page. Column indices updated for new schema: satisfaction(49), childAttitude(50), commFrequency(63), meetingFormat(36), mathConfidence(39), mathEnjoyment(40), clubSize(41), coachAttention(42), membershipGate(45), compGate(46), carderockAlloc(47), coachRatio(55), websiteUsefulness(56), portalUsefulness(57)
 - **Survey bonus entries:** each submitted role (student or parent) adds +1 drawing entry for that student
 
 **Club Awards Voting:**
@@ -204,7 +204,8 @@ MCPS ID lookup form (variable-length numeric IDs, validated with `/^\d+$/`).
 
 **Carderock** (deadline April 13, 2026; 8 spots max; contest May 1, 2026):
 - Before deadline + not signed up: "Indicate Interest" → security acknowledgement modal
-- Post-contest (signed up): single green card showing team + score tiles (Sprint/Target/Individual/Indiv.Rank/TeamRound/TeamScore/TeamRank) + Score Report link + Permission Slip link
+- Post-contest (signed up): single green card showing team + score tiles (Sprint/30, Target/16, Individual/46, Indiv.Rank, TeamRound/20, TeamScore/64, TeamRank) + Score Report link + Permission Slip link
+- Max scores same as MATHCOUNTS: hardcoded in portal and year record
 - `signUpDate` stored as string (not Date) to avoid Apps Script serialization issues
 
 **☀️ Summer Certificate Drawing — survey bonus entries:**
@@ -222,21 +223,35 @@ MCPS ID lookup form (variable-length numeric IDs, validated with `/^\d+$/`).
 
 ## Certificate Drawing Teacher Interface (`CertDraw.html`)
 
-Served at `[production URL]?certdraw=1`. Teacher-only projected drawing screen (brown/gold color scheme). Three tabs: **🎡 Drawing** (default), **📋 Survey**, **🗳️ Votes**.
+Served at `[production URL]?certdraw=1`. Teacher-only projected drawing screen (brown/gold color scheme). Drawing only — survey and votes tabs removed.
 
 **Top bar:** certificates remaining pill + eligible student count + total entry count.
 
-**Drawing tab:**
+**Drawing:**
 - "Spin the Wheel" button → fetches live pool from `getCertDrawPool()` → pre-picks winner (weighted random, proportional to entries) → canvas wheel spins ≥ 2 full rotations with tick sounds (pitch rises/falls with speed) → decelerates and lands on winner → ascending fanfare plays → winner banner pops in → "Confirm Winner" button → calls `recordCertWinner()` → status bar shows cert number + clickable Drive link.
 - Wheel rendering: each student's slice proportional to entry count; color-coded dots in pool table match slice colors; first name on each slice; labels clipped to wedge.
 - Entry pool table: Student | Entries | Ranges Leading — sorted by entries desc.
 - Winners list: previous winners shown as gold chips at bottom.
 
-**Survey tab:**
-- Loads `getSurveySummary()` lazily on first open; Refresh button re-fetches.
-- Shows total / parent / student response counts.
-- Bar-chart tally cards for: returning, try-outs, snacks, meeting format (1–5), communication frequency, volunteer interest, coaching interest (8th graders), coaching support (8th grade parents).
-- Second grid: "Would compete again?" tally for all 7 competitions.
+## Survey Results Page (`SurveyResults.html`)
+
+Served at `[production URL]?survey=1`. Standalone page showing end-of-year survey tallies.
+- Response counts (total / parent / student) + last-refreshed timestamp + Refresh button
+- Bar-chart tally cards grouped by: Overall Experience (Parent), Student Responses, Club Policy Questions
+- Uses `getSurveySummary()` backend function
+
+## Year-End Party Slides (`PartySlides.html`)
+
+Served at `[production URL]?party=1`. Full-screen projected slides for the June 4 year-end party. ~29 slides total.
+- Data loaded on startup via `getPartySlideData()` (batch function reading all competition/attendance sheets) + `getVoteResults()` + PON leaderboard API fetch
+- Navigation: arrow keys, spacebar, or click to advance
+- **Drawing slide:** embedded spinning wheel (same wheel/audio as CertDraw) — spin, confirm saves winner and refreshes pool, spin again for next drawing; cert winners slide rebuilds automatically; PON slide also refreshes after each draw
+- **Badge slides:** name chips animate in with staggered pop-in (60ms stagger)
+- **Award reveals:** two-phase (category shown → click to reveal winner with pop animation + fanfare)
+- **8th grade sendoff:** names + high schools from survey responses
+- **PON leaderboard slide:** shows preset ranges (1–20, 21–40, 41–60, 61–80, 81–100) only; fetches live from PON API
+
+`getPartySlideData()` returns: stats, badges (dedicated/regular/fullCompetitor/multiSport/competitor), recognitions (mcTeam, mcIndividual, mcState, mathLeagueMeet3Teams grouped by team, ywmAward, noeticHM/NHR/TeamW, moemsHA/Pin/Patch, mkAwards), eighthGraders (with highSchool from survey), certWinners
 
 ## `doGet()` URL Routing
 
@@ -247,9 +262,12 @@ Served at `[production URL]?certdraw=1`. Teacher-only projected drawing screen (
 | `?action=updateNoeticGradePreference&...` | Grade preference update |
 | `?action=signUpCarderock&...` | Carderock sign-up |
 | `?action=dropCarderock&...` | Carderock drop |
-| `?certdraw=1` | Serves `CertDraw.html` |
+| `?certdraw=1` | Serves `CertDraw.html` — drawing interface only |
+| `?survey=1` | Serves `SurveyResults.html` — standalone survey tally page |
+| `?party=1` | Serves `PartySlides.html` — year-end party slides |
 | `?kiosk=1` | Serves `Kiosk.html` |
-| `?surveyPreview=1` | Serves `Checkin.html` with survey section visible regardless of `SURVEY_OPEN` flag — for teacher preview only |
+| `?surveyPreview=1` | Serves `Checkin.html` with survey + year record visible (bypasses `SURVEY_OPEN`) |
+| `?votingPreview=1` | Serves `Checkin.html` with voting section visible (bypasses `VOTING_OPEN`) |
 | *(default)* | Serves `Checkin.html` (parent portal) |
 
 ## Data Sources (Google Sheets)
