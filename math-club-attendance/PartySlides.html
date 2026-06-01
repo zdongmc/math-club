@@ -387,7 +387,7 @@ function buildSlides() {
       return '<div class="name-chip" style="animation-delay:'+delay+'s'+(gold?';background:rgba(245,158,11,0.15);border-color:rgba(245,158,11,0.4);color:#fcd34d;':'')+'">' + esc(n) + '</div>';
     }).join(''),
     '</div>',
-    '<div class="glass" style="max-width:680px;padding:18px 28px;font-size:1.05rem;color:rgba(255,255,255,0.75);line-height:1.6;">',
+    '<div class="glass" style="max-width:680px;padding:18px 28px;font-size:1.05rem;color:rgba(255,255,255,0.75);line-height:1.6;opacity:0;animation:chip-in 0.4s ease forwards;animation-delay:0.9s;">',
     'And to <strong style="color:white;">every math club parent</strong> — thank you for supporting and encouraging your kids. It takes a village, and this club wouldn\'t exist without you. ❤️',
     '</div>'
   ]));
@@ -673,7 +673,11 @@ function buildCertWinners(winners) {
     '<div class="emoji-big">🎰</div>',
     '<div class="slide-title" style="margin-bottom:8px;">Summer Certificate <span class="gold">Drawing Winners</span></div>',
     '<div class="slide-subtitle" style="margin-bottom:28px;">Noetic Online Math Challenge — Summer 2026</div>',
-    '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:16px;max-width:900px;">' + (cards || '<div style="color:rgba(255,255,255,0.4)">No winners yet</div>') + '</div>'
+    '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:16px;max-width:900px;">' + (cards || '<div style="color:rgba(255,255,255,0.4)">No winners yet</div>') + '</div>',
+    '<div style="margin-top:28px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.35);border-radius:12px;padding:14px 28px;text-align:center;">',
+    '<div style="font-size:1rem;color:#fcd34d;font-weight:700;margin-bottom:4px;">🎟️ Everyone else gets a coupon!</div>',
+    '<div style="font-size:0.9rem;color:rgba(255,255,255,0.65);">25% off coupon codes available to take home today</div>',
+    '</div>'
   ]);
 }
 
@@ -754,8 +758,7 @@ function revealWinner(ai) {
   var p1 = document.getElementById('ap1-' + ai);
   var p2 = document.getElementById('ap2-' + ai);
   if (p1) p1.style.display = 'none';
-  if (p2) { p2.style.display = 'flex'; }
-  // Re-trigger pop animation
+  if (p2) p2.style.display = 'flex';
   var nameEl = document.getElementById('winner-name-' + ai);
   if (nameEl) {
     nameEl.querySelectorAll('.winner-name').forEach(function(el) {

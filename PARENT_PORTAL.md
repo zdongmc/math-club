@@ -142,7 +142,7 @@ MCPS ID lookup form (variable-length numeric IDs, validated with `/^\d+$/`).
 
 **AMC 8**: Competition date (January 23, 2026). Score out of 25 with link to individual PDF score report.
 
-**Math Kangaroo**: Always shown. If registered: green checkmark, MK ID, username/password. If not: yellow alert with invitation code `MDCLARK0003001@2026math`, fee info ($18/$35 late), competition date.
+**Math Kangaroo**: Always shown. If registered: green checkmark, MK ID, username/password; links to answer key (Drive PDF), results/rankings at mathkangaroo.us, and [National and State Winners List](https://mathkangaroo.org/mks/national-and-state-winners/). If not: yellow alert with invitation code `MDCLARK0003001@2026math`, fee info ($18/$35 late), competition date.
 
 **Noetic Learning** (contest completed April 10, 2026; registration closed):
 - If registered: "✓ Contest Completed", score/100 in gold box (or "Score pending" with link), award badges (Honorable Mention / National Honor Roll / Team Winner, from cols K/L/M), login credentials (col H/I), 6 practice PDFs (password: "noetic")
@@ -242,16 +242,19 @@ Served at `[production URL]?survey=1`. Standalone page showing end-of-year surve
 
 ## Year-End Party Slides (`PartySlides.html`)
 
-Served at `[production URL]?party=1`. Full-screen projected slides for the June 4 year-end party. ~29 slides total.
+Served at `[production URL]?party=1`. Full-screen projected slides for the June 4 year-end party.
 - Data loaded on startup via `getPartySlideData()` (batch function reading all competition/attendance sheets) + `getVoteResults()` + PON leaderboard API fetch
 - Navigation: arrow keys, spacebar, or click to advance
 - **Drawing slide:** embedded spinning wheel (same wheel/audio as CertDraw) — spin, confirm saves winner and refreshes pool, spin again for next drawing; cert winners slide rebuilds automatically; PON slide also refreshes after each draw
+- **Cert winners slide:** shows drawing winners + a note that all other students receive a 25% off coupon (distributed at the party)
 - **Badge slides:** name chips animate in with staggered pop-in (60ms stagger)
-- **Award reveals:** two-phase (category shown → click to reveal winner with pop animation + fanfare)
+- **Competition highlights:** MATHCOUNTS, Math League, AMC 8, MOEMS, Noetic, Carderock (hardcoded: Arjun Lakshmanan — Countdown Round); no Math Kangaroo slide (no national/state winners)
+- **Award reveals:** two-phase (category shown → click to reveal winner with pop animation + fanfare); no sound on reveal
+- **Parent thank you slide:** name chips animate in, then closing "every math club parent" message fades in after (~0.9s delay)
 - **8th grade sendoff:** names + high schools from survey responses
 - **PON leaderboard slide:** shows preset ranges (1–20, 21–40, 41–60, 61–80, 81–100) only; fetches live from PON API
 
-`getPartySlideData()` returns: stats, badges (dedicated/regular/fullCompetitor/multiSport/competitor), recognitions (mcTeam, mcIndividual, mcState, mathLeagueMeet3Teams grouped by team, ywmAward, noeticHM/NHR/TeamW, moemsHA/Pin/Patch, mkAwards), eighthGraders (with highSchool from survey), certWinners
+`getPartySlideData()` returns: stats, badges (dedicated/regular/fullCompetitor/multiSport/competitor), recognitions (mcTeam, mcIndividual, mcState, mathLeagueMeet3Teams grouped by team, ywmAward, noeticHM/NHR/TeamW, moemsHA/Pin/Patch), eighthGraders (with highSchool from survey), certWinners
 
 ## `doGet()` URL Routing
 
