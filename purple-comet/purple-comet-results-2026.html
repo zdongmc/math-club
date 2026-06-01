@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Purple Comet 2026 — Team Results</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; background: #f8f9fa; color: #1a1a2e; padding: 24px; }
+h1 { font-size: 1.4rem; margin-bottom: 4px; }
+.subtitle { font-size: 0.88rem; color: #555; margin-bottom: 20px; }
+
+.th-score { font-size: 1.4rem; font-weight: bold; margin: 3px 0; }
+.fc { color: #1565c0; }
+.hw { color: #b45309; }
+.pr { color: #166534; }
+.at { color: #6b21a8; }
+
+table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1); font-size: 0.85rem; }
+th { padding: 10px 14px; text-align: center; border-bottom: 2px solid #e5e7eb; background: #f1f5f9; }
+th.q-col { width: 44px; }
+th.diff-col { width: 70px; color: #374151; font-size: 0.78rem; }
+td.diff { font-size: 0.8rem; text-align: center; white-space: nowrap; }
+.d1 { color: #15803d; }
+.d2 { color: #b45309; }
+.d3 { color: #c2410c; }
+.d4 { color: #7c3aed; }
+th.fc-col { color: #1565c0; }
+th.hw-col { color: #b45309; }
+th.pr-col { color: #166534; }
+th.at-col { color: #6b21a8; }
+.th-name { font-size: 0.88rem; font-weight: bold; }
+.th-members { font-size: 0.7rem; font-weight: normal; opacity: 0.7; margin-top: 4px; line-height: 1.5; }
+
+td { padding: 7px 14px; text-align: center; border-bottom: 1px solid #f0f0f0; }
+tr:last-child td { border-bottom: none; }
+td.q-num { font-weight: bold; color: #374151; }
+
+.right     { background: #dcfce7; color: #166534; font-weight: bold; border-radius: 4px; padding: 4px 10px; display: inline-block; font-size: 1rem; }
+.wrong     { background: #fee2e2; color: #991b1b; border-radius: 4px; padding: 3px 8px; display: inline-block; cursor: pointer; user-select: none; transition: background 0.15s; }
+.wrong:hover { background: #fecaca; }
+.corrected { background: #d1fae5; color: #065f46; border-radius: 4px; padding: 4px 10px; display: inline-block; font-size: 1rem; cursor: pointer; user-select: none; border: 1px dashed #6ee7b7; }
+.corrected:hover { background: #a7f3d0; }
+.blank     { background: #f3f4f6; color: #9ca3af; border-radius: 4px; padding: 3px 8px; display: inline-block; font-style: italic; font-size: 0.78rem; cursor: pointer; user-select: none; }
+.blank:hover { background: #e5e7eb; }
+.blank-corrected { background: #d1fae5; color: #065f46; border-radius: 4px; padding: 4px 10px; display: inline-block; font-size: 1rem; cursor: pointer; user-select: none; border: 1px dashed #6ee7b7; }
+.blank-corrected:hover { background: #a7f3d0; }
+
+tr:nth-child(odd) td { background-color: #fafafa; }
+
+.note { font-size: 0.68rem; color: #92400e; margin-top: 3px; }
+.wrong-hist  { background: #fee2e2; color: #991b1b; border-radius: 4px; padding: 3px 8px; display: inline-block; font-size: 0.82rem; }
+.was-right   { background: #dcfce7; color: #166534; border-radius: 4px; padding: 3px 8px; display: inline-block; font-size: 0.82rem; }
+.sep         { font-size: 0.75rem; color: #9ca3af; margin: 0 3px; }
+</style>
+</head>
+<body>
+
+<h1>Purple Comet! Math Meet 2026 — Middle School Results</h1>
+<p class="subtitle">Contest date: April 17, 2026 &nbsp;·&nbsp; Click any ✗ to mark as corrected; click again to revert.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th class="q-col">#</th>
+      <th class="diff-col">Difficulty</th>
+      <th class="fc-col">
+        <div class="th-name">Fast Chickens</div>
+        <div class="th-score fc"><span id="score-fc">11</span> / 20</div>
+        <div class="th-members">Anish Magadala · Arjun Lakshmanan<br>Ayush Patel · Krish Janoria<br>Rakin Molla · Vihaan Shah</div>
+      </th>
+      <th class="hw-col">
+        <div class="th-name">HW Mustangs</div>
+        <div class="th-score hw"><span id="score-hw">5</span> / 20</div>
+        <div class="th-members">Abbas Ali · Siddhant Arya<br>Srihan Asapu · Vidhan Velvadapu<br>Vihaan Mendi · Yusuf Sadique</div>
+      </th>
+      <th class="pr-col">
+        <div class="th-name">Prime Reaper</div>
+        <div class="th-score pr"><span id="score-pr">5</span> / 20</div>
+        <div class="th-members">Ayaan Mankad · Charles Wang<br>Fariq Molla · Nathaniel Lam<br>Shashwat Sharma · Vihan Parikh</div>
+      </th>
+      <th class="at-col">
+        <div class="th-name">A-Team</div>
+        <div class="th-score at"><span id="score-at">2</span> / 20</div>
+        <div class="th-members">Aadhya Meka · Aaron Parmar<br>Adelaide Lam · Amishi Rajale<br>Mohammad Basil · Pihu Patel</div>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+
+    <tr>
+      <td class="q-num">Q1</td>
+      <td class="diff"><span class="d2">★★</span></td>
+      <td><span class="right">✓</span></td>
+      <td><span class="wrong" onclick="toggle(this,'hw')">198 ✗</span></td>
+      <td><span class="right">✓</span></td>
+      <td>
+        <span class="wrong-hist">54 ✗</span><span class="sep">→</span><span class="wrong" onclick="toggle(this,'at')">124 ✗</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="q-num">Q2</td>
+      <td class="diff"><span class="d1">★</span></td>
+      <td>
+        <span class="wrong-hist">72 ✗</span><span class="sep">→</span><span class="right">✓</span>
+      </td>
+      <td><span class="right">✓</span></td>
+      <td><span class="right">✓</span></td>
+      <td>
+        <span class="wrong-hist">2 ✗</span><span class="sep">→</span><span class="wrong-hist">72 ✗</span><span class="sep">→</span><span class="right">✓</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="q-num">Q3</td>
+      <td class="diff"><span class="d4">★★★★</span></td>
+      <td><span class="wrong" onclick="toggle(this,'fc')">27 ✗</span></td>
+      <td><span class="wrong" onclick="toggle(this,'hw')">18 ✗</span></td>
+      <td><span class="wrong" onclick="toggle(this,'pr')">7 ✗</span></td>
+      <td>
+        <span class="wrong-hist">58 ✗</span><span class="sep">→</span><span class="wrong-hist">67 ✗</span><span class="sep">→</span><span class="wrong" onclick="toggle(this,'at')">30 ✗</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="q-num">Q4</td>
+      <td class="diff"><span class="d1">★</span></td>
+      <td><span class="right">✓</span></td>
+      <td><span class="wrong" onclick="toggle(this,'hw')">168 ✗</span></td>
+      <td><span class="right">✓</span></td>
+      <td><span class="right">✓</span></td>
+    </tr>
+    <tr>
+      <td class="q-num">Q5</td>
+      <td class="diff"><span class="d2">★★</span></td>
+      <td>
+        <span class="was-right">✓</span><span class="sep">→</span><span class="wrong" onclick="toggle(this,'fc')">4 ✗</span>
+      </td>
+      <td>
+        <span class="wrong-hist">4 ✗</span><span class="sep">→</span><span class="right">✓</span>
+      </td>
+      <td><span class="right">✓</span></td>
+      <td><span class="wrong" onclick="toggle(this,'at')">29 ✗</span></td>
+    </tr>
+    <tr>
+      <td class="q-num">Q6</td>
+      <td class="diff"><span class="d1">★</span></td>
+      <td><span class="right">✓</span></td>
+      <td><span class="right">✓</span></td>
+      <td><span class="right">✓</span></td>
+      <td><span class="wrong" onclick="toggle(this,'at')">34 ✗</span></td>
+    </tr>
+    <tr>
+      <td class="q-num">Q7</td>
+      <td class="diff"><span class="d4">★★★★</span></td>
+      <td>
+        <span class="wrong-hist">81 ✗</span><span class="sep">→</span><span class="wrong-hist">169 ✗</span><span class="sep">→</span><span class="wrong" onclick="toggle(this,'fc')">28561 ✗</span>
+      </td>
+      <td><span class="wrong" onclick="toggle(this,'hw')">289 ✗</span></td>
+      <td>
+        <span class="wrong-hist">21 ✗</span><span class="sep">→</span><span class="wrong" onclick="toggle(this,'pr')">75 ✗</span>
+      </td>
+      <td><span class="wrong" onclick="toggle(this,'at')">67 ✗</span></td>
+    </tr>
+    <tr>
+      <td class="q-num">Q8</td>
+      <td class="diff"><span class="d2">★★</span></td>
+      <td><span class="right">✓</span></td>
+      <td><span class="right">✓</span></td>
+      <td><span class="wrong" onclick="toggle(this,'pr')">648 ✗</span></td>
+      <td>
+        <span class="wrong-hist">38 ✗</span><span class="sep">→</span><span class="wrong" onclick="toggle(this,'at')">1 ✗</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="q-num">Q9</td>
+      <td class="diff"><span class="d4">★★★★</span></td>
+      <td>
+        <span class="wrong-hist">89 ✗</span><span class="sep">→</span><span class="wrong" onclick="toggle(this,'fc')">121 ✗</span>
+      </td>
+      <td><span class="wrong" onclick="toggle(this,'hw')">500 ✗</span></td>
+      <td><span class="wrong" onclick="toggle(this,'pr')">140 ✗</span></td>
+      <td><span class="wrong" onclick="toggle(this,'at')">842 ✗</span></td>
+    </tr>
+    <tr>
+      <td class="q-num">Q10</td>
+      <td class="diff"><span class="d3">★★★</span></td>
+      <td><span class="right">✓</span></td>
+      <td><span class="wrong" onclick="toggle(this,'hw')">3 ✗</span></td>
+      <td><span class="wrong" onclick="toggle(this,'pr')">8 ✗</span></td>
+      <td><span class="wrong" onclick="toggle(this,'at')">17 ✗</span></td>
+    </tr>
+    <tr>
+      <td class="q-num">Q11</td>
+      <td class="diff"><span class="d4">★★★★</span></td>
+      <td><span class="wrong" onclick="toggle(this,'fc')">213 ✗</span></td>
+      <td><span class="wrong" onclick="toggle(this,'hw')">13 ✗</span></td>
+      <td>
+        <span class="wrong-hist">5 ✗</span><span class="sep">→</span><span class="wrong" onclick="toggle(this,'pr')">8 ✗</span>
+      </td>
+      <td><span class="blank" onclick="toggleBlank(this,'at')">blank</span></td>
+    </tr>
+    <tr>
+      <td class="q-num">Q12</td>
+      <td class="diff"><span class="d3">★★★</span></td>
+      <td><span class="right">✓</span></td>
+      <td><span class="wrong" onclick="toggle(this,'hw')">4 ✗</span></td>
+      <td>
+        <span class="wrong-hist">27 ✗</span><span class="sep">→</span><span class="wrong" onclick="toggle(this,'pr')">324 ✗</span>
+      </td>
+      <td><span class="wrong" onclick="toggle(this,'at')">0 ✗</span></td>
+    </tr>
+    <tr>
+      <td class="q-num">Q13</td>
+      <td class="diff"><span class="d3">★★★</span></td>
+      <td><span class="right">✓</span></td>
+      <td><span class="wrong" onclick="toggle(this,'hw')">72 ✗</span></td>
+      <td>
+        <span class="wrong-hist">6 ✗</span><span class="sep">→</span><span class="wrong" onclick="toggle(this,'pr')">4 ✗</span>
+      </td>
+      <td><span class="blank" onclick="toggleBlank(this,'at')">blank</span></td>
+    </tr>
+    <tr>
+      <td class="q-num">Q14</td>
+      <td class="diff"><span class="d3">★★★</span></td>
+      <td><span class="right">✓</span></td>
+      <td><span class="wrong" onclick="toggle(this,'hw')">22 ✗</span></td>
+      <td>
+        <span class="wrong-hist">9 ✗</span><span class="sep">→</span><span class="wrong" onclick="toggle(this,'pr')">53 ✗</span>
+      </td>
+      <td><span class="wrong" onclick="toggle(this,'at')">56 ✗</span></td>
+    </tr>
+    <tr>
+      <td class="q-num">Q15</td>
+      <td class="diff"><span class="d3">★★★</span></td>
+      <td><span class="right">✓</span></td>
+      <td><span class="wrong" onclick="toggle(this,'hw')">6 ✗</span></td>
+      <td><span class="wrong" onclick="toggle(this,'pr')">6 ✗</span></td>
+      <td><span class="wrong" onclick="toggle(this,'at')">24 ✗</span></td>
+    </tr>
+    <tr>
+      <td class="q-num">Q16</td>
+      <td class="diff"><span class="d4">★★★★</span></td>
+      <td><span class="wrong" onclick="toggle(this,'fc')">61 ✗</span></td>
+      <td><span class="wrong" onclick="toggle(this,'hw')">60 ✗</span></td>
+      <td><span class="wrong" onclick="toggle(this,'pr')">60 ✗</span></td>
+      <td><span class="wrong" onclick="toggle(this,'at')">31 ✗</span></td>
+    </tr>
+    <tr>
+      <td class="q-num">Q17</td>
+      <td class="diff"><span class="d3">★★★</span></td>
+      <td><span class="right">✓</span></td>
+      <td><span class="wrong" onclick="toggle(this,'hw')">24 ✗</span></td>
+      <td><span class="wrong" onclick="toggle(this,'pr')">80 ✗</span></td>
+      <td>
+        <span class="wrong-hist">3 ✗</span><span class="sep">→</span><span class="wrong-hist">80 ✗</span><span class="sep">→</span><span class="wrong" onclick="toggle(this,'at')">66 ✗</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="q-num">Q18</td>
+      <td class="diff"><span class="d4">★★★★</span></td>
+      <td><span class="wrong" onclick="toggle(this,'fc')">11 ✗</span></td>
+      <td><span class="wrong" onclick="toggle(this,'hw')">0 ✗</span></td>
+      <td><span class="wrong" onclick="toggle(this,'pr')">0 ✗</span></td>
+      <td>
+        <span class="wrong-hist">3 ✗</span><span class="sep">→</span><span class="wrong" onclick="toggle(this,'at')">22 ✗</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="q-num">Q19</td>
+      <td class="diff"><span class="d4">★★★★</span></td>
+      <td>
+        <span class="wrong-hist">251 ✗</span><span class="sep">→</span><span class="wrong" onclick="toggle(this,'fc')">756756 ✗</span>
+      </td>
+      <td><span class="wrong" onclick="toggle(this,'hw')">34 ✗</span></td>
+      <td><span class="wrong" onclick="toggle(this,'pr')">27 ✗</span></td>
+      <td><span class="blank" onclick="toggleBlank(this,'at')">blank</span></td>
+    </tr>
+    <tr>
+      <td class="q-num">Q20</td>
+      <td class="diff"><span class="d3">★★★</span></td>
+      <td>
+        <span class="wrong-hist">0 ✗</span><span class="sep">→</span><span class="wrong" onclick="toggle(this,'fc')">75 ✗</span>
+      </td>
+      <td><span class="right">✓</span></td>
+      <td><span class="wrong" onclick="toggle(this,'pr')">24 ✗</span></td>
+      <td><span class="wrong" onclick="toggle(this,'at')">47 ✗</span></td>
+    </tr>
+
+  </tbody>
+</table>
+
+<script>
+const baseScores = { fc: 11, hw: 5, pr: 5, at: 2 };
+const corrections = { fc: 0, hw: 0, pr: 0, at: 0 };
+
+function updateScore(team) {
+  const el = document.getElementById('score-' + team);
+  el.textContent = baseScores[team] + corrections[team];
+}
+
+function toggle(el, team) {
+  if (el.classList.contains('wrong')) {
+    el.classList.replace('wrong', 'corrected');
+    el.textContent = '✓';
+    corrections[team]++;
+  } else {
+    // restore original text from data attribute
+    el.classList.replace('corrected', 'wrong');
+    el.textContent = el.dataset.orig;
+    corrections[team]--;
+  }
+  updateScore(team);
+}
+
+function toggleBlank(el, team) {
+  if (el.classList.contains('blank')) {
+    el.classList.replace('blank', 'blank-corrected');
+    el.textContent = '✓';
+    corrections[team]++;
+  } else {
+    el.classList.replace('blank-corrected', 'blank');
+    el.textContent = 'blank';
+    corrections[team]--;
+  }
+  updateScore(team);
+}
+
+// Store original text in data-orig before any clicks
+document.querySelectorAll('.wrong').forEach(el => {
+  el.dataset.orig = el.textContent;
+});
+</script>
+</body>
+</html>

@@ -593,6 +593,12 @@
                 grid-template-columns: 1fr;
             }
         }
+    @media print {
+        body * { visibility: hidden; height: 0 !important; overflow: hidden; margin: 0; padding: 0; }
+        #yearRecordContent, #yearRecordContent * { visibility: visible; height: auto !important; overflow: visible; }
+        #yearRecordContent { position: fixed; top: 0; left: 0; width: 100%; padding: 20px; box-sizing: border-box; background: white; }
+        .no-print { display: none !important; }
+    }
     </style>
 </head>
 <body>
@@ -655,7 +661,8 @@
     </div>
 
     <script>
-        var SURVEY_PREVIEW = <?= surveyPreview ?>;
+        var SURVEY_PREVIEW  = '<?= surveyPreview ?>' === 'true';
+        var VOTING_PREVIEW  = '<?= votingPreview ?>' === 'true';
         // Allow Enter key to submit
         document.getElementById('mcpsId').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
@@ -809,6 +816,11 @@
             const surveyPreview = !!SURVEY_PREVIEW;
             if (surveyPreview || (result.surveyStatus && result.surveyStatus.surveyOpen)) {
               html += buildSurveySection(result);
+            }
+
+            // Club Awards Voting
+            if (VOTING_PREVIEW || (result.votingStatus && (result.votingStatus.votingOpen || result.votingStatus.votingPublished))) {
+              html += buildVotingSection(result);
             }
 
             html += `
@@ -1021,6 +1033,13 @@
                     html += '</a>';
                 }
                 html += '<div style="margin-top: 12px;"><a href="https://drive.google.com/file/d/1K1NPJQZfVUE228Bd7ebggr3yKHe2YUZi/view?usp=sharing" target="_blank" style="color: #1e40af; text-decoration: none; font-weight: 600;">📊 Question Analysis Report</a></div>';
+                if (amc8.ywmAward) {
+                    html += '<div style="margin-top:12px;background:#fdf4ff;border:2px solid #a855f7;border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:10px;">';
+                    html += '<span style="font-size:1.5rem;">🏅</span>';
+                    html += '<div><div style="font-weight:bold;color:#7e22ce;">2026 Young Women in Mathematics Award</div>';
+                    html += '<div style="font-size:0.85rem;color:#9333ea;margin-top:2px;">MAA American Mathematics Competitions</div></div>';
+                    html += '</div>';
+                }
             } else {
                 // No score recorded
                 html += '<div style="text-align: center; color: #666; padding: 10px;">';
@@ -1044,7 +1063,8 @@
                     html += '<div style="color: #065f46; font-size: 0.95rem; margin-bottom: 12px; text-align: center;">Math Kangaroo ID: <strong>' + escapeHtml(mathKangaroo.mkId) + '</strong></div>';
                 }
                 html += '<div style="background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px; margin-bottom: 10px; font-size: 0.9rem; color: #1e40af;">&#128196; <a href="https://drive.google.com/file/d/1sMZngPy-xXo0-FBr0yQ_Bm-NJcl-OWI1/view" target="_blank" style="color: #1e40af; font-weight: bold;">View the 2026 Answer Key</a></div>';
-                html += '<div style="background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px; font-size: 0.9rem; color: #1e40af;">&#127942; <strong>Results and rankings</strong> are available in your parent account at <a href="https://www.mathkangaroo.us" target="_blank" style="color: #1e40af; font-weight: bold;">mathkangaroo.us</a></div>';
+                html += '<div style="background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px; margin-bottom: 10px; font-size: 0.9rem; color: #1e40af;">&#127942; <strong>Results and rankings</strong> are available in your parent account at <a href="https://www.mathkangaroo.us" target="_blank" style="color: #1e40af; font-weight: bold;">mathkangaroo.us</a></div>';
+                html += '<div style="background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px; font-size: 0.9rem; color: #1e40af;">&#127942; <a href="https://mathkangaroo.org/mks/national-and-state-winners/" target="_blank" style="color: #1e40af; font-weight: bold;">National and State Winners List</a></div>';
                 html += '</div>';
                 html += '</div>';
                 html += '</div>';
@@ -1342,73 +1362,43 @@
             const cdFull = carderock && carderock.totalSignUps >= 8;
 
             if (carderock && carderock.signedUp) {
-              // Signed up
-              html += '<div style="background: #d1fae5; border: 2px solid #059669; border-radius: 8px; padding: 15px; margin-bottom: 12px;">';
-              html += '<div style="color: #047857; font-weight: bold; font-size: 1.1rem; margin-bottom: 8px;">✓ Signed Up</div>';
-
-              if (carderock.status) {
-                const statusColor = carderock.status === 'Selected' ? '#047857' : '#92400e';
-                const statusBg = carderock.status === 'Selected' ? '#d1fae5' : '#fef3c7';
-                const statusBorder = carderock.status === 'Selected' ? '#059669' : '#f59e0b';
-                html += '<div style="background: ' + statusBg + '; border: 2px solid ' + statusBorder + '; border-radius: 6px; padding: 8px 16px; display: inline-block; font-weight: bold; color: ' + statusColor + '; margin-bottom: 12px;">Status: ' + escapeHtml(carderock.status) + (carderock.team ? ' — ' + escapeHtml(carderock.team) : '') + '</div>';
+              // Post-contest results card
+              html += '<div style="background:#d1fae5;border:2px solid #059669;border-radius:8px;padding:15px;margin-bottom:12px;">';
+              html += '<div style="color:#047857;font-weight:bold;font-size:1.1rem;margin-bottom:10px;">✓ Participated in Carderock Math Contest — May 1, 2026</div>';
+              if (carderock.team) {
+                html += '<div style="background:white;border:1px solid #86efac;border-radius:6px;padding:5px 12px;display:inline-block;font-weight:bold;color:#166534;margin-bottom:12px;font-size:0.9rem;">Team: ' + escapeHtml(carderock.team) + '</div>';
               }
-
-              if (cdBeforeDeadline) {
-                html += '<div style="margin-top: 4px;">';
-                html += '<button onclick="dropCarderockSignUp(\'' + escapeHtml(student.mcpsId) + '\')" style="background: none; border: none; color: #6b7280; font-size: 0.85rem; cursor: pointer; text-decoration: underline;">Remove my interest</button>';
+              const cdScores = [
+                ['Sprint',      carderock.sprintScore,     30],
+                ['Target',      carderock.targetScore,     16],
+                ['Individual',  carderock.individualScore, 46],
+                ['Indiv. Rank', carderock.individualRank,  null],
+                ['Team Round',  carderock.teamRoundScore,  20],
+                ['Team Score',  carderock.teamScore,       64],
+                ['Team Rank',   carderock.teamRank,        null]
+              ];
+              const cdHasScores = cdScores.some(function(s) { return s[1] !== null; });
+              if (cdHasScores) {
+                html += '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px;">';
+                for (const [label, val, max] of cdScores) {
+                  if (val !== null) {
+                    html += '<div style="background:white;border:1px solid #a7f3d0;border-radius:6px;padding:8px 14px;text-align:center;">';
+                    html += '<div style="font-size:0.75rem;color:#6b7280;margin-bottom:2px;">' + label + '</div>';
+                    html += '<div style="font-size:1.3rem;font-weight:bold;color:#047857;">' + val + (max ? '<span style="font-size:0.75rem;color:#9ca3af;">/' + max + '</span>' : '') + '</div>';
+                    html += '</div>';
+                  }
+                }
                 html += '</div>';
               }
-
-              html += '</div>';
-
-              // Contest day logistics
-              html += '<div style="background: #eff6ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 15px; margin-bottom: 12px;">';
-              html += '<div style="color: #1e40af; font-weight: bold; font-size: 1rem; margin-bottom: 10px;">📍 Contest Day — Friday, May 1, 2026</div>';
-              html += '<div style="color: #1e3a8a; font-size: 0.9rem; line-height: 1.75;">';
-              html += '<strong>6:30 AM</strong> — Meet at the <strong>Hallie Wells school parking lot</strong><br>';
-              html += '<strong>7:00–7:30 AM</strong> — Arrive at Carderock (9500 MacArthur Blvd, West Bethesda, MD 20817)<br>';
-              html += '<strong>2:30 PM</strong> — Latest departure from Carderock<br>';
-              html += '<em>Prof. Jojo will message parents with an ETA when we are on the way back to school.</em>';
-              html += '</div>';
-              html += '<div style="margin-top: 12px; color: #1e40af; font-weight: bold; font-size: 0.9rem; margin-bottom: 6px;">What to bring:</div>';
-              html += '<ul style="color: #1e3a8a; font-size: 0.9rem; margin: 0; padding-left: 20px; line-height: 1.75;">';
-              html += '<li>Pencils</li>';
-              html += '<li>Non-programmable calculator (graphing calculators OK; <strong>no QWERTY keyboards</strong>)</li>';
-              html += '<li><strong>Packed lunch</strong> — only 30 minutes for lunch, no time to buy food on base</li>';
-              html += '<li>Glasses if you need them to read</li>';
-              html += '<li><strong>Leave phones, cameras, tablets, and laptops in the car</strong> — not permitted on base</li>';
-              html += '</ul>';
-              html += '<div style="margin-top: 12px; color: #1e40af; font-weight: bold; font-size: 0.9rem; margin-bottom: 6px;">Schedule:</div>';
-              html += '<div style="color: #1e3a8a; font-size: 0.85rem; line-height: 1.75;">';
-              html += '8:00 AM — Welcome &nbsp;·&nbsp; 8:30 AM — Sprint &amp; Target rounds &nbsp;·&nbsp; 9:50 AM — Team round<br>';
-              html += '10:20 AM — Keynote speaker &nbsp;·&nbsp; 11:10 AM — Lunch &amp; tours &nbsp;·&nbsp; 1:10 PM — Awards &amp; Countdown';
-              html += '</div>';
-              html += '</div>';
-
-              // Photo release form (required for students)
-              html += '<div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 15px; margin-bottom: 12px;">';
-              html += '<div style="color: #92400e; font-weight: bold; font-size: 1rem; margin-bottom: 8px;">📸 Photo Release Form Required</div>';
-              html += '<div style="color: #78350f; font-size: 0.9rem; margin-bottom: 10px;">All participating students (17 and under) must have a parent or guardian complete the photo release form. Any students with incomplete forms will not be included in photography.</div>';
-              html += '<a href="https://forms.osi.apps.mil/r/KwtJzuPtBD" target="_blank" style="display: inline-block; background: #d97706; color: white; text-decoration: none; padding: 8px 18px; border-radius: 6px; font-weight: bold; font-size: 0.9rem;">Complete Photo Release Form →</a>';
-              html += '</div>';
-
-              // Day of event rules
-              html += '<div style="background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 8px; padding: 15px; margin-bottom: 12px;">';
-              html += '<div style="color: #1e293b; font-weight: bold; font-size: 1rem; margin-bottom: 10px;">📋 Day of Event — Important Rules</div>';
-              html += '<ul style="color: #374151; font-size: 0.9rem; margin: 0; padding-left: 20px; line-height: 1.7;">';
-              html += '<li><strong>No phone use</strong> — cameras, microphone, and all recording features are strictly banned on base. Keep phones in the car.</li>';
-              html += '<li>All visitors must <strong>stay with the tour guide at ALL TIMES</strong> — no wandering, lingering behind, or moving ahead.</li>';
-              html += '<li>Wear <strong>comfortable shoes</strong> — there will be a lot of walking!</li>';
-              html += '</ul>';
-              html += '</div>';
-
-              // Permission slip section
+              if (carderock.scoreReportLink) {
+                html += '<a href="' + escapeHtml(carderock.scoreReportLink) + '" target="_blank" style="display:inline-block;background:#059669;color:white;text-decoration:none;padding:7px 16px;border-radius:6px;font-weight:bold;font-size:0.9rem;margin-bottom:4px;">📄 View Score Report →</a>';
+              }
               if (carderock.permissionSlipLink) {
-                html += '<div style="background: #d1fae5; border: 2px solid #059669; border-radius: 8px; padding: 15px; margin-bottom: 12px;">';
-                html += '<div style="color: #047857; font-weight: bold; font-size: 1rem; margin-bottom: 8px;">✓ Permission Slip Received</div>';
-                html += '<a href="' + escapeHtml(carderock.permissionSlipLink) + '" target="_blank" style="display: inline-block; background: #059669; color: white; text-decoration: none; padding: 8px 18px; border-radius: 6px; font-weight: bold; font-size: 0.9rem;">View Submitted Permission Slip →</a>';
-                html += '</div>';
-              } else {
+                html += ' <a href="' + escapeHtml(carderock.permissionSlipLink) + '" target="_blank" style="display:inline-block;background:white;color:#047857;border:1px solid #059669;text-decoration:none;padding:7px 16px;border-radius:6px;font-weight:bold;font-size:0.9rem;">📋 Permission Slip</a>';
+              }
+              html += '</div>';
+
+              if (false) { // pre-contest blocks removed — contest has passed
                 html += '<div style="background: #eff6ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 15px; margin-bottom: 12px;">';
                 html += '<div style="color: #1e40af; font-weight: bold; font-size: 1rem; margin-bottom: 8px;">📋 Permission Slip Required</div>';
                 html += '<div style="color: #1e3a8a; font-size: 0.9rem; margin-bottom: 10px;">Please download, complete, and return the permission slip to <strong>Prof. Jojo</strong> by <strong>Monday, April 13, 2026</strong>. You may email the completed form to <a href="mailto:zdongmc@gmail.com" style="color: #1d4ed8;">zdongmc@gmail.com</a> or hand it in directly.</div>';
@@ -1439,6 +1429,11 @@
 
             document.getElementById('studentResults').innerHTML = html;
             document.getElementById('resultsSection').classList.add('show');
+
+            // Async: load voting candidates if form is present
+            if (document.getElementById('votingFormWrap')) {
+                loadVotingForm(student.mcpsId);
+            }
 
             // Async: load summer drawing status for all students
             {
@@ -1676,6 +1671,17 @@
                         }
                     }
                     html += '</div>';
+                    const moemsAwards = [];
+                    if (moemsData.silverPin)       moemsAwards.push('🥈 Silver Pin (18–22)');
+                    if (moemsData.patch)           moemsAwards.push('🎖️ Patch (8–25)');
+                    if (moemsData.highAchievement) moemsAwards.push('🌟 High Achievement');
+                    if (moemsAwards.length) {
+                        html += '<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;">';
+                        for (const aw of moemsAwards) {
+                            html += '<span style="background:#fef3c7;border:1px solid #f59e0b;border-radius:20px;padding:4px 12px;font-size:0.85rem;font-weight:bold;color:#78350f;">' + aw + '</span>';
+                        }
+                        html += '</div>';
+                    }
                 }
             } else if (competitionName === 'MCPS Math League') {
                 // Math League meet dates and data
@@ -1705,6 +1711,10 @@
                         html += '<div style="background: #fef3c7; border: 2px solid #fbbf24; border-radius: 8px; padding: 10px; margin-bottom: 10px; text-align: center;">';
                         html += '<div style="font-weight: bold; color: #92400e; font-size: 1rem;">Team ' + escapeHtml(meetTeamAssignment) + '</div>';
                         html += '</div>';
+                        // Region 1 Meet #3 win — Varsity only (team name doesn't start with JV)
+                        if (meetIndex === 2 && !meetTeamAssignment.toLowerCase().startsWith('jv')) {
+                            html += '<div style="background:#d1fae5;border:2px solid #059669;border-radius:8px;padding:8px 12px;margin-bottom:10px;text-align:center;font-weight:bold;color:#065f46;">🏆 Region 1 Meet #3 Winners</div>';
+                        }
                     } else if (isIndividualOnly) {
                         html += '<div style="background: #e0f2fe; border: 2px solid #0284c7; border-radius: 8px; padding: 10px; margin-bottom: 10px; text-align: center;">';
                         html += '<div style="font-weight: bold; color: #0369a1; font-size: 1rem;">Individual Round Only</div>';
@@ -2920,22 +2930,465 @@
                 + '</div>';
         }
 
+        function surveyStars(name) {
+            let h = '<div>';
+            h += '<div style="font-weight:bold;color:#374151;margin-bottom:6px;">How would you rate this competition?</div>';
+            h += '<div style="display:flex;gap:4px;margin-bottom:4px;">';
+            for (let i = 1; i <= 5; i++) {
+                h += '<label style="cursor:pointer;">';
+                h += '<input type="radio" name="' + name + '" value="' + i + '" style="display:none;" onchange="updateStarDisplay(\'' + name + '\',' + i + ')">';
+                h += '<span class="survey-star" data-sname="' + name + '" data-sval="' + i + '" style="font-size:2rem;color:#d1d5db;line-height:1;">&#9733;</span>';
+                h += '</label>';
+            }
+            h += '</div>';
+            h += '<div style="font-size:0.78rem;color:#9ca3af;">1 = Not worth it &nbsp;&middot;&nbsp; 5 = Would do it every year</div>';
+            h += '</div>';
+            return h;
+        }
+
+        function updateStarDisplay(name, val) {
+            document.querySelectorAll('.survey-star[data-sname="' + name + '"]').forEach(function(el) {
+                el.style.color = parseInt(el.getAttribute('data-sval')) <= val ? '#f59e0b' : '#d1d5db';
+            });
+        }
+
+        function surveyWhyNot(pfx, key) {
+            const name    = pfx + '_' + key + '_notdone';
+            const otherId = pfx + '_' + key + '_notdone_other';
+            const opts = [
+                'Not interested in this competition',
+                'Schedule conflict',
+                'Missed the sign-up / didn\'t know about it in time',
+                'Felt unprepared'
+            ];
+            let h = '<div><div style="font-weight:bold;color:#374151;margin-bottom:6px;">Why didn\'t you participate?</div>';
+            h += '<div style="display:flex;flex-direction:column;gap:6px;">';
+            for (const opt of opts) {
+                h += '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:white;font-size:0.9rem;">';
+                h += '<input type="radio" name="' + name + '" value="' + opt.replace(/"/g, '&quot;') + '" style="width:auto;cursor:pointer;" onclick="document.getElementById(\'' + otherId + 'Wrap\').style.display=\'none\'">';
+                h += opt + '</label>';
+            }
+            h += '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:white;font-size:0.9rem;">';
+            h += '<input type="radio" name="' + name + '" value="Other" style="width:auto;cursor:pointer;" onclick="document.getElementById(\'' + otherId + 'Wrap\').style.display=\'\'">';
+            h += 'Other</label>';
+            h += '<div id="' + otherId + 'Wrap" style="display:none;padding-left:8px;">';
+            h += '<input type="text" id="' + otherId + '" placeholder="Please describe..." style="width:100%;padding:8px 10px;border:1px solid #d1d5db;border-radius:6px;font-family:inherit;font-size:0.9rem;">';
+            h += '</div>';
+            h += '</div></div>';
+            return h;
+        }
+
+        function buildStudentYearRecord(result, contests) {
+            const student    = result.student;
+            const attendance = result.attendance;
+            const dates      = attendance && attendance.dates ? attendance.dates : [];
+            const mc   = result.mathcounts  || null;
+            const mo   = result.moems       || null;
+            const ml   = result.mathLeague  || null;
+            const mk   = result.mathKangaroo|| null;
+            const a8   = result.amc8        || null;
+            const no   = result.noetic      || null;
+            const pc   = result.purpleComet || null;
+            const cd   = result.carderock   || null;
+            const doneContests = contests.filter(function(c) { return c.done; });
+
+            function scoreBox(label, val, max) {
+                if (val === null || val === undefined) return '';
+                return '<div style="background:white;border:1px solid #e5e7eb;border-radius:6px;padding:6px 12px;text-align:center;display:inline-block;min-width:60px;margin:3px;">' +
+                    '<div style="font-size:0.7rem;color:#9ca3af;margin-bottom:2px;">' + label + '</div>' +
+                    '<div style="font-size:1.1rem;font-weight:bold;color:#1e3a8a;">' + val + (max ? '<span style="font-size:0.7rem;color:#9ca3af;">/' + max + '</span>' : '') + '</div>' +
+                    '</div>';
+            }
+
+            function badge(text, color) {
+                return '<span style="background:' + color + ';color:white;font-size:0.75rem;font-weight:bold;padding:3px 8px;border-radius:12px;margin:2px;display:inline-block;">' + escapeHtml(text) + '</span>';
+            }
+
+            function compCard(label, content) {
+                return '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px 14px;margin-bottom:8px;">' +
+                    '<div style="font-weight:bold;color:#1e3a8a;font-size:0.95rem;margin-bottom:8px;">' + label + '</div>' +
+                    content + '</div>';
+            }
+
+            let h = '<div id="yearRecordContent" style="background:white;border:2px solid #1e3a8a;border-radius:12px;padding:28px 32px;max-width:760px;margin:0 auto;font-family:Arial,sans-serif;">';
+
+            // ── Header ─────────────────────────────────────────────────────────
+            h += '<div style="text-align:center;padding-bottom:20px;margin-bottom:20px;border-bottom:2px solid #e2e8f0;">';
+            h += '<div style="font-size:0.85rem;color:#6b7280;margin-bottom:2px;">🏫 Hallie Wells Middle School</div>';
+            h += '<div style="font-size:1.5rem;font-weight:bold;color:#1e3a8a;margin-bottom:2px;">Competition Math Club</div>';
+            h += '<div style="font-size:0.85rem;color:#9ca3af;letter-spacing:0.06em;">2025 – 2026 SCHOOL YEAR</div>';
+            h += '</div>';
+
+            // ── Student name ───────────────────────────────────────────────────
+            h += '<div style="text-align:center;margin-bottom:20px;">';
+            h += '<div style="font-size:2rem;font-weight:bold;color:#111827;margin-bottom:4px;">' + escapeHtml(student.name) + '</div>';
+            if (student.gradeLevel) h += '<div style="font-size:0.9rem;color:#6b7280;margin-bottom:12px;">Grade ' + escapeHtml(student.gradeLevel) + '</div>';
+
+            // ── Achievement badges ─────────────────────────────────────────────
+            const earnedBadges = [];
+            earnedBadges.push({ emoji: '🌱', label: 'Founding Member', sub: 'First year of math club', color: '#065f46', bg: '#d1fae5' });
+            const meetCount = dates.length;
+            if (meetCount >= 25) earnedBadges.push({ emoji: '⭐', label: 'Dedicated Member', sub: '25+ meetings attended', color: '#78350f', bg: '#fef3c7' });
+            else if (meetCount >= 15) earnedBadges.push({ emoji: '📅', label: 'Regular Attendee', sub: '15+ meetings attended', color: '#1e40af', bg: '#dbeafe' });
+            const openContestKeys = ['mathcounts','moems','mathleague','mathkangaroo','amc8','noetic','purplecomet'];
+            const openDone = doneContests.filter(function(c) { return openContestKeys.indexOf(c.key) !== -1; });
+            const compCount = doneContests.length;
+            if (openDone.length === openContestKeys.length) earnedBadges.push({ emoji: '🥇', label: 'Full Competitor', sub: 'All 7 open competitions', color: '#7c3aed', bg: '#ede9fe' });
+            else if (compCount >= 4) earnedBadges.push({ emoji: '🏆', label: 'Multi-Sport', sub: '4+ competitions entered', color: '#6b21a8', bg: '#f3e8ff' });
+            else if (compCount >= 1) earnedBadges.push({ emoji: '🎽', label: 'Competitor', sub: '1+ competitions entered', color: '#1e40af', bg: '#dbeafe' });
+
+            h += '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;">';
+            for (const b of earnedBadges) {
+                h += '<span style="background:' + b.bg + ';color:' + b.color + ';border-radius:12px;padding:6px 14px;font-size:0.85rem;font-weight:bold;text-align:center;display:inline-block;">';
+                h += b.emoji + ' ' + b.label + '<br>';
+                h += '<span style="font-size:0.72rem;font-weight:normal;opacity:0.8;">' + b.sub + '</span>';
+                h += '</span>';
+            }
+            h += '</div>';
+            h += '</div>';
+
+            // ── Club Meetings ──────────────────────────────────────────────────
+            h += '<div style="margin-bottom:22px;">';
+            h += '<div style="font-size:1rem;font-weight:bold;color:#374151;margin-bottom:8px;border-bottom:1px solid #f3f4f6;padding-bottom:4px;">📅 Club Meetings</div>';
+            h += '<div style="font-size:0.95rem;color:#374151;">Attended <strong>' + dates.length + '</strong> meeting' + (dates.length !== 1 ? 's' : '') + ' this year</div>';
+            h += '</div>';
+
+            // ── Competitions ───────────────────────────────────────────────────
+            if (doneContests.length) {
+                h += '<div style="margin-bottom:22px;">';
+                h += '<div style="font-size:1rem;font-weight:bold;color:#374151;margin-bottom:8px;border-bottom:1px solid #f3f4f6;padding-bottom:4px;">🏆 Competitions</div>';
+
+                for (const c of doneContests) {
+                    let body = '';
+
+                    if (c.key === 'mathcounts' && mc) {
+                        body += '<div style="display:flex;flex-wrap:wrap;gap:0;">';
+                        body += scoreBox('Sprint', mc.sprintScore, mc.maxSprint) + scoreBox('Target', mc.targetScore, mc.maxTarget) + scoreBox('Individual', mc.individualScore, mc.maxIndividual);
+                        if (mc.rank) body += scoreBox('Rank', mc.rank, null);
+                        body += '</div>';
+                        if (mc.chapterStatus) {
+                            body += '<div style="margin-top:6px;font-size:0.85rem;color:#047857;">→ ' + escapeHtml(mc.chapterStatus) + '</div>';
+                            if (mc.chapterResults) {
+                                const cr = mc.chapterResults;
+                                body += '<div style="margin-top:4px;font-size:0.8rem;color:#6b7280;">Chapter: </div>';
+                                body += '<div style="display:flex;flex-wrap:wrap;gap:0;">';
+                                body += scoreBox('Sprint', cr.sprintScore, cr.maxSprint) + scoreBox('Target', cr.targetScore, cr.maxTarget) + scoreBox('Individual', cr.individualScore, cr.maxIndividual);
+                                if (cr.teamScore !== null) body += scoreBox('Team', cr.teamScore, cr.maxTeamScore);
+                                body += '</div>';
+                            }
+                        }
+                        if (mc.stateAdvancement) body += '<div style="margin-top:6px;font-size:0.85rem;color:#7c3aed;">→ ' + escapeHtml(mc.stateAdvancement) + '</div>';
+
+                    } else if (c.key === 'moems' && mo) {
+                        const moDates = ['Nov 21', 'Dec 19', 'Jan 9', 'Feb 6', 'Mar 6'];
+                        body += '<div style="display:flex;flex-wrap:wrap;gap:0;">';
+                        body += scoreBox('Total', mo.totalScore, 25);
+                        mo.contests.forEach(function(ct, i) {
+                            if (ct.score !== null) body += scoreBox(moDates[i], ct.score, 5);
+                            else if (!ct.attended) body += scoreBox(moDates[i], 'N/A', null);
+                        });
+                        body += '</div>';
+                        if (mo.team) body += '<div style="margin-top:6px;font-size:0.85rem;color:#6b7280;">Team: ' + escapeHtml(mo.team) + '</div>';
+                        const moAwards = [];
+                        if (mo.silverPin)       moAwards.push({ t: '🥈 Silver Pin', s: '18–22' });
+                        if (mo.patch)           moAwards.push({ t: '🎖️ Patch', s: '8–25' });
+                        if (mo.highAchievement) moAwards.push({ t: '🌟 High Achievement', s: 'Team 148–175' });
+                        if (moAwards.length) {
+                            body += '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:5px;">';
+                            for (const a of moAwards) body += badge(a.t + ' (' + a.s + ')', '#d97706');
+                            body += '</div>';
+                        }
+
+                    } else if (c.key === 'mathleague' && ml) {
+                        const mlDates = ['Nov 14', 'Dec 12', 'Jan 20', 'Feb 13'];
+                        body += '<div style="display:flex;flex-wrap:wrap;gap:0;">';
+                        body += scoreBox('Cumulative', ml.cumulativeIndividualScore, null);
+                        ml.meetScores.forEach(function(score, i) {
+                            if (score !== null && score !== 'NA') body += scoreBox(mlDates[i], score, 6);
+                            else if (score === 'NA') body += scoreBox(mlDates[i], 'N/A', null);
+                        });
+                        body += '</div>';
+                        if (ml.team) body += '<div style="margin-top:6px;font-size:0.85rem;color:#6b7280;">Team: ' + escapeHtml(ml.team) + '</div>';
+                        // Region 1 Meet #3 win — check if student was on Varsity at Meet #3
+                        const meet3 = ml.teamResults && ml.teamResults[2];
+                        if (meet3 && meet3.team && !meet3.team.toLowerCase().startsWith('jv') && meet3.team.toUpperCase() !== 'NA' && meet3.team.toLowerCase() !== 'individual') {
+                            body += '<div style="margin-top:8px;">' + badge('🏆 Region 1 Meet #3 Winners', '#059669') + '</div>';
+                        }
+                        if (ml.armlTracked) {
+                            body += '<div style="margin-top:4px;font-size:0.85rem;color:#7c3aed;">ARML Tracked';
+                            if (ml.armlQualifierScore !== null) body += ' — Qualifier Score: ' + ml.armlQualifierScore;
+                            body += '</div>';
+                        }
+
+                    } else if (c.key === 'mathkangaroo' && mk) {
+                        body += '<div style="font-size:0.9rem;color:#374151;">✓ Registered';
+                        if (mk.mkId) body += ' &nbsp;·&nbsp; MK ID: ' + escapeHtml(String(mk.mkId));
+                        body += '</div>';
+
+                    } else if (c.key === 'amc8' && a8) {
+                        body += '<div style="display:flex;flex-wrap:wrap;gap:0;">' + scoreBox('Score', a8.score, 25) + '</div>';
+                        if (a8.ywmAward) body += '<div style="margin-top:8px;">' + badge('🏅 Young Women in Mathematics Award', '#7e22ce') + '</div>';
+                        if (a8.pdfLink) body += '<div class="no-print" style="margin-top:6px;"><a href="' + escapeHtml(a8.pdfLink) + '" target="_blank" style="font-size:0.8rem;color:#1d4ed8;">📄 Score Report</a></div>';
+
+                    } else if (c.key === 'noetic' && no && no.signedUp) {
+                        body += '<div style="display:flex;flex-wrap:wrap;gap:0;">' + scoreBox('Score', no.score, 100) + '</div>';
+                        const awards = [];
+                        if (no.honorableMention) awards.push(['Honorable Mention', '#d97706']);
+                        if (no.nationalHonorRoll) awards.push(['National Honor Roll', '#059669']);
+                        if (no.teamWinner) awards.push(['Team Winner', '#7c3aed']);
+                        if (awards.length) {
+                            body += '<div style="margin-top:6px;">';
+                            for (const [a, col] of awards) body += badge(a, col);
+                            body += '</div>';
+                        }
+
+                    } else if (c.key === 'purplecomet' && pc && pc.myTeam) {
+                        const pt = pc.myTeam;
+                        body += '<div style="font-size:0.9rem;color:#374151;margin-bottom:6px;">Team: <strong>' + escapeHtml(pt.teamName) + '</strong></div>';
+                        body += '<div style="display:flex;flex-wrap:wrap;gap:0;">';
+                        if (pt.teamScore) body += scoreBox('Score', pt.teamScore, null);
+                        if (pt.overallRank) body += scoreBox('Overall Rank', pt.overallRank, null);
+                        if (pt.countryRank) body += scoreBox('US Rank', pt.countryRank, null);
+                        if (pt.stateRank) body += scoreBox('MD Rank', pt.stateRank, null);
+                        body += '</div>';
+                        if (pt.certificateLink) body += '<div class="no-print" style="margin-top:6px;"><a href="' + escapeHtml(pt.certificateLink) + '" target="_blank" style="font-size:0.8rem;color:#1d4ed8;">📄 Certificate</a></div>';
+
+                    } else if (c.key === 'carderock' && cd && cd.signedUp) {
+                        if (cd.team) body += '<div style="font-size:0.9rem;color:#374151;margin-bottom:6px;">Team: <strong>' + escapeHtml(cd.team) + '</strong></div>';
+                        body += '<div style="display:flex;flex-wrap:wrap;gap:0;">';
+                        body += scoreBox('Sprint', cd.sprintScore, 30) + scoreBox('Target', cd.targetScore, 16) + scoreBox('Individual', cd.individualScore, 46);
+                        body += scoreBox('Indiv. Rank', cd.individualRank, null) + scoreBox('Team Round', cd.teamRoundScore, 20) + scoreBox('Team Score', cd.teamScore, 64) + scoreBox('Team Rank', cd.teamRank, null);
+                        body += '</div>';
+                        if (cd.scoreReportLink) body += '<div class="no-print" style="margin-top:6px;"><a href="' + escapeHtml(cd.scoreReportLink) + '" target="_blank" style="font-size:0.8rem;color:#1d4ed8;">📄 Score Report</a></div>';
+                    }
+
+                    if (body) h += compCard(c.label, body);
+                }
+                h += '</div>';
+            }
+
+            // ── Voted title ────────────────────────────────────────────────────
+            if (result.votingTitle) {
+                h += '<div style="text-align:center;margin-bottom:20px;">';
+                h += '<div style="display:inline-block;background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:white;border-radius:12px;padding:14px 28px;">';
+                h += '<div style="font-size:1.5rem;margin-bottom:4px;">' + result.votingTitle.emoji + '</div>';
+                h += '<div style="font-size:1.1rem;font-weight:bold;">' + escapeHtml(result.votingTitle.title) + '</div>';
+                h += '<div style="font-size:0.75rem;opacity:0.8;margin-top:2px;">Voted by your classmates</div>';
+                h += '</div></div>';
+            }
+
+            // ── Footer ─────────────────────────────────────────────────────────
+            h += '<div style="text-align:center;margin-top:20px;padding-top:16px;border-top:1px solid #e2e8f0;color:#6b7280;font-style:italic;font-size:0.9rem;">Thank you for a great year! — Prof. Jojo</div>';
+
+            // ── Print button ───────────────────────────────────────────────────
+            h += '<div class="no-print" style="text-align:center;margin-top:14px;">';
+            h += '<button onclick="printYearRecord()" style="background:#1e3a8a;color:white;border:none;padding:9px 22px;border-radius:8px;font-size:0.9rem;font-weight:bold;cursor:pointer;">🖨️ Print this record</button>';
+            h += '</div>';
+
+            h += '</div>';
+            return h;
+        }
+
+        function surveyCheckboxes(groupName, labelText, options) {
+            let s = '<div><div style="font-weight:bold;color:#374151;margin-bottom:6px;">' + labelText + '</div>';
+            s += '<div style="display:flex;flex-direction:column;gap:6px;">';
+            for (const opt of options) {
+                s += '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:white;font-size:0.9rem;">';
+                s += '<input type="checkbox" name="' + groupName + '" value="' + opt.replace(/"/g, '&quot;') + '" style="width:auto;cursor:pointer;">';
+                s += opt + '</label>';
+            }
+            s += '</div></div>';
+            return s;
+        }
+
+        function printYearRecord() {
+            const el = document.getElementById('yearRecordContent');
+            if (!el) return;
+            const clone = el.cloneNode(true);
+            clone.querySelectorAll('.no-print').forEach(function(n) { n.parentNode.removeChild(n); });
+            const win = window.open('', '_blank', 'width=860,height=700,scrollbars=yes');
+            if (!win) { window.print(); return; }
+            win.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Math Club Year Record</title>' +
+                '<style>body{margin:0.5in;font-family:Arial,sans-serif;}@media print{body{margin:0.4in;}}</style>' +
+                '</head><body>' + clone.outerHTML + '</body></html>');
+            win.document.close();
+            win.focus();
+            setTimeout(function() { win.print(); }, 400);
+        }
+
+        function onSurveyVolunteerChange() {
+            const checked = document.querySelector('input[name="sp_volunteer"]:checked');
+            const wrap = document.getElementById('sp_volunteerPhoneWrap');
+            if (wrap) wrap.style.display = (checked && (checked.value === 'Yes, definitely' || checked.value === 'Maybe')) ? '' : 'none';
+        }
+
+        // ── Club Awards Voting ────────────────────────────────────────────────
+        var votingPoolCache = null;
+
+        function buildVotingSection(result) {
+            const vs = result.votingStatus || {};
+            const mcpsId = escapeHtml(result.student.mcpsId);
+            let h = '<h2 class="section-title">🗳️ Club Awards</h2>';
+            h += '<div style="background:#f8f9fa;border-radius:10px;padding:20px;margin-bottom:15px;">';
+
+            if (vs.votingPublished && result.votingTitle) {
+                // Winner display
+                h += '<div style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:white;border-radius:10px;padding:24px;text-align:center;margin-bottom:12px;">';
+                h += '<div style="font-size:2rem;margin-bottom:6px;">' + result.votingTitle.emoji + '</div>';
+                h += '<div style="font-size:1.4rem;font-weight:bold;margin-bottom:4px;">' + escapeHtml(result.votingTitle.title) + '</div>';
+                h += '<div style="font-size:0.85rem;opacity:0.8;">Voted by your classmates</div>';
+                h += '</div>';
+            } else if (!vs.votingOpen && !VOTING_PREVIEW) {
+                // Closed, not published
+                h += '<div style="color:#6b7280;font-size:0.95rem;text-align:center;padding:12px;">Voting has closed. Results will be announced soon.</div>';
+            } else if (vs.hasVoted && !VOTING_PREVIEW) {
+                h += '<div id="votingFormWrap" data-mcpsid="' + mcpsId + '" data-picks="' + escapeHtml(JSON.stringify(vs.currentPicks || null)) + '">';
+                // Already voted — show picks
+                const cats2 = [
+                    {key:'mvp',emoji:'🏆',label:'MVP'},{key:'glue',emoji:'🧩',label:'The Glue'},
+                    {key:'calculator',emoji:'🧮',label:'The Human Calculator'},{key:'darkhorse',emoji:'🎯',label:'The Dark Horse'},
+                    {key:'rookie',emoji:'🌟',label:'Rookie of the Year'},{key:'leader',emoji:'👑',label:'Most Likely to Lead the Club Next Year'},
+                    {key:'highschool',emoji:'🌱',label:'Most Likely to Start a Math Club in High School'}
+                ];
+                const picks2 = vs.currentPicks || {};
+                h += '<div style="background:#d1fae5;border:2px solid #059669;border-radius:8px;padding:16px;">';
+                h += '<div style="font-weight:bold;color:#065f46;font-size:1rem;margin-bottom:12px;">✅ Your votes are recorded</div>';
+                h += '<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">';
+                for (const c of cats2) {
+                    const p = picks2[c.key] || {};
+                    h += '<div style="display:flex;gap:8px;align-items:center;font-size:0.9rem;">';
+                    h += '<span style="min-width:22px;">' + c.emoji + '</span>';
+                    h += '<span style="color:#374151;min-width:220px;">' + escapeHtml(c.label) + '</span>';
+                    h += '<span style="font-weight:bold;color:#065f46;">' + escapeHtml(p.name || '—') + '</span>';
+                    h += '</div>';
+                }
+                h += '</div>';
+                if (vs.votingOpen) {
+                    h += '<div style="text-align:center;">';
+                    h += '<button onclick="changeMyVotes()" style="background:white;color:#059669;border:2px solid #059669;padding:7px 18px;border-radius:8px;font-size:0.9rem;font-weight:bold;cursor:pointer;">✏️ Change My Votes</button>';
+                    h += '</div>';
+                }
+                h += '</div>';
+                h += '</div>'; // votingFormWrap
+            } else {
+                // Voting form
+                h += '<p style="color:#555;font-size:0.9rem;margin-bottom:16px;">Vote for one classmate per award. Your four open-category picks must be different people.</p>';
+                h += '<div id="votingFormWrap" data-mcpsid="' + mcpsId + '" data-picks="' + escapeHtml(JSON.stringify(vs.currentPicks || null)) + '"><div style="text-align:center;color:#6b7280;padding:20px;">Loading candidates…</div></div>';
+            }
+            h += '</div>';
+            return h;
+        }
+
+        function loadVotingForm(mcpsId) {
+            google.script.run
+                .withSuccessHandler(function(pool) {
+                    votingPoolCache = pool;
+                    var wrap = document.getElementById('votingFormWrap');
+                    var currentPicks = wrap ? JSON.parse(wrap.getAttribute('data-picks') || 'null') : null;
+                    renderVotingForm(mcpsId, pool, currentPicks);
+                })
+                .withFailureHandler(function(e) {
+                    var el = document.getElementById('votingFormWrap');
+                    if (el) el.innerHTML = '<div style="color:#dc2626;">Could not load candidates: ' + escapeHtml(e.message || '') + '</div>';
+                })
+                .getVotingPool();
+        }
+
+        function changeMyVotes() {
+            var wrap = document.getElementById('votingFormWrap');
+            if (!wrap) return;
+            wrap.innerHTML = '<div style="text-align:center;color:#6b7280;padding:20px;">Loading candidates…</div>';
+            var mcpsId = wrap.getAttribute('data-mcpsid');
+            loadVotingForm(mcpsId);
+        }
+
+        function renderVotingForm(mcpsId, pool, currentPicks) {
+            var el = document.getElementById('votingFormWrap');
+            if (el) el.setAttribute('data-mcpsid', mcpsId);
+            if (!el || !pool || !pool.success) return;
+            var cats = pool.categories || [];
+            var h = '<div style="display:flex;flex-direction:column;gap:14px;">';
+            cats.forEach(function(cat) {
+                var candidates = pool[cat.pool] || pool.open || [];
+                h += '<div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px;">';
+                h += '<div style="font-weight:bold;color:#1e3a8a;margin-bottom:2px;">' + cat.emoji + ' ' + escapeHtml(cat.label) + '</div>';
+                h += '<div style="font-size:0.8rem;color:#6b7280;margin-bottom:8px;">' + escapeHtml(cat.desc) + '</div>';
+                h += '<select id="vote_' + cat.key + '" style="width:100%;padding:8px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:0.9rem;background:white;">';
+                var currentId = currentPicks && currentPicks[cat.key] ? currentPicks[cat.key].mcpsId : '';
+                h += '<option value="">— Select a member —</option>';
+                candidates.forEach(function(c) {
+                    h += '<option value="' + escapeHtml(c.mcpsId) + '"' + (c.mcpsId === currentId ? ' selected' : '') + '>' + escapeHtml(c.name) + '</option>';
+                });
+                h += '</select>';
+                h += '</div>';
+            });
+            h += '</div>';
+            h += '<div id="voteError" style="color:#dc2626;font-size:0.85rem;margin-top:8px;display:none;"></div>';
+            var isUpdate = !!(currentPicks && Object.keys(currentPicks).some(function(k) { return currentPicks[k] && currentPicks[k].mcpsId; }));
+            h += '<div style="text-align:center;margin-top:14px;"><button onclick="submitVoteForm()" style="background:#1e3a8a;color:white;border:none;padding:11px 28px;border-radius:8px;font-size:1rem;font-weight:bold;cursor:pointer;">' + (isUpdate ? '✅ Update My Votes' : 'Submit My Votes') + '</button></div>';
+            el.innerHTML = h;
+        }
+
+        function submitVoteForm() {
+            var wrap = document.getElementById('votingFormWrap');
+            var mcpsId = wrap ? wrap.getAttribute('data-mcpsid') : '';
+            var cats = votingPoolCache && votingPoolCache.categories ? votingPoolCache.categories : [];
+            var picks = {};
+            var missing = [];
+            cats.forEach(function(cat) {
+                var sel = document.getElementById('vote_' + cat.key);
+                picks[cat.key] = sel ? sel.value : '';
+                if (!picks[cat.key]) missing.push(cat.emoji + ' ' + cat.label);
+            });
+            if (missing.length) {
+                var err = document.getElementById('voteError');
+                if (err) { err.textContent = 'Please pick someone for: ' + missing.join(', '); err.style.display = ''; }
+                return;
+            }
+            // Client-side unique check for open categories
+            var openKeys = ['mvp','glue','calculator','darkhorse'];
+            var openVals = openKeys.map(function(k) { return picks[k]; }).filter(Boolean);
+            if (new Set(openVals).size < openVals.length) {
+                var err = document.getElementById('voteError');
+                if (err) { err.textContent = 'Your picks for MVP, The Glue, The Human Calculator, and The Dark Horse must all be different people.'; err.style.display = ''; }
+                return;
+            }
+            var btn = document.querySelector('#votingFormWrap button');
+            if (btn) { btn.disabled = true; btn.textContent = '⏳ Submitting…'; }
+            google.script.run
+                .withSuccessHandler(function(res) {
+                    if (res.success) {
+                        showMessage(res.message, false);
+                        setTimeout(function() { lookupStudent(); }, 1200);
+                    } else {
+                        showMessage(res.message || 'Error. Please try again.', true);
+                        if (btn) { btn.disabled = false; btn.textContent = 'Submit My Votes'; }
+                    }
+                })
+                .withFailureHandler(function(e) {
+                    showMessage('Error. Please try again.', true);
+                    if (btn) { btn.disabled = false; btn.textContent = 'Submit My Votes'; }
+                })
+                .submitVote(mcpsId, picks);
+        }
+
         function buildSurveySection(result) {
             const student    = result.student;
             const ss         = result.surveyStatus || {};
             const parentDone  = !!ss.parentSubmitted;
             const studentDone = !!ss.studentSubmitted;
-            const is8th      = (student.gradeLevel || '').toString() === '8';
+            const is8th      = /^8/.test((student.gradeLevel || '').toString().trim());
             const mcpsId     = escapeHtml(student.mcpsId);
 
             const contests = [
-                { key: 'mathcounts',   label: 'MATHCOUNTS',   done: !!result.mathcounts },
-                { key: 'moems',        label: 'MOEMS',         done: !!result.moems },
-                { key: 'mathleague',   label: 'Math League',   done: !!result.mathLeague },
-                { key: 'mathkangaroo', label: 'Math Kangaroo', done: !!result.mathKangaroo },
-                { key: 'amc8',         label: 'AMC 8',         done: !!result.amc8 },
-                { key: 'noetic',       label: 'Noetic',        done: !!result.noetic },
-                { key: 'purplecomet',  label: 'Purple Comet',  done: !!result.purpleComet }
+                { key: 'mathcounts',   label: 'MATHCOUNTS',       done: !!result.mathcounts,   hasFee: true  },
+                { key: 'moems',        label: 'MOEMS',             done: !!result.moems,        hasFee: true  },
+                { key: 'mathleague',   label: 'MCPS Math League',  done: !!result.mathLeague,   hasFee: false },
+                { key: 'mathkangaroo', label: 'Math Kangaroo',     done: !!result.mathKangaroo, hasFee: true  },
+                { key: 'amc8',         label: 'AMC 8',             done: !!result.amc8,         hasFee: true,  schoolCovered: true },
+                { key: 'noetic',       label: 'Noetic',            done: !!(result.noetic && result.noetic.signedUp),        hasFee: true  },
+                { key: 'purplecomet',  label: 'Purple Comet',      done: !!(result.purpleComet && result.purpleComet.myTeam), hasFee: false },
+                { key: 'carderock',    label: 'Carderock',         done: !!(result.carderock && result.carderock.signedUp), hasFee: false }
             ];
 
             // Default to Parent tab; switch to Student if parent already submitted but student hasn't
@@ -2960,30 +3413,109 @@
                 h += surveyThankYouCard('parent');
             } else {
                 h += '<div style="display:flex;flex-direction:column;gap:18px;">';
+
+                // ── Overall experience ────────────────────────────────────────
+                h += surveyQ('sp_satisfaction', 'How would you rate your child\'s overall math club experience this year?', ['⭐⭐⭐⭐⭐ Excellent', '⭐⭐⭐⭐ Good', '⭐⭐⭐ Okay', '⭐⭐ Not great', '⭐ Poor']);
+                h += surveyQ('sp_childAttitude', 'How does your child feel about math club?', [
+                    'They love it — looks forward to it',
+                    'They enjoy it',
+                    'They go along with it — fine but not their favorite',
+                    'We encourage them to attend — they\'d skip it if it were up to them'
+                ]);
+                const doneLabels = contests.filter(function(c) { return c.done; }).map(function(c) { return c.label; });
+                const attendCount = result.attendance && result.attendance.dates ? result.attendance.dates.length : null;
+                let timeCtx = attendCount !== null ? 'Your child attended ' + attendCount + ' club meetings' : 'Math club met once a week';
+                if (doneLabels.length) timeCtx += ' and competed in ' + doneLabels.join(', ');
+                timeCtx += '. Was the overall time commitment manageable for your family?';
+                h += surveyQ('sp_timeCommitment', timeCtx, ['Yes, easily manageable', 'Manageable but busy', 'It was a stretch', 'Too much']);
+
+                // ── Competitions ──────────────────────────────────────────────
+                const doneContests = contests.filter(function(c) { return c.done; }).map(function(c) { return c.label; });
+                const notDoneContests = contests.filter(function(c) { return !c.done; }).map(function(c) { return c.label; });
+                if (doneContests.length > 0) {
+                    h += surveyCheckboxes('sp_worthwhile', 'Which competitions were most worthwhile for your child? (select all that apply)', doneContests);
+                }
+                if (notDoneContests.length > 0) {
+                    h += surveyCheckboxes('sp_wishParticipated', 'Were there any competitions you wish your child had participated in? (select all that apply)', notDoneContests);
+                }
+                h += surveyTextarea('sp_suggested', 'Are there any competitions you\'d suggest we add next year that we didn\'t offer this year?');
+                if (contests.find(function(c) { return c.key === 'mathcounts' && c.done; })) {
+                    h += surveyQ('sp_mathcounts_selection', 'For MATHCOUNTS, up to 14 students per school can advance to chapter level, selected by school competition score. What do you think of this selection method?', ['Fair — the school competition is the right way to pick the top 14', 'I\'d prefer selection based on attendance and effort, not just one competition score', 'No strong opinion']);
+                }
+                if (contests.find(function(c) { return c.key === 'mathleague' && c.done; })) {
+                    h += surveyQ('sp_mathleague_teams', 'How should Math League teams be formed?', ['Based on performance in past competitions (including past years for returning students)', 'A Math League-specific try-out at the start of the season', 'No opinion']);
+                }
+
+                // ── Information channels ──────────────────────────────────────
+                h += surveyQ('sp_websiteUsefulness', 'How useful was the club website for keeping up with news and materials?', ['Very useful', 'Somewhat useful', 'Didn\'t use it']);
+                h += surveyQ('sp_portalUsefulness', 'How useful was the parent portal for tracking your child\'s competitions and records?', ['Very useful', 'Somewhat useful', 'Didn\'t use it']);
+                h += surveyQ('sp_commFreq', 'How would you rate the frequency of communication from Prof. Jojo in the WhatsApp group?', ['Too much', 'About right', 'Not enough']);
+                h += surveyTextarea('sp_commTopics', 'What topics would you like more or less communication about? (optional)');
+
+                // ── Planning ──────────────────────────────────────────────────
+                h += '<div><div style="font-weight:bold;color:#374151;margin-bottom:8px;">Would you be willing to contribute toward the following club expenses (in addition to competition costs)?</div>';
+                h += '<div style="display:flex;flex-direction:column;gap:10px;">';
+                const expenseItems = [
+                    ['sp_exp_tshirt',      'Club t-shirt for your student'],
+                    ['sp_exp_printing',    'Printing and materials (practice problems, worksheets)'],
+                    ['sp_exp_snacks',      'Snacks during meetings'],
+                    ['sp_exp_events',      'Special events or field trips (guest speakers, off-site visits)'],
+                    ['sp_exp_celebration', 'End-of-year celebration']
+                ];
+                for (const [key, label] of expenseItems) {
+                    h += '<div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:10px 14px;">';
+                    h += '<div style="font-size:0.9rem;color:#374151;margin-bottom:6px;">' + label + '</div>';
+                    h += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+                    for (const opt of ['Yes', 'Maybe', 'No']) {
+                        h += '<label style="display:flex;align-items:center;gap:5px;cursor:pointer;padding:4px 10px;border:1px solid #d1d5db;border-radius:6px;background:#f9fafb;font-size:0.85rem;">';
+                        h += '<input type="radio" name="' + key + '" value="' + opt + '" style="width:auto;cursor:pointer;">' + opt + '</label>';
+                    }
+                    h += '</div></div>';
+                }
+                h += '</div></div>';
+                h += surveyTextarea('sp_whatchange', 'What would you change about math club?');
+
+                // ── Policy ────────────────────────────────────────────────────
+                h += surveyQ('sp_membershipGate', 'Do you think having try-outs for students to join math club is a good idea?', ['Yes — it will make sure only serious students join', 'Yes — but based on attitude/commitment, not math ability', 'Only if the club gets too large to accommodate everyone', 'No — it will exclude students who might discover they love math']);
+                h += surveyQ('sp_compGate', 'Should competing in competitions require attending a minimum number of club meetings first?', ['Yes — competitions should be for active members', 'No — competitions should be open to any interested student', 'It depends on the competition']);
+                h += surveyQ('sp_carderockAlloc', 'For limited-seat events like Carderock, how should spots be allocated?', ['First-come-first-served (as this year)', 'Priority to students who attend meetings most regularly', 'Teacher\'s choice based on readiness/fit', 'I didn\'t try to sign up / no preference']);
+                h += surveyQ('sp_coachRatio', 'Math club had about 57 regular members and averaged 26 students per session with 1 coach. What do you think is a good student-to-coach ratio?', ['Up to 15 students per coach', '16–25 per coach', '26–35 per coach', 'More than 35 is fine']);
+
+                // ── Looking ahead ─────────────────────────────────────────────
                 if (is8th) {
                     h += surveyQ('sp_returnCoach', 'Would you support your child returning to help coach math club next year?', ['Yes', 'Maybe', 'No']);
                     h += surveyTextarea('sp_coachNotes', 'Any notes about that? (optional)');
                 } else {
                     h += surveyQ('sp_returning', 'Is your child planning to return to math club next year?', ['Yes', 'No', 'Maybe']);
-                    h += surveyQ('sp_volunteer', 'Would you be willing to volunteer to help with math club next year?', ['Yes, definitely', 'Maybe', 'No']);
-                }
-                for (const c of contests) {
-                    h += '<div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:14px;">';
-                    h += '<div style="font-weight:bold;color:#374151;margin-bottom:10px;">' + c.label + '</div>';
-                    if (c.done) {
-                        h += surveyQ('sp_' + c.key + '_again', 'Would you want your child to compete in ' + c.label + ' again next year?', ['Yes', 'No', 'Maybe']);
-                        h += surveyTextarea('sp_' + c.key + '_comments', 'Any comments? (optional)');
-                    } else {
-                        h += surveyQ('sp_' + c.key + '_again', 'Now that you know more about ' + c.label + ', would you have wanted your child to participate?', ['Yes', 'No', 'Maybe']);
+                    h += '<div><div style="font-weight:bold;color:#374151;margin-bottom:6px;">Would you be willing to volunteer to help with math club next year?</div>';
+                    h += '<div style="display:flex;flex-wrap:wrap;gap:8px;">';
+                    for (const vopt of ['Yes, definitely', 'Maybe', 'No']) {
+                        h += '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:white;font-size:0.9rem;">';
+                        h += '<input type="radio" name="sp_volunteer" value="' + vopt + '" onclick="onSurveyVolunteerChange()" style="width:auto;cursor:pointer;">';
+                        h += vopt + '</label>';
                     }
+                    h += '</div></div>';
+                    h += '<div id="sp_volunteerPhoneWrap" style="display:none;">';
+                    h += surveyTextInput('sp_volunteerPhone', 'Your phone number (Prof. Jojo will reach you on WhatsApp):');
                     h += '</div>';
                 }
-                h += surveyTextarea('sp_suggested', 'Are there any competitions you\'d suggest we add next year that we didn\'t offer this year?');
-                h += surveyQ('sp_commFreq', 'How would you rate the frequency of communication from Prof. Jojo?', ['Too much', 'About right', 'Not enough']);
-                h += surveyTextarea('sp_commTopics', 'What topics would you like more or less communication about? (optional)');
-                h += surveyQ('sp_snacks', 'How should we handle snacks?', ['Donation-based (as now)', 'Set fee collected from all participants', 'No preference']);
-                h += surveyQ('sp_tryouts', 'Should limited-seat competitions require try-outs?', ['Yes', 'No', 'No preference']);
+
+                // ── Wrap-up ───────────────────────────────────────────────────
                 h += surveyTextarea('sp_suggestions', 'Any other suggestions or feedback?');
+                h += '<div><div style="font-weight:bold;color:#374151;margin-bottom:6px;">How did you hear about math club this year? (check all that apply)</div>';
+                h += '<div style="display:flex;flex-direction:column;gap:6px;">';
+                for (const src of ['Met Prof. Jojo at Back to School Night', 'School newsletter or announcement', 'Heard from another student or parent']) {
+                    h += '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:white;font-size:0.9rem;">';
+                    h += '<input type="checkbox" name="sp_howJoined" value="' + src + '" style="width:auto;cursor:pointer;">';
+                    h += src + '</label>';
+                }
+                h += '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:white;font-size:0.9rem;">';
+                h += '<input type="checkbox" name="sp_howJoined" value="Other" style="width:auto;cursor:pointer;" onclick="document.getElementById(\'sp_howJoinedOtherWrap\').style.display=this.checked?\'\':\' none\'">';
+                h += 'Other</label>';
+                h += '<div id="sp_howJoinedOtherWrap" style="display:none;padding-left:8px;">';
+                h += surveyTextInput('sp_howJoinedOther', 'Please describe:');
+                h += '</div>';
+                h += '</div></div>';
                 h += '<div style="text-align:center;margin-top:8px;"><button onclick="submitSurvey(\'' + mcpsId + '\',\'parent\')" style="background:#dc2626;color:white;border:none;padding:12px 32px;border-radius:8px;font-size:1rem;font-weight:bold;cursor:pointer;">Submit Parent Response</button></div>';
                 h += '</div>';
             }
@@ -2991,10 +3523,42 @@
 
             // ── Student panel ─────────────────────────────────────────────────
             h += '<div id="surveyPanelStudent" style="' + (!defaultParent ? '' : 'display:none;') + '">';
-            if (studentDone) {
-                h += surveyThankYouCard('student');
+            if (studentDone || SURVEY_PREVIEW) {
+                h += buildStudentYearRecord(result, contests);
             } else {
                 h += '<div style="display:flex;flex-direction:column;gap:18px;">';
+                h += surveyTextarea('ss_favorite', 'What was your favorite activity or competition this year?');
+                h += surveyTextarea('ss_whatchange', 'What would you change about math club?');
+                for (const c of contests) {
+                    h += '<div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:14px;">';
+                    h += '<div style="font-weight:bold;color:#374151;margin-bottom:10px;">' + c.label + '</div>';
+                    if (c.done) {
+                        h += surveyStars('ss_' + c.key + '_rating');
+                        h += surveyQ('ss_' + c.key + '_prep', 'Did you feel well-prepared going into this competition?', ['Yes, I felt ready', 'Somewhat', 'No, I could have used more prep']);
+                        if (c.key === 'mathcounts') {
+                            h += surveyQ('ss_mathcounts_selection', 'Up to 14 students per school can advance to chapter level, selected by school competition score. What do you think of this?', ['Fair — the school competition is the right way to pick the top 14', 'I\'d prefer selection based on attendance and effort, not just one competition score', 'No strong opinion']);
+                        }
+                        if (c.key === 'mathleague') {
+                            h += surveyQ('ss_mathleague_teams', 'How should Math League teams be formed?', ['Based on performance in past competitions (including past years for returning students)', 'A Math League-specific try-out at the start of the season', 'No opinion']);
+                        }
+                    } else {
+                        h += surveyWhyNot('ss', c.key);
+                    }
+                    h += '</div>';
+                }
+                h += surveyTextarea('ss_compFeedback', 'Any feedback on the competitions you participated in? (optional)');
+                h += surveyQ('ss_mathConfidence', 'How has math club affected how you feel about your math ability?', ['Much more confident', 'Somewhat more confident', 'About the same', 'Less confident than before']);
+                h += surveyQ('ss_mathEnjoyment', 'Since joining math club, do you enjoy math more?', ['Yes, definitely', 'Somewhat', 'About the same', 'Less than before']);
+                h += surveyQ('ss_meetingFormat', 'How should math club meetings be structured?', [
+                    'More competition prep',
+                    'Keep the current balance',
+                    'More games and activities'
+                ]);
+                h += surveyQ('ss_clubSize', 'How did math club feel in terms of size this year?', ['Too small', 'About right', 'A bit large — felt crowded or rushed', 'Too large — it hurt the experience']);
+                h += surveyQ('ss_coachAttention', 'Did you feel like you got enough individual attention from the coach during meetings?', ['Yes, plenty', 'Somewhat — could have used more', 'No — it was hard to get help']);
+                h += surveyQ('ss_membershipGate', 'Do you think having try-outs for students to join math club is a good idea?', ['Yes — it will make sure only serious students join', 'Yes — but based on attitude/commitment, not math ability', 'Only if the club gets too large to accommodate everyone', 'No — it will exclude students who might discover they love math']);
+                h += surveyQ('ss_compGate', 'Should competing in competitions require attending a minimum number of club meetings first?', ['Yes — competitions should be for active members', 'No — competitions should be open to any interested student', 'It depends on the competition']);
+                h += surveyQ('ss_carderockAlloc', 'For limited-seat events like Carderock, how should spots be allocated?', ['First-come-first-served (as this year)', 'Priority to students who attend meetings most regularly', 'Teacher\'s choice based on readiness/fit', 'I didn\'t try to sign up / no preference']);
                 if (is8th) {
                     h += surveyTextInput('ss_highschool', 'Which high school will you be attending next year?');
                     h += '<div><div style="font-weight:bold;color:#374151;margin-bottom:6px;">Would you be interested in returning to help coach math club?</div>';
@@ -3011,29 +3575,9 @@
                 } else {
                     h += surveyQ('ss_returning', 'Are you planning to return to math club next year?', ['Yes', 'No', 'Maybe']);
                 }
-                for (const c of contests) {
-                    h += '<div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:14px;">';
-                    h += '<div style="font-weight:bold;color:#374151;margin-bottom:10px;">' + c.label + '</div>';
-                    if (c.done) {
-                        h += surveyQ('ss_' + c.key + '_again', 'Would you compete in ' + c.label + ' again next year?', ['Yes', 'No', 'Maybe']);
-                        h += surveyTextarea('ss_' + c.key + '_comments', 'Any comments? (optional)');
-                    } else {
-                        h += surveyQ('ss_' + c.key + '_again', 'Now that you know more about ' + c.label + ', would you want to participate if it\'s offered again?', ['Yes', 'No', 'Maybe']);
-                    }
-                    h += '</div>';
+                if (is8th) {
+                    h += surveyTextarea('ss_wordsOfWisdom', 'Leave a message for next year\'s math club members — what should they know?');
                 }
-                h += surveyTextarea('ss_suggested', 'Are there any competitions you\'d like us to add next year that we didn\'t offer this year?');
-                h += '<div>';
-                h += '<div style="font-weight:bold;color:#374151;margin-bottom:8px;">How should math club meetings be structured?</div>';
-                h += '<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin-bottom:6px;">';
-                h += '<div style="font-size:0.85rem;color:#6b7280;text-align:right;">More focused on competition prep (practice problems, drills, test strategies)</div>';
-                h += '<input type="range" id="ss_meetingFormat" min="1" max="5" value="3" oninput="document.getElementById(\'ss_meetingVal\').textContent=this.value" style="width:120px;">';
-                h += '<div style="font-size:0.85rem;color:#6b7280;">More time on games and activities not tied to specific competitions</div>';
-                h += '</div>';
-                h += '<div style="text-align:center;font-size:0.85rem;color:#555;">Value: <strong id="ss_meetingVal">3</strong> &nbsp;(1&nbsp;=&nbsp;more prep, 3&nbsp;=&nbsp;current balance, 5&nbsp;=&nbsp;more games)</div>';
-                h += '</div>';
-                h += surveyTextarea('ss_favorite', 'What was your favorite activity this year?');
-                h += surveyQ('ss_tryouts', 'Should limited-seat competitions require try-outs?', ['Yes', 'No', 'No preference']);
                 h += surveyTextarea('ss_suggestions', 'Any other suggestions or feedback?');
                 h += '<div style="text-align:center;margin-top:8px;"><button onclick="submitSurvey(\'' + mcpsId + '\',\'student\')" style="background:#dc2626;color:white;border:none;padding:12px 32px;border-radius:8px;font-size:1rem;font-weight:bold;cursor:pointer;">Submit Student Response</button></div>';
                 h += '</div>';
@@ -3083,6 +3627,7 @@
                 a.coachingInterest  = '';
                 a.whatsAppPhone     = '';
                 a.volunteerInterest = radioVal('sp_volunteer');
+                a.volunteerPhone    = (a.volunteerInterest === 'Yes, definitely' || a.volunteerInterest === 'Maybe') ? txtVal('sp_volunteerPhone') : '';
                 a.coachingSupport   = radioVal('sp_returnCoach');
             } else {
                 const coaching = radioVal('ss_coaching');
@@ -3090,23 +3635,60 @@
                 a.coachingInterest  = coaching;
                 a.whatsAppPhone     = (coaching === 'Yes' || coaching === 'Maybe') ? txtVal('ss_phone') : '';
                 a.volunteerInterest = '';
+                a.volunteerPhone    = '';
                 a.coachingSupport   = '';
             }
 
-            const contestKeys = ['mathcounts', 'moems', 'mathleague', 'mathkangaroo', 'amc8', 'noetic', 'purplecomet'];
-            for (const c of contestKeys) {
-                a[c + '_again']    = radioVal(pfx + '_' + c + '_again');
-                a[c + '_comments'] = txtVal(pfx + '_' + c + '_comments');
+            function checkboxVals(name) {
+                return Array.from(document.querySelectorAll('input[name="' + name + '"]:checked'))
+                    .map(function(el) { return el.value; }).join(', ');
             }
 
-            const fmtEl = document.getElementById('ss_meetingFormat');
+            const contestKeys = ['mathcounts', 'moems', 'mathleague', 'mathkangaroo', 'amc8', 'noetic', 'purplecomet', 'carderock'];
+            for (const c of contestKeys) {
+                a[c + '_rating']   = isParent ? '' : radioVal('ss_' + c + '_rating');
+                a[c + '_prep']     = isParent ? '' : radioVal('ss_' + c + '_prep');
+                if (!isParent) {
+                    const notdone = radioVal('ss_' + c + '_notdone');
+                    const notdoneOther = txtVal('ss_' + c + '_notdone_other');
+                    a[c + '_notdone'] = notdone === 'Other' ? 'Other: ' + notdoneOther : notdone;
+                } else {
+                    a[c + '_notdone'] = '';
+                }
+            }
+
             a.suggestedCompetitions = txtVal(pfx + '_suggested');
-            a.meetingFormat         = isParent ? '' : (fmtEl ? fmtEl.value : '');
+            a.meetingFormat         = isParent ? '' : radioVal('ss_meetingFormat');
             a.favoriteActivity      = isParent ? '' : txtVal('ss_favorite');
-            a.tryOuts               = radioVal(pfx + '_tryouts');
+            a.compFeedback          = isParent ? '' : txtVal('ss_compFeedback');
+            a.whatChange            = txtVal(pfx + '_whatchange');
+            a.mathConfidence        = isParent ? '' : radioVal('ss_mathConfidence');
+            a.mathEnjoyment         = isParent ? '' : radioVal('ss_mathEnjoyment');
+            a.clubSize              = isParent ? '' : radioVal('ss_clubSize');
+            a.coachAttention        = isParent ? '' : radioVal('ss_coachAttention');
+            a.coachRatio            = isParent ? radioVal('sp_coachRatio') : '';
+            a.satisfaction          = isParent ? radioVal('sp_satisfaction') : '';
+            a.childAttitude         = isParent ? radioVal('sp_childAttitude') : '';
+            const howJoinedOther    = txtVal('sp_howJoinedOther');
+            a.howJoined             = isParent ? checkboxVals('sp_howJoined').replace('Other', howJoinedOther ? 'Other: ' + howJoinedOther : 'Other') : '';
+            a.timeCommitment        = isParent ? radioVal('sp_timeCommitment') : '';
+            a.worthwhileContests    = isParent ? checkboxVals('sp_worthwhile') : '';
+            a.wishParticipated      = isParent ? checkboxVals('sp_wishParticipated') : '';
+            a.websiteUsefulness     = isParent ? radioVal('sp_websiteUsefulness') : '';
+            a.portalUsefulness      = isParent ? radioVal('sp_portalUsefulness') : '';
+            a.exp_tshirt            = isParent ? radioVal('sp_exp_tshirt') : '';
+            a.exp_printing          = isParent ? radioVal('sp_exp_printing') : '';
+            a.exp_snacks            = isParent ? radioVal('sp_exp_snacks') : '';
+            a.exp_events            = isParent ? radioVal('sp_exp_events') : '';
+            a.exp_celebration       = isParent ? radioVal('sp_exp_celebration') : '';
+            a.mathcountsSelection   = isParent ? radioVal('sp_mathcounts_selection') : radioVal('ss_mathcounts_selection');
+            a.mathleagueTeams       = isParent ? radioVal('sp_mathleague_teams')     : radioVal('ss_mathleague_teams');
+            a.membershipGate        = radioVal(pfx + '_membershipGate');
+            a.compGate              = radioVal(pfx + '_compGate');
+            a.carderockAlloc        = radioVal(pfx + '_carderockAlloc');
+            a.wordsOfWisdom         = isParent ? '' : txtVal('ss_wordsOfWisdom');
             a.commFrequency         = isParent ? radioVal('sp_commFreq') : '';
             a.commTopics            = isParent ? txtVal('sp_commTopics') : '';
-            a.snacks                = isParent ? radioVal('sp_snacks') : '';
             a.suggestions           = txtVal(pfx + '_suggestions');
 
             const panel = document.getElementById(isParent ? 'surveyPanelParent' : 'surveyPanelStudent');

@@ -4,7 +4,9 @@ const COMPETITION_SIGNUP_SHEET_NAME = 'Form Responses 2';
 const ATTENDANCE_SHEET_NAME = 'Attendance Records';
 const SCHOOL_LIST_SHEET_NAME = 'School List';
 
-const SURVEY_OPEN = false;
+const SURVEY_OPEN = true; // open for end-of-year survey
+const VOTING_OPEN = new Date() < new Date('2026-06-04T00:00:00-04:00'); // closes end of June 3 EDT
+const VOTING_PUBLISHED = new Date() >= new Date('2026-06-04T00:00:00-04:00'); // auto-publishes June 4
 
 function doGet(e) {
   // Handle sign-up action
@@ -47,6 +49,20 @@ function doGet(e) {
       .setMimeType(ContentService.MimeType.JSON);
   }
 
+  // Cert winners list (called by PON leaderboard page)
+  if (e && e.parameter && e.parameter.action === 'getCertWinners') {
+    const winnersSheet = getCertWinnersSheet();
+    const wonIds = [];
+    if (winnersSheet.getLastRow() > 1) {
+      winnersSheet.getDataRange().getValues().slice(1).forEach(function(r) {
+        const id = (r[1] || '').toString().trim();
+        if (id) wonIds.push(id);
+      });
+    }
+    return ContentService.createTextOutput(JSON.stringify({ success: true, wonIds }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
   // Prime or Not student name lookup (called by Prime or Not game frontend)
   if (e && e.parameter && e.parameter.action === 'lookupStudentForPON') {
     const mcpsId = (e.parameter.id || '').toString().trim();
@@ -56,6 +72,20 @@ function doGet(e) {
       : { success: false, error: 'not_found' };
     return ContentService.createTextOutput(JSON.stringify(result))
       .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  // Survey results page
+  if (e && e.parameter && e.parameter.survey === '1') {
+    return HtmlService.createHtmlOutputFromFile('SurveyResults')
+      .setTitle('Math Club 2025–2026 Survey Results')
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  }
+
+  // Year-end party slides
+  if (e && e.parameter && e.parameter.party === '1') {
+    return HtmlService.createHtmlOutputFromFile('PartySlides')
+      .setTitle('Math Club 2025–2026 Year-End Party 🎉')
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
   }
 
   // Teacher certificate drawing interface
@@ -74,7 +104,9 @@ function doGet(e) {
 
   // Default: Return HTML page
   const checkinTemplate = HtmlService.createTemplateFromFile('Checkin');
-  checkinTemplate.surveyPreview = !!(e && e.parameter && e.parameter.surveyPreview === '1');
+  checkinTemplate.surveyPreview = (e && e.parameter && e.parameter.surveyPreview === '1') ? 'true' : 'false';
+  checkinTemplate.previewGrade  = (e && e.parameter && e.parameter.previewGrade) ? e.parameter.previewGrade : '';
+  checkinTemplate.votingPreview = (e && e.parameter && e.parameter.votingPreview === '1') ? 'true' : 'false';
   return checkinTemplate.evaluate()
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
@@ -912,7 +944,10 @@ function getMoemsResults(mcpsId) {
           fee: feeAmount,
           feePaid: isPaid,
           team: team,
-          usedInTeamScore: usedInTeamScore
+          usedInTeamScore: usedInTeamScore,
+          silverPin:       !!(row[14] && row[14].toString().trim()),
+          patch:           !!(row[15] && row[15].toString().trim()),
+          highAchievement: !!(row[16] && row[16].toString().trim())
         };
       }
     }
@@ -977,11 +1012,13 @@ function getAmc8Results(mcpsId) {
       const studentId = (row[1] || '').toString().trim(); // Column B (index 1)
 
       if (studentId === mcpsId.toString().trim()) {
-        const score = row[3] ? parseInt(row[3]) : null; // Column D (index 3) - the score
-        const pdfLink = (row[5] || '').toString().trim(); // Column F (index 5) - the PDF link
+        const score    = row[3] ? parseInt(row[3]) : null;
+        const ywmAward = !!(row[6] && row[6].toString().trim()); // Column G - Young Women in Mathematics Award
+        const pdfLink  = (row[5] || '').toString().trim();
 
         return {
           score: score,
+          ywmAward: ywmAward,
           pdfLink: pdfLink || null
         };
       }
@@ -1351,12 +1388,21 @@ function getCarderockResults(mcpsId) {
     const rawDate = studentRow[3];
     const signUpDate = rawDate ? (rawDate instanceof Date ? rawDate.toLocaleDateString() : rawDate.toString()) : null;
 
+    const parseScore = function(v) { return (v !== undefined && v !== '') ? Number(v) : null; };
+
     return {
       signedUp: true,
       signUpDate: signUpDate,
-      status: (studentRow[4] || '').toString().trim() || null,
-      team: (studentRow[5] || '').toString().trim() || null,
-      permissionSlipLink: (studentRow[6] || '').toString().trim() || null,
+      permissionSlipLink: (studentRow[4] || '').toString().trim() || null,
+      team:               (studentRow[5] || '').toString().trim() || null,
+      sprintScore:        parseScore(studentRow[6]),
+      targetScore:        parseScore(studentRow[7]),
+      individualScore:    parseScore(studentRow[8]),
+      teamRoundScore:     parseScore(studentRow[9]),
+      teamScore:          parseScore(studentRow[10]),
+      scoreReportLink:    (studentRow[11] || '').toString().trim() || null,
+      individualRank:     parseScore(studentRow[12]),
+      teamRank:           parseScore(studentRow[13]),
       totalSignUps: totalSignUps
     };
   } catch (error) {
@@ -2619,6 +2665,14 @@ function lookupStudentByMcpsId(mcpsId) {
       Logger.log('Error getting survey status: ' + err.toString());
     }
 
+    let votingStatus = null, votingTitle = null;
+    try {
+      votingStatus = getVotingStatus(mcpsIdStr);
+      votingTitle  = getStudentVotingTitle(mcpsIdStr);
+    } catch (err) {
+      Logger.log('Error getting voting status: ' + err.toString());
+    }
+
     const result = {
       success: true,
       student: studentInfo,
@@ -2633,7 +2687,9 @@ function lookupStudentByMcpsId(mcpsId) {
       noetic: noeticResults,
       purpleComet: purpleComet,
       carderock: carderockResults,
-      surveyStatus: surveyStatus
+      surveyStatus: surveyStatus,
+      votingStatus: votingStatus,
+      votingTitle:  votingTitle
     };
 
     try {
@@ -3030,7 +3086,7 @@ function getCertWinnersSheet() {
  * - totalQuestions >= 20
  * - Best = highest accuracy, then fastest time
  */
-function getPONDrawingLeaderboard_() {
+function getPONDrawingLeaderboard_(excludeIds) {
   const ss    = SpreadsheetApp.openById(PON_SHEET_ID);
   const sheet = ss.getSheetByName(PON_SHEET_NAME);
   if (!sheet || sheet.getLastRow() <= 1) return [];
@@ -3042,6 +3098,7 @@ function getPONDrawingLeaderboard_() {
     const row    = data[i];
     const mcpsId = (row[10] || '').toString().trim();
     if (!mcpsId) continue;
+    if (excludeIds && excludeIds.has(mcpsId)) continue;
 
     const min       = Number(row[2]);
     const max       = Number(row[3]);
@@ -3124,8 +3181,13 @@ function getDrawingStatus(mcpsId) {
     const certsDrawn     = winnersData.length;
     const certsRemaining = Math.max(0, CERT_TOTAL - certsDrawn);
 
-    // --- PON leaderboard (no eligibility filter — all score holders compete) ---
-    const ponRanges = getPONDrawingLeaderboard_();
+    // --- PON leaderboard — cascade past winners ---
+    const wonIdsForPON = new Set(winnersData.map(r => (r[1] || '').toString().trim()));
+    const ponRanges = getPONDrawingLeaderboard_(wonIdsForPON);
+
+    // --- Survey bonus entries ---
+    const surveyStatus = getSurveyStatus(idStr);
+    const surveyBonus  = (surveyStatus.studentSubmitted ? 1 : 0) + (surveyStatus.parentSubmitted ? 1 : 0);
 
     const baseEntry = noeticSignedUp ? 1 : 0;
     let ponEntries  = 0;
@@ -3148,9 +3210,10 @@ function getDrawingStatus(mcpsId) {
       alreadyWon,
       certLink,
       certsRemaining,
-      entries:          baseEntry + ponEntries,
+      entries:          baseEntry + ponEntries + surveyBonus,
       baseEntry,
       ponEntries,
+      surveyBonus,
       noeticParticipant: noeticSignedUp,
       rangeStatus
     };
@@ -3185,8 +3248,20 @@ function getCertDrawPool() {
       certLink: (r[5] || '').toString().trim() || null
     }));
 
-    // --- PON leaderboard (no eligibility filter — all MCPS ID holders compete) ---
-    const ponRanges  = getPONDrawingLeaderboard_();
+    // --- Survey bonus entries (1 per role submitted, max 2) ---
+    const surveyBonuses = {};
+    try {
+      const surveySheet = getSurveySheet();
+      if (surveySheet.getLastRow() > 1) {
+        surveySheet.getDataRange().getValues().slice(1).forEach(function(row) {
+          const id = (row[1] || '').toString().trim();
+          if (id && !wonIds.has(id)) surveyBonuses[id] = (surveyBonuses[id] || 0) + 1;
+        });
+      }
+    } catch (e) {}
+
+    // --- PON leaderboard — cascade past winners ---
+    const ponRanges  = getPONDrawingLeaderboard_(wonIds);
     const rangeLeads = {}; // mcpsId -> [label, ...]
     for (const r of ponRanges) {
       if (r.leader) {
@@ -3218,12 +3293,22 @@ function getCertDrawPool() {
       studentMap[mcpsId] = { name, baseEntry: 0 };
     }
 
+    // Also include students who only have survey bonus entries
+    for (const mcpsId of Object.keys(surveyBonuses)) {
+      if (wonIds.has(mcpsId)) continue;
+      if (!studentMap[mcpsId]) {
+        const name = findStudentNameByMcpsId(mcpsId) || mcpsId;
+        studentMap[mcpsId] = { name, baseEntry: 0 };
+      }
+    }
+
     const pool = Object.entries(studentMap)
       .map(([mcpsId, s]) => ({
-        name:      s.name,
+        name:        s.name,
         mcpsId,
-        rangesLed: rangeLeads[mcpsId] || [],
-        entries:   s.baseEntry + (rangeLeads[mcpsId] ? rangeLeads[mcpsId].length : 0)
+        rangesLed:   rangeLeads[mcpsId] || [],
+        surveyBonus: surveyBonuses[mcpsId] || 0,
+        entries:     s.baseEntry + (rangeLeads[mcpsId] ? rangeLeads[mcpsId].length : 0) + (surveyBonuses[mcpsId] || 0)
       }))
       .filter(s => s.entries > 0)
       .sort((a, b) => b.entries - a.entries || a.name.localeCompare(b.name));
@@ -3255,6 +3340,19 @@ function recordCertWinner(mcpsId, entriesAtWin) {
     const certLink = CERT_LINKS[certsDrawn] || null;
     getCertWinnersSheet().appendRow([name, idStr, new Date(), entriesAtWin || 0, certNum, certLink]);
 
+    // Sync all winner IDs to PON spreadsheet so the public leaderboard can cascade
+    try {
+      const ponSs = SpreadsheetApp.openById(PON_SHEET_ID);
+      let ponWinnersTab = ponSs.getSheetByName('Cert Winners');
+      if (!ponWinnersTab) ponWinnersTab = ponSs.insertSheet('Cert Winners');
+      const allIds = getCertWinnersSheet().getDataRange().getValues().slice(1)
+        .map(r => [(r[1] || '').toString().trim()]).filter(r => r[0]);
+      ponWinnersTab.clearContents();
+      if (allIds.length) ponWinnersTab.getRange(1, 1, allIds.length, 1).setValues(allIds);
+    } catch (e) {
+      Logger.log('PON winners sync error: ' + e.message);
+    }
+
     const poolData   = getCertDrawPool();
     poolData.certLink   = certLink;
     poolData.certNumber = certNum;
@@ -3278,21 +3376,24 @@ function getSurveySheet() {
     const headers = [
       'Timestamp', 'MCPS ID', 'Student Name', 'Role',
       'Returning', 'CoachingInterest', 'WhatsAppPhone',
-      'VolunteerInterest', 'CoachingSupport',
-      'MATHCOUNTS_Again', 'MATHCOUNTS_Comments',
-      'MOEMS_Again', 'MOEMS_Comments',
-      'MathLeague_Again', 'MathLeague_Comments',
-      'MathKangaroo_Again', 'MathKangaroo_Comments',
-      'AMC8_Again', 'AMC8_Comments',
-      'Noetic_Again', 'Noetic_Comments',
-      'PurpleComet_Again', 'PurpleComet_Comments',
-      'SuggestedCompetitions',
-      'MeetingFormat',
-      'FavoriteActivity',
-      'TryOuts',
-      'CommFrequency', 'CommTopics',
-      'Snacks',
-      'Suggestions'
+      'VolunteerInterest', 'VolunteerPhone', 'CoachingSupport',
+      'MATHCOUNTS_Rating', 'MATHCOUNTS_Prep', 'MATHCOUNTS_NotDone',
+      'MOEMS_Rating', 'MOEMS_Prep', 'MOEMS_NotDone',
+      'MathLeague_Rating', 'MathLeague_Prep', 'MathLeague_NotDone',
+      'MathKangaroo_Rating', 'MathKangaroo_Prep', 'MathKangaroo_NotDone',
+      'AMC8_Rating', 'AMC8_Prep', 'AMC8_NotDone',
+      'Noetic_Rating', 'Noetic_Prep', 'Noetic_NotDone',
+      'PurpleComet_Rating', 'PurpleComet_Prep', 'PurpleComet_NotDone',
+      'Carderock_Rating', 'Carderock_Prep', 'Carderock_NotDone',
+      'SuggestedCompetitions', 'CompFeedback', 'MeetingFormat', 'FavoriteActivity', 'WhatChange',
+      'MathConfidence', 'MathEnjoyment', 'ClubSize', 'CoachAttention',
+      'MATHCOUNTS_Selection', 'MathLeague_Teams',
+      'MembershipGate', 'CompGate', 'CarderockAlloc', 'WordsOfWisdom',
+      'Satisfaction', 'ChildAttitude', 'HowJoined', 'TimeCommitment',
+      'WorthwhileContests', 'WishParticipated',
+      'CoachRatio', 'WebsiteUsefulness', 'PortalUsefulness',
+      'Exp_TShirt', 'Exp_Printing', 'Exp_Snacks', 'Exp_Events', 'Exp_Celebration',
+      'CommFrequency', 'CommTopics', 'Suggestions'
     ];
     sheet.getRange(1, 1, 1, headers.length).setValues([headers]).setFontWeight('bold');
     sheet.setFrozenRows(1);
@@ -3350,25 +3451,25 @@ function submitSurveyResponse(mcpsId, role, answers) {
 
     sheet.appendRow([
       new Date(), idStr, name, role,
-      a.returning          || '',
-      a.coachingInterest   || '',
-      a.whatsAppPhone      || '',
-      a.volunteerInterest  || '',
-      a.coachingSupport    || '',
-      a.mathcounts_again   || '', a.mathcounts_comments   || '',
-      a.moems_again        || '', a.moems_comments        || '',
-      a.mathleague_again   || '', a.mathleague_comments   || '',
-      a.mathkangaroo_again || '', a.mathkangaroo_comments || '',
-      a.amc8_again         || '', a.amc8_comments         || '',
-      a.noetic_again       || '', a.noetic_comments       || '',
-      a.purplecomet_again  || '', a.purplecomet_comments  || '',
-      a.suggestedCompetitions || '',
-      a.meetingFormat      || '',
-      a.favoriteActivity   || '',
-      a.tryOuts            || '',
-      a.commFrequency      || '', a.commTopics            || '',
-      a.snacks             || '',
-      a.suggestions        || ''
+      a.returning || '', a.coachingInterest || '', a.whatsAppPhone || '',
+      a.volunteerInterest || '', a.volunteerPhone || '', a.coachingSupport || '',
+      a.mathcounts_rating || '',   a.mathcounts_prep || '',   a.mathcounts_notdone || '',
+      a.moems_rating || '',        a.moems_prep || '',        a.moems_notdone || '',
+      a.mathleague_rating || '',   a.mathleague_prep || '',   a.mathleague_notdone || '',
+      a.mathkangaroo_rating || '', a.mathkangaroo_prep || '', a.mathkangaroo_notdone || '',
+      a.amc8_rating || '',         a.amc8_prep || '',         a.amc8_notdone || '',
+      a.noetic_rating || '',       a.noetic_prep || '',       a.noetic_notdone || '',
+      a.purplecomet_rating || '',  a.purplecomet_prep || '',  a.purplecomet_notdone || '',
+      a.carderock_rating || '',    a.carderock_prep || '',    a.carderock_notdone || '',
+      a.suggestedCompetitions || '', a.compFeedback || '', a.meetingFormat || '', a.favoriteActivity || '', a.whatChange || '',
+      a.mathConfidence || '', a.mathEnjoyment || '', a.clubSize || '', a.coachAttention || '',
+      a.mathcountsSelection || '', a.mathleagueTeams || '',
+      a.membershipGate || '', a.compGate || '', a.carderockAlloc || '', a.wordsOfWisdom || '',
+      a.satisfaction || '', a.childAttitude || '', a.howJoined || '', a.timeCommitment || '',
+      a.worthwhileContests || '', a.wishParticipated || '',
+      a.coachRatio || '', a.websiteUsefulness || '', a.portalUsefulness || '',
+      a.exp_tshirt || '', a.exp_printing || '', a.exp_snacks || '', a.exp_events || '', a.exp_celebration || '',
+      a.commFrequency || '', a.commTopics || '', a.suggestions || ''
     ]);
 
     Logger.log('Survey response recorded: ' + idStr + ' / ' + role);
@@ -3395,11 +3496,18 @@ function getSurveySummary() {
       obj[k] = (obj[k] || 0) + 1;
     };
 
+    // Column indices match getSurveySheet() header order
+    // 4=Returning, 5=CoachingInterest, 7=VolunteerInterest, 9=CoachingSupport
+    // 36=MeetingFormat, 39=MathConfidence, 40=MathEnjoyment, 41=ClubSize, 42=CoachAttention
+    // 45=MembershipGate, 46=CompGate, 47=CarderockAlloc
+    // 49=Satisfaction, 50=ChildAttitude, 55=CoachRatio, 56=WebsiteUsefulness, 57=PortalUsefulness
+    // 63=CommFrequency
     const tallies = {
-      returning: {}, tryOuts: {}, snacks: {}, meetingFormat: {},
-      commFrequency: {}, volunteerInterest: {}, coachingInterest: {}, coachingSupport: {},
-      mathcounts_again: {}, moems_again: {}, mathleague_again: {},
-      mathkangaroo_again: {}, amc8_again: {}, noetic_again: {}, purplecomet_again: {}
+      returning: {}, coachingInterest: {}, volunteerInterest: {}, coachingSupport: {},
+      meetingFormat: {}, mathConfidence: {}, mathEnjoyment: {}, clubSize: {}, coachAttention: {},
+      membershipGate: {}, compGate: {}, carderockAlloc: {},
+      satisfaction: {}, childAttitude: {}, coachRatio: {}, websiteUsefulness: {}, portalUsefulness: {},
+      commFrequency: {}
     };
 
     for (const row of data) {
@@ -3407,28 +3515,403 @@ function getSurveySummary() {
       if (role === 'parent')  parentCount++;
       if (role === 'student') studentCount++;
 
-      tally(tallies.returning,          row[4]);
-      tally(tallies.coachingInterest,   row[5]);
-      tally(tallies.volunteerInterest,  row[7]);
-      tally(tallies.coachingSupport,    row[8]);
-      tally(tallies.mathcounts_again,   row[9]);
-      tally(tallies.moems_again,        row[11]);
-      tally(tallies.mathleague_again,   row[13]);
-      tally(tallies.mathkangaroo_again, row[15]);
-      tally(tallies.amc8_again,         row[17]);
-      tally(tallies.noetic_again,       row[19]);
-      tally(tallies.purplecomet_again,  row[21]);
-      tally(tallies.tryOuts,            row[26]);
-      tally(tallies.commFrequency,      row[27]);
-      tally(tallies.snacks,             row[29]);
-      const mf = parseInt(row[24]);
-      if (!isNaN(mf)) tally(tallies.meetingFormat, String(mf));
+      tally(tallies.returning,         row[4]);
+      tally(tallies.coachingInterest,  row[5]);
+      tally(tallies.volunteerInterest, row[7]);
+      tally(tallies.coachingSupport,   row[9]);
+      tally(tallies.meetingFormat,     row[36]);
+      tally(tallies.mathConfidence,    row[39]);
+      tally(tallies.mathEnjoyment,     row[40]);
+      tally(tallies.clubSize,          row[41]);
+      tally(tallies.coachAttention,    row[42]);
+      tally(tallies.membershipGate,    row[45]);
+      tally(tallies.compGate,          row[46]);
+      tally(tallies.carderockAlloc,    row[47]);
+      tally(tallies.satisfaction,      row[49]);
+      tally(tallies.childAttitude,     row[50]);
+      tally(tallies.coachRatio,        row[55]);
+      tally(tallies.websiteUsefulness, row[56]);
+      tally(tallies.portalUsefulness,  row[57]);
+      tally(tallies.commFrequency,     row[63]);
     }
 
     return { success: true, total: data.length, parentCount, studentCount, tallies };
 
   } catch (err) {
     Logger.log('getSurveySummary error: ' + err.message);
+    return { success: false, error: err.message };
+  }
+}
+
+// ── CLUB AWARDS VOTING 2026 ───────────────────────────────────────────────────
+
+const VOTES_SHEET_NAME = 'Votes 2026';
+
+const VOTE_CATEGORIES = [
+  { key: 'mvp',        label: 'MVP',                                             emoji: '🏆', desc: 'The member who contributed the most — in competitions, meetings, and team spirit',              pool: 'open'    },
+  { key: 'glue',       label: 'The Glue',                                        emoji: '🧩', desc: 'Holds the club together through encouragement, support, and helping others learn',               pool: 'open'    },
+  { key: 'calculator', label: 'The Human Calculator',                            emoji: '🧮', desc: 'Always first with the answer — the fastest mental math machine in the club',                    pool: 'open'    },
+  { key: 'darkhorse',  label: 'The Dark Horse',                                  emoji: '🎯', desc: 'Quietly impressive — consistently surprises everyone with their performance',                    pool: 'open'    },
+  { key: 'rookie',     label: 'Rookie of the Year',                              emoji: '🌟', desc: 'The 6th grader who made the biggest splash in their first year',                                pool: 'sixth'   },
+  { key: 'leader',     label: 'Most Likely to Lead the Club Next Year',          emoji: '👑', desc: 'The 7th grader who will step up and lead when the 8th graders leave',                           pool: 'seventh' },
+  { key: 'highschool', label: 'Most Likely to Start a Math Club in High School', emoji: '🌱', desc: 'The graduating 8th grader most likely to keep the math club spirit alive at their high school', pool: 'eighth'  }
+];
+
+function getVotesSheet() {
+  const ss = getSpreadsheet();
+  let sheet = ss.getSheetByName(VOTES_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(VOTES_SHEET_NAME);
+    const headers = ['Timestamp', 'VoterMcpsId'].concat(VOTE_CATEGORIES.map(function(c) { return c.key; }));
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+function getVotingPool() {
+  try {
+    const gradeByMcpsId = {}, gradeByName = {};
+    const reg = getRegistrationSheet();
+    if (reg && reg.getLastRow() > 1) {
+      reg.getDataRange().getValues().slice(1).forEach(function(row) {
+        const grade = (row[3] || '').toString().trim();
+        const email = (row[4] || '').toString().trim();
+        const name  = ((row[1] || '') + ' ' + (row[2] || '')).trim();
+        const m     = email.match(/(\d+)@mcpsmd\.net/);
+        if (m && grade) gradeByMcpsId[m[1]] = grade;
+        if (name && grade) gradeByName[name] = grade;
+      });
+    }
+    const comp = getCompetitionSignupSheet();
+    if (comp && comp.getLastRow() > 1) {
+      comp.getDataRange().getValues().slice(1).forEach(function(row) {
+        const id = (row[2] || '').toString().trim(), grade = (row[3] || '').toString().trim();
+        if (id && grade && !gradeByMcpsId[id]) gradeByMcpsId[id] = grade;
+      });
+    }
+
+    const candidates = [];
+    const att = getAttendanceSheet();
+    if (att && att.getLastRow() > 1) {
+      att.getDataRange().getValues().slice(2).forEach(function(row) {
+        const name = (row[0] || '').toString().trim(), mcpsId = (row[1] || '').toString().trim();
+        if (!name || !mcpsId) return;
+        candidates.push({ name: name, mcpsId: mcpsId, grade: gradeByMcpsId[mcpsId] || gradeByName[name] || '' });
+      });
+    }
+    candidates.sort(function(a, b) { return a.name.localeCompare(b.name); });
+
+    const slim  = function(c) { return { name: c.name, mcpsId: c.mcpsId }; };
+    const open    = candidates.map(slim);
+    const sixth   = candidates.filter(function(c) { return /^6/.test(c.grade); }).map(slim);
+    const seventh = candidates.filter(function(c) { return /^7/.test(c.grade); }).map(slim);
+    const eighth  = candidates.filter(function(c) { return /^8/.test(c.grade); }).map(slim);
+
+    return { success: true, votingOpen: VOTING_OPEN, categories: VOTE_CATEGORIES, open, sixth, seventh, eighth };
+  } catch (err) {
+    Logger.log('getVotingPool error: ' + err.message);
+    return { success: false, error: err.message };
+  }
+}
+
+function getVotingStatus(mcpsId) {
+  const idStr = (mcpsId || '').toString().trim();
+  if (!idStr) return { votingOpen: VOTING_OPEN, hasVoted: false, currentPicks: null, votingPublished: VOTING_PUBLISHED };
+  try {
+    const sheet = getVotesSheet();
+    let hasVoted = false, currentPicks = null;
+    if (sheet.getLastRow() > 1) {
+      const data = sheet.getDataRange().getValues().slice(1);
+      const row  = data.find(function(r) { return (r[1] || '').toString().trim() === idStr; });
+      if (row) {
+        hasVoted = true;
+        // Build name map from attendance for display
+        const nameMap = {};
+        try {
+          const att = getAttendanceSheet();
+          if (att && att.getLastRow() > 1) {
+            att.getDataRange().getValues().slice(2).forEach(function(r) {
+              const id = (r[1] || '').toString().trim(), name = (r[0] || '').toString().trim();
+              if (id) nameMap[id] = name;
+            });
+          }
+        } catch (e) {}
+        currentPicks = {};
+        VOTE_CATEGORIES.forEach(function(c, i) {
+          const pickedId = (row[i + 2] || '').toString().trim();
+          currentPicks[c.key] = { mcpsId: pickedId, name: nameMap[pickedId] || pickedId };
+        });
+      }
+    }
+    return { votingOpen: VOTING_OPEN, hasVoted: hasVoted, currentPicks: currentPicks, votingPublished: VOTING_PUBLISHED };
+  } catch (err) {
+    return { votingOpen: VOTING_OPEN, hasVoted: false, currentPicks: null, votingPublished: VOTING_PUBLISHED };
+  }
+}
+
+function submitVote(mcpsId, picks) {
+  try {
+    if (!VOTING_OPEN) return { success: false, message: 'Voting is currently closed.' };
+    const idStr = (mcpsId || '').toString().trim();
+    if (!idStr) return { success: false, message: 'Missing student ID.' };
+
+    const openKeys = ['mvp', 'glue', 'calculator', 'darkhorse'];
+    const openPicks = openKeys.map(function(k) { return (picks[k] || '').toString().trim(); }).filter(Boolean);
+    if (openPicks.length === 4 && new Set(openPicks).size < 4) {
+      return { success: false, message: 'Your picks for MVP, The Glue, The Human Calculator, and The Dark Horse must all be different people.' };
+    }
+
+    const sheet = getVotesSheet();
+    const rowData = [new Date(), idStr,
+      picks.mvp || '', picks.glue || '', picks.calculator || '', picks.darkhorse || '',
+      picks.rookie || '', picks.leader || '', picks.highschool || ''
+    ];
+
+    // Update existing row if one exists, otherwise append
+    let existingRow = -1;
+    if (sheet.getLastRow() > 1) {
+      const data = sheet.getDataRange().getValues();
+      for (var i = 1; i < data.length; i++) {
+        if ((data[i][1] || '').toString().trim() === idStr) { existingRow = i + 1; break; }
+      }
+    }
+    if (existingRow > 0) {
+      sheet.getRange(existingRow, 1, 1, rowData.length).setValues([rowData]);
+    } else {
+      sheet.appendRow(rowData);
+    }
+    return { success: true, message: 'Your vote has been recorded. Thank you!' };
+  } catch (err) {
+    Logger.log('submitVote error: ' + err.message);
+    return { success: false, message: 'Server error: ' + err.message };
+  }
+}
+
+function getVoteResults() {
+  try {
+    const sheet = getVotesSheet();
+    if (sheet.getLastRow() <= 1) {
+      return { success: true, total: 0, categories: VOTE_CATEGORIES.map(function(c) { return { key: c.key, label: c.label, emoji: c.emoji, desc: c.desc, tally: [] }; }) };
+    }
+    const data = sheet.getDataRange().getValues().slice(1);
+    const counts = {};
+    VOTE_CATEGORIES.forEach(function(c) { counts[c.key] = {}; });
+    data.forEach(function(row) {
+      VOTE_CATEGORIES.forEach(function(c, i) {
+        const pick = (row[i + 2] || '').toString().trim();
+        if (pick) counts[c.key][pick] = (counts[c.key][pick] || 0) + 1;
+      });
+    });
+
+    const nameMap = {};
+    const att = getAttendanceSheet();
+    if (att && att.getLastRow() > 1) {
+      att.getDataRange().getValues().slice(2).forEach(function(row) {
+        const id = (row[1] || '').toString().trim(), name = (row[0] || '').toString().trim();
+        if (id) nameMap[id] = name;
+      });
+    }
+
+    const categories = VOTE_CATEGORIES.map(function(c) {
+      const tally = Object.keys(counts[c.key]).map(function(id) {
+        return { mcpsId: id, name: nameMap[id] || id, votes: counts[c.key][id] };
+      }).sort(function(a, b) { return b.votes - a.votes; });
+      return { key: c.key, label: c.label, emoji: c.emoji, desc: c.desc, tally: tally };
+    });
+
+    return { success: true, total: data.length, categories: categories };
+  } catch (err) {
+    Logger.log('getVoteResults error: ' + err.message);
+    return { success: false, error: err.message };
+  }
+}
+
+function getStudentVotingTitle(mcpsId) {
+  if (!VOTING_PUBLISHED) return null;
+  try {
+    const idStr = (mcpsId || '').toString().trim();
+    const results = getVoteResults();
+    if (!results.success) return null;
+    for (var i = 0; i < results.categories.length; i++) {
+      const cat = results.categories[i];
+      if (cat.tally.length > 0 && cat.tally[0].mcpsId === idStr) {
+        return { title: cat.label, emoji: cat.emoji };
+      }
+    }
+    return null;
+  } catch (err) {
+    return null;
+  }
+}
+
+// ── PARTY SLIDES DATA ─────────────────────────────────────────────────────────
+
+function getPartySlideData() {
+  try {
+    // --- Grade map ---
+    const gradeByMcpsId = {}, gradeByName = {};
+    const reg = getRegistrationSheet();
+    if (reg && reg.getLastRow() > 1) {
+      reg.getDataRange().getValues().slice(1).forEach(function(row) {
+        const grade = (row[3] || '').toString().trim();
+        const email = (row[4] || '').toString().trim();
+        const name  = ((row[1] || '') + ' ' + (row[2] || '')).trim();
+        const m     = email.match(/(\d+)@mcpsmd\.net/);
+        if (m && grade) gradeByMcpsId[m[1]] = grade;
+        if (name && grade) gradeByName[name] = grade;
+      });
+    }
+    const comp2 = getCompetitionSignupSheet();
+    if (comp2 && comp2.getLastRow() > 1) {
+      comp2.getDataRange().getValues().slice(1).forEach(function(row) {
+        const id = (row[2] || '').toString().trim(), grade = (row[3] || '').toString().trim();
+        if (id && grade && !gradeByMcpsId[id]) gradeByMcpsId[id] = grade;
+      });
+    }
+
+    // --- Attendance ---
+    const students = [];
+    const attSheet = getAttendanceSheet();
+    if (attSheet && attSheet.getLastRow() > 1) {
+      attSheet.getDataRange().getValues().slice(2).forEach(function(row) {
+        const name   = (row[0] || '').toString().trim();
+        const mcpsId = (row[1] || '').toString().trim();
+        const count  = parseInt(row[2]) || 0;
+        if (!name || !mcpsId) return;
+        students.push({ name: name, mcpsId: mcpsId, count: count, grade: gradeByMcpsId[mcpsId] || gradeByName[name] || '' });
+      });
+    }
+    const nameMap = {};
+    students.forEach(function(s) { nameMap[s.mcpsId] = s.name; });
+
+    // --- Competition participation ---
+    const did = { mathcounts: new Set(), moems: new Set(), mathleague: new Set(),
+                  mathkangaroo: new Set(), amc8: new Set(), noetic: new Set(), purplecomet: new Set() };
+    const mlMeet3Varsity = new Set(), ywmIds = new Set();
+    const noeticHM = [], noeticNHR = [], noeticTeamW = [];
+
+    const sheets = { mc: getMathcountsSheet(), mo: getMoemsSheet(), ml: getMathLeagueSheet(),
+                     mk: getMathKangarooSheet(), a8: getAmc8Sheet(), no: getNoeticSheet(), pc: getPurpleCometSheet() };
+
+    const mcTeam = [], mcIndividual = [], mcState = [];
+    if (sheets.mc && sheets.mc.getLastRow() > 1) sheets.mc.getDataRange().getValues().slice(1).forEach(function(r) {
+      var id=(r[1]||'').toString().trim(), nm=(r[0]||'').toString().trim();
+      if(!id) return;
+      did.mathcounts.add(id);
+      var chStatus=(r[10]||'').toString().trim();
+      if(chStatus && chStatus !== 'Not able to attend') {
+        if(chStatus.toLowerCase().includes('team')) mcTeam.push(nm);
+        else mcIndividual.push(nm);
+      }
+      var stAdv=(r[19]||'').toString().trim();
+      if(stAdv) mcState.push(nm);
+    });
+    const moemsPin = [], monemsPatch = [], moemsHA = [];
+    if (sheets.mo && sheets.mo.getLastRow() > 1) sheets.mo.getDataRange().getValues().slice(1).forEach(function(r) {
+      var id=(r[1]||'').toString().trim(), nm=(r[0]||'').toString().trim();
+      if(id) {
+        did.moems.add(id);
+        if(r[14]) moemsPin.push(nm);
+        if(r[15]) monemsPatch.push(nm);
+        if(r[16]) moemsHA.push(nm);
+      }
+    });
+    const mlMeet3TeamMap = {}; // teamName -> [names]
+    if (sheets.ml && sheets.ml.getLastRow() > 1) {
+      sheets.ml.getDataRange().getValues().slice(1).forEach(function(r) {
+        var id=(r[1]||'').toString().trim(), nm=(r[0]||'').toString().trim(); if(!id) return;
+        did.mathleague.add(id);
+        var t3=(r[8]||'').toString().trim();
+        if(t3 && !t3.toLowerCase().startsWith('jv') && t3.toUpperCase()!=='NA' && t3.toLowerCase()!=='individual') {
+          mlMeet3Varsity.add(id);
+          var teamLabel = 'Team ' + t3;
+          if(!mlMeet3TeamMap[teamLabel]) mlMeet3TeamMap[teamLabel] = [];
+          mlMeet3TeamMap[teamLabel].push(nm);
+        }
+      });
+    }
+    const mkNames = new Set(), mkAwards = [];
+    if (sheets.mk && sheets.mk.getLastRow() > 1) sheets.mk.getDataRange().getValues().slice(1).forEach(function(r) {
+      var n=(r[0]||'').toString().trim();
+      if(n) {
+        mkNames.add(n.toLowerCase());
+        var award=(r[5]||'').toString().trim(); // col F = award
+        if(award) mkAwards.push({ name: n, award: award });
+      }
+    });
+    if (sheets.a8 && sheets.a8.getLastRow() > 1) sheets.a8.getDataRange().getValues().slice(1).forEach(function(r) { var id=(r[1]||'').toString().trim(); if(id){did.amc8.add(id); if(r[6]&&r[6].toString().trim()) ywmIds.add(id);} });
+    if (sheets.no && sheets.no.getLastRow() > 1) sheets.no.getDataRange().getValues().slice(1).forEach(function(r) { var id=(r[1]||'').toString().trim(), nm=(r[0]||'').toString().trim(); if(id){did.noetic.add(id); if(r[10]) noeticHM.push(nm); if(r[11]) noeticNHR.push(nm); if(r[12]) noeticTeamW.push(nm);} });
+    if (sheets.pc && sheets.pc.getLastRow() > 1) sheets.pc.getDataRange().getValues().slice(1).forEach(function(r) { var id=(r[1]||'').toString().trim(); if(id) did.purplecomet.add(id); });
+
+    // All competitors (any competition including Carderock)
+    const allCompetitorIds = new Set();
+    Object.keys(did).forEach(function(k) { did[k].forEach(function(id) { allCompetitorIds.add(id); }); });
+    const cdSheet = getCarderockSheet();
+    if (cdSheet && cdSheet.getLastRow() > 1) cdSheet.getDataRange().getValues().slice(1).forEach(function(r) { var id=(r[1]||'').toString().trim(); if(id) allCompetitorIds.add(id); });
+    // Add MK participants by name match
+    students.forEach(function(s) { if (mkNames.has(s.name.toLowerCase())) allCompetitorIds.add(s.mcpsId); });
+
+    // --- Badges ---
+    const openKeys = ['mathcounts','moems','mathleague','mathkangaroo','amc8','noetic','purplecomet'];
+    const badges = { dedicated: [], regular: [], fullCompetitor: [], multiSport: [], competitor: [] };
+    students.forEach(function(s) {
+      if (s.count >= 25) badges.dedicated.push(s.name);
+      else if (s.count >= 15) badges.regular.push(s.name);
+      var n = 0;
+      openKeys.forEach(function(k) { if(k==='mathkangaroo'?mkNames.has(s.name.toLowerCase()):did[k].has(s.mcpsId)) n++; });
+      if (n === openKeys.length) badges.fullCompetitor.push(s.name);
+      else if (n >= 4) badges.multiSport.push(s.name);
+      else if (n >= 1) badges.competitor.push(s.name);
+    });
+
+    // --- 8th graders + high schools ---
+    const surveyHighSchools = {};
+    const surveySheet = getSurveySheet();
+    if (surveySheet && surveySheet.getLastRow() > 1) {
+      surveySheet.getDataRange().getValues().slice(1).forEach(function(r) {
+        var id=(r[1]||'').toString().trim(), role=(r[3]||'').toString().trim().toLowerCase(), hs=(r[4]||'').toString().trim();
+        if(id && role==='student' && hs) surveyHighSchools[id]=hs;
+      });
+    }
+    const eighthGraders = students
+      .filter(function(s){return /^8/.test(s.grade);})
+      .sort(function(a,b){return a.name.localeCompare(b.name);})
+      .map(function(s){return {name:s.name, highSchool:surveyHighSchools[s.mcpsId]||''};});
+
+    // --- Stats ---
+    const certSheet = getCertWinnersSheet();
+    const certsAwarded = certSheet && certSheet.getLastRow() > 1 ? certSheet.getLastRow() - 1 : 0;
+
+    // --- Cert winners ---
+    const certWinners = [];
+    const cws = getCertWinnersSheet();
+    if (cws && cws.getLastRow() > 1) {
+      cws.getDataRange().getValues().slice(1).forEach(function(r) {
+        const name = (r[0]||'').toString().trim(), certNum = r[4] ? String(r[4]) : '';
+        if (name) certWinners.push({ name: name, certNum: certNum });
+      });
+    }
+
+    return {
+      success: true,
+      stats: { totalMembers: students.length, regularMembers: students.filter(function(s){return s.count>=14;}).length,
+               totalMeetings: 54, contentWeeks: 27, competitionsOffered: 8, certificatesAwarded: certsAwarded,
+               totalCompetitors: allCompetitorIds.size },
+      certWinners: certWinners,
+      badges: badges,
+      recognitions: {
+        mcTeam: mcTeam.sort(), mcIndividual: mcIndividual.sort(), mcState: mcState.sort(),
+        ywmAward: Array.from(ywmIds).map(function(id){return nameMap[id]||id;}).sort(),
+        noeticHM: noeticHM.sort(), noeticNHR: noeticNHR.sort(), noeticTeamW: noeticTeamW.sort(),
+        mathLeagueMeet3Teams: mlMeet3TeamMap,
+        moemsPin: moemsPin.sort(), monemsPatch: monemsPatch.sort(), moemsHA: moemsHA.sort(),
+        mkAwards: mkAwards
+      },
+      eighthGraders: eighthGraders
+    };
+  } catch (err) {
+    Logger.log('getPartySlideData error: ' + err.message);
     return { success: false, error: err.message };
   }
 }

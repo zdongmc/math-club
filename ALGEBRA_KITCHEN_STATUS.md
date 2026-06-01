@@ -14,7 +14,7 @@ Algebra Kitchen is an advanced cooking-themed math game unlocked after completin
 ## ✅ Completed Work
 
 ### Frontend Implementation (100%)
-- [x] Main game file: `mathdetective/algebra-kitchen.html` (1,596 lines)
+- [x] Main game file: `games/algebra-kitchen/algebra-kitchen.html` (1,596 lines)
 - [x] Copied to GitHub Pages: `docs/algebra-kitchen.html`
 - [x] Styling: Amber/cream theme, fully responsive, matches Training Kitchen
 - [x] Login screen with MCPS ID validation
@@ -90,7 +90,7 @@ math-club/
 ├── docs/
 │   ├── algebra-kitchen.html          ✅ READY
 │   └── materials.html                ✅ UPDATED
-├── mathdetective/
+├── games/algebra-kitchen/
 │   ├── algebra-kitchen.html          ✅ READY
 │   └── algebra-kitchen-backend/
 │       ├── Code.js                   ✅ READY
@@ -442,7 +442,7 @@ Hint: "Try elimination: subtract equations to eliminate one variable."
 ## 📞 Questions? Implementation Notes
 
 ### "How do I deploy the backend?"
-See `mathdetective/algebra-kitchen-backend/README.md` - step-by-step guide with screenshots.
+See `games/algebra-kitchen/algebra-kitchen-backend/README.md` - step-by-step guide with screenshots.
 
 ### "Will scores save without the backend?"
 Yes, but only for that session. Reload = lost progress. Deploy backend to make scores persistent.

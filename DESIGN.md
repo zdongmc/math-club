@@ -72,7 +72,7 @@ A Google Apps Script web app that lets parents look up their child's records by 
 3. School List (column B)
 4. Form Responses 2 (column C)
 
-### 3. Interactive Games (`mathdetective/`)
+### 3. Interactive Games (`games/`)
 
 Educational games with separate Apps Script backends for progress tracking.
 
@@ -104,10 +104,10 @@ Standalone HTML files with embedded timers, slideshows, and interactive displays
 | `mathcounts/` | Countdown round questions | 60 questions, MathJax, 60s timer, keyboard nav |
 | `mathcounts/` | Countdown slideshow | 19 slides, editable names, awards |
 | `mathcounts/` | Bracket display | Tournament bracket visualization |
-| `MathLeague/` | Meet timer slides | 3 rounds (Team/Relay/Individual), voice announcements |
-| `MOEMS/` | Contest timer | 30-min timer with voice announcements |
-| `AMC8/` | Contest timer | Contest timing display |
-| `MBMT/` | Diagnostic tests | 5 subject areas with instant feedback |
+| `math-league/` | Meet timer slides | 3 rounds (Team/Relay/Individual), voice announcements |
+| `moems/` | Contest timer | 30-min timer with voice announcements |
+| `amc8/` | Contest timer | Contest timing display |
+| `mbmt/` | Diagnostic tests | 5 subject areas with instant feedback |
 
 These are fully self-contained -- no backend calls, no external dependencies beyond MathJax CDN for math rendering. Designed to work offline once loaded.
 
@@ -191,7 +191,7 @@ The parent portal URL is referenced in `registration.html` and must never change
 
 **Why Google Sheets instead of a database?** The coach already uses Google Sheets for all club data. Sheets serve as both the data entry interface (for the coach) and the database (for the portal). No migration or new tools required.
 
-**Why copies of game HTML in `docs/`?** Games need to be accessible from the main website (GitHub Pages). The canonical source lives in `mathdetective/`, with copies in `docs/` for serving.
+**Why copies of game HTML in `docs/`?** Games need to be accessible from the main website (GitHub Pages). The canonical source lives in `games/`, with copies in `docs/` for serving.
 
 **Why `ANYONE_ANONYMOUS` access?** Parents need to look up records without a Google account. The portal only exposes read access to individual student data (keyed by MCPS ID), not bulk data.
 

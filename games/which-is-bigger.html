@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Which Is Bigger? — Estimation Edition</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Arial Black', Arial, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1a0a3e 100%); min-height: 100vh; color: white; }
+.hidden { display: none !important; }
+
+/* ── TITLE SCREEN ── */
+#title-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 30px; text-align: center; gap: 22px; }
+.title-emoji { font-size: 5rem; }
+.title-main  { font-size: 3rem; font-weight: bold; text-shadow: 0 0 32px rgba(255,215,0,0.35); }
+.title-edition { font-size: 1.1rem; opacity: 0.5; letter-spacing: 3px; text-transform: uppercase; font-family: Arial, sans-serif; font-weight: normal; }
+.title-sub   { font-size: 1.15rem; opacity: 0.6; max-width: 500px; line-height: 1.6; font-family: Georgia, serif; font-weight: normal; }
+.btn-open-tv { background: #ffd700; color: #1a1a1a; border: none; padding: 16px 44px; font-size: 1.1rem; font-family: inherit; font-weight: bold; border-radius: 12px; cursor: pointer; transition: background 0.15s; }
+.btn-open-tv:hover { background: #ffe44d; }
+.title-steps { display: flex; flex-direction: column; gap: 10px; max-width: 520px; text-align: left; }
+.title-step  { display: flex; align-items: flex-start; gap: 12px; font-family: Georgia, serif; font-size: 1.05rem; line-height: 1.5; font-weight: normal; opacity: 0.85; }
+.step-num    { background: #ffd700; color: #1a1a1a; font-family: 'Arial Black', Arial, sans-serif; font-size: 0.85rem; font-weight: bold; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+
+/* ── QUESTION SCREEN ── */
+#q-screen { display: flex; flex-direction: column; min-height: 100vh; padding: 16px 22px 20px; gap: 14px; }
+.q-topbar  { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.q-num     { font-size: 0.85rem; opacity: 0.45; letter-spacing: 1.5px; text-transform: uppercase; font-family: Arial, sans-serif; font-weight: normal; }
+.btn-tv-sm { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.22); border-radius: 8px; padding: 6px 14px; font-size: 0.8rem; cursor: pointer; font-family: inherit; }
+.btn-tv-sm:hover { background: rgba(255,255,255,0.2); }
+.q-prompt  { font-size: 1.35rem; text-align: center; opacity: 0.65; flex-shrink: 0; font-family: Georgia, serif; font-weight: normal; }
+
+.options-row { flex: 1; display: grid; grid-template-columns: 1fr 56px 1fr; gap: 14px; align-items: stretch; min-height: 200px; }
+.opt-card { border-radius: 16px; padding: 22px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; border: 3px solid transparent; transition: opacity 0.45s, box-shadow 0.45s, border-color 0.45s, background 0.45s; }
+.opt-card.a { background: rgba(37,99,235,0.15); border-color: rgba(37,99,235,0.45); }
+.opt-card.b { background: rgba(219,39,119,0.15);  border-color: rgba(219,39,119,0.45); }
+.opt-letter { font-size: 1.4rem; font-weight: bold; padding: 6px 22px; border-radius: 20px; }
+.opt-card.a .opt-letter { background: rgba(37,99,235,0.3); color: #93c5fd; }
+.opt-card.b .opt-letter { background: rgba(219,39,119,0.3); color: #f9a8d4; }
+.opt-text { font-size: 1.4rem; line-height: 1.4; font-family: Georgia, serif; font-weight: normal; }
+.vs-col   { display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.vs-label { font-size: 1.9rem; font-weight: bold; color: #ffd700; text-shadow: 0 0 18px rgba(255,215,0,0.65); }
+
+/* Card states after reveal */
+.opt-card.winner { border-color: #ffd700; box-shadow: 0 0 28px rgba(255,215,0,0.35); background: rgba(255,215,0,0.1); }
+.opt-card.loser  { opacity: 0.38; }
+.winner-badge { background: #ffd700; color: #1a1a1a; font-size: 0.85rem; padding: 5px 16px; border-radius: 20px; font-weight: bold; }
+
+.q-hint { font-size: 0.95rem; opacity: 0.45; text-align: center; flex-shrink: 0; font-family: Georgia, serif; font-weight: normal; min-height: 1.4em; }
+
+/* ── TIMER ── */
+#timer-wrap { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+#timer-num  { font-size: 3.2rem; font-weight: bold; line-height: 1; transition: color 0.3s; }
+#timer-num.warn { color: #fbbf24; }
+#timer-num.crit { color: #ef4444; animation: tpulse 0.5s infinite alternate; }
+#timer-num.done { color: #ef4444; font-size: 1.1rem; letter-spacing: 1px; }
+@keyframes tpulse { from { opacity:1; } to { opacity:0.25; } }
+#timer-track { width: 100%; max-width: 420px; height: 10px; background: rgba(255,255,255,0.15); border-radius: 5px; overflow: hidden; }
+#timer-fill  { height: 100%; background: #22c55e; border-radius: 5px; transition: width 1s linear, background 0.3s; }
+#timer-fill.warn { background: #fbbf24; }
+#timer-fill.crit { background: #ef4444; }
+
+/* Reveal math panel */
+#reveal-panel { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 16px 22px; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; animation: slideUp 0.42s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes slideUp { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
+.reveal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.reveal-col { background: rgba(0,0,0,0.22); border-radius: 10px; padding: 10px 14px; }
+.reveal-col-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.45; margin-bottom: 5px; }
+.reveal-col.a .reveal-col-label { color: #93c5fd; }
+.reveal-col.b .reveal-col-label { color: #f9a8d4; }
+.reveal-col-math { font-size: 0.98rem; line-height: 1.55; font-family: Georgia, serif; font-weight: normal; white-space: pre-line; }
+.reveal-explain  { font-size: 1.08rem; text-align: center; color: #ffd700; font-family: Georgia, serif; font-weight: normal; }
+.reveal-surprise { font-size: 0.9rem; text-align: center; opacity: 0.55; font-family: Georgia, serif; font-weight: normal; }
+</style>
+</head>
+<body>
+
+<!-- ── TITLE SCREEN ── -->
+<div id="title-screen">
+  <div class="title-emoji">🔭</div>
+  <div class="title-main">Which Is Bigger?</div>
+  <div class="title-edition">Estimation Edition</div>
+  <div class="title-sub">Two quantities. One is larger. Can you guess which?</div>
+  <div class="title-steps">
+    <div class="title-step"><span class="step-num">1</span>Two quantities appear — A and B.</div>
+    <div class="title-step"><span class="step-num">2</span>Vote before the timer runs out — then see how big the numbers really are.</div>
+  </div>
+  <button class="btn-open-tv" onclick="openTeacherView()">🎓 Open Teacher View</button>
+</div>
+
+<!-- ── QUESTION SCREEN ── -->
+<div id="q-screen" class="hidden">
+  <div class="q-topbar">
+    <div class="q-num" id="q-num">Question 1 of 24</div>
+    <button class="btn-tv-sm" onclick="openTeacherView()">🎓 Teacher View</button>
+  </div>
+  <div class="q-prompt">Which is bigger?</div>
+  <div class="options-row">
+    <div class="opt-card a" id="card-a">
+      <div class="opt-letter">A</div>
+      <div class="opt-text" id="opt-a-text"></div>
+    </div>
+    <div class="vs-col"><div class="vs-label">VS</div></div>
+    <div class="opt-card b" id="card-b">
+      <div class="opt-letter">B</div>
+      <div class="opt-text" id="opt-b-text"></div>
+    </div>
+  </div>
+  <div id="timer-wrap" class="hidden">
+    <div id="timer-num">15</div>
+    <div id="timer-track"><div id="timer-fill" style="width:100%"></div></div>
+  </div>
+  <div class="q-hint" id="q-hint"></div>
+  <div id="reveal-panel" class="hidden">
+    <div class="reveal-row">
+      <div class="reveal-col a">
+        <div class="reveal-col-label">Option A — the number</div>
+        <div class="reveal-col-math" id="math-a"></div>
+      </div>
+      <div class="reveal-col b">
+        <div class="reveal-col-label">Option B — the number</div>
+        <div class="reveal-col-math" id="math-b"></div>
+      </div>
+    </div>
+    <div class="reveal-explain"  id="reveal-explain"></div>
+    <div class="reveal-surprise" id="reveal-surprise"></div>
+  </div>
+</div>
+
+<script>
+// ── QUESTIONS ──────────────────────────────────────────────────────────────────
+const QUESTIONS = [
+  // ── easy: both quantities are familiar ────────────────────────────────────────
+  {
+    optA: "Inches in a mile",
+    optB: "Seconds in a day",
+    mathA: "1 mile = 5,280 ft × 12 in\n= 63,360 inches",
+    mathB: "24 hr × 60 min × 60 sec\n= 86,400 seconds",
+    explain: "86,400 > 63,360 — Option B is larger!",
+    winner: "B",
+    surprise: "There are more seconds in a day than inches in a mile — by about 36%!"
+  },
+  {
+    optA: "Hairs on a human head",
+    optB: "Words in the English language",
+    mathA: "~100,000 hairs\n(typical range: 80,000–120,000)",
+    mathB: "~170,000 words\nin the Oxford English Dictionary",
+    explain: "170,000 > 100,000 — Option B is larger!",
+    winner: "B",
+    surprise: "English has about 70% more words than you have hairs on your head!"
+  },
+  {
+    optA: "Ways to make $1.00 using US coins (pennies, nickels, dimes, quarters)",
+    optB: "Days in a non-leap year",
+    mathA: "292 combinations\n(every way to combine pennies, nickels,\ndimes, and quarters to reach $1.00)",
+    mathB: "365 days",
+    explain: "365 > 292 — Option B is larger!",
+    winner: "B",
+    surprise: "There are 292 ways to make change for a dollar — almost as many as days in the year!"
+  },
+  {
+    optA: "People alive on Earth right now",
+    optB: "Times your heart beats in an 80-year lifetime",
+    mathA: "~8 billion people\n≈ 8 × 10⁹",
+    mathB: "~80 beats/min × 525,600 min/yr × 80 yr\n≈ 3.4 billion  ≈ 3.4 × 10⁹",
+    explain: "8B > 3.4B — Option A is larger!",
+    winner: "A",
+    surprise: "More people are alive on Earth today than the total number of times your heart will ever beat!"
+  },
+  {
+    optA: "Possible 5-card poker hands from a 52-card deck",
+    optB: "Seconds in exactly 30 days",
+    mathA: "C(52,5) = 52! ÷ (5! × 47!)\n= 2,598,960",
+    mathB: "60 × 60 × 24 × 30\n= 2,592,000",
+    explain: "2,598,960 > 2,592,000 — Option A is larger!",
+    winner: "A",
+    surprise: "Possible poker hands (2,598,960) barely beat seconds in 30 days (2,592,000) — by just 6,960!"
+  },
+  {
+    optA: "Steps needed to walk all the way around Earth",
+    optB: "Grains of rice in a 1-pound bag",
+    mathA: "Earth's circumference = 40,075 km\n÷ 0.75 m per step\n≈ 53,000,000 steps",
+    mathB: "~29,000 grains per pound",
+    explain: "53,000,000 >> 29,000 — Option A is larger!",
+    winner: "A",
+    surprise: "Walking around Earth takes 53 million steps — about 1,800× the grains of rice in a bag!"
+  },
+  // ── easy–medium: one quantity needs estimation ────────────────────────────────
+  {
+    optA: "Miles of roads in the United States",
+    optB: "Miles from Earth to the Sun",
+    mathA: "~4 million miles of roads\n≈ 4 × 10⁶ miles",
+    mathB: "~93 million miles\n≈ 9.3 × 10⁷ miles",
+    explain: "93M > 4M — Option B is larger!",
+    winner: "B",
+    surprise: "All US roads laid end-to-end reach only 4% of the way to the Sun!"
+  },
+  {
+    optA: "Books ever published in all of human history",
+    optB: "Stars in the Milky Way galaxy",
+    mathA: "~130 million books\n≈ 1.3 × 10⁸",
+    mathB: "~300 billion stars\n≈ 3 × 10¹¹",
+    explain: "300B > 130M — Option B is larger!",
+    winner: "B",
+    surprise: "The Milky Way has about 2,300× more stars than all the books humans have ever written!"
+  },
+  {
+    optA: "Words in all books ever published",
+    optB: "Ants on Earth",
+    mathA: "~130M books × ~80,000 words each\n≈ 10 trillion words  ≈ 10¹³",
+    mathB: "~20 quadrillion ants\n≈ 2 × 10¹⁶",
+    explain: "2×10¹⁶ >> 10¹³ — Option B is larger!",
+    winner: "B",
+    surprise: "There are about 2,000× more ants than words in every book ever written!"
+  },
+  {
+    optA: "Years since the last dinosaurs went extinct",
+    optB: "Age of the universe in years",
+    mathA: "~66 million years\n≈ 6.6 × 10⁷ years",
+    mathB: "~13.8 billion years\n≈ 1.38 × 10¹⁰ years",
+    explain: "13.8B >> 66M — Option B is larger!",
+    winner: "B",
+    surprise: "The universe is about 209× older than the last dinosaurs — they're practically our neighbors in time!"
+  },
+  {
+    optA: "Known animal species on Earth",
+    optB: "Hairs on the entire human body",
+    mathA: "~1 million known animal species\n≈ 10⁶",
+    mathB: "~5 million body hairs\n≈ 5 × 10⁶",
+    explain: "5M > 1M — Option B is larger!",
+    winner: "B",
+    surprise: "You have about 5× more hairs on your body than there are known animal species on Earth — and millions more species are probably still undiscovered!"
+  },
+  {
+    optA: "Miles of blood vessels in a human body",
+    optB: "Miles around Earth's equator",
+    mathA: "~60,000 miles of blood vessels\n≈ 6 × 10⁴ miles",
+    mathB: "~24,901 miles\n≈ 2.49 × 10⁴ miles",
+    explain: "60,000 > 24,901 — Option A is larger!",
+    winner: "A",
+    surprise: "Your blood vessels, laid end to end, would wrap around Earth's equator about 2.4 times!"
+  },
+  // ── medium: biology and cosmic scale ─────────────────────────────────────────
+  {
+    optA: "Molecules in a single drop of water",
+    optB: "Total insects on Earth",
+    mathA: "~1.67 × 10²¹ molecules\n(a drop is ~0.05 mL; water is H₂O)",
+    mathB: "~10¹⁹ insects",
+    explain: "1.67×10²¹ >> 10¹⁹ — Option A is larger!",
+    winner: "A",
+    surprise: "One tiny drop of water has about 167× more molecules than there are insects on Earth!"
+  },
+  {
+    optA: "Bacteria living in your gut right now",
+    optB: "Every person who has ever lived in all of human history",
+    mathA: "~38 trillion bacteria\n≈ 4 × 10¹³",
+    mathB: "~100 billion people\n≈ 10¹¹",
+    explain: "4×10¹³ >> 10¹¹ — Option A is larger!",
+    winner: "A",
+    surprise: "Your gut alone has about 400× more bacteria than every human who has ever walked the Earth!"
+  },
+  {
+    optA: "Cells in a human body",
+    optB: "Trees on Earth",
+    mathA: "~37 trillion cells\n≈ 3.7 × 10¹³",
+    mathB: "~3 trillion trees\n≈ 3 × 10¹²",
+    explain: "3.7×10¹³ > 3×10¹² — Option A is larger!",
+    winner: "A",
+    surprise: "Your body has about 12× more cells than there are trees on the entire planet!"
+  },
+  {
+    optA: "Years since the Aztec Empire was founded",
+    optB: "Years since Stonehenge was built",
+    mathA: "~700 years ago\n(Tenochtitlan founded ~1325 AD)",
+    mathB: "~4,000 years ago\n(construction completed ~2000 BC)",
+    explain: "4,000 >> 700 — Option B is larger!",
+    winner: "B",
+    surprise: "Stonehenge was already 3,300 years old when the Aztecs founded their empire — the British monument predates Aztec civilization by over 3 millennia!"
+  },
+  {
+    optA: "Neurons in the human brain",
+    optB: "Stars in the Andromeda galaxy",
+    mathA: "~86 billion neurons\n≈ 8.6 × 10¹⁰",
+    mathB: "~1 trillion stars\n≈ 10¹²",
+    explain: "10¹² > 8.6×10¹⁰ — Option B is larger!",
+    winner: "B",
+    surprise: "Andromeda has about 11× more stars than your brain has neurons — and it's on a collision course with our galaxy in 4 billion years!"
+  },
+  {
+    optA: "Grains of sand on all of Earth's beaches",
+    optB: "Stars in the observable universe",
+    mathA: "~7.5 × 10¹⁸ grains of sand",
+    mathB: "~2 × 10²³ stars",
+    explain: "2×10²³ >> 7.5×10¹⁸ — Option B is larger!",
+    winner: "B",
+    surprise: "'More sand than stars' applies to the Milky Way only — the full universe has 25,000× more stars than all Earth's beach sand!"
+  },
+  // ── hard: combinatorics and the very large ────────────────────────────────────
+  {
+    optA: "Liters of water in all of Earth's oceans",
+    optB: "Possible positions on a standard 3×3 Rubik's cube",
+    mathA: "~1.335 × 10²¹ liters",
+    mathB: "~4.3 × 10¹⁹ positions",
+    explain: "1.335×10²¹ >> 4.3×10¹⁹ — Option A is larger!",
+    winner: "A",
+    surprise: "Earth's oceans contain about 31× more liters than the Rubik's cube has possible positions — and the Rubik's cube already has 43 quintillion!"
+  },
+  {
+    optA: "Ways to arrange 20 different books on a shelf (20!)",
+    optB: "Atoms in a single grain of sand",
+    mathA: "20! = 20 × 19 × 18 × … × 1\n≈ 2,432,902,008,176,640,000\n≈ 2.4 × 10¹⁸",
+    mathB: "~10¹⁹ atoms\n(a medium grain of sand, mostly SiO₂)",
+    explain: "10¹⁹ > 2.4×10¹⁸ — Option B is larger!",
+    winner: "B",
+    surprise: "A grain of sand has about 4× more atoms than ways to arrange 20 books — and that's already 2.4 quintillion arrangements!"
+  },
+  {
+    optA: "Possible outcomes of flipping a coin 100 times",
+    optB: "Molecules in a single breath of air",
+    mathA: "2¹⁰⁰ ≈ 1.27 × 10³⁰",
+    mathB: "~2.7 × 10²² molecules\n(a breath is ~0.5 L of air at sea level)",
+    explain: "1.27×10³⁰ >> 2.7×10²² — Option A is larger!",
+    winner: "A",
+    surprise: "100 coin flips produce about 47 billion times more possible outcomes than there are molecules in a breath of air!"
+  },
+  {
+    optA: "Valid completed Sudoku grids",
+    optB: "Seconds since the Big Bang",
+    mathA: "~6,670,903,752,021,072,936,960 grids\n≈ 6.7 × 10²¹",
+    mathB: "~13.8B years × 3.15×10⁷ sec/yr\n≈ 4.3 × 10¹⁷ seconds",
+    explain: "6.7×10²¹ >> 4.3×10¹⁷ — Option A is larger!",
+    winner: "A",
+    surprise: "There are about 15,000 valid Sudoku grids for every second the universe has existed!"
+  },
+  {
+    optA: "Ways to shuffle a standard 52-card deck",
+    optB: "Atoms in a human body",
+    mathA: "52!\n≈ 8 × 10⁶⁷",
+    mathB: "~7 × 10²⁷ atoms",
+    explain: "8×10⁶⁷ >> 7×10²⁷ — Option A is larger by a factor of 10⁴⁰!",
+    winner: "A",
+    surprise: "Every shuffle is almost certainly unique in the history of the universe — 52! is 10⁴⁰ times more than atoms in your body!"
+  },
+  {
+    optA: "A googol (10¹⁰⁰)",
+    optB: "Atoms in the observable universe",
+    mathA: "10¹⁰⁰\n(1 followed by 100 zeros)",
+    mathB: "~10⁸⁰ atoms",
+    explain: "10¹⁰⁰ >> 10⁸⁰ — Option A is larger by a factor of 10²⁰!",
+    winner: "A",
+    surprise: "A googol isn't just a big number — it's 10²⁰ times more than every atom in the observable universe!"
+  }
+];
+
+// ── STATE ──────────────────────────────────────────────────────────────────────
+let currentIdx = -1;
+let teacherWin = null;
+
+// ── TEACHER VIEW ───────────────────────────────────────────────────────────────
+const TV_HTML = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>Teacher — Which Is Bigger? Estimation Edition</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Arial Black',Arial,sans-serif;background:#0f172a;color:white;padding:12px;min-height:100vh;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
+h1{font-size:0.92rem;opacity:0.45;text-align:center;letter-spacing:2px;text-transform:uppercase;font-family:Arial,sans-serif;font-weight:normal;flex-shrink:0}
+#tv-qnum{font-size:0.88rem;opacity:0.5;text-align:center;flex-shrink:0}
+#tv-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex-shrink:0}
+.tv-opt{border-radius:10px;padding:10px 14px}
+.tv-opt.a{background:rgba(37,99,235,0.14);border:1px solid rgba(37,99,235,0.38)}
+.tv-opt.b{background:rgba(219,39,119,0.14);border:1px solid rgba(219,39,119,0.38)}
+.tv-opt-lbl{font-size:0.66rem;text-transform:uppercase;letter-spacing:1px;opacity:0.45;margin-bottom:4px}
+.tv-opt.a .tv-opt-lbl{color:#93c5fd}.tv-opt.b .tv-opt-lbl{color:#f9a8d4}
+.tv-opt-text{font-size:0.95rem;font-family:Georgia,serif;font-weight:normal;line-height:1.4}
+#tv-answer{background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.28);border-radius:10px;padding:12px 16px;flex-shrink:0}
+.tv-ans-hdr{font-size:0.66rem;text-transform:uppercase;letter-spacing:1px;color:#ffd700;opacity:0.65;margin-bottom:8px}
+#tv-ans-rows{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tv-ans-col{background:rgba(0,0,0,0.2);border-radius:8px;padding:8px 10px}
+.tv-ans-col-lbl{font-size:0.6rem;text-transform:uppercase;letter-spacing:1px;opacity:0.38;margin-bottom:3px}
+.tv-ans-col.a .tv-ans-col-lbl{color:#93c5fd}.tv-ans-col.b .tv-ans-col-lbl{color:#f9a8d4}
+.tv-ans-col-text{font-size:0.88rem;line-height:1.48;font-family:Georgia,serif;font-weight:normal;white-space:pre-line}
+#tv-explain{font-size:0.92rem;color:#ffd700;text-align:center;margin-top:8px;font-family:Georgia,serif;font-weight:normal}
+#tv-surprise{font-size:0.8rem;opacity:0.55;text-align:center;margin-top:4px;font-family:Georgia,serif;font-weight:normal}
+.tv-btnrow{display:flex;gap:8px;justify-content:center;flex-shrink:0;flex-wrap:wrap}
+.tvbtn{border:none;border-radius:8px;font-family:inherit;font-size:0.88rem;font-weight:bold;cursor:pointer;padding:9px 18px;transition:background 0.15s}
+.tvbtn:disabled{opacity:0.32;cursor:default}
+.tvbtn-ghost{background:rgba(255,255,255,0.12);color:white;border:1px solid rgba(255,255,255,0.25)}
+.tvbtn-ghost:hover:not(:disabled){background:rgba(255,255,255,0.22)}
+.tvbtn-gold{background:#ffd700;color:#1a1a1a;border:none}
+.tvbtn-gold:hover:not(:disabled){background:#ffe44d}
+.tv-qlist-wrap{background:rgba(0,0,0,0.25);border-radius:10px;padding:8px;flex-shrink:0}
+.tv-qlist-lbl{font-size:0.62rem;opacity:0.35;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;font-family:Arial,sans-serif;font-weight:normal}
+#tv-qlist{display:flex;flex-wrap:wrap;gap:5px}
+.tv-qchip{width:30px;height:22px;border:none;border-radius:4px;font-size:0.72rem;font-weight:bold;cursor:pointer;background:rgba(255,255,255,0.1);color:white;display:flex;align-items:center;justify-content:center;transition:background 0.12s;font-family:inherit}
+.tv-qchip:hover{background:rgba(255,255,255,0.22)}
+.tv-qchip.active{background:#ffd700;color:#1a1a1a}
+</style></head><body>
+<h1>Which Is Bigger? — Teacher View</h1>
+<div id="tv-qnum">No question loaded</div>
+<div id="tv-opts">
+  <div class="tv-opt a"><div class="tv-opt-lbl">Option A</div><div class="tv-opt-text" id="tv-opta">—</div></div>
+  <div class="tv-opt b"><div class="tv-opt-lbl">Option B</div><div class="tv-opt-text" id="tv-optb">—</div></div>
+</div>
+<div id="tv-answer">
+  <div class="tv-ans-hdr">Answer (teacher only)</div>
+  <div id="tv-ans-rows">
+    <div class="tv-ans-col a"><div class="tv-ans-col-lbl">Option A</div><div class="tv-ans-col-text" id="tv-matha">—</div></div>
+    <div class="tv-ans-col b"><div class="tv-ans-col-lbl">Option B</div><div class="tv-ans-col-text" id="tv-mathb">—</div></div>
+  </div>
+  <div id="tv-explain">—</div>
+  <div id="tv-surprise"></div>
+</div>
+<div class="tv-btnrow">
+  <button class="tvbtn tvbtn-ghost" id="btn-prev"   onclick="if(window.opener)window.opener.prevQuestion()" disabled>← Prev</button>
+  <button class="tvbtn tvbtn-gold"  id="btn-reveal" onclick="if(window.opener)window.opener.revealAnswer()" disabled>Reveal Answer</button>
+  <button class="tvbtn tvbtn-ghost" id="btn-next"   onclick="if(window.opener)window.opener.nextQuestion()" disabled>Next →</button>
+</div>
+<div class="tv-qlist-wrap">
+  <div class="tv-qlist-lbl">Quick jump — click to show on student screen</div>
+  <div id="tv-qlist"></div>
+</div>
+<script>
+(function() {
+  const n = ${QUESTIONS.length};
+  const list = document.getElementById('tv-qlist');
+  for (let i = 0; i < n; i++) {
+    const btn = document.createElement('button');
+    btn.id = 'tvchip-' + i;
+    btn.className = 'tv-qchip';
+    btn.textContent = i + 1;
+    btn.onclick = () => { if (window.opener) window.opener.showQuestion(i); };
+    list.appendChild(btn);
+  }
+})();
+<\/script>
+</body></html>`;
+
+// ── TEACHER SYNC ───────────────────────────────────────────────────────────────
+function tvSync() {
+  if (!teacherWin || teacherWin.closed) return;
+  const d   = teacherWin.document;
+  const idx = currentIdx;
+  const n   = QUESTIONS.length;
+  const set = (id, val) => { const el = d.getElementById(id); if (el) el.textContent = val; };
+
+  set('tv-qnum', idx >= 0 ? 'Question ' + (idx + 1) + ' of ' + n : 'No question loaded');
+
+  if (idx >= 0) {
+    const q = QUESTIONS[idx];
+    set('tv-opta',    q.optA);
+    set('tv-optb',    q.optB);
+    set('tv-matha',   q.mathA);
+    set('tv-mathb',   q.mathB);
+    set('tv-explain', q.explain);
+    set('tv-surprise', q.surprise);
+
+    const btnPrev   = d.getElementById('btn-prev');
+    const btnReveal = d.getElementById('btn-reveal');
+    const btnNext   = d.getElementById('btn-next');
+    if (btnPrev)   btnPrev.disabled   = (idx === 0);
+    if (btnReveal) btnReveal.disabled = false;
+    if (btnNext)   btnNext.disabled   = (idx === n - 1);
+
+    d.querySelectorAll('.tv-qchip').forEach((c, j) => c.classList.toggle('active', j === idx));
+  }
+}
+
+// ── OPEN TEACHER VIEW ──────────────────────────────────────────────────────────
+function openTeacherView() {
+  if (teacherWin && !teacherWin.closed) { teacherWin.focus(); tvSync(); return; }
+  teacherWin = window.open('', 'wib-teacher',
+    'width=820,height=650,menubar=no,toolbar=no,location=no,status=no,resizable=yes');
+  teacherWin.document.open();
+  teacherWin.document.write(TV_HTML);
+  teacherWin.document.close();
+  tvSync();
+}
+
+// ── SHOW QUESTION ──────────────────────────────────────────────────────────────
+function showQuestion(idx) {
+  const q  = QUESTIONS[idx];
+  currentIdx = idx;
+
+  document.getElementById('q-num').textContent =
+    'Question ' + (idx + 1) + ' of ' + QUESTIONS.length;
+  document.getElementById('opt-a-text').textContent = q.optA;
+  document.getElementById('opt-b-text').textContent = q.optB;
+  document.getElementById('q-hint').textContent = '';
+
+  const cardA = document.getElementById('card-a');
+  const cardB = document.getElementById('card-b');
+  cardA.className = 'opt-card a';
+  cardB.className = 'opt-card b';
+  cardA.querySelectorAll('.winner-badge').forEach(el => el.remove());
+  cardB.querySelectorAll('.winner-badge').forEach(el => el.remove());
+
+  document.getElementById('reveal-panel').classList.add('hidden');
+  document.getElementById('timer-wrap').classList.add('hidden');
+
+  document.getElementById('title-screen').classList.add('hidden');
+  document.getElementById('q-screen').classList.remove('hidden');
+
+  soundNext(getAudio());
+  tvSync();
+  startTimer();
+}
+
+function prevQuestion() { if (currentIdx > 0) showQuestion(currentIdx - 1); }
+function nextQuestion() { if (currentIdx < QUESTIONS.length - 1) showQuestion(currentIdx + 1); }
+
+// ── REVEAL ANSWER ──────────────────────────────────────────────────────────────
+function revealAnswer() {
+  if (currentIdx < 0) return;
+  stopTimer();
+  document.getElementById('timer-wrap').classList.add('hidden');
+  const q = QUESTIONS[currentIdx];
+
+  document.getElementById('math-a').textContent        = q.mathA;
+  document.getElementById('math-b').textContent        = q.mathB;
+  document.getElementById('reveal-explain').textContent = q.explain;
+  document.getElementById('reveal-surprise').textContent = '💡 ' + q.surprise;
+  document.getElementById('reveal-panel').classList.remove('hidden');
+
+  const cardA = document.getElementById('card-a');
+  const cardB = document.getElementById('card-b');
+
+  function badge(text) {
+    const s = document.createElement('span');
+    s.className = 'winner-badge';
+    s.textContent = text;
+    return s;
+  }
+
+  if (q.winner === 'A') {
+    cardA.className = 'opt-card a winner';
+    cardB.className = 'opt-card b loser';
+    cardA.appendChild(badge('🏆 Bigger'));
+  } else {
+    cardA.className = 'opt-card a loser';
+    cardB.className = 'opt-card b winner';
+    cardB.appendChild(badge('🏆 Bigger'));
+  }
+
+  document.getElementById('q-hint').textContent = '';
+  soundReveal(getAudio());
+}
+
+// ── TIMER ──────────────────────────────────────────────────────────────────────
+const TIMER_SECS = 15;
+let timerIv      = null;
+let timerLeft    = TIMER_SECS;
+
+function startTimer() {
+  stopTimer();
+  timerLeft = TIMER_SECS;
+  document.getElementById('timer-wrap').classList.remove('hidden');
+  renderTimer();
+  timerIv = setInterval(() => {
+    timerLeft--;
+    renderTimer();
+    if (timerLeft <= 3 && timerLeft > 0) soundTick(getAudio());
+    if (timerLeft <= 0) {
+      stopTimer();
+      const numEl = document.getElementById('timer-num');
+      numEl.textContent = "TIME'S UP!";
+      numEl.className   = 'done';
+      document.getElementById('timer-fill').style.width = '0%';
+      document.getElementById('timer-fill').className   = 'crit';
+      document.getElementById('q-hint').textContent = 'Lock in your vote — then wait for the reveal!';
+      soundDing(getAudio());
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerIv);
+  timerIv = null;
+}
+
+function renderTimer() {
+  const numEl  = document.getElementById('timer-num');
+  const fillEl = document.getElementById('timer-fill');
+  const pct    = (timerLeft / TIMER_SECS) * 100;
+  numEl.textContent = timerLeft;
+  fillEl.style.width = pct + '%';
+  const warn = timerLeft <= 8;
+  const crit = timerLeft <= 4;
+  numEl.className  = crit ? 'crit' : warn ? 'warn' : '';
+  fillEl.className = crit ? 'crit' : warn ? 'warn' : '';
+}
+
+// ── AUDIO ──────────────────────────────────────────────────────────────────────
+let audioCtx = null;
+function getAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function note(ctx, freq, t, dur, vol = 0.25, type = 'sine') {
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.connect(g); g.connect(ctx.destination);
+  o.type = type; o.frequency.setValueAtTime(freq, t);
+  g.gain.setValueAtTime(vol, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  o.start(t); o.stop(t + dur);
+}
+function soundTick(ctx)   { note(ctx, 660, ctx.currentTime, 0.07, 0.12); }
+function soundDing(ctx)   { note(ctx, 880, ctx.currentTime, 0.4,  0.18); }
+function soundNext(ctx) {
+  const t = ctx.currentTime;
+  note(ctx, 440, t,      0.1,  0.14);
+  note(ctx, 554, t+0.1,  0.14, 0.14);
+}
+function soundReveal(ctx) {
+  const t = ctx.currentTime;
+  note(ctx, 523, t,      0.15, 0.22);
+  note(ctx, 659, t+0.13, 0.15, 0.22);
+  note(ctx, 784, t+0.26, 0.38, 0.28);
+}
+</script>
+</body>
+</html>

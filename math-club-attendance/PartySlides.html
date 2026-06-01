@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Math Club 2025–2026 Year-End Party 🎉</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+  min-height: 100vh;
+  color: white;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ── Loading ────────────────────────────────────────────────────── */
+#loading {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 20px; font-size: 1.3rem; color: rgba(255,255,255,0.8);
+}
+.spinner {
+  width: 48px; height: 48px;
+  border: 5px solid rgba(255,255,255,0.2);
+  border-top-color: #f59e0b;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Slides ─────────────────────────────────────────────────────── */
+#slides { display: none; width: 100vw; height: 100vh; position: relative; }
+
+.slide {
+  position: absolute; inset: 0;
+  display: none;
+  flex-direction: column; align-items: center; justify-content: center;
+  padding: 40px 60px;
+  text-align: center;
+}
+.slide.active { display: flex; }
+
+/* ── Counter ────────────────────────────────────────────────────── */
+#counter {
+  position: fixed; bottom: 18px; right: 24px;
+  font-size: 0.85rem; color: rgba(255,255,255,0.4);
+  z-index: 10;
+}
+
+/* ── Navigation hint ────────────────────────────────────────────── */
+#nav-hint {
+  position: fixed; bottom: 18px; left: 24px;
+  font-size: 0.8rem; color: rgba(255,255,255,0.3);
+}
+
+/* ── Typography ─────────────────────────────────────────────────── */
+.slide-title {
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 12px;
+}
+.slide-subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.6rem);
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 32px;
+}
+.gold { color: #f59e0b; }
+.emoji-big { font-size: clamp(3rem, 8vw, 6rem); margin-bottom: 16px; line-height: 1; }
+
+/* ── Glass card ─────────────────────────────────────────────────── */
+.glass {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 16px;
+  padding: 24px 32px;
+}
+
+/* ── Stats grid ─────────────────────────────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+  max-width: 900px;
+}
+.stat-card {
+  background: rgba(255,255,255,0.1);
+  border-radius: 14px;
+  padding: 24px 16px;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.stat-number { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 800; color: #f59e0b; line-height: 1; }
+.stat-label  { font-size: 0.95rem; color: rgba(255,255,255,0.65); margin-top: 8px; }
+
+/* ── Name grid ──────────────────────────────────────────────────── */
+.name-grid {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: 10px; max-width: 1000px;
+}
+@keyframes chip-in {
+  0%   { opacity: 0; transform: scale(0.4) translateY(12px); }
+  70%  { transform: scale(1.1) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.name-chip {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 30px;
+  padding: 8px 18px;
+  font-size: clamp(0.85rem, 1.8vw, 1.1rem);
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  animation: chip-in 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+
+/* ── Recognitions ───────────────────────────────────────────────── */
+.recog-section { margin-bottom: 18px; }
+.recog-label { font-size: 1rem; color: rgba(255,255,255,0.6); margin-bottom: 8px; }
+.recog-names { font-size: clamp(1rem, 2vw, 1.4rem); font-weight: 700; }
+
+/* ── Award slides ───────────────────────────────────────────────── */
+.award-phase1 { display: flex; flex-direction: column; align-items: center; }
+.award-phase2 { display: none; flex-direction: column; align-items: center; }
+.award-desc {
+  font-size: clamp(0.9rem, 2vw, 1.3rem);
+  color: rgba(255,255,255,0.65);
+  max-width: 700px;
+  margin-bottom: 32px;
+}
+.reveal-prompt {
+  font-size: 1rem; color: rgba(255,255,255,0.35);
+  margin-top: 24px;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:0.35} 50%{opacity:0.7} }
+
+.winner-name {
+  font-size: clamp(2.5rem, 7vw, 5.5rem);
+  font-weight: 900;
+  color: #f59e0b;
+  text-shadow: 0 0 40px rgba(245,158,11,0.6), 0 0 80px rgba(245,158,11,0.3);
+  line-height: 1.1;
+  display: block;
+}
+.winner-votes {
+  font-size: 1rem; color: rgba(255,255,255,0.5);
+  margin-top: 10px;
+}
+.winner-label {
+  font-size: 1.1rem; color: rgba(255,255,255,0.5);
+  margin-bottom: 16px; letter-spacing: 0.1em; text-transform: uppercase;
+}
+
+@keyframes winner-pop {
+  0%   { transform: scale(0.2); opacity: 0; }
+  65%  { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.pop { animation: winner-pop 0.65s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+@keyframes confetti-fall {
+  0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(60px) rotate(720deg); opacity: 0; }
+}
+.confetti-wrap { position: absolute; top: 20%; left: 50%; transform: translateX(-50%); pointer-events: none; }
+.confetti-piece {
+  position: absolute;
+  width: 8px; height: 8px;
+  animation: confetti-fall 1.2s ease-out both;
+}
+
+/* ── 8th grade credits ──────────────────────────────────────────── */
+.credits-outer {
+  width: 100%; max-width: 600px;
+  height: 55vh;
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+}
+@keyframes credits-roll {
+  0%   { transform: translateY(100%); }
+  100% { transform: translateY(-100%); }
+}
+.credits-inner {
+  display: flex; flex-direction: column; align-items: center; gap: 28px;
+  padding: 40px 0;
+  animation: credits-roll 25s linear infinite;
+}
+.grad-entry { text-align: center; }
+.grad-name  { font-weight: 800; font-size: clamp(1.2rem, 3vw, 1.7rem); color: white; }
+.grad-school { font-size: clamp(0.85rem, 1.8vw, 1.1rem); color: #f59e0b; margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="spinner"></div>
+  <div>Loading party data…</div>
+</div>
+
+<div id="slides"></div>
+<div id="counter"></div>
+<div id="nav-hint">← → Space to navigate</div>
+
+<script>
+var slides = [];
+var currentIdx = 0;
+var awardStartIdx = 19; // drawing + cert winners + PON before awards intro
+var dSlideIdx = -1; // set during buildSlides
+// ── Drawing wheel state ──
+var dCW=480,dCH=510,dR=210,dCX=240,dCY=266;
+var dPALETTE=['#ef4444','#f97316','#eab308','#22c55e','#06b6d4','#3b82f6','#8b5cf6','#ec4899','#f43f5e','#84cc16'];
+var dPool=[],dSlices=[],dWheelRot=0,dIsSpinning=false,dCurrentWinner=null,dLastSeg=-1;
+var dAudioCtx=null;
+function dEnsureAudio(){if(!dAudioCtx)dAudioCtx=new(window.AudioContext||window.webkitAudioContext)();if(dAudioCtx.state==='suspended')dAudioCtx.resume();return dAudioCtx;}
+function dPlayTick(s){try{var ac=dEnsureAudio(),osc=ac.createOscillator(),g=ac.createGain();osc.connect(g);g.connect(ac.destination);osc.type='triangle';osc.frequency.value=480+s*640;var v=0.07+s*0.06;g.gain.setValueAtTime(v,ac.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.045);osc.start();osc.stop(ac.currentTime+0.05);}catch(e){}}
+function dPlayFanfare(){try{var ac=dEnsureAudio(),seq=[{f:523,t:0,d:0.3},{f:659,t:0.13,d:0.3},{f:784,t:0.26,d:0.3},{f:1047,t:0.40,d:0.55},{f:1319,t:0.55,d:0.75},{f:523,t:0.72,d:1.1},{f:659,t:0.72,d:1.1},{f:784,t:0.72,d:1.1}];seq.forEach(function(n){var osc=ac.createOscillator(),g=ac.createGain();osc.connect(g);g.connect(ac.destination);osc.type='triangle';osc.frequency.value=n.f;var t=ac.currentTime+n.t;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.2,t+0.03);g.gain.exponentialRampToValueAtTime(0.001,t+n.d);osc.start(t);osc.stop(t+n.d+0.05);});}catch(e){}}
+var awardRevealed = [false,false,false,false,false,false,false];
+var partyData = null, voteData = null, ponData = null;
+var loaded = 0;
+
+function onDataLoaded() {
+  loaded++;
+  if (loaded < 3) return;
+  if (!partyData || !partyData.success) {
+    document.getElementById('loading').innerHTML = '<div style="color:#f87171">Error loading data: ' + (partyData && partyData.error || 'unknown') + '</div>';
+    return;
+  }
+  buildSlides();
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('slides').style.display = 'block';
+  showSlide(0);
+}
+
+// ── Build slides ──────────────────────────────────────────────────────────────
+function buildSlides() {
+  var s = partyData.stats, b = partyData.badges, r = partyData.recognitions;
+  var el = document.getElementById('slides');
+  el.innerHTML = '';
+  slides = [];
+
+  // 1 — Title
+  addSlide(el, html([
+    '<div class="emoji-big">🎉</div>',
+    '<div class="slide-title">Hallie Wells Middle School<br><span class="gold">Competition Math Club</span></div>',
+    '<div class="slide-subtitle">2025 – 2026 Year-End Celebration</div>'
+  ]));
+
+  // 2 — Stats
+  addSlide(el, html([
+    '<div class="slide-title" style="margin-bottom:28px;">By the <span class="gold">Numbers</span></div>',
+    '<div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));">',
+    statCard(s.totalMembers, 'total attendees'),
+    statCard(s.regularMembers, 'regular members'),
+    statCard(s.contentWeeks, 'weeks of meetings'),
+    statCard(s.competitionsOffered, 'competitions offered'),
+    statCard(s.totalCompetitors, 'competition competitors'),
+    '</div>'
+  ]));
+
+  // 3 — Badge intro
+  addSlide(el, html([
+    '<div class="emoji-big">🏅</div>',
+    '<div class="slide-title">Achievement <span class="gold">Badges</span></div>',
+    '<div class="slide-subtitle">Recognizing dedication, effort, and commitment to the club</div>'
+  ]));
+
+  // 4 — Dedicated Members
+  addSlide(el, badgeSlide('⭐', 'Dedicated Members', '25+ meetings attended', b.dedicated));
+
+  // 4b — Aahil spotlight
+  addSlide(el, html([
+    '<div class="emoji-big">🌟</div>',
+    '<div class="slide-subtitle" style="margin-bottom:8px;letter-spacing:0.1em;text-transform:uppercase;font-size:1rem;">Most Meetings Attended</div>',
+    '<div class="slide-title" style="font-size:clamp(3rem,8vw,6rem);" class="gold"><span class="gold">Aahil Shaik</span></div>',
+    '<div style="margin-top:20px;display:flex;align-items:baseline;justify-content:center;gap:10px;">',
+    '<span style="font-size:clamp(4rem,12vw,9rem);font-weight:900;color:#f59e0b;line-height:1;">37</span>',
+    '<span style="font-size:1.5rem;color:rgba(255,255,255,0.6);">meetings</span>',
+    '</div>',
+    '<div style="margin-top:12px;color:rgba(255,255,255,0.45);font-size:1rem;">out of 54 sessions — attending nearly every week, often both days</div>'
+  ]));
+
+  // 5 — Regular Attendees
+  addSlide(el, badgeSlide('📅', 'Regular Attendees', '15–24 meetings attended', b.regular));
+
+  // 6 — Full Competitors
+  addSlide(el, badgeSlide('🥇', 'Full Competitors', 'All 7 open competitions', b.fullCompetitor));
+
+  // 7 — Multi-Sport
+  addSlide(el, badgeSlide('🏆', 'Multi-Sport', '4–6 competitions', b.multiSport));
+
+  // 8 — Competition Highlights intro
+  addSlide(el, html([
+    '<div class="emoji-big">🏅</div>',
+    '<div class="slide-title">Competition <span class="gold">Highlights</span></div>',
+    '<div class="slide-subtitle">Recognizing outstanding achievements across all 8 competitions</div>'
+  ]));
+
+  // 8a — MATHCOUNTS
+  addSlide(el, buildRecogSlide('🎯', 'MATHCOUNTS', [
+    { label: '🏆 Chapter Team', names: r.mcTeam, color: '#f59e0b' },
+    { label: '📋 Chapter Individual Competitors', names: r.mcIndividual, color: '#93c5fd' },
+    { label: '🌟 State Advancement', names: r.mcState, color: '#22d3ee' }
+  ]));
+
+  // 8b — Math League
+  var mlSections = [];
+  var mlTeams = r.mathLeagueMeet3Teams || {};
+  Object.keys(mlTeams).sort().forEach(function(teamName) {
+    mlSections.push({ label: '🏆 ' + teamName, names: mlTeams[teamName].sort(), color: '#f59e0b' });
+  });
+  if (!mlSections.length) mlSections.push({ label: '🏆 Region 1 Meet #3 Winners', names: [], color: '#f59e0b' });
+  addSlide(el, buildRecogSlide('📐', 'MCPS Math League — Region 1 Meet #3', mlSections));
+
+  // 8c — AMC 8
+  addSlide(el, buildRecogSlide('✏️', 'AMC 8', [
+    { label: '🏅 2026 Young Women in Mathematics Award', names: r.ywmAward, color: '#a855f7' }
+  ]));
+
+  // 8d — MOEMS
+  addSlide(el, buildRecogSlide('🔢', 'MOEMS', [
+    { label: '🌟 High Achievement', names: r.moemsHA, color: '#f59e0b' },
+    { label: '🥈 Silver Pin (18–22)', names: r.moemsPin, color: '#94a3b8' },
+    { label: '🎖️ Patch (8–25)', names: r.monemsPatch, color: '#6ee7b7' }
+  ]));
+
+  // 8e — Noetic
+  addSlide(el, buildRecogSlide('🧮', 'Noetic Learning', [
+    { label: '🌟 National Honor Roll', names: r.noeticNHR, color: '#22d3ee' },
+    { label: '🎖️ Honorable Mention', names: r.noeticHM, color: '#6ee7b7' },
+    { label: '🥇 Team Winner', names: r.noeticTeamW, color: '#fbbf24' }
+  ]));
+
+  // 8f — Carderock
+  addSlide(el, buildRecogSlide('🏔️', 'Carderock Math Contest', [
+    { label: '🎯 Countdown Round', names: ['Arjun Lakshmanan'], color: '#f59e0b' }
+  ]));
+
+
+  // 15 — Certificate drawing
+  addSlide(el, buildDrawSlide());
+  dSlideIdx = slides.length - 1;
+
+  // 16 — Certificate winners
+  addSlide(el, buildCertWinners(partyData.certWinners || []));
+
+  // 17 — Prime or Not (right after winners)
+  addSlide(el, buildPONSlide());
+
+  // Awards intro
+  addSlide(el, html([
+    '<div class="emoji-big">🗳️</div>',
+    '<div class="slide-title">The votes are <span class="gold">in</span></div>',
+    '<div class="slide-subtitle">Your classmates have spoken — time to announce the<br>2025–2026 Club Awards</div>'
+  ]));
+
+  // 10–16 — Award reveals (awardStartIdx = 9)
+  var cats = voteData ? voteData.categories : [];
+  for (var i = 0; i < 7; i++) {
+    var cat = cats[i] || { key: '?', label: 'Award', emoji: '🏆', desc: '', tally: [] };
+    addSlide(el, buildAwardSlide(cat, i));
+  }
+
+  // 18 — 8th grade sendoff
+  addSlide(el, buildEighthGrade(partyData.eighthGraders));
+
+  // Thank you: administrators & teachers
+  addSlide(el, buildThankYou('🏫', 'Thank You',
+    'School administrators & teachers who supported math club',
+    ['Dr. McNeal', 'Ms. Kelly', 'Mr. Paskvan', 'Ms. Huff', 'Ms. Burns', 'Mrs. DeStefano', 'Mr. Ritchie']));
+
+  // 21 — Thank you: parent volunteers
+  addSlide(el, html([
+    '<div class="emoji-big">🙏</div>',
+    '<div class="slide-title" style="margin-bottom:6px;"><span class="gold">Thank You</span></div>',
+    '<div class="slide-subtitle" style="margin-bottom:20px;">Parent volunteers &amp; snack donors</div>',
+    '<div class="name-grid" style="margin-bottom:24px;">',
+    ['Sindhura Potluri','Sumit Sinha','Jennifer Wong','Pranitha Mattey','Babita Shrestha','Aarthy Narasimhan','🍕 Snack donors'].map(function(n,i){
+      var delay=(i*0.08).toFixed(2);
+      var gold=n.startsWith('🍕');
+      return '<div class="name-chip" style="animation-delay:'+delay+'s'+(gold?';background:rgba(245,158,11,0.15);border-color:rgba(245,158,11,0.4);color:#fcd34d;':'')+'">' + esc(n) + '</div>';
+    }).join(''),
+    '</div>',
+    '<div class="glass" style="max-width:680px;padding:18px 28px;font-size:1.05rem;color:rgba(255,255,255,0.75);line-height:1.6;">',
+    'And to <strong style="color:white;">every math club parent</strong> — thank you for supporting and encouraging your kids. It takes a village, and this club wouldn\'t exist without you. ❤️',
+    '</div>'
+  ]));
+
+  // 22 — Thank you: student helpers
+  addSlide(el, buildThankYou('⭐', 'Thank You',
+    'Student helpers',
+    ['Anwi', 'Aye', 'Leo', 'Anaya', 'Abdou']));
+
+  // 23 — Closing
+  addSlide(el, html([
+    '<div class="emoji-big">🌟</div>',
+    '<div class="slide-title">Thank you for an <span class="gold">amazing</span> first year!</div>',
+    '<div class="slide-subtitle" style="margin-top:16px;">See you next fall &nbsp;·&nbsp; zdongmc.github.io/math-club</div>'
+  ]));
+}
+
+function addSlide(container, content) {
+  var div = document.createElement('div');
+  div.className = 'slide';
+  div.innerHTML = content;
+  container.appendChild(div);
+  slides.push(div);
+}
+
+function html(parts) { return parts.join(''); }
+
+function statCard(n, label) {
+  return '<div class="stat-card"><div class="stat-number">' + n + '</div><div class="stat-label">' + label + '</div></div>';
+}
+
+function badgeSlide(emoji, title, subtitle, names) {
+  var chips = names.length
+    ? names.map(function(n, i) {
+        var delay = (i * 0.06).toFixed(2);
+        return '<div class="name-chip" style="animation-delay:' + delay + 's">' + esc(n) + '</div>';
+      }).join('')
+    : '<div style="color:rgba(255,255,255,0.4);font-size:1rem;">(none yet)</div>';
+  return html([
+    '<div class="slide-title" style="margin-bottom:4px;">' + emoji + ' ' + esc(title) + '</div>',
+    '<div class="slide-subtitle" style="margin-bottom:24px;">' + esc(subtitle) + ' &nbsp;·&nbsp; ' + names.length + ' student' + (names.length!==1?'s':'') + '</div>',
+    '<div class="name-grid">' + chips + '</div>'
+  ]);
+}
+
+function buildRecogSlide(emoji, compName, sections) {
+  var content = sections
+    .filter(function(s) { return s.names && s.names.length; })
+    .map(function(s) { return recognSection(s.label, s.names, s.color); })
+    .join('');
+  if (!content) content = '<div style="color:rgba(255,255,255,0.4);font-size:1rem;">No awards this year</div>';
+  return html([
+    '<div style="font-size:clamp(2.5rem,6vw,4rem);margin-bottom:8px;">' + emoji + '</div>',
+    '<div class="slide-title" style="margin-bottom:24px;"><span class="gold">' + esc(compName) + '</span></div>',
+    '<div style="display:flex;flex-direction:column;gap:16px;width:100%;max-width:800px;">' + content + '</div>'
+  ]);
+}
+
+function recognSection(label, names, color) {
+  return '<div class="glass recog-section">' +
+    '<div class="recog-label">' + esc(label) + '</div>' +
+    '<div class="recog-names" style="color:' + color + ';">' + names.map(esc).join(' &nbsp;·&nbsp; ') + '</div>' +
+    '</div>';
+}
+
+function buildAwardSlide(cat, awardIdx) {
+  var winner = cat.tally && cat.tally.length ? cat.tally[0] : null;
+  // Find all tied winners
+  var winners = [];
+  if (winner) {
+    winners = cat.tally.filter(function(t) { return t.votes === winner.votes; });
+  }
+  var winnerHtml = winners.length
+    ? winners.map(function(w) { return '<span class="winner-name pop">' + esc(w.name) + '</span>'; }).join('<br>')
+    : '<span class="winner-name pop" style="color:rgba(255,255,255,0.4);">No votes yet</span>';
+  var votesText = winner ? winner.votes + ' vote' + (winner.votes !== 1 ? 's' : '') : '';
+
+  return '<div class="award-phase1" id="ap1-' + awardIdx + '">' +
+      '<div style="font-size:clamp(3rem,8vw,6rem);margin-bottom:12px;">' + cat.emoji + '</div>' +
+      '<div class="slide-title">' + esc(cat.label) + '</div>' +
+      '<div class="award-desc">' + esc(cat.desc) + '</div>' +
+      '<div class="reveal-prompt">→ press arrow or click to reveal</div>' +
+    '</div>' +
+    '<div class="award-phase2" id="ap2-' + awardIdx + '">' +
+      '<div style="font-size:clamp(2rem,5vw,3.5rem);margin-bottom:8px;">' + cat.emoji + '</div>' +
+      '<div class="winner-label">' + esc(cat.label) + '</div>' +
+      '<div id="winner-name-' + awardIdx + '">' + winnerHtml + '</div>' +
+      '<div class="winner-votes" style="margin-top:14px;">' + votesText + '</div>' +
+      confettiHtml() +
+    '</div>';
+}
+
+function confettiHtml() {
+  var colors = ['#f59e0b','#ef4444','#22c55e','#3b82f6','#a855f7','#ec4899','#ffffff'];
+  var pieces = '';
+  for (var i = 0; i < 18; i++) {
+    var color = colors[i % colors.length];
+    var delay = (i * 0.07).toFixed(2);
+    var left = (-100 + i * 14) + 'px';
+    pieces += '<div class="confetti-piece" style="background:' + color + ';left:' + left + ';animation-delay:' + delay + 's;animation-duration:' + (1.0 + i * 0.04).toFixed(2) + 's;border-radius:' + (i%2===0?'50%':'2px') + '"></div>';
+  }
+  return '<div class="confetti-wrap">' + pieces + '</div>';
+}
+
+function buildMKAwards(awards) {
+  if (!awards || !awards.length) {
+    return html([
+      '<div class="emoji-big">🦘</div>',
+      '<div class="slide-title">Math Kangaroo <span class="gold">Awards</span></div>',
+      '<div class="slide-subtitle" style="margin-top:16px;">National &amp; State results announced <strong style="color:#f59e0b;">June 1</strong></div>',
+      '<div style="margin-top:24px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:20px 32px;color:rgba(255,255,255,0.4);font-size:0.95rem;">Results will appear here once available</div>'
+    ]);
+  }
+  // Group by award
+  var grouped = {};
+  awards.forEach(function(a) {
+    if (!grouped[a.award]) grouped[a.award] = [];
+    grouped[a.award].push(a.name);
+  });
+  var sections = Object.keys(grouped).map(function(awardName) {
+    return recognSection('🦘 ' + awardName, grouped[awardName], '#f59e0b');
+  }).join('');
+  return html([
+    '<div class="emoji-big">🦘</div>',
+    '<div class="slide-title" style="margin-bottom:28px;">Math Kangaroo <span class="gold">Awards</span></div>',
+    '<div style="display:flex;flex-direction:column;gap:18px;width:100%;max-width:800px;">' + sections + '</div>'
+  ]);
+}
+
+function buildDrawSlide() {
+  return '<div style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;">' +
+    '<div style="font-size:1.4rem;font-weight:800;color:#f59e0b;">🎰 Noetic Summer Certificate Drawing</div>' +
+    '<div id="dStatus" style="font-size:0.85rem;color:rgba(255,255,255,0.5);">Loading…</div>' +
+    '<canvas id="dWheelCanvas" width="480" height="510" style="max-width:min(440px,75vw);display:block;"></canvas>' +
+    '<div id="dWinnerBanner" style="display:none;background:rgba(255,255,255,0.1);border-radius:12px;padding:16px 32px;">' +
+      '<div style="font-size:0.9rem;color:rgba(255,255,255,0.5);margin-bottom:4px;">Winner!</div>' +
+      '<div id="dWinnerName" style="font-size:2.2rem;font-weight:900;color:#f59e0b;"></div>' +
+      '<button id="dConfirmBtn" onclick="dConfirm();event.stopPropagation()" style="margin-top:12px;background:#059669;color:white;border:none;padding:9px 24px;border-radius:8px;font-size:0.95rem;font-weight:bold;cursor:pointer;">✅ Confirm &amp; Spin Again</button>' +
+    '</div>' +
+    '<button id="dSpinBtn" onclick="dSpin();event.stopPropagation()" style="display:none;background:#dc2626;color:white;border:none;padding:12px 36px;border-radius:10px;font-size:1.1rem;font-weight:bold;cursor:pointer;">🎡 Spin!</button>' +
+  '</div>';
+}
+
+function dInitWheel() {
+  dPool=[]; dSlices=[]; dWheelRot=0; dIsSpinning=false; dCurrentWinner=null;
+  var wb=document.getElementById('dWinnerBanner'); if(wb) wb.style.display='none';
+  var sb=document.getElementById('dSpinBtn'); if(sb) sb.style.display='none';
+  var st=document.getElementById('dStatus'); if(st) st.textContent='Loading pool…';
+  google.script.run
+    .withSuccessHandler(dRenderPool)
+    .withFailureHandler(function(e){var st=document.getElementById('dStatus');if(st) st.textContent='Error: '+(e.message||e);})
+    .getCertDrawPool();
+}
+
+function dTotalEntries(){ return dPool.reduce(function(s,p){return s+(p.entries||1);},0); }
+
+function dRenderPool(data) {
+  if(!data||!data.success){var st=document.getElementById('dStatus');if(st)st.textContent='Error';return;}
+  dPool=data.pool||[];
+  var rem=data.certsRemaining||0;
+  var st=document.getElementById('dStatus');
+  if(st) st.textContent=dPool.length+' eligible · '+dTotalEntries()+' entries · '+rem+' cert'+(rem!==1?'s':'')+' remaining';
+  dBuildSlices(); dDrawWheel(dWheelRot);
+  var sb=document.getElementById('dSpinBtn');
+  if(sb) sb.style.display=(dPool.length&&rem>0)?'inline-block':'none';
+}
+
+function dBuildSlices(){
+  dSlices=[];if(!dPool.length)return;
+  var total=dTotalEntries(),angle=0;
+  dPool.forEach(function(p,i){
+    var arc=(p.entries/total)*2*Math.PI;
+    dSlices.push({name:p.name,mcpsId:p.mcpsId,entries:p.entries,start:angle,end:angle+arc,mid:angle+arc/2,arc:arc,color:dPALETTE[i%dPALETTE.length]});
+    angle+=arc;
+  });
+}
+
+function dDrawWheel(rot){
+  var canvas=document.getElementById('dWheelCanvas');if(!canvas)return;
+  var ctx=canvas.getContext('2d');ctx.clearRect(0,0,dCW,dCH);
+  if(!dSlices.length){ctx.save();ctx.translate(dCX,dCY);ctx.beginPath();ctx.arc(0,0,dR,0,2*Math.PI);ctx.fillStyle='rgba(255,255,255,0.15)';ctx.fill();ctx.restore();dDrawPointer(ctx);return;}
+  ctx.save();ctx.shadowColor='rgba(0,0,0,0.5)';ctx.shadowBlur=28;ctx.shadowOffsetY=6;ctx.beginPath();ctx.arc(dCX,dCY,dR,0,2*Math.PI);ctx.fillStyle='#fff';ctx.fill();ctx.restore();
+  ctx.save();ctx.translate(dCX,dCY);ctx.rotate(rot-Math.PI/2);
+  dSlices.forEach(function(s){ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,dR,s.start,s.end);ctx.closePath();ctx.fillStyle=s.color;ctx.fill();ctx.strokeStyle='rgba(255,255,255,0.85)';ctx.lineWidth=2;ctx.stroke();});
+  dSlices.forEach(function(s){
+    if(s.arc<0.055)return;ctx.save();ctx.rotate(s.mid);
+    ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,dR-3,s.start-s.mid,s.end-s.mid);ctx.closePath();ctx.clip();
+    ctx.textAlign='right';ctx.textBaseline='middle';var fs=Math.max(9,Math.min(15,s.arc*52));ctx.font='bold '+fs+'px sans-serif';
+    var label=s.name.trim().split(/\s+/)[0];if(label.length>11)label=label.substring(0,10)+'…';
+    ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=4;ctx.fillStyle='white';ctx.fillText(label,dR*0.91,0);ctx.restore();
+  });
+  ctx.beginPath();ctx.arc(0,0,dR,0,2*Math.PI);ctx.strokeStyle='rgba(255,255,255,0.35)';ctx.lineWidth=5;ctx.stroke();
+  ctx.beginPath();ctx.arc(0,0,22,0,2*Math.PI);ctx.fillStyle='#78350f';ctx.fill();ctx.strokeStyle='#f59e0b';ctx.lineWidth=3;ctx.stroke();
+  ctx.fillStyle='#f59e0b';ctx.font='bold 16px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowBlur=0;ctx.fillText('★',0,0);
+  ctx.restore();
+  ctx.save();ctx.translate(dCX,dCY);ctx.beginPath();ctx.arc(0,0,dR+5,0,2*Math.PI);ctx.strokeStyle='#92400e';ctx.lineWidth=10;ctx.stroke();ctx.restore();
+  dDrawPointer(ctx);
+}
+
+function dDrawPointer(ctx){
+  var tip=dCY-dR-5;ctx.save();ctx.translate(dCX,0);
+  ctx.beginPath();ctx.moveTo(-14,tip-32);ctx.lineTo(14,tip-32);ctx.lineTo(0,tip);ctx.closePath();
+  ctx.fillStyle='#78350f';ctx.fill();ctx.strokeStyle='#f59e0b';ctx.lineWidth=2.5;ctx.stroke();
+  ctx.beginPath();ctx.arc(0,tip,5,0,2*Math.PI);ctx.fillStyle='#f59e0b';ctx.fill();ctx.restore();
+}
+
+function dSpin(){
+  if(dIsSpinning||!dSlices.length)return;
+  dEnsureAudio();
+  dIsSpinning=true;dCurrentWinner=null;dLastSeg=-1;
+  var sb=document.getElementById('dSpinBtn');if(sb)sb.disabled=true;
+  var wb=document.getElementById('dWinnerBanner');if(wb)wb.style.display='none';
+  var total=dTotalEntries(),rnd=Math.random()*total,acc=0;
+  var ws=dSlices[dSlices.length-1];
+  for(var i=0;i<dSlices.length;i++){acc+=dSlices[i].entries;if(rnd<acc){ws=dSlices[i];break;}}
+  for(var j=0;j<dPool.length;j++){if(dPool[j].mcpsId===ws.mcpsId){dCurrentWinner=dPool[j];break;}}
+  var spread=ws.arc*0.35,landAngle=ws.mid+(Math.random()*2-1)*spread;
+  landAngle=(landAngle%(2*Math.PI)+2*Math.PI)%(2*Math.PI);
+  var targetR=(2*Math.PI-landAngle+2*Math.PI)%(2*Math.PI);
+  var curNorm=(dWheelRot%(2*Math.PI)+2*Math.PI)%(2*Math.PI);
+  var delta=(targetR-curNorm+2*Math.PI)%(2*Math.PI)+(2+Math.floor(Math.random()*2))*2*Math.PI;
+  var startR=dWheelRot,startT=null,dur=5500;
+  function animate(ts){
+    if(!startT)startT=ts;
+    var t=Math.min((ts-startT)/dur,1),eased=1-Math.pow(1-t,4);
+    dWheelRot=startR+delta*eased;dDrawWheel(dWheelRot);
+    var seg=dSlices.length?( (function(){var a=((-dWheelRot)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);for(var i=0;i<dSlices.length;i++){if(a>=dSlices[i].start&&a<dSlices[i].end)return i;}return dSlices.length-1;})() ):-1;
+    if(dLastSeg>=0&&seg!==dLastSeg)dPlayTick(1-t);
+    dLastSeg=seg;
+    if(t<1){requestAnimationFrame(animate);}
+    else{dIsSpinning=false;dPlayFanfare();dOnSpinDone();}
+  }
+  requestAnimationFrame(animate);
+}
+
+function dOnSpinDone(){
+  if(!dCurrentWinner)return;
+  var nm=document.getElementById('dWinnerName');if(nm)nm.textContent=dCurrentWinner.name;
+  var wb=document.getElementById('dWinnerBanner');if(wb)wb.style.display='block';
+  var sb=document.getElementById('dSpinBtn');if(sb)sb.disabled=false;
+}
+
+function dConfirm(){
+  if(!dCurrentWinner)return;
+  var btn=document.getElementById('dConfirmBtn');
+  btn.disabled=true;btn.textContent='⏳ Saving…';
+  google.script.run
+    .withSuccessHandler(function(data){
+      btn.textContent='✅ Confirm & Spin Again';btn.disabled=false;
+      dCurrentWinner=null;
+      document.getElementById('dWinnerBanner').style.display='none';
+      // Rebuild cert winners slide with updated list
+      var certSlide = slides[dSlideIdx + 1];
+      if (certSlide) {
+        var mapped = (data.winners||[]).map(function(w,i){return {name:w.name,certNum:i+1};});
+        certSlide.innerHTML = buildCertWinners(mapped);
+      }
+      // Rebuild PON slide (cascade rules change once all certs awarded)
+      var ponSlide = slides[dSlideIdx + 2];
+      if (ponSlide) {
+        ponSlide.innerHTML = buildPONSlide();
+        // Refresh PON data
+        fetch('https://script.google.com/macros/s/AKfycbwddZFUQ7G0s4NrXfvbUQcSR2wTAPQ3_q0YQthV6Hok5gOQztPt14nMeXMwAcCEkguV/exec?action=getDrawingLeaderboard')
+          .then(function(r){return r.json();})
+          .then(function(d){ponData=d.success?d:null;if(ponSlide===slides[currentIdx]){ponSlide.innerHTML=buildPONSlide();}})
+          .catch(function(){});
+      }
+      dRenderPool(data);
+    })
+    .withFailureHandler(function(){btn.disabled=false;btn.textContent='✅ Confirm & Spin Again';})
+    .recordCertWinner(dCurrentWinner.mcpsId,dCurrentWinner.entries);
+}
+
+function buildCertWinners(winners) {
+  var cards = winners.map(function(w, i) {
+    return '<div class="stat-card" style="min-width:160px;">' +
+      '<div style="font-size:2rem;margin-bottom:6px;">🏆</div>' +
+      '<div style="font-weight:800;font-size:1.1rem;color:#f59e0b;">' + esc(w.name) + '</div>' +
+      '<div style="font-size:0.85rem;color:rgba(255,255,255,0.5);margin-top:4px;">Certificate #' + esc(w.certNum) + '</div>' +
+    '</div>';
+  }).join('');
+  return html([
+    '<div class="emoji-big">🎰</div>',
+    '<div class="slide-title" style="margin-bottom:8px;">Summer Certificate <span class="gold">Drawing Winners</span></div>',
+    '<div class="slide-subtitle" style="margin-bottom:28px;">Noetic Online Math Challenge — Summer 2026</div>',
+    '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:16px;max-width:900px;">' + (cards || '<div style="color:rgba(255,255,255,0.4)">No winners yet</div>') + '</div>'
+  ]);
+}
+
+function buildThankYou(emoji, title, subtitle, names) {
+  var chips = names.map(function(n, i) {
+    var delay = (i * 0.08).toFixed(2);
+    var isNote = n.endsWith('!');
+    var style = isNote
+      ? 'background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.4);color:#fcd34d;font-style:italic;animation-delay:' + delay + 's'
+      : 'animation-delay:' + delay + 's';
+    return '<div class="name-chip" style="' + style + '">' + esc(n) + '</div>';
+  }).join('');
+  return html([
+    '<div class="emoji-big">' + emoji + '</div>',
+    '<div class="slide-title" style="margin-bottom:6px;"><span class="gold">' + esc(title) + '</span></div>',
+    '<div class="slide-subtitle" style="margin-bottom:24px;">' + esc(subtitle) + '</div>',
+    '<div class="name-grid">' + chips + '</div>'
+  ]);
+}
+
+function buildPONSlide() {
+  var rows = '';
+  var presets = [{min:1,max:20},{min:21,max:40},{min:41,max:60},{min:61,max:80},{min:81,max:100}];
+  if (ponData && ponData.ranges && ponData.ranges.length) {
+    var presetRanges = presets.map(function(p) {
+      return ponData.ranges.find(function(r){return r.min===p.min&&r.max===p.max;}) || {label:p.min+'–'+p.max,leader:null};
+    });
+    rows = presetRanges.map(function(r) {
+      var leader = r.leader ? esc(r.leader.name) : '—';
+      var acc    = r.leader ? r.leader.accuracy + '%' : '—';
+      return '<tr>' +
+        '<td style="padding:8px 14px;font-weight:700;color:#f59e0b;">' + esc(r.label) + '</td>' +
+        '<td style="padding:8px 14px;">' + leader + '</td>' +
+        '<td style="padding:8px 14px;color:rgba(255,255,255,0.6);">' + acc + '</td>' +
+      '</tr>';
+    }).join('');
+  }
+  var table = rows
+    ? '<table style="border-collapse:collapse;font-size:0.9rem;margin:0 auto;">' +
+        '<thead><tr style="color:rgba(255,255,255,0.4);font-size:0.78rem;text-transform:uppercase;">' +
+        '<th style="padding:6px 14px;">Range</th><th style="padding:6px 14px;">Current Leader</th><th style="padding:6px 14px;">Accuracy</th>' +
+        '</tr></thead><tbody>' + rows + '</tbody></table>'
+    : '<div style="color:rgba(255,255,255,0.4)">Loading leaderboard…</div>';
+  return html([
+    '<div class="emoji-big">🎮</div>',
+    '<div class="slide-title" style="margin-bottom:6px;"><span class="gold">Prime or Not</span> — Keep Playing This Summer!</div>',
+    '<div class="slide-subtitle" style="margin-bottom:20px;">You never know what you could win when math club restarts in the fall 😉</div>',
+    '<div class="glass" style="width:100%;max-width:700px;padding:16px 8px;">' + table + '</div>',
+    '<div style="margin-top:16px;font-size:0.9rem;color:rgba(255,255,255,0.45);">zdongmc.github.io/math-club/prime-or-not.html</div>'
+  ]);
+}
+
+function buildEighthGrade(grads) {
+  var entries = grads.map(function(g) {
+    return '<div class="grad-entry"><div class="grad-name">' + esc(g.name) + '</div>' +
+      (g.highSchool ? '<div class="grad-school">' + esc(g.highSchool) + '</div>' : '') + '</div>';
+  }).join('');
+  return html([
+    '<div class="slide-title" style="margin-bottom:4px;"><span class="gold">Class of 2026</span> 🎓</div>',
+    '<div class="slide-subtitle" style="margin-bottom:20px;">Good luck at your high schools — keep doing math!</div>',
+    '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:20px;max-width:900px;">' +
+      (entries || '<div style="color:rgba(255,255,255,0.4)">No 8th graders found</div>') + '</div>'
+  ]);
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function showSlide(idx) {
+  slides.forEach(function(s) { s.classList.remove('active'); });
+  slides[idx].classList.add('active');
+  document.getElementById('counter').textContent = (idx + 1) + ' / ' + slides.length;
+  if (idx === dSlideIdx) dInitWheel();
+}
+
+function isAwardSlide(idx) { return idx >= awardStartIdx && idx < awardStartIdx + 7; }
+function awardIdx(idx) { return idx - awardStartIdx; }
+
+function revealWinner(ai) {
+  var p1 = document.getElementById('ap1-' + ai);
+  var p2 = document.getElementById('ap2-' + ai);
+  if (p1) p1.style.display = 'none';
+  if (p2) { p2.style.display = 'flex'; }
+  // Re-trigger pop animation
+  var nameEl = document.getElementById('winner-name-' + ai);
+  if (nameEl) {
+    nameEl.querySelectorAll('.winner-name').forEach(function(el) {
+      el.classList.remove('pop');
+      void el.offsetWidth;
+      el.classList.add('pop');
+    });
+  }
+}
+
+function hideWinner(ai) {
+  var p1 = document.getElementById('ap1-' + ai);
+  var p2 = document.getElementById('ap2-' + ai);
+  if (p1) p1.style.display = 'flex';
+  if (p2) p2.style.display = 'none';
+}
+
+function advance() {
+  if (currentIdx === dSlideIdx && dIsSpinning) return;
+  if (isAwardSlide(currentIdx)) {
+    var ai = awardIdx(currentIdx);
+    if (!awardRevealed[ai]) {
+      awardRevealed[ai] = true;
+      revealWinner(ai);
+      return;
+    }
+  }
+  if (currentIdx < slides.length - 1) { currentIdx++; showSlide(currentIdx); }
+}
+
+function retreat() {
+  if (isAwardSlide(currentIdx)) {
+    var ai = awardIdx(currentIdx);
+    if (awardRevealed[ai]) { awardRevealed[ai] = false; hideWinner(ai); return; }
+  }
+  if (currentIdx > 0) { currentIdx--; showSlide(currentIdx); }
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') { e.preventDefault(); advance(); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); retreat(); }
+});
+document.addEventListener('click', function() { advance(); });
+
+// ── Utility ───────────────────────────────────────────────────────────────────
+function esc(s) {
+  var d = document.createElement('div');
+  d.textContent = String(s || '');
+  return d.innerHTML;
+}
+
+// ── Load data ─────────────────────────────────────────────────────────────────
+google.script.run
+  .withSuccessHandler(function(d) { partyData = d; onDataLoaded(); })
+  .withFailureHandler(function(e) { partyData = {success:false,error:e.message}; onDataLoaded(); })
+  .getPartySlideData();
+
+google.script.run
+  .withSuccessHandler(function(d) { voteData = d.success ? d : null; onDataLoaded(); })
+  .withFailureHandler(function() { voteData = null; onDataLoaded(); })
+  .getVoteResults();
+
+fetch('https://script.google.com/macros/s/AKfycbwddZFUQ7G0s4NrXfvbUQcSR2wTAPQ3_q0YQthV6Hok5gOQztPt14nMeXMwAcCEkguV/exec?action=getDrawingLeaderboard')
+  .then(function(r) { return r.json(); })
+  .then(function(d) { ponData = d.success ? d : null; onDataLoaded(); })
+  .catch(function() { ponData = null; onDataLoaded(); });
+</script>
+</body>
+</html>

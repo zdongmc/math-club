@@ -1,0 +1,262 @@
+[
+  {
+    "img": "01.png",
+    "points": 1,
+    "name": "Equal Sums - 4"
+  },
+  {
+    "img": "02.png",
+    "points": 1,
+    "name": "Finding the Pieces - 3"
+  },
+  {
+    "img": "03.png",
+    "points": 1,
+    "name": "Lines - 1"
+  },
+  {
+    "img": "04.png",
+    "points": 1,
+    "name": "Magic Squares - 4"
+  },
+  {
+    "img": "05.png",
+    "points": 1,
+    "name": "Sujiko Puzzle - 3"
+  },
+  {
+    "img": "06.png",
+    "points": 1,
+    "name": "Letter Substitutions - 4"
+  },
+  {
+    "img": "07.png",
+    "points": 1,
+    "name": "Lines - 2"
+  },
+  {
+    "img": "08.png",
+    "points": 1,
+    "name": "Odd Squares"
+  },
+  {
+    "img": "09.png",
+    "points": 1,
+    "name": "Stick Areas"
+  },
+  {
+    "img": "10.png",
+    "points": 1,
+    "name": "Letter Substitutions - 5"
+  },
+  {
+    "img": "11.png",
+    "points": 1,
+    "name": "Fill in the Blanks - 6"
+  },
+  {
+    "img": "12.png",
+    "points": 1,
+    "name": "Adding Ten Numbers"
+  },
+  {
+    "img": "13.png",
+    "points": 1,
+    "name": "Avoiding Rectangles - 2"
+  },
+  {
+    "img": "14.png",
+    "points": 1,
+    "name": "Boxed Blocks"
+  },
+  {
+    "img": "15.png",
+    "points": 1,
+    "name": "Parity - 2 - Paths on Boards"
+  },
+  {
+    "img": "16.png",
+    "points": 1,
+    "name": "Parades - 1"
+  },
+  {
+    "img": "17.png",
+    "points": 2,
+    "name": "Avoiding Triangles"
+  },
+  {
+    "img": "18.png",
+    "points": 2,
+    "name": "Removing Digits"
+  },
+  {
+    "img": "19.png",
+    "points": 2,
+    "name": "Parity - 1 - Dominoes on Boards"
+  },
+  {
+    "img": "20.png",
+    "points": 2,
+    "name": "Parades - 2 - 7 Bridges of Konigsberg"
+  },
+  {
+    "img": "21.png",
+    "points": 2,
+    "name": "Parity - 3 - Last Number Standing"
+  },
+  {
+    "img": "22.png",
+    "points": 2,
+    "name": "Product Equals Sum"
+  },
+  {
+    "img": "23.png",
+    "points": 2,
+    "name": "Mystery Sums - 1"
+  },
+  {
+    "img": "24.png",
+    "points": 2,
+    "name": "Fractions - 1"
+  },
+  {
+    "img": "25.png",
+    "points": 2,
+    "name": "Broken Calculator - 1"
+  },
+  {
+    "img": "26.png",
+    "points": 2,
+    "name": "Maximizing Products with 16"
+  },
+  {
+    "img": "27.png",
+    "points": 2,
+    "name": "Mystery Sums - 2"
+  },
+  {
+    "img": "28.png",
+    "points": 2,
+    "name": "Fractions - 2"
+  },
+  {
+    "img": "29.png",
+    "points": 3,
+    "name": "Ladybugs that don't add up - 2"
+  },
+  {
+    "img": "30.png",
+    "points": 3,
+    "name": "Equal Products"
+  },
+  {
+    "img": "31.png",
+    "points": 3,
+    "name": "Combining Digits - 1 2 4 8"
+  },
+  {
+    "img": "32.png",
+    "points": 3,
+    "name": "Fractions - 3"
+  },
+  {
+    "img": "33.png",
+    "points": 3,
+    "name": "Topology - 2 - Are Their Hands Tied"
+  },
+  {
+    "img": "34.png",
+    "points": 3,
+    "name": "Extreme Products - 1"
+  },
+  {
+    "img": "35.png",
+    "points": 3,
+    "name": "Combining Digits - Easy as 1 2 3 4"
+  },
+  {
+    "img": "36.png",
+    "points": 3,
+    "name": "Fractions - 4"
+  },
+  {
+    "img": "37.png",
+    "points": 3,
+    "name": "Finding Squares - 1"
+  },
+  {
+    "img": "38.png",
+    "points": 3,
+    "name": "Moving Digits - 2"
+  },
+  {
+    "img": "39.png",
+    "points": 3,
+    "name": "Combining Digits - Five 2's"
+  },
+  {
+    "img": "40.png",
+    "points": 3,
+    "name": "Fractions - 6"
+  },
+  {
+    "img": "41.png",
+    "points": 4,
+    "name": "Finding Squares - 2"
+  },
+  {
+    "img": "42.png",
+    "points": 4,
+    "name": "Water Cups - 1"
+  },
+  {
+    "img": "43.png",
+    "points": 4,
+    "name": "Turning the Tables"
+  },
+  {
+    "img": "44.png",
+    "points": 4,
+    "name": "Fractions - 7"
+  },
+  {
+    "img": "45.png",
+    "points": 4,
+    "name": "Trapezoidal Numbers - 1"
+  },
+  {
+    "img": "46.png",
+    "points": 4,
+    "name": "Water Cups - 2"
+  },
+  {
+    "img": "47.png",
+    "points": 4,
+    "name": "Filling Squares WIth Squares"
+  },
+  {
+    "img": "48.png",
+    "points": 4,
+    "name": "Fractions - 9"
+  },
+  {
+    "img": "49.png",
+    "points": 4,
+    "name": "Handshakes at a Party - 2"
+  },
+  {
+    "img": "50.png",
+    "points": 4,
+    "name": "Pirates with Gold - 1"
+  },
+  {
+    "img": "51.png",
+    "points": 4,
+    "name": "Filling Triangles With Triangles"
+  },
+  {
+    "img": "52.png",
+    "points": 4,
+    "name": "Fractions - 12"
+  }
+]

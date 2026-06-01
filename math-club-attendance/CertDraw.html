@@ -174,7 +174,6 @@
 
 <div class="tab-bar">
   <button class="tab-btn active" id="tabDrawing" onclick="showTab('drawing')">🎡 Drawing</button>
-  <button class="tab-btn"        id="tabSurvey"  onclick="showTab('survey')">📋 Survey</button>
 </div>
 
 <div class="main">
@@ -204,9 +203,10 @@
 
 <div class="status-bar" id="statusBar">Loading draw pool…</div>
 
-<div class="survey-main" id="surveyMain">
-  <div class="survey-card" id="surveyCardContent">
-    <div style="text-align:center;color:#92400e;padding:30px;">Loading survey data…</div>
+<div id="surveyMain" style="display:none;"></div>
+<div id="votesMain" style="display:none;">
+  <div class="survey-card" id="votesCardContent">
+    <div style="text-align:center;color:#1e40af;padding:30px;">Loading vote results…</div>
   </div>
 </div>
 
@@ -298,7 +298,8 @@ function buildSlices() {
       name     : p.name,
       mcpsId   : p.mcpsId,
       entries  : p.entries,
-      rangesLed: p.rangesLed || [],
+      rangesLed:   p.rangesLed || [],
+      surveyBonus: p.surveyBonus || 0,
       start    : angle,
       end      : angle + arc,
       mid      : angle + arc / 2,
@@ -458,7 +459,9 @@ function renderPool(data) {
     var rows = pool.map(function(s, i) {
       var dot = '<span style="display:inline-block;width:9px;height:9px;border-radius:50%;' +
         'background:' + PALETTE[i % PALETTE.length] + ';margin-right:5px;vertical-align:middle;"></span>';
-      var ranges = (s.rangesLed && s.rangesLed.length) ? s.rangesLed.join(', ') : '(base entry)';
+      var rangeParts = (s.rangesLed && s.rangesLed.length) ? s.rangesLed.slice() : [];
+      if (s.surveyBonus) rangeParts.push('survey ×' + s.surveyBonus);
+      var ranges = rangeParts.length ? rangeParts.join(', ') : '(base entry)';
       return '<tr id="row-' + esc(s.mcpsId) + '">' +
         '<td>' + dot + esc(s.name) + '</td>' +
         '<td><span class="entry-pip">' + s.entries + '</span></td>' +
@@ -603,15 +606,11 @@ function esc(s) {
   return d.innerHTML;
 }
 
-// ── Survey tab ──────────────────────────────────────────────────────────────
+// ── Tabs ─────────────────────────────────────────────────────────────────────
 function showTab(tab) {
-  var isDrawing = tab === 'drawing';
-  document.getElementById('tabDrawing').classList.toggle('active',  isDrawing);
-  document.getElementById('tabSurvey').classList.toggle('active',  !isDrawing);
-  document.querySelector('.main').style.display  = isDrawing ? '' : 'none';
-  document.getElementById('statusBar').style.display = isDrawing ? '' : 'none';
-  document.getElementById('surveyMain').style.display = isDrawing ? 'none' : '';
-  if (!isDrawing) loadSurveyData();
+  document.getElementById('tabDrawing').classList.toggle('active', tab === 'drawing');
+  document.querySelector('.main').style.display      = tab === 'drawing' ? '' : 'none';
+  document.getElementById('statusBar').style.display = tab === 'drawing' ? '' : 'none';
 }
 
 var surveyLoaded = false;
@@ -676,28 +675,92 @@ function renderSurveyData(data) {
 
   var t = data.tallies || {};
 
+  h += '<div style="font-weight:bold;color:#78350f;margin:0 0 10px;font-size:0.95rem;">Overall Experience (Parent)</div>';
+  h += '<div class="tally-grid">';
+  h += renderTallyCard('Overall Satisfaction', t.satisfaction);
+  h += renderTallyCard('Child Attitude Toward Club', t.childAttitude);
+  h += renderTallyCard('Time Commitment', t.timeCommitment);
+  h += renderTallyCard('Website Usefulness', t.websiteUsefulness);
+  h += renderTallyCard('Portal Usefulness', t.portalUsefulness);
+  h += renderTallyCard('WhatsApp Communication Frequency', t.commFrequency);
+  h += renderTallyCard('Coach-to-Student Ratio', t.coachRatio);
+  h += renderTallyCard('Volunteer Interest', t.volunteerInterest);
+  h += renderTallyCard('Coaching Support — 8th Grade', t.coachingSupport);
+  h += '</div>';
+
+  h += '<div style="font-weight:bold;color:#78350f;margin:16px 0 10px;font-size:0.95rem;">Student Responses</div>';
   h += '<div class="tally-grid">';
   h += renderTallyCard('Returning Next Year', t.returning);
-  h += renderTallyCard('Try-outs for Limited-Seat Competitions', t.tryOuts);
-  h += renderTallyCard('Snacks', t.snacks);
-  h += renderTallyCard('Meeting Format (1–5)', t.meetingFormat);
-  h += renderTallyCard('Communication Frequency (Parent)', t.commFrequency);
-  h += renderTallyCard('Volunteer Interest (Parent)', t.volunteerInterest);
   h += renderTallyCard('Coaching Interest — 8th Graders', t.coachingInterest);
-  h += renderTallyCard('Coaching Support — 8th Grade Parents', t.coachingSupport);
+  h += renderTallyCard('Meeting Format', t.meetingFormat);
+  h += renderTallyCard('Math Confidence', t.mathConfidence);
+  h += renderTallyCard('Enjoy Math More?', t.mathEnjoyment);
+  h += renderTallyCard('Club Size', t.clubSize);
+  h += renderTallyCard('Coach Attention', t.coachAttention);
   h += '</div>';
 
-  h += '<div style="font-weight:bold;color:#78350f;margin:16px 0 10px;font-size:0.95rem;">Competitions — Would Compete Again?</div>';
+  h += '<div style="font-weight:bold;color:#78350f;margin:16px 0 10px;font-size:0.95rem;">Policy Questions</div>';
   h += '<div class="tally-grid">';
-  h += renderTallyCard('MATHCOUNTS', t.mathcounts_again);
-  h += renderTallyCard('MOEMS', t.moems_again);
-  h += renderTallyCard('Math League', t.mathleague_again);
-  h += renderTallyCard('Math Kangaroo', t.mathkangaroo_again);
-  h += renderTallyCard('AMC 8', t.amc8_again);
-  h += renderTallyCard('Noetic', t.noetic_again);
-  h += renderTallyCard('Purple Comet', t.purplecomet_again);
+  h += renderTallyCard('Club Membership Try-out', t.membershipGate);
+  h += renderTallyCard('Competition Sign-up Gate', t.compGate);
+  h += renderTallyCard('Carderock Allocation', t.carderockAlloc);
   h += '</div>';
 
+  el.innerHTML = h;
+}
+
+// ── Votes tab ────────────────────────────────────────────────────────────────
+var votesLoaded = false;
+
+function loadVoteData() {
+  if (votesLoaded) return;
+  document.getElementById('votesCardContent').innerHTML =
+    '<div style="text-align:center;color:#1e40af;padding:30px;">Loading…</div>';
+  google.script.run
+    .withSuccessHandler(renderVoteData)
+    .withFailureHandler(function(e) {
+      document.getElementById('votesCardContent').innerHTML =
+        '<div style="color:#dc2626;padding:20px;">Error: ' + esc((e && e.message) || 'unknown') + '</div>';
+    })
+    .getVoteResults();
+}
+
+function renderVoteData(data) {
+  votesLoaded = true;
+  var el = document.getElementById('votesCardContent');
+  if (!data || !data.success) {
+    el.innerHTML = '<div style="color:#dc2626;padding:20px;">Could not load vote results.</div>';
+    return;
+  }
+  if (data.total === 0) {
+    el.innerHTML = '<div style="text-align:center;color:#6b7280;padding:30px;">No votes submitted yet.</div>';
+    return;
+  }
+  var h = '<div style="margin-bottom:16px;font-size:0.95rem;color:#374151;"><strong>' + data.total + '</strong> vote' + (data.total !== 1 ? 's' : '') + ' submitted</div>';
+  h += '<div style="font-size:0.8rem;color:#6b7280;margin-bottom:20px;background:#fef3c7;border:1px solid #f59e0b;border-radius:6px;padding:8px 12px;">To show winning titles on student certificates, set <code>VOTING_PUBLISHED = true</code> in Code.js and redeploy.</div>';
+  (data.categories || []).forEach(function(cat) {
+    h += '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px;margin-bottom:12px;">';
+    h += '<div style="font-weight:bold;color:#1e3a8a;margin-bottom:10px;">' + cat.emoji + ' ' + esc(cat.label) + '</div>';
+    if (!cat.tally || cat.tally.length === 0) {
+      h += '<div style="color:#9ca3af;font-size:0.85rem;">No votes yet</div>';
+    } else {
+      var maxVotes = cat.tally[0].votes;
+      cat.tally.slice(0, 5).forEach(function(entry, i) {
+        var isWinner = entry.votes === maxVotes;
+        var barPct = Math.round((entry.votes / maxVotes) * 100);
+        h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
+        h += '<div style="min-width:140px;font-size:0.85rem;font-weight:' + (isWinner ? 'bold' : 'normal') + ';color:' + (isWinner ? '#065f46' : '#374151') + ';">';
+        if (isWinner) h += '🏅 ';
+        h += esc(entry.name) + '</div>';
+        h += '<div style="flex:1;background:#e5e7eb;border-radius:4px;height:14px;overflow:hidden;">';
+        h += '<div style="background:' + (isWinner ? '#059669' : '#93c5fd') + ';width:' + barPct + '%;height:100%;border-radius:4px;"></div>';
+        h += '</div>';
+        h += '<div style="min-width:32px;text-align:right;font-size:0.85rem;color:#6b7280;">' + entry.votes + '</div>';
+        h += '</div>';
+      });
+    }
+    h += '</div>';
+  });
   el.innerHTML = h;
 }
 </script>

@@ -38,33 +38,44 @@ body { font-family: 'Arial Black', Arial, sans-serif; background: linear-gradien
 .att-add-row select option { background: #0f172a; }
 
 /* ── BOARD ── */
-#board-screen { display: flex; flex-direction: column; min-height: 100vh; padding: 12px; gap: 10px; }
-
-.score-bar { background: rgba(0,0,0,0.35); border-radius: 10px; padding: 10px 16px; flex-shrink: 0; display: flex; flex-direction: column; gap: 6px; }
+#board-screen { display: flex; flex-direction: column; min-height: 100vh; padding: 12px; gap: 8px; }
+.score-bar { background: rgba(0,0,0,0.35); border-radius: 10px; padding: 10px 16px; flex-shrink: 0; display: flex; flex-direction: column; gap: 5px; }
 .score-row { display: flex; align-items: center; gap: 10px; }
-.score-team-label { font-size: 0.88rem; font-weight: bold; width: 115px; flex-shrink: 0; }
+.score-team-label { font-size: 0.85rem; font-weight: bold; width: 115px; flex-shrink: 0; }
 .score-team-label.blue   { color: #64b5f6; }
 .score-team-label.orange { color: #ffb74d; }
-.score-track { flex: 1; height: 14px; background: rgba(255,255,255,0.12); border-radius: 7px; overflow: hidden; }
-.score-fill { height: 100%; border-radius: 7px; transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+.score-team-label.green  { color: #81c784; }
+.score-team-label.purple { color: #ce93d8; }
+.score-track { flex: 1; height: 12px; background: rgba(255,255,255,0.12); border-radius: 6px; overflow: hidden; position: relative; }
+.score-fill { height: 100%; border-radius: 6px; transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1); }
 .score-fill.blue   { background: linear-gradient(to right, #1565c0, #42a5f5); }
 .score-fill.orange { background: linear-gradient(to right, #e65100, #ffa726); }
-.score-num { font-size: 1rem; font-weight: bold; width: 58px; text-align: right; flex-shrink: 0; }
+.score-fill.green  { background: linear-gradient(to right, #1b5e20, #66bb6a); }
+.score-fill.purple { background: linear-gradient(to right, #4a148c, #ab47bc); }
+.score-num { font-size: 0.95rem; font-weight: bold; width: 58px; text-align: right; flex-shrink: 0; }
 .score-num.blue   { color: #64b5f6; }
 .score-num.orange { color: #ffb74d; }
+.score-num.green  { color: #81c784; }
+.score-num.purple { color: #ce93d8; }
+.score-win-marker { position: absolute; right: 0; top: 0; bottom: 0; width: 2px; background: rgba(255,215,0,0.6); }
 
-.matchup-bar { background: rgba(0,0,0,0.35); border-radius: 10px; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-shrink: 0; flex-wrap: wrap; }
-.matchup-side { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 120px; }
-.matchup-role { font-size: 0.68rem; opacity: 0.55; text-transform: uppercase; letter-spacing: 1px; }
-.matchup-name { font-size: 1.15rem; font-weight: bold; }
-.matchup-badge { font-size: 0.65rem; padding: 2px 8px; border-radius: 10px; font-weight: bold; letter-spacing: 0.5px; }
+.matchup-info { background: rgba(0,0,0,0.25); border-radius: 8px; padding: 7px 14px; flex-shrink: 0; text-align: center; }
+.matchup-round { font-size: 0.9rem; opacity: 0.7; }
+.matchup-instruction { font-size: 0.82rem; opacity: 0.55; margin-top: 2px; }
+
+.matchup-teams { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; flex-shrink: 0; }
+.matchup-side { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 8px 10px; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.matchup-role { font-size: 0.65rem; opacity: 0.55; text-transform: uppercase; letter-spacing: 1px; }
+.matchup-name { font-size: 1rem; font-weight: bold; text-align: center; }
+.matchup-badge { font-size: 0.62rem; padding: 2px 8px; border-radius: 10px; font-weight: bold; letter-spacing: 0.5px; }
 .matchup-side.blue   .matchup-name  { color: #64b5f6; }
 .matchup-side.orange .matchup-name  { color: #ffb74d; }
+.matchup-side.green  .matchup-name  { color: #81c784; }
+.matchup-side.purple .matchup-name  { color: #ce93d8; }
 .matchup-side.blue   .matchup-badge { background: rgba(100,181,246,0.25); color: #90caf9; }
 .matchup-side.orange .matchup-badge { background: rgba(255,183,77,0.25);  color: #ffcc80; }
-.matchup-center { text-align: center; flex: 1; }
-.matchup-round { font-size: 0.88rem; opacity: 0.65; }
-.matchup-instruction { font-size: 0.78rem; opacity: 0.5; margin-top: 3px; }
+.matchup-side.green  .matchup-badge { background: rgba(129,199,132,0.25); color: #a5d6a7; }
+.matchup-side.purple .matchup-badge { background: rgba(206,147,216,0.25); color: #e1bee7; }
 
 .q-grid-section { flex: 1; background: rgba(0,0,0,0.25); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
 .q-grade-block { display: flex; flex-direction: column; gap: 6px; }
@@ -84,14 +95,15 @@ body { font-family: 'Arial Black', Arial, sans-serif; background: linear-gradien
 .q-chip.used { opacity: 0.2; cursor: default; text-decoration: line-through; }
 .q-chip:disabled:not(.used) { opacity: 0.45; cursor: default; }
 
-.queue-strip { background: rgba(0,0,0,0.25); border-radius: 8px; padding: 8px 12px; flex-shrink: 0; display: flex; align-items: center; gap: 0; }
-.queue-half { flex: 1; display: flex; align-items: center; gap: 5px; overflow: hidden; }
-.queue-sep  { width: 1px; background: rgba(255,255,255,0.15); align-self: stretch; margin: 0 12px; flex-shrink: 0; }
-.queue-label { font-size: 0.72rem; opacity: 0.6; white-space: nowrap; flex-shrink: 0; }
-.queue-item { font-size: 0.76rem; background: rgba(255,255,255,0.1); padding: 3px 9px; border-radius: 11px; white-space: nowrap; flex-shrink: 0; }
+.queue-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; flex-shrink: 0; }
+.queue-half { background: rgba(0,0,0,0.25); border-radius: 8px; padding: 6px 10px; display: flex; align-items: center; gap: 4px; overflow: hidden; }
+.queue-label { font-size: 0.7rem; opacity: 0.6; white-space: nowrap; flex-shrink: 0; }
+.queue-item { font-size: 0.72rem; background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; }
+.queue-arrow { font-size: 0.65rem; opacity: 0.35; flex-shrink: 0; }
 .queue-half.blue   .queue-item.current { background: rgba(100,181,246,0.3); border: 1px solid rgba(100,181,246,0.45); color: #90caf9; }
 .queue-half.orange .queue-item.current { background: rgba(255,183,77,0.3);  border: 1px solid rgba(255,183,77,0.45);  color: #ffcc80; }
-.queue-arrow { font-size: 0.68rem; opacity: 0.35; flex-shrink: 0; }
+.queue-half.green  .queue-item.current { background: rgba(129,199,132,0.3); border: 1px solid rgba(129,199,132,0.45); color: #a5d6a7; }
+.queue-half.purple .queue-item.current { background: rgba(206,147,216,0.3); border: 1px solid rgba(206,147,216,0.45); color: #e1bee7; }
 
 /* ── QUESTION SCREEN ── */
 #q-screen { position: fixed; inset: 0; background: #0a0a3e; display: flex; flex-direction: column; align-items: center; padding: 14px 20px; z-index: 100; overflow-y: auto; gap: 10px; }
@@ -99,9 +111,7 @@ body { font-family: 'Arial Black', Arial, sans-serif; background: linear-gradien
 .q-badge { padding: 4px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
 .q-badge.blue   { background: rgba(33,150,243,0.2); border: 1px solid rgba(33,150,243,0.4); color: #90caf9; }
 .q-badge.orange { background: rgba(255,111,0,0.2);  border: 1px solid rgba(255,111,0,0.4);  color: #ffcc80; }
-.q-matchup-mini { font-size: 0.82rem; opacity: 0.75; }
-.q-matchup-mini .bname { color: #64b5f6; font-weight: bold; }
-.q-matchup-mini .oname { color: #ffb74d; font-weight: bold; }
+.q-players-mini { font-size: 0.78rem; opacity: 0.7; width: 100%; max-width: 860px; text-align: center; flex-shrink: 0; }
 .timer-wrap { width: 100%; max-width: 860px; flex-shrink: 0; }
 .timer-row  { display: flex; align-items: center; gap: 10px; }
 .timer-num  { font-size: 1.8rem; font-weight: bold; min-width: 3.4rem; text-align: right; transition: color 0.3s; flex-shrink: 0; }
@@ -121,55 +131,66 @@ body { font-family: 'Arial Black', Arial, sans-serif; background: linear-gradien
 .q-actions { display: flex; gap: 10px; justify-content: center; flex-shrink: 0; flex-wrap: wrap; }
 .btn-reveal { background: #ffd700; color: #1a1a1a; border: none; padding: 12px 36px; font-size: 1.05rem; font-family: inherit; font-weight: bold; border-radius: 10px; cursor: pointer; }
 .btn-reveal:hover { background: #ffe44d; }
-.ans-section { display: none; width: 100%; max-width: 860px; }
-.ans-box { background: rgba(255,255,255,0.08); border: 2px solid #ffd700; border-radius: 10px; padding: 14px 24px; text-align: center; margin-bottom: 14px; }
+.ans-section { display: none; width: 100%; max-width: 860px; display: none; flex-direction: column; align-items: center; gap: 12px; }
+.ans-box { background: rgba(255,255,255,0.08); border: 2px solid #ffd700; border-radius: 10px; padding: 14px 24px; text-align: center; width: 100%; }
 .ans-label { font-size: 0.78rem; opacity: 0.6; margin-bottom: 3px; }
 .ans-val { font-size: 2.6rem; font-weight: bold; color: #ffd700; }
-.verdict-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
-.vbtn { border: none; padding: 11px 18px; font-size: 0.92rem; font-family: inherit; font-weight: bold; border-radius: 8px; cursor: pointer; }
-.vbtn:hover { filter: brightness(1.12); }
-.vbtn.vblue   { background: #1565c0; color: white; }
-.vbtn.vorange { background: #e65100; color: white; }
-.vbtn.vboth   { background: #16a34a; color: white; }
-.vbtn.vneither { background: #6b7280; color: white; }
+.verdict-checks { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.vcheck { display: flex; align-items: center; gap: 6px; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-size: 0.95rem; font-weight: bold; border: 2px solid transparent; transition: border-color 0.15s, background 0.15s; }
+.vcheck input { width: 18px; height: 18px; cursor: pointer; accent-color: #ffd700; }
+.vcheck.blue   { background: rgba(21,101,192,0.25);  color: #90caf9; }
+.vcheck.orange { background: rgba(230,81,0,0.25);    color: #ffcc80; }
+.vcheck.green  { background: rgba(46,125,50,0.25);   color: #a5d6a7; }
+.vcheck.purple { background: rgba(106,27,154,0.25);  color: #e1bee7; }
+.vcheck:has(input:checked).blue   { border-color: #64b5f6; }
+.vcheck:has(input:checked).orange { border-color: #ffb74d; }
+.vcheck:has(input:checked).green  { border-color: #81c784; }
+.vcheck:has(input:checked).purple { border-color: #ce93d8; }
 
 /* ── PREVIEW SCREEN ── */
 #preview-screen { display: flex; flex-direction: column; min-height: 100vh; padding: 16px; gap: 14px; }
 .preview-title { font-size: 1.4rem; text-shadow: 1px 1px 3px rgba(0,0,0,0.4); flex-shrink: 0; }
 .matchup-table-wrap { flex: 1; overflow-y: auto; background: rgba(0,0,0,0.25); border-radius: 10px; }
 table.matchup-table { width: 100%; border-collapse: collapse; }
-table.matchup-table th { padding: 10px 14px; border-bottom: 2px solid rgba(255,255,255,0.1); }
-table.matchup-table th.col-blue   { text-align: right; }
-table.matchup-table th.col-orange { text-align: left; }
-table.matchup-table th.col-round  { text-align: center; width: 60px; }
-table.matchup-table td { padding: 8px 14px; font-size: 0.88rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+table.matchup-table th { padding: 10px 10px; border-bottom: 2px solid rgba(255,255,255,0.1); text-align: center; }
+table.matchup-table td { padding: 7px 10px; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center; }
 table.matchup-table tr:last-child td { border-bottom: none; }
 table.matchup-table tr.extra-round td { color: #ffd700; background: rgba(255,215,0,0.06); }
-.col-round  { width: 60px; opacity: 0.45; font-size: 0.8rem; text-align: center; }
-.col-blue-n  { color: #90caf9; text-align: right; }
-.col-orange-n { color: #ffcc80; text-align: left; }
-.th-input { background: transparent; border: none; border-bottom: 2px solid; border-radius: 0; padding: 2px 4px; font-size: 1rem; font-weight: bold; width: 100%; outline: none; font-family: inherit; text-align: inherit; }
+.col-round { width: 48px; opacity: 0.45; font-size: 0.78rem; }
+.col-blue-n   { color: #90caf9; }
+.col-orange-n { color: #ffcc80; }
+.col-green-n  { color: #a5d6a7; }
+.col-purple-n { color: #e1bee7; }
+.th-input { background: transparent; border: none; border-bottom: 2px solid; border-radius: 0; padding: 2px 4px; font-size: 0.95rem; font-weight: bold; width: 100%; outline: none; font-family: inherit; text-align: center; }
 .th-input.blue   { color: #90caf9; border-color: rgba(100,181,246,0.5); }
 .th-input.orange { color: #ffcc80; border-color: rgba(255,183,77,0.5); }
-.lp-section { background: rgba(255,215,0,0.08); border: 1px solid rgba(255,215,0,0.25); border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; }
+.th-input.green  { color: #a5d6a7; border-color: rgba(129,199,132,0.5); }
+.th-input.purple { color: #e1bee7; border-color: rgba(206,147,216,0.5); }
+.lp-section { background: rgba(255,215,0,0.08); border: 1px solid rgba(255,215,0,0.25); border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; }
+.lp-team-block { display: flex; flex-direction: column; gap: 8px; }
 .lp-desc { font-size: 0.88rem; color: #ffd700; }
-.lp-players { display: flex; flex-wrap: wrap; gap: 8px; }
-.lp-player { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 7px 14px; font-size: 0.85rem; cursor: pointer; color: white; font-family: inherit; transition: background 0.15s; }
+.lp-players-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.lp-player { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 6px 12px; font-size: 0.82rem; cursor: pointer; color: white; font-family: inherit; transition: background 0.15s; }
 .lp-player:hover { background: rgba(255,255,255,0.2); }
 .lp-player.selected { background: rgba(255,215,0,0.2); border-color: #ffd700; color: #ffd700; }
-.preview-footer { flex-shrink: 0; display: flex; justify-content: flex-end; }
+.preview-footer { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; }
+.preview-winscore { font-size: 0.88rem; opacity: 0.65; }
 
 /* ── GAME OVER ── */
-#over-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 30px; text-align: center; gap: 16px; }
+#over-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 30px; text-align: center; gap: 14px; }
 .over-trophy   { font-size: 5rem; transition: opacity 0.4s; }
 .over-subtitle { font-size: 1.2rem; opacity: 0.7; transition: opacity 0.4s; }
-.over-winner   { font-size: 2.6rem; font-weight: bold; color: #ffd700; text-shadow: 0 0 20px rgba(255,215,0,0.5); transition: opacity 0.3s; }
-.over-scores   { display: flex; gap: 24px; margin-top: 6px; }
-.over-score    { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 14px 28px; text-align: center; }
-.over-score .team-lbl { font-size: 0.88rem; opacity: 0.65; margin-bottom: 4px; }
-.over-score .pts { font-size: 2.2rem; font-weight: bold; }
-.over-score.bscore .pts { color: #64b5f6; }
-.over-score.oscore .pts { color: #ffb74d; }
+.over-winner   { font-size: 2.2rem; font-weight: bold; color: #ffd700; text-shadow: 0 0 20px rgba(255,215,0,0.5); transition: opacity 0.3s; }
+.over-scores   { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 6px; width: 100%; max-width: 600px; }
+.over-score    { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px 20px; text-align: center; }
+.over-score .team-lbl { font-size: 0.85rem; opacity: 0.65; margin-bottom: 4px; }
+.over-score .pts { font-size: 2rem; font-weight: bold; }
+.pts.blue   { color: #64b5f6; }
+.pts.orange { color: #ffb74d; }
+.pts.green  { color: #81c784; }
+.pts.purple { color: #ce93d8; }
+.over-roster { margin-top: 8px; display: flex; flex-direction: column; gap: 2px; text-align: left; max-height: 180px; overflow-y: auto; }
+.over-roster-name { font-size: 0.75rem; opacity: 0.75; padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
 @keyframes winner-pop {
   0%   { transform: scale(0.2); opacity: 0; }
   65%  { transform: scale(1.12); opacity: 1; }
@@ -183,7 +204,7 @@ table.matchup-table tr.extra-round td { color: #ffd700; background: rgba(255,215
 <!-- ── ATTENDANCE ── -->
 <div id="att-screen">
   <div class="att-title">🦘 Math Kangaroo 2026 — Team Review</div>
-  <div class="att-subtitle">Mark who is present, then start the game. Students are auto-assigned to teams.</div>
+  <div class="att-subtitle">Mark who is present, then start the game. Students are auto-assigned to 4 teams.</div>
   <div class="att-grade-cols">
     <div class="att-col">
       <div class="att-col-header">6th Grade <span class="att-col-count" id="cnt-6">0 selected</span></div>
@@ -224,45 +245,24 @@ table.matchup-table tr.extra-round td { color: #ffd700; background: rgba(255,215
     <table class="matchup-table" id="matchup-table"></table>
   </div>
   <div class="lp-section hidden" id="lp-section">
-    <div class="lp-desc" id="lp-desc"></div>
-    <div class="lp-players" id="lp-players"></div>
+    <div id="lp-content"></div>
   </div>
   <div class="preview-footer">
+    <div class="preview-winscore" id="preview-winscore"></div>
     <button class="btn btn-gold" onclick="launchGame()">Let's Go! →</button>
   </div>
 </div>
 
 <!-- ── BOARD ── -->
 <div id="board-screen" class="hidden">
-  <div class="score-bar">
-    <div class="score-row">
-      <div class="score-team-label blue">🔵 <span class="team-name-blue">Blue</span></div>
-      <div class="score-track"><div class="score-fill blue" id="sfill-blue" style="width:0%"></div></div>
-      <div class="score-num blue" id="snum-blue">0</div>
-    </div>
-    <div class="score-row">
-      <div class="score-team-label orange">🟠 <span class="team-name-orange">Orange</span></div>
-      <div class="score-track"><div class="score-fill orange" id="sfill-orange" style="width:0%"></div></div>
-      <div class="score-num orange" id="snum-orange">0</div>
-    </div>
+  <div class="score-bar" id="score-bar"></div>
+
+  <div class="matchup-info">
+    <div class="matchup-round" id="mb-round">Round — / —</div>
+    <div class="matchup-instruction" id="mb-instruction">Waiting…</div>
   </div>
 
-  <div class="matchup-bar">
-    <div class="matchup-side blue">
-      <div class="matchup-role">🔵 <span class="team-name-blue">Blue</span></div>
-      <div class="matchup-name" id="mb-blue-name">—</div>
-      <div class="matchup-badge" id="mb-blue-badge"></div>
-    </div>
-    <div class="matchup-center">
-      <div class="matchup-round" id="mb-round">Round — / —</div>
-      <div class="matchup-instruction" id="mb-instruction">Waiting…</div>
-    </div>
-    <div class="matchup-side orange">
-      <div class="matchup-role">🟠 <span class="team-name-orange">Orange</span></div>
-      <div class="matchup-name" id="mb-orange-name">—</div>
-      <div class="matchup-badge" id="mb-orange-badge"></div>
-    </div>
-  </div>
+  <div class="matchup-teams" id="matchup-teams"></div>
 
   <div class="q-grid-section">
     <div class="q-grade-block">
@@ -275,14 +275,10 @@ table.matchup-table tr.extra-round td { color: #ffd700; background: rgba(255,215
     </div>
   </div>
 
-  <div class="queue-strip">
-    <div class="queue-half blue" id="qhalf-blue">
-      <div class="queue-label">🔵 Blue:</div>
-    </div>
-    <div class="queue-sep"></div>
-    <div class="queue-half orange" id="qhalf-orange">
-      <div class="queue-label">🟠 Orange:</div>
-    </div>
+  <div class="queue-grid" id="queue-grid"></div>
+
+  <div style="display:flex;justify-content:flex-end;flex-shrink:0">
+    <button class="btn btn-ghost" style="font-size:0.78rem;padding:5px 12px" onclick="openTeacherView()">🎓 Teacher View</button>
   </div>
 </div>
 
@@ -290,9 +286,9 @@ table.matchup-table tr.extra-round td { color: #ffd700; background: rgba(255,215
 <div id="q-screen" class="hidden">
   <div class="q-header">
     <div class="q-badge blue" id="q-badge">Grade 5/6 — Q1 — ★★★ (3 pts)</div>
-    <div class="q-matchup-mini" id="q-matchup-mini"></div>
     <button class="btn btn-ghost" style="font-size:0.78rem;padding:5px 12px" onclick="openTeacherView()">🎓 Teacher View</button>
   </div>
+  <div class="q-players-mini" id="q-players-mini"></div>
   <div class="timer-wrap">
     <div class="timer-row">
       <div class="timer-num" id="timer-num">1:00</div>
@@ -310,12 +306,13 @@ table.matchup-table tr.extra-round td { color: #ffd700; background: rgba(255,215
       <div class="ans-label">Answer</div>
       <div class="ans-val" id="ans-val"></div>
     </div>
-    <div class="verdict-row">
-      <button class="vbtn vblue"   id="vbtn-blue"   onclick="verdict('blue')">🔵 Blue Correct</button>
-      <button class="vbtn vorange" id="vbtn-orange" onclick="verdict('orange')">🟠 Orange Correct</button>
-      <button class="vbtn vboth"   onclick="verdict('both')">🤝 Both Correct</button>
-      <button class="vbtn vneither" onclick="verdict('neither')">✗ Neither</button>
+    <div class="verdict-checks">
+      <label class="vcheck blue">  <input type="checkbox" id="vc-blue">   🔵 <span class="team-name-blue">Blue</span> Correct</label>
+      <label class="vcheck orange"><input type="checkbox" id="vc-orange"> 🟠 <span class="team-name-orange">Orange</span> Correct</label>
+      <label class="vcheck green"> <input type="checkbox" id="vc-green">  🟢 <span class="team-name-green">Green</span> Correct</label>
+      <label class="vcheck purple"><input type="checkbox" id="vc-purple"> 🟣 <span class="team-name-purple">Purple</span> Correct</label>
     </div>
+    <button class="btn btn-gold" style="font-size:1rem;padding:12px 40px" onclick="submitVerdict()">Submit Verdict</button>
   </div>
 </div>
 
@@ -324,23 +321,12 @@ table.matchup-table tr.extra-round td { color: #ffd700; background: rgba(255,215
   <div class="over-trophy" id="over-trophy">🏆</div>
   <div class="over-subtitle" id="over-subtitle">Winner</div>
   <div class="over-winner" id="over-winner"></div>
-  <div class="over-scores">
-    <div class="over-score bscore">
-      <div class="team-lbl">🔵 Team Blue</div>
-      <div class="pts" id="final-blue">0</div>
-    </div>
-    <div class="over-score oscore">
-      <div class="team-lbl">🟠 Team Orange</div>
-      <div class="pts" id="final-orange">0</div>
-    </div>
-  </div>
-  <button class="btn btn-gold" onclick="location.reload()">Play Again</button>
+  <div class="over-scores" id="over-scores"></div>
+  <button class="btn btn-gold" onclick="playAgain()">Play Again</button>
 </div>
 
 <script>
 // ── STUDENTS ──────────────────────────────────────────────────────────────────
-// Ranked by normalized composite score: MATHCOUNTS, AMC 8, Math League, MOEMS, Noetic (4:1)
-// Ranks 67+ = attendance-only (no prior competition data), snake-drafted last
 const STUDENTS = [
   {rank:1,  name:"Vihaan Shah",             grade:8},
   {rank:2,  name:"Arjun Lakshmanan",        grade:8},
@@ -443,63 +429,129 @@ const Q_TEXT = {
 function ptsFor(q)   { return q <= 10 ? 3 : q <= 20 ? 4 : 5; }
 function starsFor(q) { const p = ptsFor(q); return '★'.repeat(p) + '☆'.repeat(5-p); }
 
+// ── TEAM CONFIG ───────────────────────────────────────────────────────────────
+const TEAMS      = ['blue','orange','green','purple'];
+const TEAM_EMOJI = {blue:'🔵', orange:'🟠', green:'🟢', purple:'🟣'};
+const TEAM_DEF   = {blue:'Blue', orange:'Orange', green:'Green', purple:'Purple'};
+
 // ── STATE ─────────────────────────────────────────────────────────────────────
-let blueQueue    = [];
-let orangeQueue  = [];
-let blueScore    = 0;
-let orangeScore  = 0;
-let round        = 0;   // 0-indexed
-let totalRounds  = 0;
-let usedQs       = new Set();
-let currentQ     = null;  // {grade, num, pts}
-let pickerTeam   = 'blue';
-let teacherWin   = null;
-let timerIv      = null;
+let queues   = {blue:[], orange:[], green:[], purple:[]};
+let rosters  = {blue:[], orange:[], green:[], purple:[]};
+let scores   = {blue:0,  orange:0,  green:0,  purple:0};
+let round    = 0;
+let maxRounds = 0;
+let usedQs   = new Set();   // persists across games in a session
+let currentQ = null;
+let pickerTeam = 'blue';
+let studentPerf = {};       // rank → {played, correct}; persists across games
+let teacherWin  = null;
+let timerIv     = null;
 let timerRunning = false;
-let timerSecs    = 60;
-let timerTotal   = 60;
-let nextCustom   = 1000;
+let timerSecs   = 60;
+let timerTotal  = 60;
+let nextCustom  = 1000;
+
+function getTeamName(t) {
+  const el = document.getElementById('name-' + t);
+  return el ? (el.value.trim() || TEAM_DEF[t]) : TEAM_DEF[t];
+}
 
 // ── TEACHER VIEW ──────────────────────────────────────────────────────────────
 const TV_HTML = `<!DOCTYPE html><html><head><meta charset="UTF-8">
 <title>Teacher — MK 2026 Team Review</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial,sans-serif;background:#0f172a;color:white;padding:16px;min-height:100vh;display:flex;flex-direction:column;gap:10px}
-#tvbar{background:rgba(255,255,255,0.06);border-radius:8px;padding:9px 16px;display:flex;justify-content:space-around;align-items:center;gap:12px;flex-wrap:wrap}
-.tside{text-align:center}.trole{font-size:0.62rem;text-transform:uppercase;letter-spacing:1px;opacity:0.5}.tname{font-size:1.1rem;font-weight:bold}
-.tblue{color:#64b5f6}.torange{color:#ffb74d}
-#tvbadge{font-size:0.8rem;color:#94a3b8;text-align:center}
-#tvq{background:white;color:#0a0a3e;border-radius:10px;padding:18px 22px;font-family:Georgia,serif;font-size:1.1rem;line-height:1.6;flex:1;overflow-y:auto}
-#tvq svg{display:block;margin:12px auto 0}
-#tvans{background:rgba(255,215,0,0.1);border:2px solid #ffd700;border-radius:10px;padding:10px 18px}
+body{font-family:Arial,sans-serif;background:#0f172a;color:white;padding:12px;min-height:100vh;display:flex;flex-direction:column;gap:8px}
+#tvbar{background:rgba(255,255,255,0.06);border-radius:8px;padding:8px 12px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center;flex-shrink:0}
+.tside{text-align:center}.trole{font-size:0.62rem;text-transform:uppercase;letter-spacing:1px;opacity:0.5;margin-bottom:2px}.tname{font-size:1rem;font-weight:bold}
+.tblue{color:#64b5f6}.torange{color:#ffb74d}.tgreen{color:#81c784}.tpurple{color:#ce93d8}
+#tv-picker{font-size:0.82rem;font-weight:bold;text-align:center;flex-shrink:0}
+#tvbadge{font-size:0.8rem;color:#94a3b8;text-align:center;flex-shrink:0}
+#tv-grid{background:rgba(0,0,0,0.3);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.tv-grade-row{display:flex;align-items:center;gap:3px;flex-wrap:nowrap}
+.tv-grade-lbl{font-size:0.68rem;opacity:0.5;width:28px;flex-shrink:0}
+.tv-chip{width:26px;height:20px;border:none;border-radius:3px;font-size:0.65rem;font-weight:bold;cursor:pointer;color:white;transition:opacity 0.15s,transform 0.1s;flex-shrink:0}
+.tv-chip:hover:not(:disabled){transform:scale(1.2)}
+.tv-chip:disabled{opacity:0.2;cursor:default}
+.tv-chip.active{outline:2px solid #ffd700;outline-offset:1px}
+#tvq{background:white;color:#0a0a3e;border-radius:10px;padding:14px 18px;font-family:Georgia,serif;font-size:1rem;line-height:1.55;flex:1;overflow-y:auto;min-height:60px}
+#tvq svg{display:block;margin:10px auto 0}
+#tvans{background:rgba(255,215,0,0.1);border:2px solid #ffd700;border-radius:10px;padding:8px 16px;text-align:center;flex-shrink:0}
 #tvansl{font-size:0.65rem;opacity:0.5;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
-#tvansv{font-size:2.2rem;font-weight:bold;color:#ffd700}
-.tvrow{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-.tvbtn{border:none;border-radius:8px;padding:10px 16px;font-family:inherit;font-size:0.9rem;font-weight:bold;cursor:pointer}
-.tvbtn:hover{filter:brightness(1.15)}
-.tvbl{background:#1565c0;color:white}.tvor{background:#e65100;color:white}
-.tvbo{background:#16a34a;color:white}.tvni{background:#6b7280;color:white}
+#tvansv{font-size:2rem;font-weight:bold;color:#ffd700}
+.tvchecks{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;flex-shrink:0}
+.tvcheck{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:0.88rem;font-weight:bold;border:2px solid transparent}
+.tvcheck input{width:16px;height:16px;cursor:pointer}
+.tvcheck.tvbl{background:rgba(21,101,192,0.25);color:#90caf9}.tvcheck.tvor{background:rgba(230,81,0,0.25);color:#ffcc80}
+.tvcheck.tvgr{background:rgba(46,125,50,0.25);color:#a5d6a7}.tvcheck.tvpu{background:rgba(106,27,154,0.25);color:#e1bee7}
+.tvcheck:has(input:checked).tvbl{border-color:#64b5f6}.tvcheck:has(input:checked).tvor{border-color:#ffb74d}
+.tvcheck:has(input:checked).tvgr{border-color:#81c784}.tvcheck:has(input:checked).tvpu{border-color:#ce93d8}
+.tv-btnrow{display:flex;gap:8px;justify-content:center;flex-shrink:0}
+.tvreveal{background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:8px;padding:8px 18px;font-family:inherit;font-size:0.88rem;font-weight:bold;cursor:pointer}
+.tvreveal:hover{background:rgba(255,255,255,0.25)}
+.tvsubmit{background:#ffd700;color:#1a1a1a;border:none;border-radius:8px;padding:8px 24px;font-family:inherit;font-size:0.95rem;font-weight:bold;cursor:pointer}
+.tvsubmit:hover{background:#ffe44d}
 </style></head><body>
 <div id="tvbar">
-  <div class="tside"><div class="trole">Blue</div><div class="tname tblue" id="tvblue">—</div></div>
-  <div style="opacity:0.3;font-size:1.2rem">vs</div>
-  <div class="tside"><div class="trole">Orange</div><div class="tname torange" id="tvorange">—</div></div>
+  <div class="tside"><div class="trole">🔵 Blue</div><div class="tname tblue" id="tv-name-blue">—</div></div>
+  <div class="tside"><div class="trole">🟠 Orange</div><div class="tname torange" id="tv-name-orange">—</div></div>
+  <div class="tside"><div class="trole">🟢 Green</div><div class="tname tgreen" id="tv-name-green">—</div></div>
+  <div class="tside"><div class="trole">🟣 Purple</div><div class="tname tpurple" id="tv-name-purple">—</div></div>
 </div>
-<div id="tvbadge">Select a question from the board…</div>
+<div id="tv-picker"></div>
+<div id="tvbadge">Select a question below…</div>
+<div id="tv-grid"></div>
 <div id="tvq" style="color:#64748b;font-style:italic">No question selected.</div>
 <div id="tvans"><div id="tvansl">Answer</div><div id="tvansv">—</div></div>
-<div class="tvrow">
-  <button class="tvbtn tvbl" onclick="window.opener&&window.opener.verdict('blue')">🔵 Blue Correct</button>
-  <button class="tvbtn tvor" onclick="window.opener&&window.opener.verdict('orange')">🟠 Orange Correct</button>
-  <button class="tvbtn tvbo" onclick="window.opener&&window.opener.verdict('both')">🤝 Both Correct</button>
-  <button class="tvbtn tvni" onclick="window.opener&&window.opener.verdict('neither')">✗ Neither</button>
+<div class="tvchecks">
+  <label class="tvcheck tvbl"><input type="checkbox" id="tv-vc-blue">   🔵 Blue Correct</label>
+  <label class="tvcheck tvor"><input type="checkbox" id="tv-vc-orange"> 🟠 Orange Correct</label>
+  <label class="tvcheck tvgr"><input type="checkbox" id="tv-vc-green">  🟢 Green Correct</label>
+  <label class="tvcheck tvpu"><input type="checkbox" id="tv-vc-purple"> 🟣 Purple Correct</label>
 </div>
+<div class="tv-btnrow">
+  <button class="tvreveal" onclick="if(window.opener)window.opener.revealAnswer()">Reveal Answer</button>
+  <button class="tvsubmit" onclick="submitToOpener()">Submit Verdict</button>
+</div>
+<script>
+['5/6','7/8'].forEach(grade => {
+  const row = document.createElement('div');
+  row.className = 'tv-grade-row';
+  const lbl = document.createElement('span');
+  lbl.className = 'tv-grade-lbl';
+  lbl.textContent = grade;
+  row.appendChild(lbl);
+  for (let q = 1; q <= 30; q++) {
+    const bg = q<=10 ? '#1e3a8a' : q<=20 ? '#92400e' : '#7f1d1d';
+    const btn = document.createElement('button');
+    btn.id = 'tv-chip-' + grade.replace('/','') + '-' + q;
+    btn.className = 'tv-chip';
+    btn.style.background = bg;
+    btn.textContent = q;
+    btn.onclick = () => { if (window.opener) window.opener.pickQuestion(grade, q); };
+    row.appendChild(btn);
+  }
+  document.getElementById('tv-grid').appendChild(row);
+});
+function submitToOpener() {
+  if (!window.opener) return;
+  const correct = ['blue','orange','green','purple']
+    .filter(t => document.getElementById('tv-vc-' + t).checked);
+  ['blue','orange','green','purple'].forEach(t =>
+    document.getElementById('tv-vc-' + t).checked = false);
+  window.opener.verdictFromTeacher(correct);
+}
+['blue','orange','green','purple'].forEach(t => {
+  document.getElementById('tv-vc-' + t).addEventListener('change', function() {
+    if (window.opener) window.opener.syncCheckFromTeacher(t, this.checked);
+  });
+});
+<\/script>
 </body></html>`;
 
 function openTeacherView() {
   if (teacherWin && !teacherWin.closed) { teacherWin.focus(); return; }
-  teacherWin = window.open('','mk-teacher','width=820,height=640,menubar=no,toolbar=no,location=no,status=no');
+  teacherWin = window.open('','mk-teacher','width=860,height=700,menubar=no,toolbar=no,location=no,status=no');
   teacherWin.document.open();
   teacherWin.document.write(TV_HTML);
   teacherWin.document.close();
@@ -509,18 +561,70 @@ function openTeacherView() {
 function tvSync() {
   if (!teacherWin || teacherWin.closed) return;
   const d = teacherWin.document;
-  d.getElementById('tvblue').textContent   = blueQueue.length  > 0 ? blueQueue[0].name  : '—';
-  d.getElementById('tvorange').textContent = orangeQueue.length > 0 ? orangeQueue[0].name : '—';
+  TEAMS.forEach(t => {
+    const el = d.getElementById('tv-name-' + t);
+    if (el) el.textContent = queues[t].length > 0 ? queues[t][0].name : '—';
+  });
+  const pickerEl = d.getElementById('tv-picker');
+  if (pickerEl) {
+    const colors = {blue:'#64b5f6',orange:'#ffb74d',green:'#81c784',purple:'#ce93d8'};
+    pickerEl.style.color = colors[pickerTeam] || 'white';
+    pickerEl.textContent = pickerTeam
+      ? `${TEAM_EMOJI[pickerTeam]} ${getTeamName(pickerTeam)} picks`
+      : '';
+  }
   if (currentQ) {
     const {grade, num, pts} = currentQ;
     d.getElementById('tvbadge').textContent = `Grade ${grade} — Q${num} — ${starsFor(num)} (${pts} pts)`;
     d.getElementById('tvq').innerHTML = Q_TEXT[grade][num-1];
     d.getElementById('tvansv').innerHTML = ANSWERS[grade][num-1];
   } else {
-    d.getElementById('tvbadge').textContent = 'Select a question from the board…';
+    d.getElementById('tvbadge').textContent = 'Select a question below…';
     d.getElementById('tvq').innerHTML = '<span style="color:#64748b;font-style:italic">No question selected.</span>';
     d.getElementById('tvansv').innerHTML = '—';
   }
+  tvSyncChips(d);
+}
+
+function tvSyncChips(d) {
+  ['5/6','7/8'].forEach(grade => {
+    for (let q = 1; q <= 30; q++) {
+      const chip = d.getElementById('tv-chip-' + grade.replace('/','') + '-' + q);
+      if (!chip) return;
+      chip.disabled = usedQs.has(grade + '-' + q);
+      chip.classList.toggle('active', !!(currentQ && currentQ.grade === grade && currentQ.num === q));
+    }
+  });
+}
+
+function verdictFromTeacher(correct) {
+  verdict(correct);
+}
+
+function syncCheckFromTeacher(t, checked) {
+  const cb = document.getElementById('vc-' + t);
+  if (cb) cb.checked = checked;
+}
+
+function resetVerdictChecks() {
+  TEAMS.forEach(t => {
+    document.getElementById('vc-' + t).checked = false;
+    if (teacherWin && !teacherWin.closed) {
+      const cb = teacherWin.document.getElementById('tv-vc-' + t);
+      if (cb) cb.checked = false;
+    }
+  });
+}
+
+function initCheckboxSync() {
+  TEAMS.forEach(t => {
+    document.getElementById('vc-' + t).addEventListener('change', function() {
+      if (teacherWin && !teacherWin.closed) {
+        const cb = teacherWin.document.getElementById('tv-vc-' + t);
+        if (cb) cb.checked = this.checked;
+      }
+    });
+  });
 }
 
 // ── ATTENDANCE ────────────────────────────────────────────────────────────────
@@ -559,7 +663,7 @@ function updateSummary() {
   });
   document.getElementById('att-summary').textContent =
     checked.length + ' student' + (checked.length !== 1 ? 's' : '') + ' selected';
-  document.getElementById('start-btn').disabled = checked.length < 2;
+  document.getElementById('start-btn').disabled = checked.length < 4;
 }
 
 function selectAll(v) {
@@ -588,145 +692,190 @@ function addStudent() {
 }
 
 // ── GAME SETUP ────────────────────────────────────────────────────────────────
+function draftRank(s) {
+  const p = studentPerf[s.rank];
+  if (p && p.played > 0) return (1 - p.correct / p.played) * 78;
+  return s.rank;
+}
+
 function startGame() {
   const present = [...document.querySelectorAll('#att-screen input:checked')]
     .map(c => STUDENTS.find(s => s.rank === +c.value))
     .filter(Boolean)
-    .sort((a,b) => a.rank - b.rank);  // ascending: rank 1 = strongest first
-  if (present.length < 2) return;
+    .sort((a,b) => draftRank(a) - draftRank(b));
+  if (present.length < 4) return;
 
-  // Snake draft: index 0,2,4… → blue; index 1,3,5… → orange
-  const bTeam = [], oTeam = [];
-  present.forEach((s,i) => { (i%2===0 ? bTeam : oTeam).push(s); });
-  // Reverse so weakest (highest rank number) plays first
-  blueQueue   = bTeam.reverse();
-  orangeQueue = oTeam.reverse();
+  // 4-team snake draft; reverse so weakest plays first
+  const tmp = {blue:[], orange:[], green:[], purple:[]};
+  present.forEach((s,i) => tmp[TEAMS[i % 4]].push(s));
+  TEAMS.forEach(t => {
+    queues[t]  = tmp[t].reverse();
+    rosters[t] = [...queues[t]];
+    scores[t]  = 0;
+  });
 
-  blueScore = orangeScore = round = 0;
-  usedQs = new Set(); currentQ = null; pickerTeam = 'blue';
-  totalRounds = Math.min(blueQueue.length, orangeQueue.length);
+  const maxLen = Math.max(...TEAMS.map(t => queues[t].length));
+  maxRounds = maxLen;
+  round     = 0;
+  currentQ  = null;
+  updatePicker();
 
   document.getElementById('att-screen').classList.add('hidden');
   showMatchupPreview();
 }
 
-let lastPickQueue = null;  // the shorter team's queue, if unequal
-
 function showMatchupPreview() {
   document.getElementById('preview-screen').classList.remove('hidden');
 
-  const n = Math.min(blueQueue.length, orangeQueue.length);
-  const unequal = blueQueue.length !== orangeQueue.length;
-  lastPickQueue = null;
+  const maxLen = Math.max(...TEAMS.map(t => queues[t].length));
+  const minLen = Math.min(...TEAMS.map(t => queues[t].length));
+  const hasExtra = maxLen > minLen;
 
-  // Build matchup table (from end of queues = first rounds, weakest first)
+  // Header row with editable team names
   const table = document.getElementById('matchup-table');
   table.innerHTML = `<tr>
-    <th class="col-blue"><input id="name-blue" class="th-input blue" type="text" value="Blue" placeholder="Blue"></th>
     <th class="col-round"></th>
-    <th class="col-orange"><input id="name-orange" class="th-input orange" type="text" value="Orange" placeholder="Orange"></th>
+    ${TEAMS.map(t => `<th><input id="name-${t}" class="th-input ${t}" type="text" value="${TEAM_DEF[t]}" placeholder="${TEAM_DEF[t]}"></th>`).join('')}
   </tr>`;
 
-  for (let i = 0; i < n; i++) {
+  // Regular rounds
+  for (let i = 0; i < minLen; i++) {
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td class="col-blue-n">${esc(blueQueue[i].name)}</td>
-      <td class="col-round">${i+1}</td>
-      <td class="col-orange-n">${esc(orangeQueue[i].name)}</td>`;
+    tr.innerHTML = `<td class="col-round">${i+1}</td>` +
+      TEAMS.map(t => `<td class="col-${t}-n">${esc(queues[t][i].name)}</td>`).join('');
     table.appendChild(tr);
   }
 
-  // Extra round row if unequal
-  if (unequal) {
-    const longerIsBlue = blueQueue.length > orangeQueue.length;
-    lastPickQueue = longerIsBlue ? orangeQueue : blueQueue;
-    const longerLast = longerIsBlue ? blueQueue[n] : orangeQueue[n];
-
+  // Extra round row for unequal teams
+  if (hasExtra) {
     const tr = document.createElement('tr');
     tr.className = 'extra-round';
-    tr.innerHTML = longerIsBlue
-      ? `<td class="col-blue-n">${esc(longerLast.name)}</td><td class="col-round">${n+1}</td><td class="col-orange-n" id="extra-cell">—</td>`
-      : `<td class="col-blue-n" id="extra-cell">—</td><td class="col-round">${n+1}</td><td class="col-orange-n">${esc(longerLast.name)}</td>`;
+    tr.innerHTML = `<td class="col-round">${maxLen}</td>` +
+      TEAMS.map(t => {
+        if (queues[t].length === maxLen) {
+          return `<td class="col-${t}-n">${esc(queues[t][maxLen-1].name)}</td>`;
+        }
+        // Short team: default volunteer = last in queue
+        return `<td class="col-${t}-n" id="extra-cell-${t}">${esc(queues[t][queues[t].length-1].name)}</td>`;
+      }).join('');
     table.appendChild(tr);
-
-    // Last-pick section
-    const section = document.getElementById('lp-section');
-    section.classList.remove('hidden');
-    const teamLabel = longerIsBlue ? '🟠 Orange' : '🔵 Blue';
-    document.getElementById('lp-desc').textContent =
-      `Pick who will go twice, as the last player against ${longerLast.name}:`;
-
-    const container = document.getElementById('lp-players');
-    container.innerHTML = '';
-    lastPickQueue.forEach((s, i) => {
-      const btn = document.createElement('button');
-      btn.className = 'lp-player' + (i === lastPickQueue.length - 1 ? ' selected' : '');
-      btn.textContent = s.name;
-      btn.addEventListener('click', () => {
-        container.querySelectorAll('.lp-player').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        lastPickQueue.splice(i, 1);
-        lastPickQueue.push(s);
-        document.getElementById('extra-cell').textContent = s.name;
-      });
-      container.appendChild(btn);
-    });
-  } else {
-    document.getElementById('lp-section').classList.add('hidden');
   }
+
+  // Volunteer pickers for each short team
+  const shortTeams = TEAMS.filter(t => queues[t].length < maxLen);
+  const lpSection  = document.getElementById('lp-section');
+  const lpContent  = document.getElementById('lp-content');
+  lpContent.innerHTML = '';
+
+  if (shortTeams.length > 0) {
+    lpSection.classList.remove('hidden');
+    shortTeams.forEach(t => buildVolunteerPicker(t));
+  } else {
+    lpSection.classList.add('hidden');
+  }
+
+  document.getElementById('preview-winscore').textContent = `${maxRounds} rounds`;
+}
+
+function buildVolunteerPicker(t) {
+  const lpContent = document.getElementById('lp-content');
+  const existing = document.getElementById('lp-block-' + t);
+  if (existing) existing.remove();
+
+  const block = document.createElement('div');
+  block.id = 'lp-block-' + t;
+  block.className = 'lp-team-block';
+
+  const desc = document.createElement('div');
+  desc.className = 'lp-desc';
+  desc.textContent = `${TEAM_EMOJI[t]} ${TEAM_DEF[t]} — pick who goes twice in the extra round:`;
+  block.appendChild(desc);
+
+  const row = document.createElement('div');
+  row.className = 'lp-players-row';
+
+  queues[t].forEach((s, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'lp-player' + (i === queues[t].length - 1 ? ' selected' : '');
+    btn.textContent = s.name;
+    btn.addEventListener('click', () => {
+      queues[t].splice(queues[t].indexOf(s), 1);
+      queues[t].push(s);
+      const cell = document.getElementById('extra-cell-' + t);
+      if (cell) cell.textContent = s.name;
+      buildVolunteerPicker(t);
+    });
+    row.appendChild(btn);
+  });
+
+  block.appendChild(row);
+  lpContent.appendChild(block);
 }
 
 function launchGame() {
-  // Apply team names
-  const bName = document.getElementById('name-blue').value.trim()   || 'Blue';
-  const oName = document.getElementById('name-orange').value.trim() || 'Orange';
-  document.querySelectorAll('.team-name-blue').forEach(el => el.textContent = bName);
-  document.querySelectorAll('.team-name-orange').forEach(el => el.textContent = oName);
-  document.getElementById('vbtn-blue').textContent   = `🔵 ${bName} Correct`;
-  document.getElementById('vbtn-orange').textContent = `🟠 ${oName} Correct`;
+  TEAMS.forEach(t => {
+    const name = getTeamName(t);
+    document.querySelectorAll('.team-name-' + t).forEach(el => el.textContent = name);
+  });
 
   document.getElementById('preview-screen').classList.add('hidden');
   document.getElementById('board-screen').classList.remove('hidden');
+  buildScoreBar();
+  buildMatchupTeams();
   buildChips();
   renderBoard();
+  openTeacherView();
 }
 
 // ── BOARD ─────────────────────────────────────────────────────────────────────
+function buildScoreBar() {
+  const bar = document.getElementById('score-bar');
+  bar.innerHTML = TEAMS.map(t => `
+    <div class="score-row">
+      <div class="score-team-label ${t}">${TEAM_EMOJI[t]} <span class="team-name-${t}">${getTeamName(t)}</span></div>
+      <div class="score-track">
+        <div class="score-fill ${t}" id="sfill-${t}" style="width:0%"></div>
+      </div>
+      <div class="score-num ${t}" id="snum-${t}">0</div>
+    </div>`).join('');
+}
+
+function buildMatchupTeams() {
+  const el = document.getElementById('matchup-teams');
+  el.innerHTML = TEAMS.map(t => `
+    <div class="matchup-side ${t}">
+      <div class="matchup-role">${TEAM_EMOJI[t]} <span class="team-name-${t}">${getTeamName(t)}</span></div>
+      <div class="matchup-name" id="mb-name-${t}">—</div>
+      <div class="matchup-badge" id="mb-badge-${t}"></div>
+    </div>`).join('');
+}
+
 function renderBoard() {
-  const bn = blueQueue.length   > 0 ? blueQueue[0].name   : '—';
-  const on = orangeQueue.length > 0 ? orangeQueue[0].name : '—';
-
-  document.getElementById('mb-blue-name').textContent   = bn;
-  document.getElementById('mb-orange-name').textContent = on;
-
-  const pickerName = pickerTeam === 'blue' ? bn : on;
-  document.getElementById('mb-round').textContent =
-    'Round ' + (round+1) + ' / ' + totalRounds;
-
-  const done = blueQueue.length === 0 || orangeQueue.length === 0;
-  document.getElementById('mb-instruction').textContent = done
-    ? 'Game complete!'
-    : pickerName + ' — pick a question';
-
-  const bLabel = document.getElementById('name-blue').value.trim()   || 'Blue';
-  const oLabel = document.getElementById('name-orange').value.trim() || 'Orange';
-  document.getElementById('mb-blue-badge').textContent   = pickerTeam==='blue'   ? 'PICKS' : 'answers';
-  document.getElementById('mb-orange-badge').textContent = pickerTeam==='orange' ? 'PICKS' : 'answers';
-  document.getElementById('vbtn-blue').textContent   = `🔵 ${bLabel} Correct`;
-  document.getElementById('vbtn-orange').textContent = `🟠 ${oLabel} Correct`;
-
-  // Score bars
-  const scale = Math.max(totalRounds * 5, 1);
-  document.getElementById('sfill-blue').style.width   = Math.min(blueScore/scale*100,  100) + '%';
-  document.getElementById('sfill-orange').style.width = Math.min(orangeScore/scale*100, 100) + '%';
-  document.getElementById('snum-blue').textContent    = blueScore;
-  document.getElementById('snum-orange').textContent  = orangeScore;
-
-  // Chip interactivity
-  document.querySelectorAll('.q-chip:not(.used)').forEach(c => {
-    c.disabled = done;
+  // Score bars (scale to max possible score)
+  const maxPossible = maxRounds * 5 || 1;
+  TEAMS.forEach(t => {
+    document.getElementById('sfill-' + t).style.width = Math.min(scores[t] / maxPossible * 100, 100) + '%';
+    document.getElementById('snum-' + t).textContent  = scores[t];
   });
 
-  // Queue strips
+  // Current players + picker badges
+  const allDone = TEAMS.every(t => queues[t].length === 0);
+  TEAMS.forEach(t => {
+    const player = queues[t][0];
+    document.getElementById('mb-name-' + t).textContent  = player ? player.name : 'Done ✓';
+    document.getElementById('mb-badge-' + t).textContent = t === pickerTeam ? 'PICKS' : '';
+  });
+
+  // Round info
+  document.getElementById('mb-round').textContent =
+    `Round ${round + 1} / ${maxRounds}`;
+  document.getElementById('mb-instruction').textContent = allDone
+    ? 'Game complete!'
+    : `${TEAM_EMOJI[pickerTeam]} ${getTeamName(pickerTeam)} picks a question`;
+
+  // Chip interactivity
+  document.querySelectorAll('.q-chip:not(.used)').forEach(c => { c.disabled = allDone; });
+
   renderQueues();
   tvSync();
 }
@@ -761,26 +910,27 @@ function buildChips() {
 }
 
 function renderQueues() {
-  ['blue','orange'].forEach(team => {
-    const q    = team === 'blue' ? blueQueue : orangeQueue;
-    const half = document.getElementById('qhalf-' + team);
-    half.innerHTML = `<div class="queue-label">${team==='blue'?'🔵 Blue:':'🟠 Orange:'}</div>`;
+  const grid = document.getElementById('queue-grid');
+  grid.innerHTML = TEAMS.map(t => {
+    const q = queues[t];
+    let inner = `<div class="queue-label">${TEAM_EMOJI[t]} ${getTeamName(t)}:</div>`;
     if (q.length === 0) {
-      half.innerHTML += '<div class="queue-item">Done ✓</div>';
+      inner += '<div class="queue-item">Done ✓</div>';
     } else {
-      q.slice(0, 7).forEach((s, i) => {
-        if (i > 0) half.innerHTML += '<span class="queue-arrow">›</span>';
-        half.innerHTML += `<div class="queue-item ${i===0?'current':''}">${esc(s.name)}</div>`;
+      q.slice(0, 5).forEach((s, i) => {
+        if (i > 0) inner += '<span class="queue-arrow">›</span>';
+        inner += `<div class="queue-item ${i===0?'current':''}">${esc(s.name)}</div>`;
       });
-      if (q.length > 7) half.innerHTML += `<span class="queue-arrow">+${q.length-7}</span>`;
+      if (q.length > 5) inner += `<span class="queue-arrow">+${q.length-5}</span>`;
     }
-  });
+    return `<div class="queue-half ${t}">${inner}</div>`;
+  }).join('');
 }
 
 // ── QUESTION FLOW ─────────────────────────────────────────────────────────────
 function pickQuestion(grade, num) {
   if (usedQs.has(grade+'-'+num)) return;
-  if (blueQueue.length === 0 || orangeQueue.length === 0) return;
+  if (TEAMS.every(t => queues[t].length === 0)) return;
 
   const pts = ptsFor(num);
   currentQ = {grade, num, pts};
@@ -789,18 +939,21 @@ function pickQuestion(grade, num) {
   badge.textContent = `Grade ${grade} — Q${num} — ${starsFor(num)} (${pts} pts)`;
   badge.className   = 'q-badge ' + (grade==='5/6' ? 'blue' : 'orange');
 
-  document.getElementById('q-matchup-mini').innerHTML =
-    `<span class="bname">🔵 ${esc(blueQueue[0].name)}</span>` +
-    `<span style="opacity:0.4"> vs </span>` +
-    `<span class="oname">🟠 ${esc(orangeQueue[0].name)}</span>`;
-
-  document.getElementById('vbtn-blue').textContent   = `🔵 ${esc(blueQueue[0].name)} Correct`;
-  document.getElementById('vbtn-orange').textContent = `🟠 ${esc(orangeQueue[0].name)} Correct`;
+  document.getElementById('q-players-mini').innerHTML =
+    TEAMS.map(t => {
+      const p = queues[t][0];
+      if (!p) return '';
+      const colors = {blue:'#64b5f6',orange:'#ffb74d',green:'#81c784',purple:'#ce93d8'};
+      return `<span style="color:${colors[t]};font-weight:bold">${TEAM_EMOJI[t]} ${esc(p.name)}</span>`;
+    }).filter(Boolean).join('<span style="opacity:0.4"> · </span>');
 
   document.getElementById('q-text').innerHTML = Q_TEXT[grade][num-1];
   document.getElementById('ans-val').innerHTML = ANSWERS[grade][num-1];
   document.getElementById('ans-section').style.display = 'none';
   document.getElementById('btn-reveal').style.display  = 'block';
+
+  // Uncheck all verdict checkboxes
+  resetVerdictChecks();
 
   stopTimer();
   timerTotal = timerSecs = pts===3 ? 60 : pts===4 ? 90 : 120;
@@ -833,10 +986,7 @@ function toggleTimer() {
   }
 }
 
-function stopTimer() {
-  clearInterval(timerIv);
-  timerRunning = false;
-}
+function stopTimer() { clearInterval(timerIv); timerRunning = false; }
 
 function renderTimerDisplay() {
   const numEl  = document.getElementById('timer-num');
@@ -861,7 +1011,7 @@ function renderTimerDisplay() {
 function revealAnswer() {
   stopTimer();
   document.getElementById('btn-reveal').style.display  = 'none';
-  document.getElementById('ans-section').style.display = 'block';
+  document.getElementById('ans-section').style.display = 'flex';
 }
 
 function goBack() {
@@ -872,30 +1022,53 @@ function goBack() {
   renderBoard();
 }
 
-function verdict(who) {
+// ── VERDICT ───────────────────────────────────────────────────────────────────
+function submitVerdict() {
+  const correct = TEAMS.filter(t => document.getElementById('vc-' + t).checked);
+  resetVerdictChecks();
+  verdict(correct);
+}
+
+function verdict(correct) {
   stopTimer();
   if (!currentQ) return;
 
   const {grade, num, pts} = currentQ;
-  if (who==='blue'   || who==='both') blueScore   += pts;
-  if (who==='orange' || who==='both') orangeScore += pts;
-  if      (who==='both')    soundBoth(getAudio());
-  else if (who==='neither') soundWrong(getAudio());
-  else                      soundCorrect(getAudio());
 
-  usedQs.add(grade+'-'+num);
+  // Award points and track per-student performance
+  TEAMS.forEach(t => {
+    const player = queues[t][0];
+    if (!player) return;
+    if (!studentPerf[player.rank]) studentPerf[player.rank] = {played:0, correct:0};
+    studentPerf[player.rank].played++;
+    if (correct.includes(t)) {
+      scores[t] += pts;
+      studentPerf[player.rank].correct++;
+    }
+  });
+
+  // Sound
+  if      (correct.length === 4) soundBoth(getAudio());
+  else if (correct.length === 0) soundWrong(getAudio());
+  else                           soundCorrect(getAudio());
+
+  // Mark question used
+  usedQs.add(grade + '-' + num);
   const chip = document.querySelector(`.q-chip[data-grade="${grade}"][data-q="${num}"]`);
   if (chip) chip.classList.add('used');
 
-  blueQueue.shift();
-  orangeQueue.shift();
+  // Advance queues
+  TEAMS.forEach(t => queues[t].shift());
   round++;
-  pickerTeam = (round % 2 === 0) ? 'blue' : 'orange';
   currentQ = null;
+
+  const gameOver = TEAMS.every(t => queues[t].length === 0);
+
+  updatePicker();
 
   document.getElementById('q-screen').classList.add('hidden');
 
-  if (blueQueue.length === 0 || orangeQueue.length === 0) {
+  if (gameOver) {
     showGameOver();
   } else {
     document.getElementById('board-screen').classList.remove('hidden');
@@ -903,25 +1076,38 @@ function verdict(who) {
   }
 }
 
+function updatePicker() {
+  const minScore = Math.min(...TEAMS.map(t => scores[t]));
+  const trailing = TEAMS.filter(t => scores[t] === minScore);
+  pickerTeam = trailing[round % trailing.length];
+}
+
 // ── GAME OVER ─────────────────────────────────────────────────────────────────
 function showGameOver() {
-  const bN = document.getElementById('name-blue').value.trim()   || 'Blue';
-  const oN = document.getElementById('name-orange').value.trim() || 'Orange';
-  document.querySelector('#over-screen .bscore .team-lbl').textContent = `🔵 ${bN}`;
-  document.querySelector('#over-screen .oscore .team-lbl').textContent = `🟠 ${oN}`;
+  const maxScore = Math.max(...TEAMS.map(t => scores[t]));
+  const winners  = TEAMS.filter(t => scores[t] === maxScore);
 
-  let trophy, subtitle, winner, color;
-  if (blueScore > orangeScore) {
-    trophy='🏆'; subtitle='Winner!'; winner=`🔵 ${bN} wins! 🦘`; color='#64b5f6';
-  } else if (orangeScore > blueScore) {
-    trophy='🏆'; subtitle='Winner!'; winner=`🟠 ${oN} wins! 🦘`; color='#ffb74d';
+  let trophy, subtitle, winnerText;
+  if (winners.length === 1) {
+    const w = winners[0];
+    trophy = '🏆'; subtitle = 'Winner!';
+    winnerText = `${TEAM_EMOJI[w]} ${getTeamName(w)} wins! 🦘`;
   } else {
-    trophy='🤝'; subtitle="It's a tie!"; winner=`🔵 ${bN}  ties  ${oN} 🟠 🦘🦘`; color='#ffd700';
+    trophy = '🤝'; subtitle = "It's a tie!";
+    winnerText = winners.map(w => TEAM_EMOJI[w] + ' ' + getTeamName(w)).join('  ties  ') + ' 🦘🦘';
   }
 
-  // Start with scores at 0 and winner hidden
-  document.getElementById('final-blue').textContent   = '0';
-  document.getElementById('final-orange').textContent = '0';
+  // Build score boxes
+  const overScores = document.getElementById('over-scores');
+  overScores.innerHTML = TEAMS.map(t => `
+    <div class="over-score" id="over-score-${t}">
+      <div class="team-lbl">${TEAM_EMOJI[t]} ${getTeamName(t)}</div>
+      <div class="pts ${t}" id="final-${t}">0</div>
+      <div class="over-roster" id="roster-${t}">
+        ${[...rosters[t]].reverse().map(s => `<div class="over-roster-name">${esc(s.name)}</div>`).join('')}
+      </div>
+    </div>`).join('');
+
   document.getElementById('over-trophy').style.opacity   = '0';
   document.getElementById('over-subtitle').style.opacity = '0';
   document.getElementById('over-winner').style.opacity   = '0';
@@ -930,19 +1116,16 @@ function showGameOver() {
   document.getElementById('board-screen').classList.add('hidden');
   document.getElementById('over-screen').classList.remove('hidden');
 
-  // Phase 1: brief pause, then drumroll + scores count up
   setTimeout(() => {
     soundDrumroll(getAudio(), 2.2);
-    countUpScores(blueScore, orangeScore, 2200, () => {
-      // Phase 2: suspense pause
+    countUpScores(2200, () => {
       setTimeout(() => {
-        // Phase 3: winner reveal
         document.getElementById('over-trophy').textContent   = trophy;
         document.getElementById('over-subtitle').textContent = subtitle;
         document.getElementById('over-trophy').style.opacity   = '1';
         document.getElementById('over-subtitle').style.opacity = '1';
         const w = document.getElementById('over-winner');
-        w.textContent = winner; w.style.color = color;
+        w.textContent = winnerText;
         w.style.opacity = '1';
         w.classList.add('winner-pop');
         soundFanfare(getAudio());
@@ -951,15 +1134,28 @@ function showGameOver() {
   }, 400);
 }
 
-function countUpScores(targetB, targetO, duration, callback) {
-  const start = performance.now();
+function countUpScores(duration, callback) {
+  const targets = {...scores};
+  const start   = performance.now();
   (function step(now) {
     const t = Math.min((now - start) / duration, 1);
     const eased = 1 - Math.pow(1 - t, 3);
-    document.getElementById('final-blue').textContent   = Math.round(targetB * eased);
-    document.getElementById('final-orange').textContent = Math.round(targetO * eased);
+    TEAMS.forEach(team => {
+      const el = document.getElementById('final-' + team);
+      if (el) el.textContent = Math.round(targets[team] * eased);
+    });
     t < 1 ? requestAnimationFrame(step) : callback();
   })(start);
+}
+
+function playAgain() {
+  TEAMS.forEach(t => { scores[t] = 0; queues[t] = []; rosters[t] = []; });
+  round = 0; currentQ = null; pickerTeam = null;
+  stopTimer();
+  tvSync();
+  document.getElementById('over-screen').classList.add('hidden');
+  document.getElementById('att-screen').classList.remove('hidden');
+  updateSummary();
 }
 
 // ── AUDIO ─────────────────────────────────────────────────────────────────────
@@ -1019,6 +1215,7 @@ function esc(s) {
 }
 
 buildAttendance();
+initCheckboxSync();
 </script>
 </body>
 </html>

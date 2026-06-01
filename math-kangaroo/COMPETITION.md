@@ -1,4 +1,74 @@
-# Math Kangaroo Practice Competition
+# Math Kangaroo Competition Tools
+
+## 2026 Team Review
+
+`math-kangaroo-team-2026.html` is a whole-club team review activity for the 2026 competition. Four teams (Blue, Orange, Green, Purple) compete simultaneously on every question; everyone plays. First team to reach the win-score threshold wins. Multiple games can be played back-to-back without reloading — questions are never reused within a session.
+
+### Flow
+
+1. **Attendance** — check off present students (minimum 4); add walk-ins by name
+2. **Match Preview** — shows the rotation order for all 4 teams in a table. Team names are editable (defaults: Blue / Orange / Green / Purple). Win score is shown at the bottom. If teams are unequal, each short team gets a volunteer picker — one player from that team is chosen to go twice in the extra round (defaults to the last player in the queue).
+3. **Board** — 4 score bars (scaled to win score), current active players with PICKS/answers badges, question grid, 4 queue strips
+4. **Question** — timer auto-starts on question selection; teacher reveals answer; teacher checks which teams answered correctly and clicks Submit Verdict
+5. **Game Over** — scores count up with drumroll, winner pops in with fanfare; Play Again returns to Attendance with same students pre-checked
+
+### Questions
+
+- 60 questions total: 30 per grade level (5/6 and 7/8)
+- Grouped by point value: ★★★ 3 pts / 1:00 (Q1–10), ★★★★ 4 pts / 1:30 (Q11–20), ★★★★★ 5 pts / 2:00 (Q21–30)
+- Displayed as screenshot images from `2026Competition/` (`5_6q01.png`–`5_6q30.png`, `7_8q01.png`–`7_8q30.png`)
+- Answer key embedded in HTML; used questions are never reused across games in a session
+
+### Team Assignment
+
+4-team snake draft by rank (rank 1 → Blue, rank 2 → Orange, rank 3 → Green, rank 4 → Purple, rank 5 → Blue…). Weakest plays first, strongest plays last.
+
+In subsequent games, draft order uses each student's actual `correct/played` ratio from the session rather than static rank, so teams rebalance based on observed performance.
+
+### Win Condition
+
+**Fixed rounds** — the game runs for exactly `maxTeamSize` rounds (the size of the largest team), so every student plays at least once. Most points at the end wins. Score bars scale to the maximum possible score (`maxRounds × 5`). Round count is shown in the Match Preview footer and updated each round on the board.
+
+### Picker
+
+The trailing team (lowest score) picks each question. On a tie, tied teams rotate by round number.
+
+### Scoring
+
+Each team answers simultaneously. Any combination of teams can score on a question — each correct team earns the question's point value. Neither correct = 0 pts. Round always advances.
+
+### Uneven Teams
+
+With uneven attendance (e.g. 27 students → 7+7+7+6), short teams pick one volunteer to go twice in the extra round. Shown and selectable in the Match Preview screen.
+
+### Teacher View
+
+Opens automatically when the game launches ("Let's Go!" on the Match Preview screen). Can also be opened manually via the `🎓 Teacher View` button on the Board or Question screen. Subsequent clicks focus the existing window rather than opening a new one. Resets to idle state when Play Again is triggered.
+
+The teacher view contains:
+- **Active players bar** — shows the current student from each team
+- **Picker line** — shows which team is picking, in that team's color
+- **Question grid** — two compact rows (Grade 5/6 and 7/8), color-coded by point value (blue 3pt / amber 4pt / red 5pt). Clicking a chip selects that question on the main screen. Used chips are grayed out; the active chip is highlighted in gold.
+- **Question display** — mirrors what's shown on the main screen
+- **Answer** — shown in gold after Reveal Answer is clicked
+- **Reveal Answer button** — controls the main screen reveal
+- **Verdict checkboxes** — bidirectionally synced with the main screen; checking either updates the other
+- **Submit Verdict button** — awards points and advances the round
+
+On the main board, only the picking team shows a "PICKS" badge; non-picking teams show no badge.
+
+### Student Roster
+
+Reuses ranking from `noetic/noetic-countdown.html` — 78 students; ranks 67–78 = attendance-only.
+
+### 2026 Answer Keys
+
+- **Grade 5/6:** D C D E A B E C C D · C D A D A B D E C B · B C E D C D B B C C
+- **Grade 7/8:** E B B E A D E D C C · C A E E C D B A C A · D C B B D D B D A E
+
+---
+
+## Practice Competition
 
 ## Overview
 

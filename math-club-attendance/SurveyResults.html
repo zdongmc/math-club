@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Math Club 2025–2026 Survey Results</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background:#f3f4f6; color:#1f2937; min-height:100vh; }
+.header { background:linear-gradient(135deg,#dc2626,#991b1b); color:white; padding:20px 24px; }
+.header h1 { font-size:1.3rem; font-weight:800; }
+.header p  { font-size:0.85rem; opacity:0.75; margin-top:3px; }
+.content { max-width:960px; margin:0 auto; padding:20px 16px 40px; }
+.stat-row { display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap; }
+.stat-card { background:white; border-radius:10px; padding:16px 20px; flex:1; min-width:120px;
+             box-shadow:0 2px 8px rgba(0,0,0,0.08); text-align:center; }
+.stat-num  { font-size:2.2rem; font-weight:800; color:#dc2626; }
+.stat-lbl  { font-size:0.78rem; color:#6b7280; margin-top:4px; font-weight:600; }
+.section-title { font-size:1rem; font-weight:700; color:#374151; margin:24px 0 12px;
+                 padding-bottom:6px; border-bottom:2px solid #e5e7eb; }
+.tally-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px; margin-bottom:8px; }
+.tally-card { background:white; border-radius:10px; padding:16px; box-shadow:0 2px 8px rgba(0,0,0,0.07); }
+.tally-title { font-size:0.8rem; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:10px; }
+.tally-row  { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.tally-lbl  { font-size:0.82rem; color:#374151; min-width:0; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tally-track { flex:2; background:#f3f4f6; border-radius:4px; height:10px; overflow:hidden; }
+.tally-fill  { background:#dc2626; height:100%; border-radius:4px; transition:width 0.6s ease; }
+.tally-count { font-size:0.8rem; font-weight:700; color:#dc2626; min-width:22px; text-align:right; }
+.empty { text-align:center; color:#9ca3af; padding:40px; font-style:italic; }
+.refresh-btn { background:#dc2626; color:white; border:none; border-radius:20px; padding:8px 20px;
+               font-weight:bold; cursor:pointer; font-size:0.85rem; margin-left:12px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>📋 Math Club 2025–2026 Survey Results</h1>
+  <p>Hallie Wells Middle School Competition Math Club</p>
+</div>
+<div class="content" id="content">
+  <div class="empty">Loading…</div>
+</div>
+
+<script>
+function load() {
+  google.script.run
+    .withSuccessHandler(render)
+    .withFailureHandler(function(e) {
+      document.getElementById('content').innerHTML =
+        '<div class="empty" style="color:#dc2626;">Error: ' + (e.message||'unknown') + '</div>';
+    })
+    .getSurveySummary();
+}
+
+function render(data) {
+  var el = document.getElementById('content');
+  if (!data || !data.success) {
+    el.innerHTML = '<div class="empty" style="color:#dc2626;">Error loading data.</div>'; return;
+  }
+
+  var h = '';
+  h += '<div style="display:flex;align-items:center;margin-bottom:16px;">';
+  h += '<div style="font-size:0.9rem;color:#6b7280;">Last refreshed: ' + new Date().toLocaleTimeString() + '</div>';
+  h += '<button class="refresh-btn" onclick="load()">↻ Refresh</button>';
+  h += '</div>';
+
+  h += '<div class="stat-row">';
+  h += stat(data.total, 'Total Responses');
+  h += stat(data.parentCount, 'Parent');
+  h += stat(data.studentCount, 'Student');
+  h += '</div>';
+
+  if (data.total === 0) {
+    h += '<div class="empty">No responses yet — check back after surveys start coming in.</div>';
+    el.innerHTML = h; return;
+  }
+
+  var t = data.tallies || {};
+
+  h += section('Overall Experience (Parent)', [
+    tally('Overall Satisfaction', t.satisfaction),
+    tally('Child Attitude Toward Club', t.childAttitude),
+    tally('WhatsApp Communication Frequency', t.commFrequency),
+    tally('Website Usefulness', t.websiteUsefulness),
+    tally('Portal Usefulness', t.portalUsefulness),
+    tally('Coach-to-Student Ratio', t.coachRatio),
+    tally('Volunteer Interest', t.volunteerInterest),
+    tally('Coaching Support — 8th Grade', t.coachingSupport)
+  ]);
+
+  h += section('Student Responses', [
+    tally('Returning Next Year', t.returning),
+    tally('Coaching Interest — 8th Graders', t.coachingInterest),
+    tally('Meeting Format Preference', t.meetingFormat),
+    tally('Math Confidence', t.mathConfidence),
+    tally('Enjoy Math More?', t.mathEnjoyment),
+    tally('Club Size Feel', t.clubSize),
+    tally('Individual Coach Attention', t.coachAttention)
+  ]);
+
+  h += section('Club Policy Questions', [
+    tally('Club Membership Try-out', t.membershipGate),
+    tally('Competition Sign-up Gate', t.compGate),
+    tally('Carderock Allocation', t.carderockAlloc)
+  ]);
+
+  el.innerHTML = h;
+}
+
+function stat(n, label) {
+  return '<div class="stat-card"><div class="stat-num">' + n + '</div><div class="stat-lbl">' + label + '</div></div>';
+}
+
+function section(title, cards) {
+  var content = cards.filter(Boolean).join('');
+  if (!content) return '';
+  return '<div class="section-title">' + title + '</div><div class="tally-grid">' + content + '</div>';
+}
+
+function tally(title, obj) {
+  var entries = Object.keys(obj || {})
+    .filter(function(k){ return k !== '(blank)'; })
+    .map(function(k){ return [k, obj[k]]; })
+    .sort(function(a,b){ return b[1]-a[1]; });
+  if (!entries.length) return '';
+  var max = entries[0][1];
+  var h = '<div class="tally-card"><div class="tally-title">' + title + '</div>';
+  entries.forEach(function(e) {
+    var pct = max ? Math.round(e[1]/max*100) : 0;
+    h += '<div class="tally-row">';
+    h += '<div class="tally-lbl" title="' + e[0] + '">' + e[0] + '</div>';
+    h += '<div class="tally-track"><div class="tally-fill" style="width:' + pct + '%"></div></div>';
+    h += '<div class="tally-count">' + e[1] + '</div>';
+    h += '</div>';
+  });
+  return h + '</div>';
+}
+
+load();
+</script>
+</body>
+</html>

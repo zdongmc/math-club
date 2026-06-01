@@ -8,7 +8,7 @@
 
 1. **Frontend**: Already done and in `/docs/` - ready for GitHub Pages
 2. **Backend**: Requires 1-2 hours of setup
-3. **Files**: All code is in `mathdetective/algebra-kitchen*` directories
+3. **Files**: All code is in `games/algebra-kitchen/algebra-kitchen*` directories
 
 ---
 
@@ -41,7 +41,7 @@ Just visit `docs/algebra-kitchen.html` and play!
 4. **Save the Script ID** you're given
 
 ### Step 2: Copy Code
-1. Open `mathdetective/algebra-kitchen-backend/Code.js`
+1. Open `games/algebra-kitchen/algebra-kitchen-backend/Code.js`
 2. Copy entire file
 3. Paste into Apps Script editor, replacing existing code
 4. Save
@@ -49,7 +49,7 @@ Just visit `docs/algebra-kitchen.html` and play!
 ### Step 3: Update Config
 1. In Apps Script, click **Project Settings**
 2. Copy the **Project ID**
-3. Open `mathdetective/algebra-kitchen-backend/.clasp.json`
+3. Open `games/algebra-kitchen/algebra-kitchen-backend/.clasp.json`
 4. Update:
    ```json
    {
@@ -75,7 +75,7 @@ Just visit `docs/algebra-kitchen.html` and play!
    const ALGEBRA_KITCHEN_URL = 'https://script.google.com/macros/s/PLACEHOLDER/exec';
    ```
 3. Replace `PLACEHOLDER` with your deployment ID (the `ABC123` part)
-4. Also update `mathdetective/algebra-kitchen.html` with the same URL
+4. Also update `games/algebra-kitchen/algebra-kitchen.html` with the same URL
 
 ### Step 6: Test
 1. Visit `docs/algebra-kitchen.html`
@@ -112,7 +112,7 @@ Just visit `docs/algebra-kitchen.html` and play!
 docs/
   └── algebra-kitchen.html            ← Copy this to browser
 
-mathdetective/
+games/algebra-kitchen/
   ├── algebra-kitchen.html            ← Same file, local copy
   └── algebra-kitchen-backend/
       ├── Code.js                     ← Copy to Apps Script
@@ -259,7 +259,7 @@ Does NOT require:
 
 Questions? Check:
 1. `ALGEBRA_KITCHEN_STATUS.md` - comprehensive status
-2. `mathdetective/algebra-kitchen-backend/README.md` - detailed deployment
+2. `games/algebra-kitchen/algebra-kitchen-backend/README.md` - detailed deployment
 3. Inline code comments - specific implementation details
 
 ---

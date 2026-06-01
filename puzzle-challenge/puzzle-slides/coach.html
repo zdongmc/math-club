@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Math Puzzle Challenge – Coach</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #111827; color: #f9fafb; height: 100vh; overflow: hidden; }
+
+/* ── Screens ── */
+.screen { display: none; height: 100vh; flex-direction: column; overflow: hidden; }
+.screen.active { display: flex; }
+
+/* ── Shared buttons ── */
+.btn {
+  padding: 8px 18px; border-radius: 8px; border: none;
+  font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: opacity 0.15s;
+}
+.btn:hover { opacity: 0.85; }
+.btn:disabled { opacity: 0.35; cursor: default; }
+.btn-primary { background: #dc2626; color: white; }
+.btn-ghost { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.25); }
+.btn-sm { padding: 5px 12px; font-size: 0.8rem; }
+
+/* ══════════════════════════════════════════════
+   SCREEN 1 – ATTENDANCE
+   ══════════════════════════════════════════════ */
+#screen-att { padding: 16px; gap: 12px; }
+
+.att-header {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 10px; flex-shrink: 0;
+}
+.att-header h1 { font-size: 1.3rem; }
+.att-header-right { display: flex; gap: 8px; align-items: center; }
+
+.grade-columns {
+  flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; overflow: hidden;
+}
+.grade-col {
+  display: flex; flex-direction: column; overflow: hidden;
+  background: rgba(255,255,255,0.05); border-radius: 10px;
+}
+.grade-col-header {
+  background: rgba(255,255,255,0.1); padding: 9px 14px;
+  font-weight: 700; font-size: 0.9rem;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-shrink: 0;
+}
+.grade-count { font-size: 0.75rem; opacity: 0.65; font-weight: 400; }
+.student-list { flex: 1; overflow-y: auto; padding: 6px; display: flex; flex-direction: column; gap: 3px; }
+
+.student-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px; border-radius: 6px; cursor: pointer; user-select: none;
+  transition: background 0.1s;
+}
+.student-row:hover { background: rgba(255,255,255,0.08); }
+.student-row input[type=checkbox] { width: 15px; height: 15px; cursor: pointer; accent-color: #dc2626; flex-shrink: 0; }
+.student-name { flex: 1; font-size: 0.85rem; }
+.rank-badge {
+  font-size: 0.68rem; background: rgba(255,255,255,0.13);
+  padding: 1px 6px; border-radius: 10px; font-weight: 600; min-width: 26px; text-align: center;
+}
+
+.add-student-row {
+  display: flex; gap: 8px; align-items: center; flex-shrink: 0;
+  padding: 8px 0; border-top: 1px solid rgba(255,255,255,0.08);
+}
+.add-student-row input[type=text] {
+  flex: 1; padding: 7px 12px; border-radius: 7px; border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08); color: white; font-size: 0.85rem; outline: none;
+}
+.add-student-row input[type=text]::placeholder { color: rgba(255,255,255,0.4); }
+.add-student-row input[type=text]:focus { border-color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.12); }
+.add-student-row select {
+  padding: 7px 10px; border-radius: 7px; border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08); color: white; font-size: 0.85rem; cursor: pointer; outline: none;
+}
+.add-student-row select option { background: #1f2937; }
+
+.att-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0 0; border-top: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;
+}
+.att-summary { font-size: 0.85rem; opacity: 0.75; }
+
+/* ══════════════════════════════════════════════
+   SCREEN 2 – TEAMS
+   ══════════════════════════════════════════════ */
+#screen-teams { padding: 16px; gap: 12px; }
+
+.teams-header {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 10px; flex-shrink: 0;
+}
+.teams-header h1 { font-size: 1.3rem; }
+
+.teams-grid {
+  flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; overflow: hidden;
+}
+.team-card {
+  display: flex; flex-direction: column; border-radius: 10px; overflow: hidden;
+  border: 2px solid;
+}
+.team-card-header { padding: 9px 12px; font-weight: 700; flex-shrink: 0; }
+.team-name-input {
+  background: rgba(255,255,255,0.2); border: none; color: white;
+  font-weight: 700; font-size: 0.95rem; width: 100%; outline: none;
+}
+.team-name-input::placeholder { color: rgba(255,255,255,0.45); }
+.team-members {
+  background: rgba(0,0,0,0.25); flex: 1; padding: 6px;
+  display: flex; flex-direction: column; gap: 3px; overflow-y: auto;
+}
+.member-item {
+  padding: 5px 8px; background: rgba(255,255,255,0.07); border-radius: 5px;
+  font-size: 0.8rem; display: flex; align-items: center; justify-content: space-between; gap: 4px;
+}
+.grade-pill {
+  font-size: 0.68rem; padding: 1px 6px; border-radius: 10px;
+  background: rgba(255,255,255,0.18); white-space: nowrap; flex-shrink: 0;
+}
+.team-stats {
+  padding: 5px 8px; background: rgba(0,0,0,0.2); font-size: 0.72rem;
+  opacity: 0.75; flex-shrink: 0;
+}
+
+.teams-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0 0; border-top: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;
+  font-size: 0.78rem; opacity: 0.6;
+}
+
+/* ══════════════════════════════════════════════
+   SCREEN 3 – GAME GRID
+   ══════════════════════════════════════════════ */
+#game-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px; background: rgba(0,0,0,0.45); flex-shrink: 0;
+  flex-wrap: wrap; gap: 8px;
+}
+#team-legend { display: flex; gap: 12px; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.82rem; }
+.legend-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+#claim-count { font-size: 0.82rem; opacity: 0.75; }
+
+/* team roster strip */
+#team-roster {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px;
+  padding: 8px 16px; background: rgba(0,0,0,0.3); flex-shrink: 0;
+}
+.roster-col { display: flex; flex-direction: column; gap: 2px; }
+.roster-header {
+  font-size: 0.72rem; font-weight: 700; padding: 3px 7px;
+  border-radius: 5px; color: white; margin-bottom: 2px;
+}
+.roster-name { font-size: 0.72rem; padding: 2px 7px; opacity: 0.85; }
+
+#grid-area { flex: 1; overflow-y: auto; padding: 12px 16px; }
+.level-columns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; align-items: start; }
+.pt-section { display: flex; flex-direction: column; gap: 6px; }
+.pt-label {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; opacity: 0.5; margin-bottom: 2px;
+}
+.card-row { display: flex; flex-direction: column; gap: 7px; }
+.card-tile {
+  width: 100%; min-height: 50px; padding: 8px 7px;
+  background: white; color: #111; border-radius: 8px;
+  cursor: pointer; font-size: 0.72rem; font-weight: 600;
+  text-align: center; line-height: 1.3;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.card-tile:hover:not(.claimed) {
+  transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.45);
+}
+.card-tile.claimed { cursor: default; opacity: 0.9; color: white; font-size: 0.68rem; }
+
+/* ══════════════════════════════════════════════
+   SCREEN 4 – RESULTS (reveal-by-click)
+   ══════════════════════════════════════════════ */
+#screen-results {
+  padding: 20px 28px; gap: 14px;
+  background: linear-gradient(160deg, #0f172a 0%, #1e1b4b 100%);
+  align-items: center; cursor: pointer; position: relative; overflow: hidden;
+}
+#confetti-canvas {
+  position: absolute; inset: 0; pointer-events: none; z-index: 10;
+}
+#results-title {
+  font-size: 1.8rem; font-weight: 800; letter-spacing: 1px;
+  text-align: center; color: #ffd700;
+  text-shadow: 0 0 30px rgba(255,215,0,0.4);
+  flex-shrink: 0;
+}
+#winner-banner {
+  font-size: 1.35rem; font-weight: 900; letter-spacing: 2px;
+  text-align: center; flex-shrink: 0; min-height: 1.8rem;
+  opacity: 0; transform: scale(0.8);
+  transition: opacity 0.5s, transform 0.5s cubic-bezier(0.2,0.8,0.3,1.3);
+}
+#winner-banner.visible { opacity: 1; transform: scale(1); }
+#results-podium {
+  width: 100%; max-width: 860px;
+  display: flex; flex-direction: column; gap: 8px;
+  overflow-y: auto; flex: 1;
+}
+.result-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 16px; border-radius: 12px; min-height: 56px;
+  border: 2px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.03);
+  transform: translateX(90px); opacity: 0;
+  transition: transform 0.45s cubic-bezier(0.2,0.8,0.3,1), opacity 0.45s,
+              background 0.3s, border-color 0.3s;
+}
+.result-row.revealed { transform: translateX(0); opacity: 1; }
+@keyframes winnerPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(255,215,0,0); }
+  50%      { box-shadow: 0 0 36px 10px rgba(255,215,0,0.3); }
+}
+.result-row.winner-glow { animation: winnerPulse 1.1s ease-in-out 0s 3; }
+.result-rank {
+  font-size: 1.8rem; font-weight: 900; min-width: 48px;
+  text-align: center; line-height: 1;
+}
+.medal-1 { color: #ffd700; }
+.medal-2 { color: #c0c0c0; }
+.medal-3 { color: #cd7f32; }
+.result-team-name { flex: 1; font-size: 1.2rem; font-weight: 700; }
+.result-breakdown {
+  display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end;
+}
+.level-badge {
+  font-size: 0.7rem; padding: 3px 8px; border-radius: 20px;
+  background: rgba(255,255,255,0.1); font-weight: 600; white-space: nowrap;
+}
+.range-badge {
+  font-size: 0.72rem; padding: 3px 9px; border-radius: 20px;
+  background: rgba(255,215,0,0.2); color: #ffd700;
+  font-weight: 700; border: 1px solid rgba(255,215,0,0.4); white-space: nowrap;
+}
+.result-score {
+  font-size: 1.7rem; font-weight: 900; min-width: 62px; text-align: right; line-height: 1;
+}
+#results-hint {
+  font-size: 0.82rem; opacity: 0.5; text-align: center; flex-shrink: 0;
+  animation: hintPulse 1.8s ease-in-out infinite;
+}
+@keyframes hintPulse { 0%,100%{opacity:0.5} 50%{opacity:0.85} }
+#results-hint.done { animation: none; opacity: 0.3; }
+#results-back { flex-shrink: 0; align-self: flex-start; }
+
+/* ══════════════════════════════════════════════
+   ANSWER OVERLAY
+   ══════════════════════════════════════════════ */
+#answer-overlay {
+  display: none; position: fixed; inset: 0; z-index: 100;
+  background: rgba(0,0,0,0.88); flex-direction: column;
+  align-items: center; padding: 14px; gap: 10px;
+}
+#answer-overlay.open { display: flex; }
+
+#answer-top {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; max-width: 1100px; flex-shrink: 0;
+}
+#answer-card-name { font-size: 1rem; font-weight: 700; }
+#answer-images {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  width: 100%; max-width: 1100px; flex: 1; min-height: 0;
+}
+.img-wrap {
+  background: white; border-radius: 10px; overflow: hidden;
+  display: flex; flex-direction: column; min-height: 0;
+}
+.img-label {
+  background: #374151; color: white; font-size: 0.7rem;
+  font-weight: 700; text-align: center; padding: 4px; letter-spacing: 1px; flex-shrink: 0;
+}
+.img-wrap img { width: 100%; flex: 1; object-fit: contain; min-height: 0; display: block; }
+
+#award-row {
+  display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+  align-items: center; flex-shrink: 0;
+}
+.award-btn {
+  padding: 9px 20px; border: none; border-radius: 8px;
+  font-size: 0.88rem; font-weight: 700; cursor: pointer; color: white;
+  transition: transform 0.1s;
+}
+.award-btn:hover { transform: scale(1.04); }
+.return-btn {
+  padding: 9px 18px; background: #374151; color: white;
+  border: 2px solid rgba(255,255,255,0.25); border-radius: 8px;
+  font-size: 0.85rem; font-weight: 600; cursor: pointer;
+}
+.return-btn:hover { background: #4b5563; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════
+     SCREEN 1 – ATTENDANCE
+     ══════════════════════════════════════════════════════════ -->
+<div id="screen-att" class="screen active">
+  <div class="att-header">
+    <h1>🦘 Math Puzzle Challenge</h1>
+    <div class="att-header-right">
+      <button class="btn btn-ghost btn-sm" onclick="selectAll(true)">Select All</button>
+      <button class="btn btn-ghost btn-sm" onclick="selectAll(false)">Clear All</button>
+    </div>
+  </div>
+
+  <div class="grade-columns">
+    <div class="grade-col">
+      <div class="grade-col-header">
+        6th Grade <span class="grade-count" id="cnt-6">0 selected</span>
+      </div>
+      <div class="student-list" id="list-6"></div>
+    </div>
+    <div class="grade-col">
+      <div class="grade-col-header">
+        7th Grade <span class="grade-count" id="cnt-7">0 selected</span>
+      </div>
+      <div class="student-list" id="list-7"></div>
+    </div>
+    <div class="grade-col">
+      <div class="grade-col-header">
+        8th Grade <span class="grade-count" id="cnt-8">0 selected</span>
+      </div>
+      <div class="student-list" id="list-8"></div>
+    </div>
+  </div>
+
+  <div class="add-student-row">
+    <input type="text" id="new-name" placeholder="Add a student not on the list…" maxlength="60"
+      onkeydown="if(event.key==='Enter') addStudent()">
+    <select id="new-grade">
+      <option value="6">6th grade</option>
+      <option value="7">7th grade</option>
+      <option value="8">8th grade</option>
+    </select>
+    <button class="btn btn-ghost btn-sm" onclick="addStudent()">+ Add</button>
+  </div>
+
+  <div class="att-footer">
+    <span class="att-summary" id="att-summary">0 students selected</span>
+    <button class="btn btn-primary" id="gen-btn" onclick="doGenerateTeams()" disabled>
+      Generate Teams →
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SCREEN 2 – TEAMS REVIEW
+     ══════════════════════════════════════════════════════════ -->
+<div id="screen-teams" class="screen">
+  <div class="teams-header">
+    <h1>Generated Teams</h1>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-ghost" onclick="showScreen('att')">← Back</button>
+      <button class="btn btn-primary" onclick="startGame()">Start Activity →</button>
+    </div>
+  </div>
+  <div class="teams-grid" id="teams-grid"></div>
+  <div class="teams-footer">
+    <span>Team names are editable — click to rename</span>
+    <span id="teams-summary"></span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SCREEN 3 – GAME GRID
+     ══════════════════════════════════════════════════════════ -->
+<div id="screen-game" class="screen">
+  <div id="game-header">
+    <div id="team-legend"></div>
+    <div id="claim-count">0 / 51 claimed</div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-primary btn-sm" onclick="showResults()">Show Results →</button>
+      <button class="btn btn-ghost btn-sm" onclick="confirmReset()">Reset</button>
+    </div>
+  </div>
+  <div id="team-roster"></div>
+  <div id="grid-area"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SCREEN 4 – RESULTS (click to reveal)
+     ══════════════════════════════════════════════════════════ -->
+<div id="screen-results" class="screen" onclick="revealNext()">
+  <canvas id="confetti-canvas"></canvas>
+  <div id="results-title">🏆 Final Results</div>
+  <div id="winner-banner"></div>
+  <div id="results-podium"></div>
+  <div id="results-hint">Click anywhere to reveal</div>
+  <button class="btn btn-ghost" id="results-back"
+    onclick="event.stopPropagation(); showScreen('game')">← Back to Game</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     ANSWER OVERLAY
+     ══════════════════════════════════════════════════════════ -->
+<div id="answer-overlay">
+  <div id="answer-top">
+    <div id="answer-card-name"></div>
+    <button class="return-btn" onclick="returnToTable()">↩ Return to Table</button>
+  </div>
+  <div id="answer-images">
+    <div class="img-wrap">
+      <div class="img-label">QUESTION</div>
+      <img id="q-img" src="" alt="Question">
+    </div>
+    <div class="img-wrap">
+      <div class="img-label">ANSWER KEY</div>
+      <img id="a-img" src="" alt="Answer">
+    </div>
+  </div>
+  <div id="award-row"></div>
+</div>
+
+<script>
+// ════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════
+
+// Ranked by normalized composite score across MATHCOUNTS, AMC 8, Math League, MOEMS, and Noetic
+// (4:1 weighting: prior competitions : Noetic; within-level normalization for Noetic)
+// Ranks 67+ = attendance-only students (no prior competition data), snake-drafted last
+const STUDENTS = [
+  {rank:1,  name:"Vihaan Shah",              grade:8},
+  {rank:2,  name:"Arjun Lakshmanan",         grade:8},
+  {rank:3,  name:"Ella Shang",               grade:8},
+  {rank:4,  name:"Rakin Molla",              grade:8},
+  {rank:5,  name:"Anish Magadala",           grade:8},
+  {rank:6,  name:"Krish Janoria",            grade:8},
+  {rank:7,  name:"Joyce Shang",              grade:6},
+  {rank:8,  name:"Ayush Patel",              grade:7},
+  {rank:9,  name:"Charles Wang",             grade:6},
+  {rank:10, name:"Jayden George",            grade:7},
+  {rank:11, name:"Pihu Patel",               grade:7},
+  {rank:12, name:"Navraj Kaler",             grade:8},
+  {rank:13, name:"Nandini Desai",            grade:8},
+  {rank:14, name:"Fariq Molla",              grade:6},
+  {rank:15, name:"Reya Ganesh",              grade:8},
+  {rank:16, name:"Olivia Dai",               grade:6},
+  {rank:17, name:"Parth Kapoor",             grade:7},
+  {rank:18, name:"Vihan Parikh",             grade:7},
+  {rank:19, name:"Yusuf Sadique",            grade:6},
+  {rank:20, name:"Mohammad Basil",           grade:7},
+  {rank:21, name:"Ayaan Mankad",             grade:6},
+  {rank:22, name:"Kavya Kamalabharathy",     grade:7},
+  {rank:23, name:"Sameeksha Namburu",        grade:8},
+  {rank:24, name:"Reha Patel",               grade:8},
+  {rank:25, name:"Samarth Vedpathak",        grade:8},
+  {rank:26, name:"Om Pawar",                 grade:8},
+  {rank:27, name:"Mia Mody",                 grade:8},
+  {rank:28, name:"Annika Saravanan",         grade:8},
+  {rank:29, name:"Abhay Devaguptapu",        grade:6},
+  {rank:30, name:"Nathaniel Lam",            grade:8},
+  {rank:31, name:"Sanjukta Thumbi Karthik",  grade:7},
+  {rank:32, name:"Shashwat Sharma",          grade:6},
+  {rank:33, name:"Nitara Hemantha",          grade:8},
+  {rank:34, name:"Shreyansh Dixit",          grade:8},
+  {rank:35, name:"Aadhya Balija",            grade:7},
+  {rank:36, name:"Bhargavi Parthasarathy",   grade:8},
+  {rank:37, name:"Jaina Gaur",               grade:8},
+  {rank:38, name:"Vihaan Mendi",             grade:6},
+  {rank:39, name:"Namie Patani",             grade:7},
+  {rank:40, name:"Riya Suthar",              grade:7},
+  {rank:41, name:"Siddhant Arya",            grade:7},
+  {rank:42, name:"Faith Ethy",               grade:7},
+  {rank:43, name:"Rayyan Aqeel",             grade:6},
+  {rank:44, name:"Vedah Shrestha",           grade:7},
+  {rank:45, name:"Sathvik Sripathi",         grade:6},
+  {rank:46, name:"Vanshika Gunda",           grade:7},
+  {rank:47, name:"Aadhya Meka",              grade:6},
+  {rank:48, name:"Aahil Shaik",              grade:6},
+  {rank:49, name:"Sanskriti Baveja",         grade:6},
+  {rank:50, name:"Juliette Kilroy",          grade:6},
+  {rank:51, name:"Nithi Gowda",              grade:6},
+  {rank:52, name:"Abbas Ali",                grade:7},
+  {rank:53, name:"Srihan Asapu",             grade:6},
+  {rank:54, name:"Benjamin Snobar",          grade:6},
+  {rank:55, name:"Amishi Rajale",            grade:7},
+  {rank:56, name:"Arjun Chalasani",          grade:7},
+  {rank:57, name:"Aaron Parmar",             grade:8},
+  {rank:58, name:"Advitha Doda",             grade:0},
+  {rank:59, name:"Adelaide Lam",             grade:6},
+  {rank:60, name:"Veeraj Sandhu",            grade:7},
+  {rank:61, name:"Aaron Sharma",             grade:6},
+  {rank:62, name:"Anish Telukutla",          grade:6},
+  {rank:63, name:"Vedik Mehra",              grade:8},
+  {rank:64, name:"Karthika Rayavarapu",      grade:8},
+  {rank:65, name:"Saanvi Sinha",             grade:8},
+  {rank:66, name:"Dilshan Prakash",          grade:8},
+  // Attendance-only (no prior competition data) — snake-drafted after ranked students
+  {rank:67, name:"Aadhya Banoori",           grade:6},
+  {rank:68, name:"Aadhya Pandrapragada",     grade:6},
+  {rank:69, name:"Camille Huang",            grade:6},
+  {rank:70, name:"Dante Abarca",             grade:6},
+  {rank:71, name:"Inaam Ahmad",              grade:8},
+  {rank:72, name:"Jameson Eng",              grade:8},
+  {rank:73, name:"Jessica Zhu",              grade:6},
+  {rank:74, name:"Vidhan Velvadapu",         grade:6},
+  {rank:75, name:"Mia Cappucio",             grade:6},
+  {rank:76, name:"Nathan Beka",              grade:8},
+  {rank:77, name:"Nethra Sambathkumar",      grade:8},
+  {rank:78, name:"Sashvi Nagu",              grade:6},
+];
+
+const CARDS = [
+  // Level 0 – 1 pt
+  {id:"12",pts:1,name:"Adding Ten Numbers"},
+  {id:"13",pts:1,name:"Avoiding Rectangles – 2"},
+  {id:"14",pts:1,name:"Boxed Blocks"},
+  {id:"01",pts:1,name:"Equal Sums – 4"},
+  {id:"11",pts:1,name:"Fill in the Blanks – 6"},
+  {id:"02",pts:1,name:"Finding the Pieces – 3"},
+  {id:"10",pts:1,name:"Letter Substitutions – 5"},
+  {id:"03",pts:1,name:"Lines – 1"},
+  {id:"07",pts:1,name:"Lines – 2"},
+  {id:"04",pts:1,name:"Magic Squares – 4"},
+  {id:"08",pts:1,name:"Odd Squares"},
+  {id:"16",pts:1,name:"Parades – 1"},
+  {id:"15",pts:1,name:"Paths on Checkerboards"},
+  {id:"09",pts:1,name:"Stick Areas"},
+  {id:"05",pts:1,name:"Sujiko Puzzle – 3"},
+  // Level 1 – 2 pts
+  {id:"17",pts:2,name:"Avoiding Triangles"},
+  {id:"25",pts:2,name:"Broken Calculator – 1"},
+  {id:"19",pts:2,name:"Dominoes on Checkerboards"},
+  {id:"24",pts:2,name:"Fractions – 1"},
+  {id:"28",pts:2,name:"Fractions – 2"},
+  {id:"26",pts:2,name:"Maximizing Products with 16"},
+  {id:"23",pts:2,name:"Mystery Sums – 1"},
+  {id:"27",pts:2,name:"Mystery Sums – 2"},
+  {id:"20",pts:2,name:"Parades – 2 – 7 Bridges of Königsberg"},
+  {id:"21",pts:2,name:"Parity – 3 – Last Number Standing"},
+  {id:"22",pts:2,name:"Product Equals Sum"},
+  {id:"18",pts:2,name:"Removing Digits"},
+  // Level 2 – 4 pts
+  {id:"33",pts:4,name:"Are Their Hands Tied?"},
+  {id:"31",pts:4,name:"Combining Digits – 1 2 4 8"},
+  {id:"35",pts:4,name:"Combining Digits – Easy as 1 2 3 4"},
+  {id:"39",pts:4,name:"Combining Digits – Five 2's"},
+  {id:"30",pts:4,name:"Equal Products"},
+  {id:"34",pts:4,name:"Extreme Products – 1"},
+  {id:"37",pts:4,name:"Finding Squares – 1"},
+  {id:"32",pts:4,name:"Fractions – 3"},
+  {id:"36",pts:4,name:"Fractions – 4"},
+  {id:"40",pts:4,name:"Fractions – 5"},
+  {id:"29",pts:4,name:"Ladybugs that don't Add Up – 2"},
+  {id:"38",pts:4,name:"Moving Digits – 2"},
+  // Level 3 – 8 pts
+  {id:"47",pts:8,name:"Filling Squares with Squares"},
+  {id:"51",pts:8,name:"Filling Triangles with Triangles"},
+  {id:"41",pts:8,name:"Finding Squares – 2"},
+  {id:"44",pts:8,name:"Fractions – 6"},
+  {id:"48",pts:8,name:"Fractions – 7"},
+  {id:"52",pts:8,name:"Fractions – 12"},
+  {id:"49",pts:8,name:"Handshakes at a Party – 2"},
+  {id:"50",pts:8,name:"Pirates with Gold – 1"},
+  {id:"45",pts:8,name:"Trapezoidal Numbers – 1"},
+  {id:"43",pts:8,name:"Turning the Tables"},
+  {id:"42",pts:8,name:"Water Cups – 1"},
+  {id:"46",pts:8,name:"Water Cups – 2"},
+];
+
+const TEAM_COLORS = ['#1d4ed8','#15803d','#b91c1c','#b45309','#7c3aed','#0f766e','#be185d','#c2410c','#6d28d9'];
+const TEAM_LABELS = ['A','B','C','D','E','F','G','H','I'];
+
+// ════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════
+
+let teams = [];      // [{name, color, members}]
+let claimed = {};    // cardId -> teamIndex
+let currentCard = null;
+
+// ════════════════════════════════════════════
+// SCREEN ROUTING
+// ════════════════════════════════════════════
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+}
+
+// ════════════════════════════════════════════
+// ATTENDANCE SCREEN
+// ════════════════════════════════════════════
+
+function buildAttendance() {
+  const buckets = {6:[], 7:[], 8:[], 0:[]};
+  STUDENTS.forEach(s => buckets[s.grade].push(s));
+
+  const alpha = (a, b) => a.name.localeCompare(b.name);
+  [6, 7, 8].forEach(g => {
+    const list = document.getElementById('list-' + g);
+    buckets[g].sort(alpha).forEach(s => list.appendChild(makeRow(s)));
+  });
+  // Unknown-grade students appended to 8th grade column, alphabetically
+  buckets[0].sort(alpha).forEach(s => document.getElementById('list-8').appendChild(makeRow(s)));
+
+  updateAttSummary();
+}
+
+function makeRow(s) {
+  const row = document.createElement('div');
+  row.className = 'student-row';
+  const cbId = 'cb-' + s.rank;
+  row.innerHTML = `
+    <input type="checkbox" id="${cbId}" value="${s.rank}">
+    <label class="student-name" for="${cbId}">${s.name}${s.grade === 0 ? ' <span style="opacity:.5;font-size:.7em">(?)</span>' : ''}</label>
+  `;
+  row.querySelector('input').addEventListener('change', updateAttSummary);
+  row.addEventListener('click', e => {
+    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'LABEL') {
+      row.querySelector('input').click();
+    }
+  });
+  return row;
+}
+
+function updateAttSummary() {
+  const checked = [...document.querySelectorAll('#screen-att input[type=checkbox]:checked')];
+
+  [6, 7, 8].forEach(g => {
+    const n = checked.filter(c => {
+      const s = STUDENTS.find(s => s.rank === +c.value);
+      return s && (s.grade === g || (g === 8 && s.grade === 0));
+    }).length;
+    document.getElementById('cnt-' + g).textContent = n + ' selected';
+  });
+
+  const total = checked.length;
+  document.getElementById('att-summary').textContent =
+    total + ' student' + (total !== 1 ? 's' : '') + ' selected';
+  document.getElementById('gen-btn').disabled = total < 2;
+}
+
+function selectAll(val) {
+  document.querySelectorAll('#screen-att input[type=checkbox]').forEach(c => c.checked = val);
+  updateAttSummary();
+}
+
+let nextCustomRank = 1000;
+
+function addStudent() {
+  const nameInput = document.getElementById('new-name');
+  const grade = parseInt(document.getElementById('new-grade').value);
+  const name = nameInput.value.trim();
+  if (!name) return;
+
+  const s = {rank: nextCustomRank++, name, grade};
+  STUDENTS.push(s);
+
+  const listId = grade === 0 ? 'list-8' : 'list-' + grade;
+  const list = document.getElementById(listId);
+  const row = makeRow(s);
+
+  // Insert alphabetically among existing rows
+  const rows = [...list.querySelectorAll('.student-row')];
+  const after = rows.find(r => {
+    const lbl = r.querySelector('label');
+    return lbl && name.localeCompare(lbl.textContent.trim()) < 0;
+  });
+  after ? list.insertBefore(row, after) : list.appendChild(row);
+
+  row.querySelector('input').checked = true;
+  nameInput.value = '';
+  nameInput.focus();
+  updateAttSummary();
+}
+
+// ════════════════════════════════════════════
+// TEAM GENERATION  (grade-interleaved snake)
+// ════════════════════════════════════════════
+
+function doGenerateTeams() {
+  const present = [...document.querySelectorAll('#screen-att input[type=checkbox]:checked')]
+    .map(c => STUDENTS.find(s => s.rank === +c.value))
+    .filter(Boolean)
+    .sort((a, b) => a.rank - b.rank);
+
+  // Ranked students (have competition data): order by rank only
+  const ranked   = present.filter(s => s.rank <= 66);
+  const unranked = present.filter(s => s.rank >  66);
+
+  // Unranked students: interleave by grade so they spread across teams evenly
+  const gradeBuckets = {6:[], 7:[], 8:[], 0:[]};
+  unranked.forEach(s => gradeBuckets[s.grade].push(s));
+  const unrankedInterleaved = [];
+  let any = true;
+  while (any) {
+    any = false;
+    [6, 7, 8].forEach(g => {
+      if (gradeBuckets[g].length) { unrankedInterleaved.push(gradeBuckets[g].shift()); any = true; }
+    });
+  }
+  unrankedInterleaved.push(...gradeBuckets[0]);
+
+  const interleaved = [...ranked, ...unrankedInterleaved];
+
+  // Snake-assign to N teams (target size 3, allow 4 if needed)
+  const N = Math.max(2, Math.floor(present.length / 3));
+  const slots = Array.from({length: N}, () => []);
+  interleaved.forEach((s, i) => {
+    const round = Math.floor(i / N);
+    const pos   = i % N;
+    slots[round % 2 === 0 ? pos : N - 1 - pos].push(s);
+  });
+
+  teams = slots.map((members, i) => ({
+    name: 'Team ' + TEAM_LABELS[i],
+    color: TEAM_COLORS[i],
+    members,
+  }));
+
+  renderTeamsScreen();
+  showScreen('teams');
+}
+
+// ════════════════════════════════════════════
+// TEAMS SCREEN
+// ════════════════════════════════════════════
+
+function renderTeamsScreen() {
+  const grid = document.getElementById('teams-grid');
+  grid.innerHTML = '';
+
+  teams.forEach((team, ti) => {
+    const g6 = team.members.filter(m => m.grade === 6).length;
+    const g7 = team.members.filter(m => m.grade === 7).length;
+    const g8 = team.members.filter(m => m.grade === 8).length;
+    const gu = team.members.filter(m => m.grade === 0).length;
+    const parts = [g6&&`6th:${g6}`, g7&&`7th:${g7}`, g8&&`8th:${g8}`, gu&&`?:${gu}`].filter(Boolean);
+
+    const card = document.createElement('div');
+    card.className = 'team-card';
+    card.style.borderColor = team.color;
+    card.innerHTML = `
+      <div class="team-card-header" style="background:${team.color}">
+        <input class="team-name-input" value="${team.name}"
+          oninput="teams[${ti}].name = this.value">
+      </div>
+      <div class="team-members">
+        ${[...team.members].sort((a,b) => a.name.localeCompare(b.name)).map(m => `
+          <div class="member-item">
+            <span>${m.name}</span>
+            <span class="grade-pill">${m.grade === 0 ? '?' : m.grade + 'th'}</span>
+          </div>`).join('')}
+      </div>
+      <div class="team-stats">
+        ${team.members.length} students &nbsp;·&nbsp; ${parts.join(' · ')}
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  const total = teams.reduce((s, t) => s + t.members.length, 0);
+  document.getElementById('teams-summary').textContent = total + ' students across ' + teams.length + ' teams';
+}
+
+// ════════════════════════════════════════════
+// GAME SCREEN
+// ════════════════════════════════════════════
+
+function startGame() {
+  claimed = {};
+  document.getElementById('team-legend').innerHTML =
+    teams.map(t => `<div class="legend-item">
+      <div class="legend-dot" style="background:${t.color}"></div>
+      <span>${t.name}</span>
+    </div>`).join('');
+  document.getElementById('team-roster').innerHTML =
+    teams.map(t => `
+      <div class="roster-col">
+        <div class="roster-header" style="background:${t.color}">${t.name}</div>
+        ${[...t.members].sort((a,b) => a.name.localeCompare(b.name)).map(m => `<div class="roster-name">${m.name}</div>`).join('')}
+      </div>`).join('');
+  buildGrid();
+  showScreen('game');
+}
+
+function buildGrid() {
+  const area = document.getElementById('grid-area');
+  area.innerHTML = '';
+  const cols = document.createElement('div');
+  cols.className = 'level-columns';
+  area.appendChild(cols);
+  const levelLabels = {1:'Level 0 — 1 pt', 2:'Level 1 — 2 pts', 4:'Level 2 — 4 pts', 8:'Level 3 — 8 pts'};
+  [1, 2, 4, 8].forEach(pts => {
+    const sec = document.createElement('div');
+    sec.className = 'pt-section';
+    sec.innerHTML = `<div class="pt-label">${levelLabels[pts]}</div>
+                     <div class="card-row" id="row-${pts}"></div>`;
+    cols.appendChild(sec);
+  });
+  CARDS.forEach(card => {
+    const tile = document.createElement('div');
+    tile.className = 'card-tile';
+    tile.id = 'tile-' + card.id;
+    tile.textContent = card.name;
+    tile.onclick = () => openAnswer(card);
+    document.getElementById('row-' + card.pts).appendChild(tile);
+  });
+  updateClaimCount();
+}
+
+function updateClaimCount() {
+  document.getElementById('claim-count').textContent =
+    Object.keys(claimed).length + ' / 51 claimed';
+}
+
+function confirmReset() {
+  if (!confirm('Reset all claimed cards?')) return;
+  claimed = {};
+  CARDS.forEach(c => {
+    const t = document.getElementById('tile-' + c.id);
+    t.classList.remove('claimed');
+    t.style.background = '';
+    t.textContent = c.name;
+  });
+  updateClaimCount();
+}
+
+// ════════════════════════════════════════════
+// RESULTS SCREEN  (click-to-reveal)
+// ════════════════════════════════════════════
+
+let revealQueue = [];  // sorted worst→best; each click pops next
+let revealIdx = 0;
+
+function showResults() {
+  const stats = teams.map((t, i) => {
+    const cards = CARDS.filter(c => claimed[c.id] === i);
+    const byLevel = {1:0, 2:0, 4:0, 8:0};
+    let base = 0;
+    cards.forEach(c => { byLevel[c.pts]++; base += c.pts; });
+    const hasRange = [1,2,4,8].every(p => byLevel[p] > 0);
+    const total = base + (hasRange ? 5 : 0);
+    return {team: t, idx: i, base, byLevel, hasRange, total};
+  });
+  stats.sort((a, b) => b.total - a.total || b.base - a.base);
+
+  // worst-first reveal queue
+  revealQueue = [...stats].reverse();
+  revealIdx = 0;
+
+  // Reset UI
+  const podium = document.getElementById('results-podium');
+  podium.innerHTML = '';
+  const banner = document.getElementById('winner-banner');
+  banner.textContent = ''; banner.className = '';
+  const hint = document.getElementById('results-hint');
+  hint.textContent = 'Click anywhere to reveal'; hint.className = '';
+
+  const medals = ['🥇','🥈','🥉'];
+  const medClass = ['medal-1','medal-2','medal-3'];
+
+  // Pre-build all rows (off-screen to the right)
+  stats.forEach((s, rank) => {
+    const levelBreakdown = [{pts:1,label:'L0'},{pts:2,label:'L1'},{pts:4,label:'L2'},{pts:8,label:'L3'}]
+      .filter(l => s.byLevel[l.pts] > 0)
+      .map(l => `<span class="level-badge">${l.label}: ${s.byLevel[l.pts]}×${l.pts}=${s.byLevel[l.pts]*l.pts}</span>`)
+      .join('');
+    const rangeBadge = s.hasRange ? `<span class="range-badge">✦ Range +5</span>` : '';
+
+    const row = document.createElement('div');
+    row.className = 'result-row';
+    row.id = 'rrow-' + rank;
+    row.innerHTML = `
+      <div class="result-rank ${medClass[rank] || ''}">${medals[rank] || (rank + 1)}</div>
+      <div class="result-team-name" style="color:${s.team.color}">${s.team.name}</div>
+      <div class="result-breakdown">${levelBreakdown}${rangeBadge}</div>
+      <div class="result-score" id="rscore-${rank}">—</div>
+    `;
+    podium.appendChild(row);
+  });
+
+  showScreen('results');
+}
+
+function revealNext() {
+  if (revealIdx >= revealQueue.length) return;
+
+  const s = revealQueue[revealIdx];
+  const N = revealQueue.length;
+  const rank = N - 1 - revealIdx;   // 0 = winner
+  const isWinner = rank === 0;
+
+  const row = document.getElementById('rrow-' + rank);
+  row.style.background = isWinner
+    ? `linear-gradient(90deg, ${s.team.color}44, ${s.team.color}18)`
+    : `${s.team.color}22`;
+  row.style.borderColor = isWinner ? '#ffd700' : s.team.color;
+  row.classList.add('revealed');
+
+  const scoreEl = document.getElementById('rscore-' + rank);
+  if (isWinner) scoreEl.style.color = '#ffd700';
+  animateScore(scoreEl, s.total, isWinner ? 900 : 550);
+
+  playRevealSound(rank, N);
+  revealIdx++;
+
+  const hint = document.getElementById('results-hint');
+  if (revealIdx >= revealQueue.length) {
+    hint.textContent = '🏁 All teams revealed!';
+    hint.classList.add('done');
+    if (isWinner) {
+      setTimeout(() => {
+        row.classList.add('winner-glow');
+        const banner = document.getElementById('winner-banner');
+        banner.textContent = '🎉 ' + s.team.name + ' wins!';
+        banner.style.color = s.team.color;
+        banner.classList.add('visible');
+        launchConfetti(s.team.color);
+      }, 960);
+    }
+  } else {
+    hint.textContent = 'Click to reveal — ' + (revealQueue.length - revealIdx) + ' more';
+  }
+}
+
+function animateScore(el, target, duration) {
+  const start = performance.now();
+  function tick(now) {
+    const t = Math.min(1, (now - start) / duration);
+    const eased = 1 - Math.pow(1 - t, 3);
+    el.textContent = Math.round(eased * target);
+    if (t < 1) requestAnimationFrame(tick);
+    else el.textContent = target;
+  }
+  requestAnimationFrame(tick);
+}
+
+function playRevealSound(rank, n) {
+  if (rank === 0) {
+    // Winner fanfare: C5 E5 G5 C6 E6
+    [[523,0],[659,0.16],[784,0.32],[1047,0.52],[1319,0.78]]
+      .forEach(([f,t]) => beep(f, t, 0.55, 0.32));
+    // Sparkle after score lands
+    setTimeout(() =>
+      [[1568,0],[1760,0.11],[2093,0.24]].forEach(([f,t]) => beep(f, t, 0.28, 0.18)), 980);
+  } else if (rank === 1) {
+    [523,659,784,1047].forEach((f, i) => beep(f, i * 0.14, 0.38));
+  } else if (rank <= Math.ceil(n / 2)) {
+    [392,523,659].forEach((f, i) => beep(f, i * 0.14, 0.32));
+  } else {
+    [294,330].forEach((f, i) => beep(f, i * 0.16, 0.28, 0.2));
+  }
+}
+
+function launchConfetti(teamColor) {
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const palette = [teamColor, '#ffd700', '#ffffff', '#ff6b6b', '#4ecdc4', '#a8e063'];
+  const particles = Array.from({length: 130}, () => ({
+    x: Math.random() * canvas.width,
+    y: -12 - Math.random() * 60,
+    vx: (Math.random() - 0.5) * 7,
+    vy: Math.random() * 3 + 1.5,
+    color: palette[Math.floor(Math.random() * palette.length)],
+    w: Math.random() * 10 + 5,
+    h: Math.random() * 6 + 3,
+    rot: Math.random() * Math.PI * 2,
+    rotV: (Math.random() - 0.5) * 0.22,
+  }));
+
+  const start = performance.now();
+  const duration = 3800;
+
+  function draw(now) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const life = Math.max(0, 1 - (now - start) / duration);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.13; p.rot += p.rotV;
+      ctx.save();
+      ctx.globalAlpha = life * 0.9;
+      ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    });
+    if (life > 0) requestAnimationFrame(draw);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  requestAnimationFrame(draw);
+}
+
+// ════════════════════════════════════════════
+// ANSWER OVERLAY
+// ════════════════════════════════════════════
+
+function openAnswer(card) {
+  if (claimed[card.id] !== undefined) return;
+  currentCard = card;
+  document.getElementById('answer-card-name').textContent =
+    card.pts + '-point card · ' + card.name;
+  document.getElementById('q-img').src = 'images/' + card.id + '.png';
+  document.getElementById('a-img').src = 'answers/' + card.id + '.png';
+
+  const row = document.getElementById('award-row');
+  row.innerHTML = '';
+  teams.forEach((team, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'award-btn';
+    btn.style.background = team.color;
+    btn.textContent = '✓ Award to ' + team.name;
+    btn.onclick = () => awardCard(i);
+    row.appendChild(btn);
+  });
+  const ret = document.createElement('button');
+  ret.className = 'return-btn';
+  ret.textContent = '↩ Return to Table';
+  ret.onclick = returnToTable;
+  row.appendChild(ret);
+
+  document.getElementById('answer-overlay').classList.add('open');
+}
+
+function awardCard(teamIdx) {
+  if (!currentCard) return;
+  claimed[currentCard.id] = teamIdx;
+  const tile = document.getElementById('tile-' + currentCard.id);
+  tile.classList.add('claimed');
+  tile.style.background = teams[teamIdx].color;
+  tile.textContent = teams[teamIdx].name;
+  playClaimSound(currentCard.pts);
+  updateClaimCount();
+  closeAnswer();
+}
+
+function returnToTable() { playReturnSound(); closeAnswer(); }
+
+function closeAnswer() {
+  document.getElementById('answer-overlay').classList.remove('open');
+  currentCard = null;
+}
+
+// ════════════════════════════════════════════
+// SOUND  (Web Audio API)
+// ════════════════════════════════════════════
+
+let actx = null;
+function getCtx() {
+  if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+  return actx;
+}
+function beep(freq, t0, dur, vol = 0.28) {
+  const c = getCtx();
+  const osc = c.createOscillator(), g = c.createGain();
+  osc.connect(g); g.connect(c.destination);
+  osc.frequency.value = freq; osc.type = 'sine';
+  g.gain.setValueAtTime(vol, c.currentTime + t0);
+  g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + t0 + dur);
+  osc.start(c.currentTime + t0);
+  osc.stop(c.currentTime + t0 + dur + 0.05);
+}
+function playClaimSound(pts) {
+  ({1:[523,659], 2:[523,659,784], 4:[523,659,784,1047], 8:[523,659,784,1047,1319]}[pts] || [523,659])
+    .forEach((f, i) => beep(f, i * 0.14, 0.32));
+}
+function playReturnSound() {
+  [392, 330, 262].forEach((f, i) => beep(f, i * 0.17, 0.38, 0.2));
+}
+
+// ════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════
+
+buildAttendance();
+</script>
+</body>
+</html>

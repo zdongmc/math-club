@@ -3,7 +3,7 @@
 ## What Was Created
 
 ### Frontend Files
-1. **`mathdetective/algebra-kitchen.html`** (56 KB)
+1. **`games/algebra-kitchen/algebra-kitchen.html`** (56 KB)
    - Self-contained HTML game with embedded CSS and JavaScript
    - Copied to `docs/algebra-kitchen.html` for GitHub Pages deployment
 
@@ -13,7 +13,7 @@
    - Description: Advanced algebra challenges for Certified Chefs
 
 ### Backend Files
-3. **`mathdetective/algebra-kitchen-backend/Code.js`**
+3. **`games/algebra-kitchen/algebra-kitchen-backend/Code.js`**
    - Handles student lookup via Training Kitchen Roster
    - Checks Certified Chef status (all 5 Training Kitchen modules complete)
    - Manages Algebra Kitchen progress sheet (star ratings)
@@ -21,13 +21,13 @@
      - `getAlgebraProgress` - retrieves student's current stars
      - `recordAlgebraProgress` - saves test results (only if better than previous)
 
-4. **`mathdetective/algebra-kitchen-backend/appsscript.json`**
+4. **`games/algebra-kitchen/algebra-kitchen-backend/appsscript.json`**
    - Apps Script configuration with public access
 
-5. **`mathdetective/algebra-kitchen-backend/.clasp.json`**
+5. **`games/algebra-kitchen/algebra-kitchen-backend/.clasp.json`**
    - Placeholder for Script ID (to be filled after deployment)
 
-6. **`mathdetective/algebra-kitchen-backend/README.md`**
+6. **`games/algebra-kitchen/algebra-kitchen-backend/README.md`**
    - Complete deployment and setup instructions
 
 ## Game Features
@@ -162,14 +162,14 @@ Factory A checks determinant ≠ 0 and falls back to Factory B if degenerate (ma
 - **`docs/materials.html`**: Added Algebra Kitchen link
 
 ### New Directories
-- **`mathdetective/algebra-kitchen-backend/`**: Complete backend structure
+- **`games/algebra-kitchen/algebra-kitchen-backend/`**: Complete backend structure
 
 ### New Files (Total 9)
-1. `mathdetective/algebra-kitchen.html`
-2. `mathdetective/algebra-kitchen-backend/Code.js`
-3. `mathdetective/algebra-kitchen-backend/appsscript.json`
-4. `mathdetective/algebra-kitchen-backend/.clasp.json`
-5. `mathdetective/algebra-kitchen-backend/README.md`
+1. `games/algebra-kitchen/algebra-kitchen.html`
+2. `games/algebra-kitchen/algebra-kitchen-backend/Code.js`
+3. `games/algebra-kitchen/algebra-kitchen-backend/appsscript.json`
+4. `games/algebra-kitchen/algebra-kitchen-backend/.clasp.json`
+5. `games/algebra-kitchen/algebra-kitchen-backend/README.md`
 6. `docs/algebra-kitchen.html` (copy of #1)
 7. `ALGEBRA_KITCHEN_IMPLEMENTATION.md` (this file)
 

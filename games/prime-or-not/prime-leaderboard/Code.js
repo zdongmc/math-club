@@ -154,13 +154,21 @@ function getAvailableRanges() {
  */
 function getDrawingLeaderboard() {
   try {
-    // Fetch cert winners from parent portal (server-to-server avoids CORS)
-    let wonIds = new Set();
+    // Load cert winners: bootstrap with known IDs, then add any from the synced sheet tab
+    const CERT_TOTAL = 9;
+    const wonIds = new Set(['287219', '267459', '263583']);
     try {
-      const resp = UrlFetchApp.fetch(PORTAL_URL + '?action=getCertWinners', { muteHttpExceptions: true });
-      const parsed = JSON.parse(resp.getContentText());
-      if (parsed.success && parsed.wonIds) wonIds = new Set(parsed.wonIds);
-    } catch (e) { /* if unreachable, continue without cascading */ }
+      const winnersTab = SpreadsheetApp.openById(SHEET_ID).getSheetByName('Cert Winners');
+      if (winnersTab && winnersTab.getLastRow() > 0) {
+        winnersTab.getDataRange().getValues().forEach(function(row) {
+          const id = (row[0] || '').toString().trim();
+          if (id) wonIds.add(id);
+        });
+      }
+    } catch (e) { /* continue with bootstrapped list if sheet unavailable */ }
+
+    // Once all certs are awarded, show full leaderboard without cascade
+    if (wonIds.size >= CERT_TOTAL) wonIds.clear();
 
     const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(SHEET_NAME);
     const data = sheet.getDataRange().getValues();

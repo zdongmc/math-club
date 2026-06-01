@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Would You Rather? — Math Edition</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Arial Black', Arial, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1a0a3e 100%); min-height: 100vh; color: white; }
+.hidden { display: none !important; }
+
+/* ── TITLE SCREEN ── */
+#title-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 30px; text-align: center; gap: 22px; }
+.title-emoji { font-size: 5rem; }
+.title-main  { font-size: 3rem; font-weight: bold; text-shadow: 0 0 32px rgba(255,215,0,0.35); }
+.title-edition { font-size: 1.1rem; opacity: 0.5; letter-spacing: 3px; text-transform: uppercase; font-family: Arial, sans-serif; font-weight: normal; }
+.title-sub   { font-size: 1.15rem; opacity: 0.6; max-width: 480px; line-height: 1.6; font-family: Georgia, serif; font-weight: normal; }
+.btn-open-tv { background: #ffd700; color: #1a1a1a; border: none; padding: 16px 44px; font-size: 1.1rem; font-family: inherit; font-weight: bold; border-radius: 12px; cursor: pointer; transition: background 0.15s; }
+.btn-open-tv:hover { background: #ffe44d; }
+.title-steps { display: flex; flex-direction: column; gap: 10px; max-width: 520px; text-align: left; }
+.title-step  { display: flex; align-items: flex-start; gap: 12px; font-family: Georgia, serif; font-size: 1.05rem; line-height: 1.5; font-weight: normal; opacity: 0.85; }
+.step-num    { background: #ffd700; color: #1a1a1a; font-family: 'Arial Black', Arial, sans-serif; font-size: 0.85rem; font-weight: bold; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+
+/* ── QUESTION SCREEN ── */
+#q-screen { display: flex; flex-direction: column; min-height: 100vh; padding: 16px 22px 20px; gap: 14px; }
+.q-topbar  { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.q-num     { font-size: 0.85rem; opacity: 0.45; letter-spacing: 1.5px; text-transform: uppercase; font-family: Arial, sans-serif; font-weight: normal; }
+.btn-tv-sm { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.22); border-radius: 8px; padding: 6px 14px; font-size: 0.8rem; cursor: pointer; font-family: inherit; }
+.btn-tv-sm:hover { background: rgba(255,255,255,0.2); }
+.q-prompt  { font-size: 1.35rem; text-align: center; opacity: 0.65; flex-shrink: 0; font-family: Georgia, serif; font-weight: normal; }
+
+.options-row { flex: 1; display: grid; grid-template-columns: 1fr 56px 1fr; gap: 14px; align-items: stretch; min-height: 200px; }
+.opt-card { border-radius: 16px; padding: 22px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; border: 3px solid transparent; transition: opacity 0.45s, box-shadow 0.45s, border-color 0.45s, background 0.45s; }
+.opt-card.a { background: rgba(13,148,136,0.15); border-color: rgba(13,148,136,0.45); }
+.opt-card.b { background: rgba(234,88,12,0.15);  border-color: rgba(234,88,12,0.45);  }
+.opt-letter { font-size: 1.4rem; font-weight: bold; padding: 6px 22px; border-radius: 20px; }
+.opt-card.a .opt-letter { background: rgba(13,148,136,0.3); color: #5eead4; }
+.opt-card.b .opt-letter { background: rgba(234,88,12,0.3);  color: #fdba74; }
+.opt-text { font-size: 1.5rem; line-height: 1.4; font-family: Georgia, serif; font-weight: normal; }
+.vs-col   { display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.vs-label { font-size: 1.9rem; font-weight: bold; color: #ffd700; text-shadow: 0 0 18px rgba(255,215,0,0.65); }
+
+/* Card states after reveal */
+.opt-card.winner { border-color: #ffd700; box-shadow: 0 0 28px rgba(255,215,0,0.35); background: rgba(255,215,0,0.1); }
+.opt-card.loser  { opacity: 0.38; }
+.opt-card.tied   { border-color: rgba(148,163,184,0.6); background: rgba(148,163,184,0.08); }
+.winner-badge { background: #ffd700; color: #1a1a1a; font-size: 0.85rem; padding: 5px 16px; border-radius: 20px; font-weight: bold; }
+.tie-badge    { background: rgba(148,163,184,0.2); color: #94a3b8; font-size: 0.85rem; padding: 5px 16px; border-radius: 20px; font-weight: bold; border: 1px solid rgba(148,163,184,0.4); }
+
+.q-hint { font-size: 0.95rem; opacity: 0.45; text-align: center; flex-shrink: 0; font-family: Georgia, serif; font-weight: normal; min-height: 1.4em; }
+
+/* ── TIMER ── */
+#timer-wrap { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+#timer-num  { font-size: 3.2rem; font-weight: bold; line-height: 1; transition: color 0.3s; }
+#timer-num.warn { color: #fbbf24; }
+#timer-num.crit { color: #ef4444; animation: tpulse 0.5s infinite alternate; }
+#timer-num.done { color: #ef4444; font-size: 1.1rem; letter-spacing: 1px; }
+@keyframes tpulse { from { opacity:1; } to { opacity:0.25; } }
+#timer-track { width: 100%; max-width: 420px; height: 10px; background: rgba(255,255,255,0.15); border-radius: 5px; overflow: hidden; }
+#timer-fill  { height: 100%; background: #22c55e; border-radius: 5px; transition: width 1s linear, background 0.3s; }
+#timer-fill.warn { background: #fbbf24; }
+#timer-fill.crit { background: #ef4444; }
+
+/* Reveal math panel */
+#reveal-panel { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 16px 22px; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; animation: slideUp 0.42s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes slideUp { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
+.reveal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.reveal-col { background: rgba(0,0,0,0.22); border-radius: 10px; padding: 10px 14px; }
+.reveal-col-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.45; margin-bottom: 5px; }
+.reveal-col.a .reveal-col-label { color: #5eead4; }
+.reveal-col.b .reveal-col-label { color: #fdba74; }
+.reveal-col-math { font-size: 0.98rem; line-height: 1.55; font-family: Georgia, serif; font-weight: normal; white-space: pre-line; }
+.reveal-explain  { font-size: 1.08rem; text-align: center; color: #ffd700; font-family: Georgia, serif; font-weight: normal; }
+.reveal-surprise { font-size: 0.9rem; text-align: center; opacity: 0.55; font-family: Georgia, serif; font-weight: normal; }
+</style>
+</head>
+<body>
+
+<!-- ── TITLE SCREEN ── -->
+<div id="title-screen">
+  <div class="title-emoji">🤔</div>
+  <div class="title-main">Would You Rather?</div>
+  <div class="title-edition">Math Edition</div>
+  <div class="title-sub">Two options. One right answer. Let's find out together.</div>
+  <div class="title-steps">
+    <div class="title-step"><span class="step-num">1</span>A question appears with two options — A and B.</div>
+    <div class="title-step"><span class="step-num">2</span>Go with your gut! Vote for A or B before the timer runs out.</div>
+
+  </div>
+  <button class="btn-open-tv" onclick="openTeacherView()">🎓 Open Teacher View</button>
+</div>
+
+<!-- ── QUESTION SCREEN ── -->
+<div id="q-screen" class="hidden">
+  <div class="q-topbar">
+    <div class="q-num" id="q-num">Question 1 of 12</div>
+    <button class="btn-tv-sm" onclick="openTeacherView()">🎓 Teacher View</button>
+  </div>
+  <div class="q-prompt">Would you rather…</div>
+  <div class="options-row">
+    <div class="opt-card a" id="card-a">
+      <div class="opt-letter">A</div>
+      <div class="opt-text" id="opt-a-text"></div>
+    </div>
+    <div class="vs-col"><div class="vs-label">VS</div></div>
+    <div class="opt-card b" id="card-b">
+      <div class="opt-letter">B</div>
+      <div class="opt-text" id="opt-b-text"></div>
+    </div>
+  </div>
+  <div id="timer-wrap" class="hidden">
+    <div id="timer-num">10</div>
+    <div id="timer-track"><div id="timer-fill" style="width:100%"></div></div>
+  </div>
+  <div class="q-hint" id="q-hint"></div>
+  <div id="reveal-panel" class="hidden">
+    <div class="reveal-row">
+      <div class="reveal-col a">
+        <div class="reveal-col-label">Option A — the math</div>
+        <div class="reveal-col-math" id="math-a"></div>
+      </div>
+      <div class="reveal-col b">
+        <div class="reveal-col-label">Option B — the math</div>
+        <div class="reveal-col-math" id="math-b"></div>
+      </div>
+    </div>
+    <div class="reveal-explain"  id="reveal-explain"></div>
+    <div class="reveal-surprise" id="reveal-surprise"></div>
+  </div>
+</div>
+
+<script>
+// ── QUESTIONS ──────────────────────────────────────────────────────────────────
+const QUESTIONS = [
+  // ── percentage & money traps ───────────────────────────────────────────────────
+  {
+    optA: "40% off, then another 20% off at checkout (on a $100 item)",
+    optB: "One flat 60% discount",
+    mathA: "$100 × 0.60 × 0.80 = $48\n→ you save $52 total",
+    mathB: "$100 × 0.40 = $40\n→ you save $60 total",
+    explain: "$40 < $48 — Option B saves more!",
+    winner: "B",
+    surprise: "40% + 20% stacked saves only 52% total, not 60%!"
+  },
+  {
+    optA: "10% raise, then another 10% raise",
+    optB: "One flat 20% raise",
+    mathA: "$1,000 × 1.10 × 1.10 = $1,210\n→ 21% total gain",
+    mathB: "$1,000 × 1.20 = $1,200\n→ 20% gain",
+    explain: "$1,210 > $1,200 — Option A earns more!",
+    winner: "A",
+    surprise: "Two 10% raises compound to 21% — beating a flat 20% raise by $10!"
+  },
+  {
+    optA: "A stock that goes up 50%, then down 50% — which leaves you richer?",
+    optB: "A stock that stays flat (no change)",
+    mathA: "$100 → up 50% → $150 → down 50% → $75\n→ you lose 25%!",
+    mathB: "$100 stays at $100\n→ no change",
+    explain: "$100 > $75 — Option B leaves you richer!",
+    winner: "B",
+    surprise: "Up 50% then down 50% sounds like a wash — but you end up 25% poorer!"
+  },
+  // ── geometry ─────────────────────────────────────────────────────────────────
+  {
+    optA: "A cylinder with radius 3 cm and height 4 cm",
+    optB: "A cylinder with radius 4 cm and height 3 cm",
+    mathA: "V = π × 3² × 4 = 36π ≈ 113 cm³",
+    mathB: "V = π × 4² × 3 = 48π ≈ 151 cm³",
+    explain: "151 > 113 — Option B holds more!",
+    winner: "B",
+    surprise: "Radius is squared in V = πr²h — making a cylinder wider matters more than making it taller!"
+  },
+  {
+    optA: "One 14-inch diameter pizza",
+    optB: "Two 10-inch diameter pizzas",
+    mathA: "Area = π × 7² ≈ 153.9 sq in",
+    mathB: "Each: π × 5² ≈ 78.5 sq in\nTotal: 2 × 78.5 ≈ 157.1 sq in",
+    explain: "157.1 > 153.9 — Option B gives more pizza!",
+    winner: "B",
+    surprise: "Area scales with radius squared — two 10-inch pizzas beat one 14-inch pizza!"
+  },
+  // ── math identities (framed as dollar amounts) ────────────────────────────────
+  {
+    optA: "√9 + √16 dollars",
+    optB: "√(9 + 16) dollars",
+    mathA: "3 + 4 = 7\n→ $7",
+    mathB: "√25 = 5\n→ $5",
+    explain: "$7 > $5 — Option A is worth more!",
+    winner: "A",
+    surprise: "√(a + b) ≠ √a + √b — you can't split a square root over addition!"
+  },
+  {
+    optA: "100 × 100 dollars",
+    optB: "99 × 101 dollars",
+    mathA: "100 × 100 = 10,000\n→ $10,000",
+    mathB: "(100 − 1)(100 + 1) = 100² − 1 = 9,999\n→ $9,999",
+    explain: "$10,000 > $9,999 — Option A is worth more!",
+    winner: "A",
+    surprise: "Difference of squares: (n−1)(n+1) = n² − 1. Always one less than the perfect square!"
+  },
+  {
+    optA: "Drive to school and back at a steady 35 mph",
+    optB: "Drive to school at 20 mph, return home at 60 mph",
+    mathA: "Time = 10 ÷ 35 ≈ 0.286 hr\n→ average speed: 35 mph",
+    mathB: "Time = 5/20 + 5/60 = 0.333 hr\n→ avg speed = 10 ÷ 0.333 ≈ 30 mph",
+    explain: "35 mph > 30 mph — Option A gets you home sooner!",
+    winner: "A",
+    surprise: "The average of 20 mph and 60 mph is NOT 40 — it's only 30 mph! The slow leg eats your time."
+  },
+  {
+    optA: "1 + 2 + 4 + 8 + … + 512 dollars  (powers of 2 from 2⁰ to 2⁹)",
+    optB: "2¹⁰ dollars",
+    mathA: "Sum = 2¹⁰ − 1 = 1,023\n→ $1,023",
+    mathB: "2¹⁰ = 1,024\n→ $1,024",
+    explain: "$1,024 > $1,023 — Option B is worth more!",
+    winner: "B",
+    surprise: "The sum of every power of 2 up to 2⁹ is always exactly one less than 2¹⁰!"
+  },
+  // ── probability ────────────────────────────────────────────────────────────────
+  {
+    optA: "Flip a coin twice — win if both flips are heads",
+    optB: "Roll a die — win if you roll a 6",
+    mathA: "P(HH) = ½ × ½ = 1/4 = 25%",
+    mathB: "P(6) = 1/6 ≈ 16.7%",
+    explain: "25% > 16.7% — Option A gives better odds!",
+    winner: "A",
+    surprise: "Getting two straight heads is more likely than rolling a specific number on a die!"
+  },
+  {
+    optA: "Roll a die 6 times — win if you get at least one 6",
+    optB: "Flip a fair coin — win if you get heads",
+    mathA: "P = 1 − (5/6)⁶ ≈ 1 − 0.335 = 66.5%",
+    mathB: "P = 1/2 = 50%",
+    explain: "66.5% > 50% — Option A gives better odds!",
+    winner: "A",
+    surprise: "Six rolls for six outcomes gives a 66.5% chance — way better than a coin flip!"
+  },
+  {
+    optA: "Draw 2 cards from a shuffled deck — win if both are the same suit",
+    optB: "Draw 2 cards from a shuffled deck — win if both are red",
+    mathA: "P(2nd matches 1st suit) = 12/51 ≈ 23.5%",
+    mathB: "P(both red) = 26/52 × 25/51 = 25/102 ≈ 24.5%",
+    explain: "24.5% > 23.5% — Option B wins!",
+    winner: "B",
+    surprise: "There are more red cards than cards of any single suit — so both-red beats same-suit!"
+  },
+  {
+    optA: "Roll a die: win $100 if you roll 1, 2, or 3; win $0 otherwise",
+    optB: "Roll a die: win $360 if you roll a 6; win $0 otherwise",
+    mathA: "P(1, 2, or 3) = 3/6 = 1/2\nExpected value = 1/2 × $100 = $50",
+    mathB: "P(6) = 1/6\nExpected value = 1/6 × $360 = $60",
+    explain: "Expected value: $60 > $50 — Option B pays more on average!",
+    winner: "B",
+    surprise: "Both are dice bets — but B's expected value is $10 higher. Bigger reward for lower odds!"
+  },
+  // ── number theory & algebra ───────────────────────────────────────────────────
+  {
+    optA: "3²⁰ dollars",
+    optB: "2³⁰ dollars",
+    mathA: "3²⁰ = (3¹⁰)² = 59,049²\n≈ 3,486,784,401  (≈$3.5 billion)",
+    mathB: "2³⁰ = (2¹⁰)³ = 1,024³\n≈ 1,073,741,824  (≈$1.1 billion)",
+    explain: "$3.5B > $1.1B — Option A wins!",
+    winner: "A",
+    surprise: "A bigger base beats a bigger exponent — 3²⁰ is over 3× larger than 2³⁰!"
+  },
+  {
+    optA: "5/11 of $88",
+    optB: "3/7 of $91",
+    mathA: "88 ÷ 11 = 8\n5 × 8 = $40",
+    mathB: "91 ÷ 7 = 13\n3 × 13 = $39",
+    explain: "$40 > $39 — Option A pays more!",
+    winner: "A",
+    surprise: "The bigger dollar amount loses — cross-multiply to check: 5×7=35 vs 3×11=33, so 5/11 > 3/7!"
+  },
+  {
+    optA: "Borrow $1,000 at 24% annual interest for 1 year",
+    optB: "Borrow $1,000 at 2% monthly interest for 12 months",
+    mathA: "$1,000 × 1.24 = $1,240\n→ pay $240 in interest",
+    mathB: "$1,000 × (1.02)¹² ≈ $1,268\n→ pay $268 in interest",
+    explain: "$240 < $268 — Option A is the cheaper loan!",
+    winner: "A",
+    surprise: "2% per month sounds tiny but compounds to 26.8% per year — more than the '24% annual' loan!"
+  },
+  // ── hard & counterintuitive ───────────────────────────────────────────────────
+  {
+    optA: "Pick a random day of the year — win if it's a Saturday or Sunday",
+    optB: "Pick a random month — win if it has exactly 30 days",
+    mathA: "Weekend days ≈ 104–106 out of 365–366 days\n≈ 28.5% (varies by year)",
+    mathB: "Months with exactly 30 days: Apr, Jun, Sep, Nov\n= 4/12 = 1/3 ≈ 33.3%",
+    explain: "33.3% > ~28.5% — Option B is more likely!",
+    winner: "B",
+    surprise: "Weekend days make up only about 2-in-7 of the year (~28.5%) — 30-day months (33%) are more common!"
+  },
+  {
+    optA: "Start with $1, earn $10 per day for 30 days",
+    optB: "Start with $1, your money grows by 50% every day for 30 days",
+    mathA: "$1 + ($10 × 30) = $301",
+    mathB: "$1 × (1.5)³⁰ ≈ $191,751",
+    explain: "$191,751 >> $301 — Option B wins by a landslide!",
+    winner: "B",
+    surprise: "×1.5 per day seems slow at first — but after 30 days it's over 600× bigger than adding $10 daily!"
+  },
+  {
+    optA: "Pick a random 2-digit number (10–99) — win if it's divisible by 3",
+    optB: "Flip a coin 3 times — win if you get exactly one head",
+    mathA: "Multiples of 3 from 10–99: 12, 15, …, 99 = 30 numbers\nP = 30/90 = 1/3 ≈ 33.3%",
+    mathB: "P(exactly 1 head) = C(3,1) / 2³ = 3/8 = 37.5%",
+    explain: "37.5% > 33.3% — Option B wins!",
+    winner: "B",
+    surprise: "Exactly one head in three flips (37.5%) barely edges out picking a multiple of 3 (33.3%)!"
+  },
+  {
+    optA: "Draw 2 marbles from a bag of 5 red and 5 blue — win if both are the same color",
+    optB: "Flip a fair coin — win if you get heads",
+    mathA: "P(both red) + P(both blue)\n= C(5,2)/C(10,2) + C(5,2)/C(10,2)\n= 10/45 + 10/45 ≈ 44.4%",
+    mathB: "P(heads) = 1/2 = 50%",
+    explain: "50% > 44.4% — Option B gives better odds!",
+    winner: "B",
+    surprise: "From an even 5-5 split you'd expect 50/50 — but matching colors is only 44%!"
+  },
+  {
+    optA: "$1,000 invested at 10% annual return for 30 years",
+    optB: "$10,000 invested at 1% annual return for 30 years",
+    mathA: "$1,000 × (1.10)³⁰ ≈ $17,449",
+    mathB: "$10,000 × (1.01)³⁰ ≈ $13,480",
+    explain: "$17,449 > $13,480 — Option A wins!",
+    winner: "A",
+    surprise: "Starting with 10× less money but investing at 10% beats 1% on $10,000 — rate of return matters more than starting amount!"
+  }
+];
+
+// ── STATE ──────────────────────────────────────────────────────────────────────
+let currentIdx = -1;
+let teacherWin = null;
+
+// ── TEACHER VIEW ───────────────────────────────────────────────────────────────
+const TV_HTML = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>Teacher — Would You Rather? Math Edition</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Arial Black',Arial,sans-serif;background:#0f172a;color:white;padding:12px;min-height:100vh;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
+h1{font-size:0.92rem;opacity:0.45;text-align:center;letter-spacing:2px;text-transform:uppercase;font-family:Arial,sans-serif;font-weight:normal;flex-shrink:0}
+#tv-qnum{font-size:0.88rem;opacity:0.5;text-align:center;flex-shrink:0}
+#tv-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex-shrink:0}
+.tv-opt{border-radius:10px;padding:10px 14px}
+.tv-opt.a{background:rgba(13,148,136,0.14);border:1px solid rgba(13,148,136,0.38)}
+.tv-opt.b{background:rgba(234,88,12,0.14);border:1px solid rgba(234,88,12,0.38)}
+.tv-opt-lbl{font-size:0.66rem;text-transform:uppercase;letter-spacing:1px;opacity:0.45;margin-bottom:4px}
+.tv-opt.a .tv-opt-lbl{color:#5eead4}.tv-opt.b .tv-opt-lbl{color:#fdba74}
+.tv-opt-text{font-size:0.95rem;font-family:Georgia,serif;font-weight:normal;line-height:1.4}
+#tv-answer{background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.28);border-radius:10px;padding:12px 16px;flex-shrink:0}
+.tv-ans-hdr{font-size:0.66rem;text-transform:uppercase;letter-spacing:1px;color:#ffd700;opacity:0.65;margin-bottom:8px}
+#tv-ans-rows{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tv-ans-col{background:rgba(0,0,0,0.2);border-radius:8px;padding:8px 10px}
+.tv-ans-col-lbl{font-size:0.6rem;text-transform:uppercase;letter-spacing:1px;opacity:0.38;margin-bottom:3px}
+.tv-ans-col.a .tv-ans-col-lbl{color:#5eead4}.tv-ans-col.b .tv-ans-col-lbl{color:#fdba74}
+.tv-ans-col-text{font-size:0.88rem;line-height:1.48;font-family:Georgia,serif;font-weight:normal;white-space:pre-line}
+#tv-explain{font-size:0.92rem;color:#ffd700;text-align:center;margin-top:8px;font-family:Georgia,serif;font-weight:normal}
+#tv-surprise{font-size:0.8rem;opacity:0.55;text-align:center;margin-top:4px;font-family:Georgia,serif;font-weight:normal}
+.tv-btnrow{display:flex;gap:8px;justify-content:center;flex-shrink:0;flex-wrap:wrap}
+.tvbtn{border:none;border-radius:8px;font-family:inherit;font-size:0.88rem;font-weight:bold;cursor:pointer;padding:9px 18px;transition:background 0.15s}
+.tvbtn:disabled{opacity:0.32;cursor:default}
+.tvbtn-ghost{background:rgba(255,255,255,0.12);color:white;border:1px solid rgba(255,255,255,0.25)}
+.tvbtn-ghost:hover:not(:disabled){background:rgba(255,255,255,0.22)}
+.tvbtn-teal{background:#0d9488;color:white;border:none}
+.tvbtn-teal:hover:not(:disabled){background:#0f766e}
+.tvbtn-gold{background:#ffd700;color:#1a1a1a;border:none}
+.tvbtn-gold:hover:not(:disabled){background:#ffe44d}
+.tv-qlist-wrap{background:rgba(0,0,0,0.25);border-radius:10px;padding:8px;flex-shrink:0}
+.tv-qlist-lbl{font-size:0.62rem;opacity:0.35;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;font-family:Arial,sans-serif;font-weight:normal}
+#tv-qlist{display:flex;flex-wrap:wrap;gap:5px}
+.tv-qchip{width:30px;height:22px;border:none;border-radius:4px;font-size:0.72rem;font-weight:bold;cursor:pointer;background:rgba(255,255,255,0.1);color:white;display:flex;align-items:center;justify-content:center;transition:background 0.12s;font-family:inherit}
+.tv-qchip:hover{background:rgba(255,255,255,0.22)}
+.tv-qchip.active{background:#ffd700;color:#1a1a1a}
+</style></head><body>
+<h1>Would You Rather? — Teacher View</h1>
+<div id="tv-qnum">No question loaded</div>
+<div id="tv-opts">
+  <div class="tv-opt a"><div class="tv-opt-lbl">Option A</div><div class="tv-opt-text" id="tv-opta">—</div></div>
+  <div class="tv-opt b"><div class="tv-opt-lbl">Option B</div><div class="tv-opt-text" id="tv-optb">—</div></div>
+</div>
+<div id="tv-answer">
+  <div class="tv-ans-hdr">Answer (teacher only)</div>
+  <div id="tv-ans-rows">
+    <div class="tv-ans-col a"><div class="tv-ans-col-lbl">Option A</div><div class="tv-ans-col-text" id="tv-matha">—</div></div>
+    <div class="tv-ans-col b"><div class="tv-ans-col-lbl">Option B</div><div class="tv-ans-col-text" id="tv-mathb">—</div></div>
+  </div>
+  <div id="tv-explain">—</div>
+  <div id="tv-surprise"></div>
+</div>
+<div class="tv-btnrow">
+  <button class="tvbtn tvbtn-ghost" id="btn-prev"   onclick="if(window.opener)window.opener.prevQuestion()" disabled>← Prev</button>
+  <button class="tvbtn tvbtn-gold"  id="btn-reveal" onclick="if(window.opener)window.opener.revealAnswer()" disabled>Reveal Answer</button>
+  <button class="tvbtn tvbtn-ghost" id="btn-next"   onclick="if(window.opener)window.opener.nextQuestion()" disabled>Next →</button>
+</div>
+<div class="tv-qlist-wrap">
+  <div class="tv-qlist-lbl">Quick jump — click to show on student screen</div>
+  <div id="tv-qlist"></div>
+</div>
+<script>
+(function() {
+  const n = ${QUESTIONS.length};
+  const list = document.getElementById('tv-qlist');
+  for (let i = 0; i < n; i++) {
+    const btn = document.createElement('button');
+    btn.id = 'tvchip-' + i;
+    btn.className = 'tv-qchip';
+    btn.textContent = i + 1;
+    btn.onclick = () => { if (window.opener) window.opener.showQuestion(i); };
+    list.appendChild(btn);
+  }
+})();
+<\/script>
+</body></html>`;
+
+// ── TEACHER SYNC ───────────────────────────────────────────────────────────────
+function tvSync() {
+  if (!teacherWin || teacherWin.closed) return;
+  const d   = teacherWin.document;
+  const idx = currentIdx;
+  const n   = QUESTIONS.length;
+  const set = (id, val) => { const el = d.getElementById(id); if (el) el.textContent = val; };
+
+  set('tv-qnum', idx >= 0 ? 'Question ' + (idx + 1) + ' of ' + n : 'No question loaded');
+
+  if (idx >= 0) {
+    const q = QUESTIONS[idx];
+    set('tv-opta',    q.optA);
+    set('tv-optb',    q.optB);
+    set('tv-matha',   q.mathA);
+    set('tv-mathb',   q.mathB);
+    set('tv-explain', q.explain);
+    set('tv-surprise', q.surprise);
+
+    const btnPrev   = d.getElementById('btn-prev');
+    const btnReveal = d.getElementById('btn-reveal');
+    const btnNext   = d.getElementById('btn-next');
+    if (btnPrev)   btnPrev.disabled   = (idx === 0);
+    if (btnReveal) btnReveal.disabled = false;
+    if (btnNext)   btnNext.disabled   = (idx === n - 1);
+
+    d.querySelectorAll('.tv-qchip').forEach((c, j) => c.classList.toggle('active', j === idx));
+  }
+}
+
+// ── OPEN TEACHER VIEW ──────────────────────────────────────────────────────────
+function openTeacherView() {
+  if (teacherWin && !teacherWin.closed) { teacherWin.focus(); tvSync(); return; }
+  teacherWin = window.open('', 'wyr-teacher',
+    'width=820,height=650,menubar=no,toolbar=no,location=no,status=no,resizable=yes');
+  teacherWin.document.open();
+  teacherWin.document.write(TV_HTML);
+  teacherWin.document.close();
+  tvSync();
+}
+
+// ── SHOW QUESTION ──────────────────────────────────────────────────────────────
+function showQuestion(idx) {
+  const q  = QUESTIONS[idx];
+  currentIdx = idx;
+
+  document.getElementById('q-num').textContent =
+    'Question ' + (idx + 1) + ' of ' + QUESTIONS.length;
+  document.getElementById('opt-a-text').textContent = q.optA;
+  document.getElementById('opt-b-text').textContent = q.optB;
+  document.getElementById('q-hint').textContent = '';
+
+  // Reset card states
+  const cardA = document.getElementById('card-a');
+  const cardB = document.getElementById('card-b');
+  cardA.className = 'opt-card a';
+  cardB.className = 'opt-card b';
+
+  // Remove any leftover badges
+  cardA.querySelectorAll('.winner-badge,.tie-badge').forEach(el => el.remove());
+  cardB.querySelectorAll('.winner-badge,.tie-badge').forEach(el => el.remove());
+
+  // Hide reveal panel and reset timer wrap
+  document.getElementById('reveal-panel').classList.add('hidden');
+  document.getElementById('timer-wrap').classList.add('hidden');
+
+  // Transition to question screen
+  document.getElementById('title-screen').classList.add('hidden');
+  document.getElementById('q-screen').classList.remove('hidden');
+
+  soundNext(getAudio());
+  tvSync();
+  startTimer();
+}
+
+function prevQuestion() { if (currentIdx > 0) showQuestion(currentIdx - 1); }
+function nextQuestion() { if (currentIdx < QUESTIONS.length - 1) showQuestion(currentIdx + 1); }
+
+// ── REVEAL ANSWER ──────────────────────────────────────────────────────────────
+function revealAnswer() {
+  if (currentIdx < 0) return;
+  stopTimer();
+  document.getElementById('timer-wrap').classList.add('hidden');
+  const q = QUESTIONS[currentIdx];
+
+  // Fill math panel
+  document.getElementById('math-a').textContent        = q.mathA;
+  document.getElementById('math-b').textContent        = q.mathB;
+  document.getElementById('reveal-explain').textContent = q.explain;
+  document.getElementById('reveal-surprise').textContent = '💡 ' + q.surprise;
+  document.getElementById('reveal-panel').classList.remove('hidden');
+
+  // Style cards
+  const cardA = document.getElementById('card-a');
+  const cardB = document.getElementById('card-b');
+
+  function badge(cls, text) {
+    const s = document.createElement('span');
+    s.className = cls;
+    s.textContent = text;
+    return s;
+  }
+
+  if (q.winner === 'A') {
+    cardA.className = 'opt-card a winner';
+    cardB.className = 'opt-card b loser';
+    cardA.appendChild(badge('winner-badge', '🏆 Winner'));
+  } else if (q.winner === 'B') {
+    cardA.className = 'opt-card a loser';
+    cardB.className = 'opt-card b winner';
+    cardB.appendChild(badge('winner-badge', '🏆 Winner'));
+  } else {
+    cardA.className = 'opt-card a tied';
+    cardB.className = 'opt-card b tied';
+    cardA.appendChild(badge('tie-badge', '🤝 Tie!'));
+    cardB.appendChild(badge('tie-badge', '🤝 Tie!'));
+  }
+
+  document.getElementById('q-hint').textContent = '';
+
+  soundReveal(getAudio());
+}
+
+// ── TIMER ──────────────────────────────────────────────────────────────────────
+const TIMER_SECS = 15;
+let timerIv      = null;
+let timerLeft    = TIMER_SECS;
+
+function startTimer() {
+  stopTimer();
+  timerLeft = TIMER_SECS;
+  document.getElementById('timer-wrap').classList.remove('hidden');
+  renderTimer();
+  timerIv = setInterval(() => {
+    timerLeft--;
+    renderTimer();
+    if (timerLeft <= 3 && timerLeft > 0) soundTick(getAudio());
+    if (timerLeft <= 0) {
+      stopTimer();
+      const numEl = document.getElementById('timer-num');
+      numEl.textContent = "TIME'S UP!";
+      numEl.className   = 'done';
+      document.getElementById('timer-fill').style.width = '0%';
+      document.getElementById('timer-fill').className   = 'crit';
+      document.getElementById('q-hint').textContent = 'Move your magnet — then wait for the reveal!';
+      soundDing(getAudio());
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerIv);
+  timerIv = null;
+}
+
+function renderTimer() {
+  const numEl  = document.getElementById('timer-num');
+  const fillEl = document.getElementById('timer-fill');
+  const pct    = (timerLeft / TIMER_SECS) * 100;
+  numEl.textContent = timerLeft;
+  fillEl.style.width = pct + '%';
+  const warn = timerLeft <= 8;
+  const crit = timerLeft <= 4;
+  numEl.className  = crit ? 'crit' : warn ? 'warn' : '';
+  fillEl.className = crit ? 'crit' : warn ? 'warn' : '';
+}
+
+// ── AUDIO ──────────────────────────────────────────────────────────────────────
+let audioCtx = null;
+function getAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function note(ctx, freq, t, dur, vol = 0.25, type = 'sine') {
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.connect(g); g.connect(ctx.destination);
+  o.type = type; o.frequency.setValueAtTime(freq, t);
+  g.gain.setValueAtTime(vol, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  o.start(t); o.stop(t + dur);
+}
+function soundTick(ctx)   { note(ctx, 660, ctx.currentTime, 0.07, 0.12); }
+function soundDing(ctx)   { note(ctx, 880, ctx.currentTime, 0.4,  0.18); }
+function soundNext(ctx) {
+  const t = ctx.currentTime;
+  note(ctx, 440, t,      0.1,  0.14);
+  note(ctx, 554, t+0.1,  0.14, 0.14);
+}
+function soundReveal(ctx) {
+  const t = ctx.currentTime;
+  note(ctx, 523, t,      0.15, 0.22);
+  note(ctx, 659, t+0.13, 0.15, 0.22);
+  note(ctx, 784, t+0.26, 0.38, 0.28);
+}
+</script>
+</body>
+</html>

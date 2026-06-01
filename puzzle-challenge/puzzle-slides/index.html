@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Math Puzzle Challenge</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #dc2626, #991b1b);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+  }
+
+  #top-bar {
+    width: 100%;
+    max-width: 960px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px 8px;
+    gap: 12px;
+  }
+
+  #title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
+  #filter-bar {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .filter-btn {
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.4);
+    color: white;
+    padding: 5px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .filter-btn:hover { background: rgba(255,255,255,0.3); }
+  .filter-btn.active {
+    background: #ffd700;
+    border-color: #ffd700;
+    color: #7c2d12;
+  }
+
+  #counter {
+    font-size: 0.9rem;
+    opacity: 0.85;
+    white-space: nowrap;
+    min-width: 80px;
+    text-align: right;
+  }
+
+  #slide-area {
+    width: 100%;
+    max-width: 960px;
+    padding: 0 16px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  #point-badge {
+    font-size: 1.4rem;
+    font-weight: 800;
+    background: #ffd700;
+    color: #7c2d12;
+    padding: 6px 24px;
+    border-radius: 24px;
+    letter-spacing: 1px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  #puzzle-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    opacity: 0.9;
+    letter-spacing: 0.3px;
+  }
+
+  #slide-frame {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    width: 100%;
+    max-width: 780px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #slide-img {
+    width: 100%;
+    display: block;
+  }
+
+  #nav-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 0 16px;
+  }
+
+  .nav-btn {
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.5);
+    color: white;
+    font-size: 1.5rem;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav-btn:hover { background: rgba(255,255,255,0.3); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+  #progress-dots {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 400px;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .dot:hover { background: rgba(255,255,255,0.6); }
+  .dot.active { background: #ffd700; transform: scale(1.3); }
+  .dot.pt1 { background: rgba(255,255,255,0.3); }
+  .dot.pt2 { background: rgba(100,200,255,0.5); }
+  .dot.pt4 { background: rgba(255,180,50,0.6); }
+  .dot.pt8 { background: rgba(255,100,100,0.6); }
+  .dot.active { background: #ffd700 !important; }
+
+  #keyboard-hint {
+    font-size: 0.75rem;
+    opacity: 0.55;
+    padding-bottom: 8px;
+  }
+
+  #no-slides {
+    display: none;
+    font-size: 1.2rem;
+    opacity: 0.7;
+    padding: 40px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div id="top-bar">
+  <div id="title">Math Puzzle Challenge</div>
+  <div id="filter-bar">
+    <button class="filter-btn active" data-pts="0" onclick="setFilter(0)">All</button>
+    <button class="filter-btn" data-pts="1" onclick="setFilter(1)">Level 0</button>
+    <button class="filter-btn" data-pts="2" onclick="setFilter(2)">Level 1</button>
+    <button class="filter-btn" data-pts="4" onclick="setFilter(4)">Level 2</button>
+    <button class="filter-btn" data-pts="8" onclick="setFilter(8)">Level 3</button>
+  </div>
+  <div id="counter">1 / 52</div>
+</div>
+
+<div id="slide-area">
+  <div id="point-badge">1 Point</div>
+  <div id="puzzle-name">Equal Sums - 4</div>
+  <div id="slide-frame">
+    <img id="slide-img" src="" alt="Puzzle">
+  </div>
+  <div id="no-slides">No puzzles match this filter.</div>
+</div>
+
+<div id="nav-bar">
+  <button class="nav-btn" id="btn-prev" onclick="navigate(-1)" title="Previous (←)">&#8592;</button>
+  <div id="progress-dots"></div>
+  <button class="nav-btn" id="btn-next" onclick="navigate(1)" title="Next (→)">&#8594;</button>
+</div>
+<div id="keyboard-hint">← → arrow keys to navigate</div>
+
+<script>
+const ALL_SLIDES = [
+  {"img":"images/01.png","points":1,"name":"Equal Sums - 4"},
+  {"img":"images/02.png","points":1,"name":"Finding the Pieces - 3"},
+  {"img":"images/03.png","points":1,"name":"Lines - 1"},
+  {"img":"images/04.png","points":1,"name":"Magic Squares - 4"},
+  {"img":"images/05.png","points":1,"name":"Sujiko Puzzle - 3"},
+  {"img":"images/06.png","points":1,"name":"Letter Substitutions - 4"},
+  {"img":"images/07.png","points":1,"name":"Lines - 2"},
+  {"img":"images/08.png","points":1,"name":"Odd Squares"},
+  {"img":"images/09.png","points":1,"name":"Stick Areas"},
+  {"img":"images/10.png","points":1,"name":"Letter Substitutions - 5"},
+  {"img":"images/11.png","points":1,"name":"Fill in the Blanks - 6"},
+  {"img":"images/12.png","points":1,"name":"Adding Ten Numbers"},
+  {"img":"images/13.png","points":1,"name":"Avoiding Rectangles - 2"},
+  {"img":"images/14.png","points":1,"name":"Boxed Blocks"},
+  {"img":"images/15.png","points":1,"name":"Parity - 2 - Paths on Boards"},
+  {"img":"images/16.png","points":1,"name":"Parades - 1"},
+  {"img":"images/17.png","points":2,"name":"Avoiding Triangles"},
+  {"img":"images/18.png","points":2,"name":"Removing Digits"},
+  {"img":"images/19.png","points":2,"name":"Parity - 1 - Dominoes on Boards"},
+  {"img":"images/20.png","points":2,"name":"Parades - 2 - 7 Bridges of Konigsberg"},
+  {"img":"images/21.png","points":2,"name":"Parity - 3 - Last Number Standing"},
+  {"img":"images/22.png","points":2,"name":"Product Equals Sum"},
+  {"img":"images/23.png","points":2,"name":"Mystery Sums - 1"},
+  {"img":"images/24.png","points":2,"name":"Fractions - 1"},
+  {"img":"images/25.png","points":2,"name":"Broken Calculator - 1"},
+  {"img":"images/26.png","points":2,"name":"Maximizing Products with 16"},
+  {"img":"images/27.png","points":2,"name":"Mystery Sums - 2"},
+  {"img":"images/28.png","points":2,"name":"Fractions - 2"},
+  {"img":"images/29.png","points":4,"name":"Ladybugs that don't add up - 2"},
+  {"img":"images/30.png","points":4,"name":"Equal Products"},
+  {"img":"images/31.png","points":4,"name":"Combining Digits - 1 2 4 8"},
+  {"img":"images/32.png","points":4,"name":"Fractions - 3"},
+  {"img":"images/33.png","points":4,"name":"Topology - 2 - Are Their Hands Tied"},
+  {"img":"images/34.png","points":4,"name":"Extreme Products - 1"},
+  {"img":"images/35.png","points":4,"name":"Combining Digits - Easy as 1 2 3 4"},
+  {"img":"images/36.png","points":4,"name":"Fractions - 4"},
+  {"img":"images/37.png","points":4,"name":"Finding Squares - 1"},
+  {"img":"images/38.png","points":4,"name":"Moving Digits - 2"},
+  {"img":"images/39.png","points":4,"name":"Combining Digits - Five 2's"},
+  {"img":"images/40.png","points":4,"name":"Fractions - 6"},
+  {"img":"images/41.png","points":8,"name":"Finding Squares - 2"},
+  {"img":"images/42.png","points":8,"name":"Water Cups - 1"},
+  {"img":"images/43.png","points":8,"name":"Turning the Tables"},
+  {"img":"images/44.png","points":8,"name":"Fractions - 7"},
+  {"img":"images/45.png","points":8,"name":"Trapezoidal Numbers - 1"},
+  {"img":"images/46.png","points":8,"name":"Water Cups - 2"},
+  {"img":"images/47.png","points":8,"name":"Filling Squares With Squares"},
+  {"img":"images/48.png","points":8,"name":"Fractions - 9"},
+  {"img":"images/49.png","points":8,"name":"Handshakes at a Party - 2"},
+  {"img":"images/50.png","points":8,"name":"Pirates with Gold - 1"},
+  {"img":"images/51.png","points":8,"name":"Filling Triangles With Triangles"},
+  {"img":"images/52.png","points":8,"name":"Fractions - 12"}
+];
+
+let slides = [...ALL_SLIDES];
+let currentIndex = 0;
+let activeFilter = 0;
+
+function setFilter(pts) {
+  activeFilter = pts;
+  slides = pts === 0 ? [...ALL_SLIDES] : ALL_SLIDES.filter(s => s.points === pts);
+  currentIndex = 0;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.pts) === pts);
+  });
+  buildDots();
+  render();
+}
+
+function buildDots() {
+  const container = document.getElementById('progress-dots');
+  container.innerHTML = '';
+  slides.forEach((s, i) => {
+    const d = document.createElement('div');
+    d.className = `dot pt${s.points}`;
+    d.title = s.name;
+    d.onclick = () => { currentIndex = i; render(); };
+    container.appendChild(d);
+  });
+}
+
+function render() {
+  const frame = document.getElementById('slide-frame');
+  const noSlides = document.getElementById('no-slides');
+
+  if (slides.length === 0) {
+    frame.style.display = 'none';
+    noSlides.style.display = 'block';
+    document.getElementById('point-badge').textContent = '—';
+    document.getElementById('puzzle-name').textContent = '';
+    document.getElementById('counter').textContent = '0 / 0';
+    return;
+  }
+
+  frame.style.display = 'flex';
+  noSlides.style.display = 'none';
+
+  const s = slides[currentIndex];
+  document.getElementById('slide-img').src = s.img;
+  const lvl = {1:0, 2:1, 4:2, 8:3}[s.points];
+  document.getElementById('point-badge').textContent = `Level ${lvl} · ${s.points} pt${s.points !== 1 ? 's' : ''}`;
+  document.getElementById('puzzle-name').textContent = s.name;
+  document.getElementById('counter').textContent =
+    `${currentIndex + 1} / ${slides.length}`;
+
+  document.querySelectorAll('.dot').forEach((d, i) => {
+    d.classList.toggle('active', i === currentIndex);
+  });
+
+  document.getElementById('btn-prev').disabled = currentIndex === 0;
+  document.getElementById('btn-next').disabled = currentIndex === slides.length - 1;
+}
+
+function navigate(dir) {
+  const next = currentIndex + dir;
+  if (next >= 0 && next < slides.length) {
+    currentIndex = next;
+    render();
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft')  navigate(-1);
+  if (e.key === 'ArrowRight') navigate(1);
+});
+
+buildDots();
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purple Comet! Math Meet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #4a1d96 0%, #2e1065 100%);
+            overflow: hidden;
+            color: white;
+        }
+
+        .slide-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            text-align: center;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        /* Shared components */
+        .gold {
+            color: #fbbf24;
+            font-weight: bold;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #fbbf24;
+        }
+
+        .info-card p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+
+        /* Slide 1: Welcome */
+        .welcome-slide h1 {
+            font-size: 5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #e9d5ff 0%, #fbbf24 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .welcome-slide .comet-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        .welcome-slide h2 {
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 30px;
+            font-weight: normal;
+        }
+
+        .welcome-slide .date-badge {
+            font-size: 1.6rem;
+            background: rgba(251, 191, 36, 0.2);
+            border: 2px solid #fbbf24;
+            border-radius: 12px;
+            padding: 12px 30px;
+            margin-bottom: 35px;
+            color: #fbbf24;
+            font-weight: bold;
+        }
+
+        .before-begin {
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 30px 50px;
+            max-width: 900px;
+            text-align: left;
+        }
+
+        .before-begin h3 {
+            font-size: 1.5rem;
+            color: #fbbf24;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+
+        .before-begin ul {
+            list-style: none;
+            font-size: 1.3rem;
+            line-height: 2;
+        }
+
+        .before-begin ul li::before {
+            content: "• ";
+            color: #fbbf24;
+        }
+
+        /* Slide 2: Rules */
+        .rules-slide h1 {
+            font-size: 3.8rem;
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .rules-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            max-width: 1100px;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .rule-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 25px 30px;
+            text-align: left;
+        }
+
+        .rule-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rule-card h3.allowed {
+            color: #86efac;
+        }
+
+        .rule-card h3.not-allowed {
+            color: #fca5a5;
+        }
+
+        .rule-card ul {
+            list-style: none;
+            font-size: 1.15rem;
+            line-height: 1.9;
+        }
+
+        .rule-card ul li::before {
+            content: "✓ ";
+            color: #86efac;
+            font-weight: bold;
+        }
+
+        .rule-card ul.no-list li::before {
+            content: "✗ ";
+            color: #fca5a5;
+            font-weight: bold;
+        }
+
+        .submit-note {
+            background: rgba(251, 191, 36, 0.15);
+            border: 2px solid #fbbf24;
+            border-radius: 12px;
+            padding: 18px 35px;
+            font-size: 1.2rem;
+            max-width: 1100px;
+            line-height: 1.7;
+        }
+
+        /* Slide 2: Teams */
+        .teams-slide h1 {
+            font-size: 3.5rem;
+            margin-bottom: 35px;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .teams-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .team-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 25px 30px;
+            text-align: left;
+        }
+
+        .team-card h3 {
+            font-size: 1.5rem;
+            color: #fbbf24;
+            margin-bottom: 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 10px;
+        }
+
+        .team-card ul {
+            list-style: none;
+            font-size: 1.15rem;
+            line-height: 1.9;
+        }
+
+        .team-card ul li::before {
+            content: "• ";
+            color: #c4b5fd;
+        }
+
+        /* Slide 4: Go! */
+        .go-slide h1 {
+            font-size: 6rem;
+            background: linear-gradient(135deg, #e9d5ff 0%, #fbbf24 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+
+        .go-slide .subtitle {
+            font-size: 2.2rem;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 50px;
+        }
+
+        .go-slide .info-row {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin-bottom: 50px;
+        }
+
+        .go-slide .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            border-radius: 15px;
+            padding: 25px 45px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .go-slide .stat-box .num {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #fbbf24;
+            display: block;
+        }
+
+        .go-slide .reminder {
+            font-size: 1.4rem;
+            color: rgba(255, 255, 255, 0.75);
+            max-width: 700px;
+            line-height: 1.8;
+        }
+
+        /* Navigation */
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 30px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: scale(1.1);
+        }
+
+        .slide-counter {
+            color: white;
+            font-size: 1.2rem;
+            min-width: 60px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+
+        <!-- Slide 1: Welcome -->
+        <div class="slide active welcome-slide">
+            <div style="display:flex; align-items:center; gap:15px; margin-bottom:8px;">
+                <span class="comet-icon" style="font-size:3rem;">☄️</span>
+                <h1 style="font-size:3.8rem;">Purple Comet! Math Meet</h1>
+            </div>
+            <h2 style="margin-bottom:8px;">Hallie Wells Middle School Competition Math Club</h2>
+            <div class="date-badge" style="margin-bottom:25px;">April 17, 2026 &nbsp;•&nbsp; 3:15 PM</div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1.6fr; gap:25px; max-width:1150px; width:100%; align-items:start;">
+                <div class="before-begin">
+                    <h3>Before We Begin</h3>
+                    <ul>
+                        <li>Check in with Prof. Jojo</li>
+                        <li>Sit with your team (see right)</li>
+                        <li>Open your <span class="gold">Chromebook</span></li>
+                        <li>Log in at <span class="gold">purplecomet.org/teams/login</span></li>
+                        <li>Have calculators &amp; scratch paper ready</li>
+                    </ul>
+                </div>
+
+                <div class="teams-grid" style="grid-template-columns:1fr 1fr; gap:15px;">
+                    <div class="team-card">
+                        <h3 style="font-size:1.25rem;">🐔 Fast Chickens</h3>
+                        <ul style="font-size:1.05rem;">
+                            <li>Anish Magadala</li>
+                            <li>Arjun Lakshmanan</li>
+                            <li>Ayush Patel</li>
+                            <li>Krish Janoria</li>
+                            <li>Rakin Molla</li>
+                            <li>Vihaan Shah</li>
+                        </ul>
+                    </div>
+                    <div class="team-card">
+                        <h3 style="font-size:1.25rem;">💀 Prime Reaper</h3>
+                        <ul style="font-size:1.05rem;">
+                            <li>Ayaan Mankad</li>
+                            <li>Charles Wang</li>
+                            <li>Fariq Molla</li>
+                            <li>Nathaniel Lam</li>
+                            <li>Shashwat Sharma</li>
+                            <li>Vihan Parikh</li>
+                        </ul>
+                    </div>
+                    <div class="team-card">
+                        <h3 style="font-size:1.25rem;">⭐ The A-Team</h3>
+                        <ul style="font-size:1.05rem;">
+                            <li>Aadhya Meka</li>
+                            <li>Aaron Parmar</li>
+                            <li>Adelaide Lam</li>
+                            <li>Amishi Rajale</li>
+                            <li>Mohammad Basil</li>
+                            <li>Pihu Patel</li>
+                        </ul>
+                    </div>
+                    <div class="team-card">
+                        <h3 style="font-size:1.25rem;">🐴 HW Mustangs</h3>
+                        <ul style="font-size:1.05rem;">
+                            <li>Abbas Ali</li>
+                            <li>Siddhant Arya</li>
+                            <li>Srihan Asapu</li>
+                            <li>Vidhan Velvadapu</li>
+                            <li>Vihaan Mendi</li>
+                            <li>Yusuf Sadique</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Rules -->
+        <div class="slide rules-slide">
+            <h1>Contest Rules</h1>
+
+            <div class="rules-grid">
+                <div class="rule-card">
+                    <h3 class="allowed">✓ Allowed</h3>
+                    <ul>
+                        <li>Calculators</li>
+                        <li>Reference materials (notes, books)</li>
+                        <li>Talking with your teammates</li>
+                        <li>Multiple answer submissions <span style="font-size:0.95rem; color: rgba(255,255,255,0.7)">(last one counts)</span></li>
+                    </ul>
+                </div>
+
+                <div class="rule-card">
+                    <h3 class="not-allowed">✗ Not Allowed</h3>
+                    <ul class="no-list">
+                        <li>Search engines (no Googling)</li>
+                        <li>AI tools (ChatGPT, Gemini, etc.)</li>
+                        <li>Help from people outside your team</li>
+                        <li>Discussing problems with other teams</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="submit-note">
+                💡 Submit answers online — you can resubmit as many times as you like.
+                <strong style="color: #fbbf24;">Only your last submission before time runs out will be scored.</strong>
+            </div>
+
+            <div style="background: rgba(239,68,68,0.15); border: 2px solid #fca5a5; border-radius: 12px; padding: 18px 35px; max-width: 1100px; margin-top: 20px; font-size: 1.2rem; line-height: 1.7;">
+                🚫 <strong style="color: #fca5a5;">No discussing or posting about any contest questions until April 24.</strong>
+                The contest window is open until April 23 — do not share problems, answers, or strategies with anyone outside your team before then.
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Navigation -->
+    <div class="navigation">
+        <button class="nav-btn" onclick="previousSlide()">◄</button>
+        <span class="slide-counter"><span id="current-slide">1</span> / 2</span>
+        <button class="nav-btn" onclick="nextSlide()">►</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function goToSlide(index) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = index;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) goToSlide(currentSlide + 1);
+        }
+
+        function previousSlide() {
+            if (currentSlide > 0) goToSlide(currentSlide - 1);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') previousSlide();
+        });
+    </script>
+</body>
+</html>

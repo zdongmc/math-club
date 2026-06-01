@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noetic 2026 — Countdown Challenge</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Arial Black', Arial, sans-serif; background: linear-gradient(135deg, #dc2626, #991b1b); min-height: 100vh; color: white; }
+.hidden { display: none !important; }
+
+/* ── ATTENDANCE ── */
+#att-screen { display: flex; flex-direction: column; min-height: 100vh; padding: 16px; gap: 10px; }
+.att-title { font-size: 1.4rem; text-shadow: 1px 1px 3px rgba(0,0,0,0.4); flex-shrink: 0; }
+.att-subtitle { font-size: 0.85rem; opacity: 0.75; flex-shrink: 0; }
+.att-grade-cols { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; overflow: hidden; }
+.att-col { background: rgba(0,0,0,0.25); border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; }
+.att-col-header { background: rgba(0,0,0,0.3); padding: 8px 12px; font-size: 0.9rem; font-weight: bold; flex-shrink: 0; display: flex; justify-content: space-between; }
+.att-col-count { font-weight: normal; opacity: 0.7; font-size: 0.8rem; }
+.att-list { flex: 1; overflow-y: auto; padding: 4px; display: flex; flex-direction: column; gap: 2px; }
+.att-row { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 6px; cursor: pointer; }
+.att-row:hover { background: rgba(255,255,255,0.1); }
+.att-row input[type=checkbox] { width: 15px; height: 15px; accent-color: #ffd700; cursor: pointer; flex-shrink: 0; }
+.att-row label { font-size: 0.82rem; cursor: pointer; flex: 1; }
+.att-rank { font-size: 0.68rem; background: rgba(255,255,255,0.15); padding: 1px 5px; border-radius: 8px; }
+.att-footer { flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.15); flex-wrap: wrap; gap: 8px; }
+.att-summary { font-size: 0.85rem; opacity: 0.75; }
+.btn { border: none; border-radius: 8px; font-family: inherit; font-weight: bold; cursor: pointer; padding: 9px 20px; font-size: 0.9rem; }
+.btn:disabled { opacity: 0.35; cursor: default; }
+.btn-gold { background: #ffd700; color: #1a1a1a; }
+.btn-gold:hover:not(:disabled) { background: #ffe44d; }
+.btn-ghost { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); }
+.btn-ghost:hover { background: rgba(255,255,255,0.25); }
+.att-add-row { display: flex; gap: 6px; align-items: center; flex-shrink: 0; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.1); }
+.att-add-row input[type=text] { flex: 1; padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.12); color: white; font-size: 0.82rem; outline: none; }
+.att-add-row input::placeholder { color: rgba(255,255,255,0.4); }
+.att-add-row select { padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.12); color: white; font-size: 0.82rem; cursor: pointer; }
+.att-add-row select option { background: #991b1b; }
+
+/* ── BOARD ── */
+#board-screen { display: flex; flex-direction: column; min-height: 100vh; padding: 12px; gap: 10px; }
+.matchup-bar { background: rgba(0,0,0,0.35); border-radius: 10px; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-shrink: 0; flex-wrap: wrap; }
+.matchup-side { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.matchup-role { font-size: 0.7rem; opacity: 0.65; text-transform: uppercase; letter-spacing: 1px; }
+.matchup-name { font-size: 1.2rem; font-weight: bold; color: #ffd700; }
+.matchup-vs { font-size: 1.4rem; font-weight: bold; opacity: 0.5; }
+.matchup-instruction { font-size: 0.8rem; opacity: 0.7; text-align: center; }
+
+.cat-grid { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: 10px; }
+.cat-card { background: #1a237e; border: 2px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 20px 16px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: background 0.15s, transform 0.1s, border-color 0.15s; }
+.cat-card:hover:not(.exhausted) { background: #1565c0; border-color: #ffd700; transform: scale(1.02); }
+.cat-card.exhausted { background: #2d2d2d; border-color: rgba(255,255,255,0.08); cursor: default; opacity: 0.5; }
+.cat-name { font-size: 2.2rem; font-weight: bold; color: #ffd700; line-height: 1.2; text-align: center; }
+.cat-timing { font-size: 2.2rem; font-weight: bold; color: white; }
+.cat-timing.exhausted-label { font-size: 1.1rem; color: #9ca3af; }
+.cat-dots { display: flex; gap: 3px; flex-wrap: wrap; justify-content: center; }
+.cat-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); flex-shrink: 0; }
+.cat-dot.used { background: rgba(255,255,255,0.6); }
+
+.queue-strip { background: rgba(0,0,0,0.25); border-radius: 8px; padding: 8px 12px; flex-shrink: 0; display: flex; align-items: center; gap: 8px; overflow-x: auto; }
+.queue-label { font-size: 0.72rem; opacity: 0.6; white-space: nowrap; flex-shrink: 0; }
+.queue-item { font-size: 0.78rem; background: rgba(255,255,255,0.12); padding: 3px 10px; border-radius: 12px; white-space: nowrap; flex-shrink: 0; }
+.queue-item.next { background: rgba(255,215,0,0.25); border: 1px solid rgba(255,215,0,0.5); color: #ffd700; }
+.queue-arrow { font-size: 0.7rem; opacity: 0.4; flex-shrink: 0; }
+.board-footer { flex-shrink: 0; display: flex; justify-content: flex-end; }
+
+/* ── QUESTION ── */
+#q-screen { position: fixed; inset: 0; background: #0a0a3e; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 14px 20px; z-index: 100; overflow-y: auto; gap: 10px; }
+.q-header { width: 100%; max-width: 860px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.q-cat-badge { background: #1a237e; color: #ffd700; padding: 4px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
+.q-matchup-mini { font-size: 0.82rem; opacity: 0.7; }
+.q-matchup-mini span { color: #ffd700; font-weight: bold; }
+.last-chance-banner { width: 100%; max-width: 860px; margin: 0 auto; background: #7f1d1d; color: #fca5a5; border: 1px solid #ef4444; border-radius: 6px; padding: 5px 14px; font-size: 0.82rem; font-weight: bold; text-align: center; letter-spacing: 0.4px; flex-shrink: 0; }
+.timer-wrap { width: 100%; max-width: 860px; flex-shrink: 0; }
+.timer-row { display: flex; align-items: center; gap: 12px; }
+.timer-num { font-size: 1.8rem; font-weight: bold; min-width: 3.2rem; text-align: right; transition: color 0.3s; flex-shrink: 0; }
+.timer-num.warn { color: #fbbf24; }
+.timer-num.crit { color: #ef4444; animation: pulse 0.5s infinite alternate; }
+.timer-num.done { color: #ef4444; font-size: 1rem; }
+@keyframes pulse { from { opacity:1; } to { opacity:0.3; } }
+.timer-bar-track { flex: 1; height: 10px; background: rgba(255,255,255,0.2); border-radius: 5px; overflow: hidden; }
+.timer-bar-fill { height: 100%; background: #22c55e; border-radius: 5px; transition: width 1s linear, background 0.3s; }
+.timer-bar-fill.warn { background: #fbbf24; }
+.timer-bar-fill.crit { background: #ef4444; }
+.q-card { background: white; color: #0a0a3e; border-radius: 14px; padding: 28px 36px; font-size: 1.95rem; font-family: Georgia, 'Times New Roman', serif; font-weight: normal; line-height: 1.65; text-align: left; max-width: 860px; width: 100%; }
+.q-card sub, .q-card sup { font-size: 0.65em; }
+.q-card svg { display: block; margin: 16px auto 0; }
+.btn-reveal { background: #ffd700; color: #1a1a1a; border: none; padding: 12px 36px; font-size: 1.1rem; font-family: inherit; font-weight: bold; border-radius: 10px; cursor: pointer; flex-shrink: 0; }
+.btn-reveal:hover { background: #ffe44d; }
+.ans-section { display: none; width: 100%; max-width: 860px; }
+.ans-box { background: rgba(255,255,255,0.1); border: 2px solid #ffd700; border-radius: 10px; padding: 14px 24px; text-align: center; margin-bottom: 14px; }
+.ans-label { font-size: 0.8rem; opacity: 0.65; margin-bottom: 3px; }
+.ans-val { font-size: 1.8rem; font-weight: bold; color: #ffd700; }
+.ans-hint { font-size: 0.9rem; opacity: 0.75; margin-top: 6px; font-style: italic; }
+.verdict-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 10px; }
+.btn-correct { background: #16a34a; color: white; border: none; padding: 11px 20px; font-size: 0.95rem; font-family: inherit; font-weight: bold; border-radius: 8px; cursor: pointer; }
+.btn-correct:hover { background: #15803d; }
+.btn-neither { background: #6b7280; color: white; border: none; padding: 11px 20px; font-size: 0.95rem; font-family: inherit; font-weight: bold; border-radius: 8px; cursor: pointer; }
+.btn-neither:hover { background: #4b5563; }
+
+/* ── GAME OVER ── */
+#over-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 30px; text-align: center; gap: 16px; }
+.over-trophy { font-size: 5rem; }
+.over-title { font-size: 1.4rem; opacity: 0.8; }
+.over-name { font-size: 2.8rem; font-weight: bold; color: #ffd700; text-shadow: 0 0 20px rgba(255,215,0,0.5); }
+.over-stats { font-size: 0.95rem; opacity: 0.7; }
+</style>
+</head>
+<body>
+
+<!-- ATTENDANCE -->
+<div id="att-screen">
+  <div class="att-title">Noetic 2026 — Countdown Challenge</div>
+  <div class="att-subtitle">Check off who is present today</div>
+  <div class="att-grade-cols">
+    <div class="att-col">
+      <div class="att-col-header">6th Grade <span class="att-col-count" id="cnt-6">0 selected</span></div>
+      <div class="att-list" id="list-6"></div>
+    </div>
+    <div class="att-col">
+      <div class="att-col-header">7th Grade <span class="att-col-count" id="cnt-7">0 selected</span></div>
+      <div class="att-list" id="list-7"></div>
+    </div>
+    <div class="att-col">
+      <div class="att-col-header">8th Grade <span class="att-col-count" id="cnt-8">0 selected</span></div>
+      <div class="att-list" id="list-8"></div>
+    </div>
+  </div>
+  <div class="att-add-row">
+    <input type="text" id="add-name" placeholder="Add student name…" maxlength="40" onkeydown="if(event.key==='Enter')addStudent()">
+    <select id="add-grade"><option value="6">6th</option><option value="7">7th</option><option value="8" selected>8th</option></select>
+    <button class="btn btn-ghost" onclick="addStudent()">Add</button>
+  </div>
+  <div class="att-footer">
+    <div class="att-summary" id="att-summary">0 students selected</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost" onclick="selectAll(true)">Select All</button>
+      <button class="btn btn-ghost" onclick="selectAll(false)">Clear</button>
+      <button class="btn btn-gold" id="start-btn" disabled onclick="startGame()">Start →</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOARD -->
+<div id="board-screen" class="hidden">
+  <div class="matchup-bar">
+    <div class="matchup-side">
+      <div class="matchup-role">Champion</div>
+      <div class="matchup-name" id="champion-name">—</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+      <div class="matchup-vs">vs</div>
+      <div class="matchup-instruction" id="matchup-instruction">Challenger picks a category</div>
+    </div>
+    <div class="matchup-side">
+      <div class="matchup-role">Challenger</div>
+      <div class="matchup-name" id="challenger-name">—</div>
+    </div>
+  </div>
+  <div id="board-last-chance-banner" class="last-chance-banner hidden">⚠ Last chance — challenger must succeed here to unseat current champion</div>
+  <div class="cat-grid" id="cat-grid"></div>
+  <div class="queue-strip" id="queue-strip"></div>
+  <div class="board-footer" style="display:flex;justify-content:space-between">
+    <button class="btn btn-ghost" style="font-size:0.8rem;padding:6px 14px" onclick="openTeacherView()">👁 Teacher View</button>
+    <button class="btn btn-ghost" style="font-size:0.8rem;padding:6px 14px" onclick="startGame()">↺ New Game</button>
+  </div>
+</div>
+
+<!-- QUESTION -->
+<div id="q-screen" class="hidden">
+  <div class="q-header">
+    <div class="q-cat-badge" id="q-cat-badge"></div>
+    <div class="q-matchup-mini" id="q-matchup-mini"></div>
+  </div>
+  <div id="last-chance-banner" class="last-chance-banner hidden">⚠ Last chance — challenger must succeed here to unseat current champion</div>
+  <div class="timer-wrap">
+    <div class="timer-row">
+      <div class="timer-num" id="timer-num">60</div>
+      <div class="timer-bar-track"><div class="timer-bar-fill" id="timer-bar" style="width:100%"></div></div>
+    </div>
+  </div>
+  <div class="q-card" id="q-text"></div>
+  <button class="btn-reveal" id="btn-reveal" onclick="revealAnswer()">Reveal Answer</button>
+  <div class="ans-section" id="ans-section">
+    <div class="ans-box">
+      <div class="ans-label">Answer</div>
+      <div class="ans-val" id="ans-val"></div>
+      <div class="ans-hint" id="ans-hint"></div>
+    </div>
+    <div class="verdict-row" id="verdict-row"></div>
+  </div>
+</div>
+
+<!-- GAME OVER -->
+<div id="over-screen" class="hidden">
+  <div class="over-trophy">🏆</div>
+  <div class="over-title">Countdown Champion</div>
+  <div class="over-name" id="over-name"></div>
+  <div class="over-stats" id="over-stats"></div>
+  <button class="btn btn-gold" style="margin-top:16px" onclick="location.reload()">Play Again</button>
+</div>
+
+<script>
+// ── STUDENTS ─────────────────────────────────────────────────────────────────
+// Ranked by normalized composite score across MATHCOUNTS, AMC 8, Math League, MOEMS, and Noetic
+// (4:1 weighting: prior competitions : Noetic; within-level normalization for Noetic)
+// Ranks 67+ = attendance-only students (no competition data), snake-drafted last
+const STUDENTS = [
+  {rank:1,  name:"Vihaan Shah",             grade:8},
+  {rank:2,  name:"Arjun Lakshmanan",        grade:8},
+  {rank:3,  name:"Ella Shang",              grade:8},
+  {rank:4,  name:"Rakin Molla",             grade:8},
+  {rank:5,  name:"Anish Magadala",          grade:8},
+  {rank:6,  name:"Krish Janoria",           grade:8},
+  {rank:7,  name:"Joyce Shang",             grade:6},
+  {rank:8,  name:"Ayush Patel",             grade:7},
+  {rank:9,  name:"Charles Wang",            grade:6},
+  {rank:10, name:"Jayden George",           grade:7},
+  {rank:11, name:"Pihu Patel",              grade:7},
+  {rank:12, name:"Navraj Kaler",            grade:8},
+  {rank:13, name:"Nandini Desai",           grade:8},
+  {rank:14, name:"Fariq Molla",             grade:6},
+  {rank:15, name:"Reya Ganesh",             grade:8},
+  {rank:16, name:"Olivia Dai",              grade:6},
+  {rank:17, name:"Parth Kapoor",            grade:7},
+  {rank:18, name:"Vihan Parikh",            grade:7},
+  {rank:19, name:"Yusuf Sadique",           grade:6},
+  {rank:20, name:"Mohammad Basil",          grade:7},
+  {rank:21, name:"Ayaan Mankad",            grade:6},
+  {rank:22, name:"Kavya Kamalabharathy",    grade:7},
+  {rank:23, name:"Sameeksha Namburu",       grade:8},
+  {rank:24, name:"Reha Patel",              grade:8},
+  {rank:25, name:"Samarth Vedpathak",       grade:8},
+  {rank:26, name:"Om Pawar",                grade:8},
+  {rank:27, name:"Mia Mody",                grade:8},
+  {rank:28, name:"Annika Saravanan",        grade:8},
+  {rank:29, name:"Abhay Devaguptapu",       grade:6},
+  {rank:30, name:"Nathaniel Lam",           grade:8},
+  {rank:31, name:"Sanjukta Thumbi Karthik", grade:7},
+  {rank:32, name:"Shashwat Sharma",         grade:6},
+  {rank:33, name:"Nitara Hemantha",         grade:8},
+  {rank:34, name:"Shreyansh Dixit",         grade:8},
+  {rank:35, name:"Aadhya Balija",           grade:7},
+  {rank:36, name:"Bhargavi Parthasarathy",  grade:8},
+  {rank:37, name:"Jaina Gaur",              grade:8},
+  {rank:38, name:"Vihaan Mendi",            grade:6},
+  {rank:39, name:"Namie Patani",            grade:7},
+  {rank:40, name:"Riya Suthar",             grade:7},
+  {rank:41, name:"Siddhant Arya",           grade:7},
+  {rank:42, name:"Faith Ethy",              grade:7},
+  {rank:43, name:"Rayyan Aqeel",            grade:6},
+  {rank:44, name:"Vedah Shrestha",          grade:7},
+  {rank:45, name:"Sathvik Sripathi",        grade:6},
+  {rank:46, name:"Vanshika Gunda",          grade:7},
+  {rank:47, name:"Aadhya Meka",             grade:6},
+  {rank:48, name:"Aahil Shaik",             grade:6},
+  {rank:49, name:"Sanskriti Baveja",        grade:6},
+  {rank:50, name:"Juliette Kilroy",         grade:6},
+  {rank:51, name:"Nithi Gowda",             grade:6},
+  {rank:52, name:"Abbas Ali",               grade:7},
+  {rank:53, name:"Srihan Asapu",            grade:6},
+  {rank:54, name:"Benjamin Snobar",         grade:6},
+  {rank:55, name:"Amishi Rajale",           grade:7},
+  {rank:56, name:"Arjun Chalasani",         grade:7},
+  {rank:57, name:"Aaron Parmar",            grade:8},
+  {rank:58, name:"Advitha Doda",            grade:0},
+  {rank:59, name:"Adelaide Lam",            grade:6},
+  {rank:60, name:"Veeraj Sandhu",           grade:7},
+  {rank:61, name:"Aaron Sharma",            grade:6},
+  {rank:62, name:"Anish Telukutla",         grade:6},
+  {rank:63, name:"Vedik Mehra",             grade:8},
+  {rank:64, name:"Karthika Rayavarapu",     grade:8},
+  {rank:65, name:"Saanvi Sinha",            grade:8},
+  {rank:66, name:"Dilshan Prakash",         grade:8},
+  // Attendance-only (no prior competition data), snake-drafted last
+  {rank:67, name:"Aadhya Banoori",          grade:6},
+  {rank:68, name:"Aadhya Pandrapragada",    grade:6},
+  {rank:69, name:"Camille Huang",           grade:6},
+  {rank:70, name:"Dante Abarca",            grade:6},
+  {rank:71, name:"Inaam Ahmad",             grade:8},
+  {rank:72, name:"Jameson Eng",             grade:8},
+  {rank:73, name:"Jessica Zhu",             grade:6},
+  {rank:74, name:"Vidhan Velvadapu",        grade:6},
+  {rank:75, name:"Mia Cappucio",            grade:6},
+  {rank:76, name:"Nathan Beka",             grade:8},
+  {rank:77, name:"Nethra Sambathkumar",     grade:8},
+  {rank:78, name:"Sashvi Nagu",             grade:6},
+];
+
+// ── QUESTION DATA ─────────────────────────────────────────────────────────────
+// 6 categories × 8 questions, ordered easiest → hardest within each category
+// Timing by position index: [45,45,60,60,90,90,120,120] seconds
+
+const TIMING = [45, 45, 60, 60, 90, 90, 120, 120];
+
+function fmtTime(s) {
+  if (s < 60) return s + 's';
+  return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+}
+
+const CATEGORIES = [
+  {
+    name: "Shape & Space",
+    questions: [
+      { q: "In a rectangle, the length is three times the width. The perimeter of the rectangle is 128 inches. What is the length?",
+        a: "48 inches", hint: "2(l+w)=128, l=3w → 8w=128 → w=16, l=48.", src: "G7 #2" },
+      { q: "Triangle ABC is made of smaller identical triangles, as shown below. The area of triangle ABC is 72 square inches. What is the area of the shaded trapezoid BCDE?",
+        a: "40 sq in", hint: "Shaded region = 5 of the 9 small triangles → 5/9 × 72 = 40.", src: "G6 #4",
+        svg: `<svg viewBox="0 -18 220 213" width="190" height="183"><defs><style>.ts{fill:#c0cfe0;stroke:#1e3a8a;stroke-width:1.5}.tc{fill:#f8f8f8;stroke:#1e3a8a;stroke-width:1.5}</style></defs><polygon points="20,185 200,185 170,125 50,125" class="ts"/><line x1="80" y1="185" x2="50" y2="125" stroke="#1e3a8a" stroke-width="1.5"/><line x1="80" y1="185" x2="110" y2="125" stroke="#1e3a8a" stroke-width="1.5"/><line x1="140" y1="185" x2="110" y2="125" stroke="#1e3a8a" stroke-width="1.5"/><line x1="140" y1="185" x2="170" y2="125" stroke="#1e3a8a" stroke-width="1.5"/><polygon points="80,65 140,65 170,125 50,125" class="tc"/><line x1="80" y1="65" x2="110" y2="125" stroke="#1e3a8a" stroke-width="1.5"/><line x1="140" y1="65" x2="110" y2="125" stroke="#1e3a8a" stroke-width="1.5"/><polygon points="110,5 80,65 140,65" class="tc"/><polygon points="110,5 20,185 200,185" fill="none" stroke="#1e3a8a" stroke-width="2.5"/><line x1="50" y1="125" x2="170" y2="125" stroke="#dc2626" stroke-width="2.5"/><text x="110" y="-3" text-anchor="middle" font-size="16" font-weight="bold" fill="#1e3a8a">A</text><text x="10" y="190" font-size="16" font-weight="bold" fill="#1e3a8a">B</text><text x="200" y="190" font-size="16" font-weight="bold" fill="#1e3a8a">C</text><text x="36" y="124" font-size="16" font-weight="bold" fill="#dc2626">E</text><text x="172" y="124" font-size="16" font-weight="bold" fill="#dc2626">D</text></svg>` },
+      { q: "A marching band practices its formation. At first, the entire band forms a rectangle with 7 rows with the same number of people in each row. Then they form another rectangle with 6 rows. The number of people in the band is between 150 and 200. How many people are in the band?",
+        a: "168", hint: "Must be a multiple of both 6 and 7, i.e. a multiple of 42. Between 150–200: 42×4=168.", src: "G6 #3" },
+      { q: "Garvin has three square tiles A, B, and C glued together as shown below. Tile A has perimeter 16 inches and Tile B has perimeter 24 inches. What is the perimeter of the combined shape?",
+        a: "52 inches", hint: "Side A=4, Side B=6, Side C=A+B=10. Perimeter: (10+4)+4+2+6+(6+10)+10 = 52.", src: "G6 #15 / G7 #11",
+        svg: `<svg viewBox="0 0 215 130" width="200" height="121"><rect x="5" y="5" width="120" height="120" fill="#f0f4ff" stroke="#1e3a8a" stroke-width="2"/><text x="65" y="70" text-anchor="middle" font-size="22" fill="#1e3a8a">C</text><rect x="125" y="5" width="48" height="48" fill="#f0f4ff" stroke="#1e3a8a" stroke-width="2"/><text x="149" y="34" text-anchor="middle" font-size="16" fill="#1e3a8a">A</text><rect x="125" y="53" width="72" height="72" fill="#f0f4ff" stroke="#1e3a8a" stroke-width="2"/><text x="161" y="94" text-anchor="middle" font-size="16" fill="#1e3a8a">B</text></svg>` },
+      { q: "In triangle OAD, points B and C lie on segment AD. OA = OB = BC and OC = CD. The measure of ∠AOB is 20°. What is the measure of ∠CDO?",
+        a: "20°", hint: "∠OAB=80°, so ∠OBC=100° (supplement). OBC isosceles → ∠BOC=40°. ∠OCD=140° (supplement). OCD isosceles → ∠CDO=20°.", src: "G8 #16",
+        svg: `<svg viewBox="0 0 260 210" width="230" height="185"><line x1="20" y1="175" x2="222" y2="175" stroke="#334155" stroke-width="2"/><line x1="32" y1="105" x2="20" y2="175" stroke="#1e3a8a" stroke-width="1.8"/><line x1="32" y1="105" x2="44" y2="175" stroke="#1e3a8a" stroke-width="1.8"/><line x1="32" y1="105" x2="114" y2="175" stroke="#1e3a8a" stroke-width="1.8"/><line x1="32" y1="105" x2="222" y2="175" stroke="#1e3a8a" stroke-width="1.8"/><line x1="21" y1="139" x2="31" y2="141" stroke="#1e3a8a" stroke-width="1.5"/><line x1="33" y1="141" x2="43" y2="139" stroke="#1e3a8a" stroke-width="1.5"/><line x1="79" y1="172" x2="79" y2="178" stroke="#1e3a8a" stroke-width="1.5"/><line x1="68" y1="141" x2="74" y2="135" stroke="#1e3a8a" stroke-width="1.5"/><line x1="72" y1="145" x2="78" y2="139" stroke="#1e3a8a" stroke-width="1.5"/><line x1="165" y1="172" x2="165" y2="178" stroke="#1e3a8a" stroke-width="1.5"/><line x1="171" y1="172" x2="171" y2="178" stroke="#1e3a8a" stroke-width="1.5"/><text x="32" y="97" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e3a8a">O</text><text x="14" y="192" font-size="13" font-weight="bold" fill="#1e3a8a">A</text><text x="44" y="192" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e3a8a">B</text><text x="114" y="192" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e3a8a">C</text><text x="222" y="192" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e3a8a">D</text></svg>` },
+      { q: "Daniela draws two acute triangles. Four of the six interior angles of the two triangles measure 80°, 75°, 40°, and 15°. What is the measure of the largest interior angle of the two triangles?",
+        a: "85°", hint: "Try: Triangle 1 has 80°+15°+85°=180° (all acute ✓). Triangle 2 has 75°+40°+65°=180° (all acute ✓). Largest = 85°.", src: "G8 #19" },
+      { q: "A solid cube with side length 4 cm is painted green on all six faces and then cut into 1-cm cubes. How many of the 1-cm cubes have exactly two green faces?",
+        a: "24 cubes", hint: "Exactly 2 painted faces = edge-interior cubes (not corners). Each of the 12 edges has 4−2=2 such cubes. 12×2=24.", src: "G8 #4",
+        svg: `<svg viewBox="4 4 136 136" width="190" height="190"><polygon points="16,48 96,48 96,128 16,128" fill="#4ade80"/><polygon points="16,48 96,48 128,16 48,16" fill="#22c55e"/><polygon points="96,48 96,128 128,96 128,16" fill="#16a34a"/><line x1="16" y1="68" x2="96" y2="68" stroke="#15803d" stroke-width="1"/><line x1="16" y1="88" x2="96" y2="88" stroke="#15803d" stroke-width="1"/><line x1="16" y1="108" x2="96" y2="108" stroke="#15803d" stroke-width="1"/><line x1="36" y1="48" x2="36" y2="128" stroke="#15803d" stroke-width="1"/><line x1="56" y1="48" x2="56" y2="128" stroke="#15803d" stroke-width="1"/><line x1="76" y1="48" x2="76" y2="128" stroke="#15803d" stroke-width="1"/><line x1="24" y1="40" x2="104" y2="40" stroke="#15803d" stroke-width="1"/><line x1="32" y1="32" x2="112" y2="32" stroke="#15803d" stroke-width="1"/><line x1="40" y1="24" x2="120" y2="24" stroke="#15803d" stroke-width="1"/><line x1="36" y1="48" x2="68" y2="16" stroke="#15803d" stroke-width="1"/><line x1="56" y1="48" x2="88" y2="16" stroke="#15803d" stroke-width="1"/><line x1="76" y1="48" x2="108" y2="16" stroke="#15803d" stroke-width="1"/><line x1="104" y1="40" x2="104" y2="120" stroke="#15803d" stroke-width="1"/><line x1="112" y1="32" x2="112" y2="112" stroke="#15803d" stroke-width="1"/><line x1="120" y1="24" x2="120" y2="104" stroke="#15803d" stroke-width="1"/><line x1="96" y1="68" x2="128" y2="36" stroke="#15803d" stroke-width="1"/><line x1="96" y1="88" x2="128" y2="56" stroke="#15803d" stroke-width="1"/><line x1="96" y1="108" x2="128" y2="76" stroke="#15803d" stroke-width="1"/><rect x="16" y="48" width="80" height="80" fill="none" stroke="#14532d" stroke-width="2"/><line x1="16" y1="48" x2="48" y2="16" stroke="#14532d" stroke-width="2"/><line x1="96" y1="48" x2="128" y2="16" stroke="#14532d" stroke-width="2"/><line x1="48" y1="16" x2="128" y2="16" stroke="#14532d" stroke-width="2"/><line x1="96" y1="128" x2="128" y2="96" stroke="#14532d" stroke-width="2"/><line x1="128" y1="16" x2="128" y2="96" stroke="#14532d" stroke-width="2"/><line x1="48" y1="16" x2="48" y2="96" stroke="#14532d" stroke-width="1.5" stroke-dasharray="5,3"/><line x1="48" y1="96" x2="128" y2="96" stroke="#14532d" stroke-width="1.5" stroke-dasharray="5,3"/><line x1="16" y1="128" x2="48" y2="96" stroke="#14532d" stroke-width="1.5" stroke-dasharray="5,3"/></svg>` },
+      { q: "The side length of square ABCD is 2 inches. Two circles, each with radius 2 inches, are drawn with centers at points B and D. What is the area of the region where the two circles overlap (the shaded region)? Use π = 3.14.",
+        a: "2.28 sq in", hint: "BA=BC=2=radius, so A and C lie on both circles. ∠ABC=90°. Overlap = 2×(sector area − triangle area) = 2×(3.14−2) = 2.28.", src: "G8 #20",
+        svg: `<svg viewBox="15 10 270 170" width="250" height="157"><circle cx="100" cy="95" r="71" fill="none" stroke="#94a3b8" stroke-width="1.5"/><circle cx="200" cy="95" r="71" fill="none" stroke="#94a3b8" stroke-width="1.5"/><path d="M 150 45 A 71 71 0 0 0 150 145 A 71 71 0 0 0 150 45 Z" fill="#bfdbfe" fill-opacity="0.8" stroke="#1e40af" stroke-width="2"/><polygon points="150,45 200,95 150,145 100,95" fill="none" stroke="#475569" stroke-width="1.3" stroke-dasharray="5,3"/><circle cx="200" cy="95" r="3" fill="#1e3a8a"/><circle cx="100" cy="95" r="3" fill="#1e3a8a"/><circle cx="150" cy="45" r="3" fill="#1e3a8a"/><circle cx="150" cy="145" r="3" fill="#1e3a8a"/><text x="150" y="36" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e3a8a">A</text><text x="215" y="99" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e3a8a">B</text><text x="150" y="161" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e3a8a">C</text><text x="85" y="99" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e3a8a">D</text><text x="181" y="65" text-anchor="middle" font-size="11" fill="#475569">2</text></svg>` },
+    ]
+  },
+  {
+    name: "Numbers & Patterns",
+    questions: [
+      { q: "The four-digit number 2178 uses the digits 1, 2, 7, and 8. What other positive four-digit number is a multiple of 2178 and uses each of these digits exactly once?",
+        a: "8712", hint: "2178 × 4 = 8712. Digits: 8,7,1,2 ✓", src: "G6 #11" },
+      { q: "Points A through G are equally spaced on a number line. Point A represents −28 and point G represents 2. What number does point E represent?",
+        a: "−8", hint: "6 gaps over 30 units → each gap = 5. A=−28, B=−23, C=−18, D=−13, E=−8.", src: "G6 #10",
+        svg: `<svg viewBox="0 0 500 70" width="460" height="64"><line x1="30" y1="35" x2="470" y2="35" stroke="#334155" stroke-width="2.5"/><polygon points="460,29 475,35 460,41" fill="#334155"/><polygon points="40,29 25,35 40,41" fill="#334155"/>${['A','B','C','D','E','F','G'].map((l,i)=>{const x=80+i*55;return`<circle cx="${x}" cy="35" r="5" fill="#1e3a8a"/><text x="${x}" y="22" text-anchor="middle" font-size="15" font-weight="bold" fill="#1e3a8a">${l}</text>`;}).join('')}<text x="80" y="58" text-anchor="middle" font-size="13" fill="#64748b">−28</text><text x="410" y="58" text-anchor="middle" font-size="13" fill="#64748b">2</text></svg>` },
+      { q: "What is the greatest whole number that is less than 400 and is divisible by 3, 5, and 7?",
+        a: "315", hint: "LCM(3,5,7)=105. Multiples: 105, 210, 315, 420. Greatest < 400 is 315.", src: "G7 #4" },
+      { q: "On the number line below, points A through G are equally spaced. Point A represents ¼ and point G represents ½. Which point represents ⅓?",
+        a: "Point C", hint: "Each gap = (½−¼)/6 = 1/24. A=6/24, B=7/24, C=8/24 = ⅓. ✓", src: "G8 #9",
+        svg: `<svg viewBox="0 0 500 70" width="460" height="64"><line x1="30" y1="35" x2="470" y2="35" stroke="#334155" stroke-width="2.5"/><polygon points="460,29 475,35 460,41" fill="#334155"/><polygon points="40,29 25,35 40,41" fill="#334155"/>${['A','B','C','D','E','F','G'].map((l,i)=>{const x=80+i*55;return`<circle cx="${x}" cy="35" r="5" fill="#1e3a8a"/><text x="${x}" y="22" text-anchor="middle" font-size="15" font-weight="bold" fill="#1e3a8a">${l}</text>`;}).join('')}<text x="80" y="58" text-anchor="middle" font-size="13" fill="#64748b">¼</text><text x="410" y="58" text-anchor="middle" font-size="13" fill="#64748b">½</text></svg>` },
+      { q: "Isaac collects toy cars. If he puts them in groups of 2, he has 1 left over. If he puts them in groups of 3, he has 2 left over. If he puts them in groups of 5, he has 4 left over. Isaac has fewer than 50 toy cars. How many does he have?",
+        a: "29", hint: "n ≡ −1 (mod 2), (mod 3), and (mod 5) → n ≡ −1 (mod 30) → n = 29.", src: "G6 #14" },
+      { q: "In the inequality below, the variable <em>w</em> represents a positive integer. What value does <em>w</em> represent?<br><br style='line-height:0.5'><span style='font-size:1.4em'>¼ &lt; 2/<em>w</em> &lt; ⅓</span>",
+        a: "7", hint: "2/w > ¼ → w < 8.  2/w < ⅓ → w > 6.  Only positive integer: w = 7.", src: "G7 #6" },
+      { q: "What is the sum of the two largest prime factors of 2310?",
+        a: "18", hint: "2310 = 2×3×5×7×11. The two largest prime factors are 7 and 11. Sum = 18.", src: "G8 #5" },
+      { q: "What is the ones digit of 27<sup>27</sup>?",
+        a: "3", hint: "Ones digits of powers of 7 cycle with period 4: 7, 9, 3, 1, 7, 9, 3, 1,… 27 mod 4 = 3 → same ones digit as 7³ = 343 → <strong>3</strong>.", src: "G8 #10" },
+    ]
+  },
+  {
+    name: "Counting & Probability",
+    questions: [
+      { q: "A cashier has an unlimited supply of pennies (1¢), nickels (5¢), dimes (10¢), and quarters (25¢). What is the minimum number of coins needed to make exactly 43¢?",
+        a: "6 coins", hint: "1 quarter + 1 dime + 1 nickel + 3 pennies = 25+10+5+3 = 43¢ in 6 coins.", src: "G6 #2" },
+      { q: "Payton plays darts. Each dart scores either 4 points or 9 points. He scored a total of 51 points. How many of his darts scored 9 points?",
+        a: "3 darts", hint: "9×3=27, and 51−27=24=4×6. So 3 nine-point darts and 6 four-point darts. ✓", src: "G6 #12" },
+      { q: "In the figure below, how many rectangles of any size contain the star?",
+        a: "9", hint: "Star is in the middle (3rd) cell. Left boundary: 3 choices. Right boundary: 3 choices. Total = 3×3 = 9.", src: "G6 #9",
+        svg: `<svg viewBox="0 0 332 76" width="300" height="68"><rect x="4" y="4" width="320" height="64" fill="#dbeafe"/><rect x="132" y="4" width="64" height="64" fill="#bfdbfe"/><rect x="4" y="4" width="320" height="64" fill="none" stroke="#1e40af" stroke-width="2.5"/><line x1="68" y1="4" x2="68" y2="68" stroke="#1e40af" stroke-width="1.5"/><line x1="132" y1="4" x2="132" y2="68" stroke="#1e40af" stroke-width="1.5"/><line x1="196" y1="4" x2="196" y2="68" stroke="#1e40af" stroke-width="1.5"/><line x1="260" y1="4" x2="260" y2="68" stroke="#1e40af" stroke-width="1.5"/><text x="164" y="48" text-anchor="middle" font-size="36" fill="#1e3a8a">★</text></svg>` },
+      { q: "Six points are drawn in a plane. One of the points is labeled P. Using point P and any 2 of the remaining 5 points as vertices, how many different triangles can be formed? (Assume no 3 points are collinear.)",
+        a: "10", hint: "Choose 2 from the 5 other points: C(5,2) = 10.", src: "G7 #7",
+        svg: `<svg viewBox="0 0 270 185" width="240" height="165"><circle cx="140" cy="22" r="4" fill="#475569"/><circle cx="242" cy="58" r="4" fill="#475569"/><circle cx="218" cy="150" r="4" fill="#475569"/><circle cx="95" cy="160" r="4" fill="#475569"/><circle cx="18" cy="112" r="4" fill="#475569"/><circle cx="40" cy="52" r="5" fill="#1e3a8a"/><text x="40" y="44" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e3a8a">P</text></svg>` },
+      { q: "What is the greatest four-digit number whose digits have a product of 90?",
+        a: "9521", hint: "90 = 9×5×2×1. Arrange digits largest-first: 9521.", src: "G7 #9" },
+      { q: "A fair six-sided die with faces numbered 1 through 6 is rolled twice. What is the probability that the product of the two numbers rolled is odd? Express your answer as a percent.",
+        a: "25%", hint: "Product is odd only if both rolls are odd. P(odd)=3/6. P(both odd) = ½×½ = ¼ = 25%.", src: "G8 #8" },
+      { q: "Using the digits 4, 5, 7, 8, and 9, how many three-digit positive numbers divisible by 6 can be formed if no digit is repeated in each number?",
+        a: "8", hint: "Divisible by 6 = even (last digit 4 or 8) AND digit sum divisible by 3. Case last=4: pairs from {5,7,8,9} with sum≡2(mod 3) → (5,9),(8,9) → 4 numbers. Case last=8: pairs from {4,5,7,9} with sum≡1(mod 3) → (4,9),(7,9) → 4 numbers. Total: 8.", src: "G8 #11" },
+      { q: "From the eight numbers 1, 2, 3, 4, 5, 6, 7, and 8, how many different ways are there to choose six different numbers whose sum is 27?",
+        a: "4 ways", hint: "Choosing 6 of 8 leaves out 2 numbers. Those 2 must sum to 36−27=9. Pairs summing to 9: (1,8),(2,7),(3,6),(4,5). That's 4 ways.", src: "G8 #12" },
+    ]
+  },
+  {
+    name: "Rates & Work",
+    questions: [
+      { q: "Rick burns 60 calories during a 12-minute walk. If he keeps burning calories at this rate, how many minutes in total will it take him to burn 540 calories?",
+        a: "108 minutes", hint: "Rate = 60/12 = 5 cal/min. 540 ÷ 5 = 108 min.", src: "G6 #5" },
+      { q: "For every 3 tulip bulbs Cynthia planted, she planted 5 iris bulbs. She planted 12 more iris bulbs than tulip bulbs. How many tulip bulbs did she plant in all?",
+        a: "18 tulip bulbs", hint: "Each group of 3 tulip + 5 iris has 2 more iris. Groups = 12÷2 = 6. Tulips = 6×3 = 18.", src: "G6 #6" },
+      { q: "Camila attended a 3-day math camp. Each day after the first, she solved 3 more problems than the previous day. She solved a total of 51 problems. How many problems did she solve on the first day?",
+        a: "14 problems", hint: "d + (d+3) + (d+6) = 51 → 3d+9=51 → d=14.", src: "G7 #3" },
+      { q: "Lucia and Maria both live 1 mile from the gym. Lucia walks at 3 mph and Maria jogs at 5 mph. They leave home at the same time. How many minutes sooner will Maria arrive at the gym than Lucia?",
+        a: "8 minutes", hint: "Lucia: 60/3=20 min. Maria: 60/5=12 min. Difference = 8 min.", src: "G7 #8 / G8 #6" },
+      { q: "There are 60 boys and girls at a party. During a dance, ⅓ of the boys are paired with ½ of the girls. How many boys are at the party?",
+        a: "36 boys", hint: "b/3 = (60−b)/2 → 2b = 3(60−b) → 5b=180 → b=36.", src: "G7 #10" },
+      { q: "It takes Ryan 6 hours to mow a soccer field by himself. It takes Seth 12 hours. Ryan starts mowing alone. Then, 3 hours later, Seth joins him. How many more hours will it take them to finish mowing the field together?",
+        a: "2 hours", hint: "Ryan mows ½ in 3 hrs. Remaining ½ at combined rate ¼/hr → ½ ÷ ¼ = 2 hrs.", src: "G6 #18 / G7 #16" },
+      { q: "It takes Ryan 6 hours to mow a soccer field by himself. It takes Seth 12 hours. Ryan starts mowing alone. Then, 5 hours later, Seth joins him. How many more <strong>minutes</strong> will it take them to finish mowing the field together?",
+        a: "40 minutes", hint: "After 5 hrs Ryan has done 5/6. Remaining = 1/6. Combined rate = 1/6+1/12 = 1/4 per hr. Time = (1/6)÷(1/4) = 2/3 hr = 40 min.", src: "G8 #17" },
+      { q: "Rohit arranges marbles in rows to form a triangle. The top row contains 1 black marble. Each row below the top has 1 more marble than the row above it. The rows alternate in color between black and white. When Rohit finishes, there are exactly 10 more white marbles than black marbles. How many rows are in his triangle?",
+        a: "20 rows", hint: "For an even number N of rows: white total − black total = N/2 = 10 → N = 20.", src: "G7 #15",
+        svg: `<svg viewBox="35 5 130 128" width="165" height="162"><circle cx="100" cy="18" r="10" fill="#334155" stroke="#1e293b" stroke-width="1.5"/><circle cx="88" cy="44" r="10" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/><circle cx="112" cy="44" r="10" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/><circle cx="76" cy="70" r="10" fill="#334155" stroke="#1e293b" stroke-width="1.5"/><circle cx="100" cy="70" r="10" fill="#334155" stroke="#1e293b" stroke-width="1.5"/><circle cx="124" cy="70" r="10" fill="#334155" stroke="#1e293b" stroke-width="1.5"/><circle cx="64" cy="96" r="10" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/><circle cx="88" cy="96" r="10" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/><circle cx="112" cy="96" r="10" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/><circle cx="136" cy="96" r="10" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/><text x="100" y="124" text-anchor="middle" font-size="22" fill="#64748b">⋮</text></svg>` },
+    ]
+  },
+  {
+    name: "Fractions & Percents",
+    questions: [
+      { q: "Mom's age is ¾ of Dad's age, and Dad's age is ⅔ of Grandma's age. Mom is 36 years old. How old is Grandma?",
+        a: "72 years old", hint: "Dad = 36 × 4/3 = 48. Grandma = 48 × 3/2 = 72.", src: "G6 #7" },
+      { q: "Jim, Sam, and Wade are on a basketball team. The ratio of Jim's to Sam's to Wade's points was 3:7:5. Jim and Sam scored a total of 30 points. How many points did Wade score?",
+        a: "15 points", hint: "Jim+Sam = (3+7)k = 10k = 30 → k=3. Wade = 5k = 15.", src: "G8 #3" },
+      { q: "During the first half of the semester, Judy had 4 math tests with an average score of 83. During the second half, she had 6 math tests with an average score of 93. What was her average score on all 10 tests?",
+        a: "89", hint: "Total = 4×83 + 6×93 = 332+558 = 890. Average = 890/10 = 89.", src: "G6 #13" },
+      { q: "At Riverview Middle School, two-thirds of the students are in choir and one-half of the students are in band. Every student is in choir, band, or both. If 27 students are in both, what is the total number of students at Riverview Middle School?",
+        a: "162 students", hint: "⅔ + ½ − 27/n = 1 → 7/6 − 1 = 27/n → 1/6 = 27/n → n = 162.", src: "G7 #18 / G8 #15" },
+      { q: "Today, ¾ of the students at Washington Elementary each checked out exactly 1 book from the library. The remaining 105 students did not check out any books. The books checked out today represent exactly 5% of the total number of books in the library's collection. What is the total number of books in the library?",
+        a: "6,300 books", hint: "¼ of students = 105 → total = 420. Books checked out = ¾×420 = 315. 315 = 5% → total = 315/0.05 = 6300.", src: "G6 #20 / G7 #19" },
+      { q: "Caleb, Hussain, and Shyam each have a collection of baseball cards. Hussain has 20% more baseball cards than Caleb. Shyam has 25% more baseball cards than Hussain. Shyam has 180 baseball cards. How many baseball cards does Caleb have?",
+        a: "120 cards", hint: "Hussain = 180/1.25 = 144. Caleb = 144/1.2 = 120.", src: "G7 #14" },
+      { q: "Georgia makes strings of beads using blue (B), red (R), and yellow (Y) beads. All beads of the same color have the same length, and a blue bead is 2 mm longer than a yellow bead. She makes two strings that are each 34 mm long, as shown below. Then she makes a third string using 1 blue bead, 1 red bead, and 1 yellow bead. How long is the third string?",
+        a: "29 mm", hint: "From String 2: 4Y+2B=34 → 2Y+B=17. B=Y+2 → Y=5, B=7. From String 1: R=34−2(5)−7=17. String 3: 7+17+5=29.", src: "G6 #19",
+        svg: `<svg viewBox="0 5 310 165" width="300" height="160"><defs><style>.by{fill:#fde68a;stroke:#92400e;stroke-width:2}.br{fill:#fca5a5;stroke:#991b1b;stroke-width:2}.bb{fill:#93c5fd;stroke:#1e40af;stroke-width:2}</style></defs><line x1="10" y1="28" x2="214" y2="28" stroke="#64748b" stroke-width="1.5"/><ellipse cx="25" cy="28" rx="15" ry="13" class="by"/><text x="25" y="32" text-anchor="middle" font-size="12" font-weight="bold" fill="#78350f">Y</text><ellipse cx="91" cy="28" rx="51" ry="13" class="br"/><text x="91" y="32" text-anchor="middle" font-size="12" font-weight="bold" fill="#7f1d1d">R</text><ellipse cx="163" cy="28" rx="21" ry="13" class="bb"/><text x="163" y="32" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e3a8a">B</text><ellipse cx="199" cy="28" rx="15" ry="13" class="by"/><text x="199" y="32" text-anchor="middle" font-size="12" font-weight="bold" fill="#78350f">Y</text><text x="112" y="53" text-anchor="middle" font-size="13" fill="#374151">← 34 mm →</text><line x1="10" y1="85" x2="214" y2="85" stroke="#64748b" stroke-width="1.5"/><ellipse cx="25" cy="85" rx="15" ry="13" class="by"/><text x="25" y="89" text-anchor="middle" font-size="12" font-weight="bold" fill="#78350f">Y</text><ellipse cx="55" cy="85" rx="15" ry="13" class="by"/><text x="55" y="89" text-anchor="middle" font-size="12" font-weight="bold" fill="#78350f">Y</text><ellipse cx="91" cy="85" rx="21" ry="13" class="bb"/><text x="91" y="89" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e3a8a">B</text><ellipse cx="127" cy="85" rx="15" ry="13" class="by"/><text x="127" y="89" text-anchor="middle" font-size="12" font-weight="bold" fill="#78350f">Y</text><ellipse cx="157" cy="85" rx="15" ry="13" class="by"/><text x="157" y="89" text-anchor="middle" font-size="12" font-weight="bold" fill="#78350f">Y</text><ellipse cx="193" cy="85" rx="21" ry="13" class="bb"/><text x="193" y="89" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e3a8a">B</text><text x="112" y="110" text-anchor="middle" font-size="13" fill="#374151">← 34 mm →</text><line x1="10" y1="142" x2="184" y2="142" stroke="#64748b" stroke-width="1.5"/><ellipse cx="31" cy="142" rx="21" ry="13" class="bb"/><text x="31" y="146" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e3a8a">B</text><ellipse cx="103" cy="142" rx="51" ry="13" class="br"/><text x="103" y="146" text-anchor="middle" font-size="12" font-weight="bold" fill="#7f1d1d">R</text><ellipse cx="169" cy="142" rx="15" ry="13" class="by"/><text x="169" y="146" text-anchor="middle" font-size="12" font-weight="bold" fill="#78350f">Y</text><text x="225" y="147" font-size="14" font-weight="bold" fill="#374151">= ? mm</text></svg>` },
+      { q: "How many cups of an 18% alcohol solution should be added to 1 cup of a 30% alcohol solution to make a solution that is 20% alcohol?",
+        a: "5 cups", hint: "0.18x + 0.30 = 0.20(x+1) → 0.10 = 0.02x → x = 5.", src: "G7 #20 / G8 #18" },
+    ]
+  },
+  {
+    name: "Logic & Algebra",
+    questions: [
+      { q: "Mrs. Garcia conducted a pet survey in her class of 28 students. She found that 11 students have only dogs, 9 students have only cats, and 3 students have neither dogs nor cats. How many students have both dogs and cats?",
+        a: "5 students", hint: "11 + 9 + both + 3 = 28 → both = 5.", src: "G7 #5" },
+      { q: "The operation # is defined by x # y = x² − y². What is the value of 11 # 10?",
+        a: "21", hint: "11² − 10² = 121 − 100 = 21. (Or: (11+10)(11−10) = 21.)", src: "G8 #2" },
+      { q: "When the digits of a two-digit number are reversed, the new number is 36 less than the original number. In the original number, how much greater is the tens digit than the ones digit?",
+        a: "4", hint: "Let original = 10a+b. Reversed = 10b+a. Difference = 9(a−b) = 36 → a−b = 4.", src: "G7 #17 / G8 #14" },
+      { q: "In the figure below, place the numbers 1, 2, 3, and 4 in the empty boxes, using each number exactly once. The sum of the three numbers in the horizontal row must be 11, and the sum of the four numbers in the vertical column must also be 11. What number should go in the box with the question mark?",
+        a: "1", hint: "Row: _+?+6=11 → _+?=5. Column: 5+?+_+_=11. Try ?=1: row 4+1+6=11 ✓, column 5+1+2+3=11 ✓", src: "G6 #8",
+        svg: `<svg viewBox="0 0 156 207" width="145" height="192"><rect x="52" y="2" width="50" height="50" fill="#dbeafe" stroke="#1e40af" stroke-width="2"/><text x="77" y="35" text-anchor="middle" font-size="25" font-weight="bold" fill="#1e3a8a">5</text><rect x="2" y="52" width="50" height="50" fill="#f8f8f8" stroke="#1e40af" stroke-width="2"/><rect x="52" y="52" width="50" height="50" fill="#fef9c3" stroke="#b45309" stroke-width="2.5"/><text x="77" y="85" text-anchor="middle" font-size="25" font-weight="bold" fill="#92400e">?</text><rect x="102" y="52" width="50" height="50" fill="#dbeafe" stroke="#1e40af" stroke-width="2"/><text x="127" y="85" text-anchor="middle" font-size="25" font-weight="bold" fill="#1e3a8a">6</text><rect x="52" y="102" width="50" height="50" fill="#f8f8f8" stroke="#1e40af" stroke-width="2"/><rect x="52" y="152" width="50" height="50" fill="#f8f8f8" stroke="#1e40af" stroke-width="2"/></svg>` },
+      { q: "Penny has bowls, cups, and mugs. All bowls weigh the same, all cups weigh the same, and all mugs weigh the same. She compares their weights using a balance scale and finds that: (1) 2 bowls and 1 mug weigh more than 2 cups and 1 mug; (2) 2 mugs and 1 cup weigh more than 2 bowls and 1 mug. Which item weighs the most?",
+        a: "Mug", hint: "From (1): bowl > cup. From (2): mug > bowl. Therefore mug > bowl > cup.", src: "G7 #13" },
+      { q: "There are 40 guests at a party arranged into 20 pairs. A pair is served cherry pie if at least one person in the pair is allergic to nuts. Of all 40 guests, 14 are allergic to nuts, and 8 pairs are served cherry pie. In how many pairs are <strong>both</strong> people allergic to nuts?",
+        a: "6 pairs", hint: "Let x = both-allergic pairs. Then 2x + (8−x) = 14 → x = 6.", src: "G6 #17" },
+      { q: "In the addition problem below, the same letters represent the same digit and different letters represent different digits. What digit does the letter A represent?",
+        a: "A = 7", hint: "11A + 2(10A+B) = 110C+A → 30A+2B=110C. Try A=7: 210+2B=110C → B=5, C=2. Check: 77+75+75=227 ✓", src: "G6 #16 / G7 #12",
+        svg: `<svg viewBox="0 0 88 108" width="115" height="140"><text x="78" y="26" text-anchor="end" font-family="monospace" font-size="20" fill="#1e3a8a">AA</text><text x="78" y="51" text-anchor="end" font-family="monospace" font-size="20" fill="#1e3a8a">AB</text><text x="8" y="76" font-family="monospace" font-size="20" fill="#1e3a8a">+</text><text x="78" y="76" text-anchor="end" font-family="monospace" font-size="20" fill="#1e3a8a">AB</text><line x1="6" y1="83" x2="80" y2="83" stroke="#1e3a8a" stroke-width="2"/><text x="78" y="104" text-anchor="end" font-family="monospace" font-size="20" fill="#1e3a8a">CCA</text></svg>` },
+      { q: "In the addition problem below, the same letters represent the same digit and different letters represent different digits. What digit does the letter A represent?",
+        a: "A = 3", hint: "11A+(10A+B)+A = 10B+A → 22A+B = 10B+A → 21A=9B → 7A=3B. A=3 → B=7. Check: 33+37+3=73 ✓", src: "G8 #13",
+        svg: `<svg viewBox="0 0 88 108" width="115" height="140"><text x="78" y="26" text-anchor="end" font-family="monospace" font-size="20" fill="#1e3a8a">AA</text><text x="78" y="51" text-anchor="end" font-family="monospace" font-size="20" fill="#1e3a8a">AB</text><text x="8" y="76" font-family="monospace" font-size="20" fill="#1e3a8a">+</text><text x="78" y="76" text-anchor="end" font-family="monospace" font-size="20" fill="#1e3a8a">A</text><line x1="6" y1="83" x2="80" y2="83" stroke="#1e3a8a" stroke-width="2"/><text x="78" y="104" text-anchor="end" font-family="monospace" font-size="20" fill="#1e3a8a">BA</text></svg>` },
+    ]
+  },
+];
+
+// ── TEACHER VIEW ─────────────────────────────────────────────────────────────
+let teacherWin = null;
+
+const TV_HTML = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>Teacher View</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#0f172a;color:white;padding:18px;min-height:100vh}
+#tv-bar{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.06);border-radius:8px;padding:9px 16px;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.tv-side{text-align:center}
+.tv-role{font-size:0.65rem;text-transform:uppercase;letter-spacing:1px;opacity:0.5}
+.tv-name{font-size:1.05rem;font-weight:bold;color:#fbbf24}
+#tv-cat{font-size:0.8rem;color:#64748b;margin-bottom:6px}
+#tv-q{background:white;color:#0f172a;border-radius:10px;padding:18px 22px;font-family:Georgia,serif;font-size:1.15rem;line-height:1.6;margin-bottom:14px}
+#tv-q svg{display:block;margin:12px auto 0}
+#tv-ans-wrap{background:rgba(255,215,0,0.1);border:2px solid #ffd700;border-radius:10px;padding:12px 18px;margin-bottom:10px}
+#tv-ans-lbl{font-size:0.68rem;opacity:0.55;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+#tv-ans{font-size:2rem;font-weight:bold;color:#ffd700;line-height:1.1}
+#tv-hint-lbl{font-size:0.68rem;opacity:0.45;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+#tv-hint{font-size:0.88rem;color:#94a3b8;font-style:italic;line-height:1.5}
+</style></head><body>
+<div id="tv-bar">
+  <div class="tv-side"><div class="tv-role">Champion</div><div class="tv-name" id="tv-champ">—</div></div>
+  <div style="opacity:0.35;font-size:1.1rem">vs</div>
+  <div class="tv-side"><div class="tv-role">Challenger</div><div class="tv-name" id="tv-chal">—</div></div>
+  <div id="tv-cat" style="flex:1;text-align:right"></div>
+</div>
+<div id="tv-q" style="color:#64748b;font-style:italic">Waiting for category selection…</div>
+<div id="tv-ans-wrap">
+  <div id="tv-ans-lbl">Answer</div>
+  <div id="tv-ans"></div>
+</div>
+<div id="tv-hint-lbl">Solution hint</div>
+<div id="tv-hint"></div>
+</body></html>`;
+
+function openTeacherView() {
+  if (teacherWin && !teacherWin.closed) { teacherWin.focus(); return; }
+  teacherWin = window.open('', 'noetic-teacher', 'width=860,height=680,menubar=no,toolbar=no,location=no,status=no');
+  teacherWin.document.open();
+  teacherWin.document.write(TV_HTML);
+  teacherWin.document.close();
+  tvUpdateBoard();
+}
+
+function tvUpdateBoard() {
+  if (!teacherWin || teacherWin.closed) return;
+  const d = teacherWin.document;
+  const chalName = queue.length > 0 ? queue[0].name : null;
+  d.getElementById('tv-champ').textContent = champion ? champion.name : '—';
+  d.getElementById('tv-chal').textContent  = chalName || '—';
+  d.getElementById('tv-cat').textContent   = '';
+  d.getElementById('tv-q').innerHTML       = chalName
+    ? `<span style="color:#64748b;font-style:italic"><strong style="color:#fbbf24">${escHtml(chalName)}</strong> is choosing a category…</span>`
+    : '<span style="color:#64748b;font-style:italic">Game complete</span>';
+  d.getElementById('tv-ans').innerHTML     = '';
+  d.getElementById('tv-hint').textContent  = '';
+}
+
+function tvUpdateQuestion(ci, qi) {
+  if (!teacherWin || teacherWin.closed) return;
+  const cat = CATEGORIES[ci];
+  const q   = cat.questions[qi];
+  const d   = teacherWin.document;
+  d.getElementById('tv-champ').textContent = champion.name;
+  d.getElementById('tv-chal').textContent  = queue[0].name;
+  d.getElementById('tv-cat').textContent   = cat.name + ' · Q' + (qi+1) + ' of 8 · ' + fmtTime(TIMING[qi]);
+  d.getElementById('tv-q').innerHTML       = q.q + (q.svg || '');
+  d.getElementById('tv-ans').innerHTML     = q.a;
+  d.getElementById('tv-hint').textContent  = q.hint;
+}
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let champion = null;   // student object
+let queue    = [];     // ordered challengers, queue[0] is current challenger
+let catPtrs  = [0,0,0,0,0,0]; // next question index per category
+let currentCatIdx = null;
+let challengerNeitherCount = 0;
+let timerInterval = null;
+let timerTotal = 60;
+let nextCustomRank = 1000;
+
+// ── ATTENDANCE ────────────────────────────────────────────────────────────────
+function buildAttendance() {
+  const buckets = {6:[],7:[],8:[],0:[]};
+  STUDENTS.forEach(s => buckets[s.grade].push(s));
+  const alpha = (a,b) => a.name.localeCompare(b.name);
+  [6,7,8].forEach(g => {
+    const list = document.getElementById('list-' + g);
+    buckets[g].sort(alpha).forEach(s => list.appendChild(makeRow(s)));
+  });
+  buckets[0].sort(alpha).forEach(s => document.getElementById('list-8').appendChild(makeRow(s)));
+}
+
+function makeRow(s) {
+  const row = document.createElement('div');
+  row.className = 'att-row';
+  const id = 'cb-' + s.rank;
+  row.innerHTML = `<input type="checkbox" id="${id}" value="${s.rank}">
+    <label for="${id}">${s.name}</label>`;
+  row.querySelector('input').addEventListener('change', updateSummary);
+  row.addEventListener('click', e => { if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'LABEL') row.querySelector('input').click(); });
+  return row;
+}
+
+function updateSummary() {
+  const checked = [...document.querySelectorAll('#att-screen input:checked')];
+  [6,7,8].forEach(g => {
+    const n = checked.filter(c => {
+      const s = STUDENTS.find(s => s.rank === +c.value);
+      return s && (s.grade === g || (g===8 && s.grade===0));
+    }).length;
+    document.getElementById('cnt-' + g).textContent = n + ' selected';
+  });
+  document.getElementById('att-summary').textContent = checked.length + ' student' + (checked.length !== 1 ? 's' : '') + ' selected';
+  document.getElementById('start-btn').disabled = checked.length < 2;
+}
+
+function selectAll(val) {
+  document.querySelectorAll('#att-screen input[type=checkbox]').forEach(c => c.checked = val);
+  updateSummary();
+}
+
+function addStudent() {
+  const inp = document.getElementById('add-name');
+  const name = inp.value.trim();
+  if (!name) return;
+  const grade = parseInt(document.getElementById('add-grade').value);
+  const s = {rank: nextCustomRank++, name, grade};
+  STUDENTS.push(s);
+  const listId = grade === 0 ? 'list-8' : 'list-' + grade;
+  const list = document.getElementById(listId);
+  const row = makeRow(s);
+  const rows = [...list.querySelectorAll('.att-row')];
+  const after = rows.find(r => { const lbl = r.querySelector('label'); return lbl && name.localeCompare(lbl.textContent.trim()) < 0; });
+  after ? list.insertBefore(row, after) : list.appendChild(row);
+  row.querySelector('input').checked = true;
+  inp.value = '';
+  inp.focus();
+  updateSummary();
+}
+
+// ── GAME SETUP ────────────────────────────────────────────────────────────────
+function startGame() {
+  const present = [...document.querySelectorAll('#att-screen input:checked')]
+    .map(c => STUDENTS.find(s => s.rank === +c.value))
+    .filter(Boolean)
+    .sort((a,b) => b.rank - a.rank); // highest rank (weakest) first
+
+  if (present.length < 2) return;
+
+  catPtrs = [0,0,0,0,0,0];
+  challengerNeitherCount = 0;
+  champion = present[0];
+  queue = present.slice(1); // queue[0] = current challenger
+
+  document.getElementById('att-screen').classList.add('hidden');
+  document.getElementById('board-screen').classList.remove('hidden');
+  renderBoard();
+}
+
+// ── BOARD ─────────────────────────────────────────────────────────────────────
+function renderBoard() {
+  document.getElementById('champion-name').textContent = champion.name;
+  document.getElementById('challenger-name').textContent = queue.length > 0 ? queue[0].name : '—';
+  document.getElementById('matchup-instruction').textContent = queue.length > 0 ? queue[0].name + ', pick a category' : 'Game complete!';
+  document.getElementById('board-last-chance-banner').classList.toggle('hidden', challengerNeitherCount === 0);
+  tvUpdateBoard();
+
+  // Category grid
+  const grid = document.getElementById('cat-grid');
+  grid.innerHTML = '';
+  CATEGORIES.forEach((cat, ci) => {
+    const ptr = catPtrs[ci];
+    const exhausted = ptr >= 8;
+    const card = document.createElement('div');
+    card.className = 'cat-card' + (exhausted ? ' exhausted' : '');
+    if (!exhausted && queue.length > 0) card.onclick = () => pickCategory(ci);
+
+    const dots = Array.from({length:8}, (_,i) =>
+      `<div class="cat-dot ${i < ptr ? 'used' : ''}"></div>`
+    ).join('');
+
+    card.innerHTML = `
+      <div class="cat-name">${cat.name}</div>
+      <div class="cat-timing ${exhausted ? 'exhausted-label' : ''}">${exhausted ? 'Used up' : fmtTime(TIMING[ptr])}</div>
+      <div class="cat-dots">${dots}</div>`;
+    grid.appendChild(card);
+  });
+
+  // Queue strip
+  const strip = document.getElementById('queue-strip');
+  strip.innerHTML = '<div class="queue-label">Up next →</div>';
+  if (queue.length === 0) {
+    strip.innerHTML += '<div class="queue-item">Game complete</div>';
+  } else {
+    queue.slice(0, 10).forEach((s, i) => {
+      if (i > 0) strip.innerHTML += '<div class="queue-arrow">›</div>';
+      strip.innerHTML += `<div class="queue-item ${i===0?'next':''}">${s.name}</div>`;
+    });
+    if (queue.length > 10) strip.innerHTML += `<div class="queue-arrow">+${queue.length-10} more</div>`;
+  }
+}
+
+function pickCategory(ci) {
+  if (catPtrs[ci] >= 8 || queue.length === 0) return;
+  currentCatIdx = ci;
+  showQuestion();
+}
+
+// ── QUESTION ──────────────────────────────────────────────────────────────────
+function showQuestion() {
+  const ci = currentCatIdx;
+  const qi = catPtrs[ci];
+  const cat = CATEGORIES[ci];
+  const q = cat.questions[qi];
+  const timeSec = TIMING[qi];
+
+  document.getElementById('q-cat-badge').textContent = cat.name + ' · Q' + (qi+1) + ' of 8';
+  document.getElementById('last-chance-banner').classList.toggle('hidden', challengerNeitherCount === 0);
+  document.getElementById('q-matchup-mini').innerHTML =
+    `<span>${champion.name}</span> vs <span>${queue[0].name}</span>`;
+  document.getElementById('q-text').innerHTML = q.q + (q.svg || '');
+  document.getElementById('ans-val').innerHTML = q.a;
+  document.getElementById('ans-hint').textContent = q.hint;
+
+  // Verdict buttons
+  const vr = document.getElementById('verdict-row');
+  vr.innerHTML =
+    `<button class="btn-correct" onclick="verdict('champion')">✓ ${escHtml(champion.name)}</button>` +
+    `<button class="btn-correct" onclick="verdict('challenger')">✓ ${escHtml(queue[0].name)}</button>` +
+    `<button class="btn-neither" onclick="verdict('neither')">Neither — next question</button>`;
+
+  document.getElementById('ans-section').style.display = 'none';
+  document.getElementById('btn-reveal').style.display = 'block';
+
+  document.getElementById('board-screen').classList.add('hidden');
+  document.getElementById('q-screen').classList.remove('hidden');
+
+  tvUpdateQuestion(ci, qi);
+  startTimer(timeSec);
+}
+
+function startTimer(sec) {
+  clearInterval(timerInterval);
+  timerTotal = sec;
+  let remaining = sec;
+  const numEl = document.getElementById('timer-num');
+  const barEl = document.getElementById('timer-bar');
+
+  function tick() {
+    numEl.textContent = remaining;
+    const pct = (remaining / timerTotal) * 100;
+    barEl.style.width = pct + '%';
+    numEl.className = 'timer-num' + (remaining <= 0 ? ' done' : remaining <= 5 ? ' crit' : remaining <= Math.ceil(timerTotal*0.2) ? ' warn' : '');
+    barEl.className = 'timer-bar-fill' + (remaining <= 0 ? ' crit' : remaining <= 5 ? ' crit' : remaining <= Math.ceil(timerTotal*0.2) ? ' warn' : '');
+    if (remaining <= 0) { numEl.textContent = "Time's up!"; clearInterval(timerInterval); }
+    remaining--;
+  }
+  tick();
+  timerInterval = setInterval(tick, 1000);
+}
+
+function revealAnswer() {
+  clearInterval(timerInterval);
+  document.getElementById('btn-reveal').style.display = 'none';
+  document.getElementById('ans-section').style.display = 'block';
+}
+
+function verdict(who) {
+  clearInterval(timerInterval);
+  catPtrs[currentCatIdx]++;
+
+  if (who === 'neither') {
+    challengerNeitherCount++;
+    document.getElementById('q-screen').classList.add('hidden');
+    if (challengerNeitherCount >= 2) {
+      // Second neither — eliminate challenger
+      queue.shift();
+      challengerNeitherCount = 0;
+      if (queue.length === 0) { showGameOver(); return; }
+    }
+    document.getElementById('board-screen').classList.remove('hidden');
+    renderBoard();
+    return;
+  }
+
+  // Someone answered correctly — reset strike counter for next challenger
+  challengerNeitherCount = 0;
+
+  if (who === 'challenger') {
+    champion = queue.shift();
+  } else {
+    queue.shift();
+  }
+
+  document.getElementById('q-screen').classList.add('hidden');
+
+  if (queue.length === 0) {
+    showGameOver();
+  } else {
+    document.getElementById('board-screen').classList.remove('hidden');
+    renderBoard();
+  }
+}
+
+// ── GAME OVER ─────────────────────────────────────────────────────────────────
+function showGameOver() {
+  document.getElementById('over-name').textContent = champion.name;
+  document.getElementById('over-stats').textContent = 'Grade ' + (champion.grade || '?') + ' · Seed #' + champion.rank;
+  document.getElementById('over-screen').classList.remove('hidden');
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// Init
+buildAttendance();
+</script>
+</body>
+</html>
