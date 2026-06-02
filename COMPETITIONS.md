@@ -85,6 +85,10 @@ Full design details (format, categories, questions, timing, SVG diagrams, rankin
   - Visual indicators: normal (white) → warning (yellow) → critical (red pulse)
   - Controls: Start/Pause/Reset; keyboard: Space=start, arrows=navigate
 
+**`moems-ha-companion.html`** — Print-ready companion card to affix to the back of High Achievement Award certificates:
+- 3-inch wide card; shows award title, year (2025–2026), team score (175/250), and name/grade table for all 10 recipients
+- Print button hidden on print; open directly in browser and print
+
 **Other resources:**
 - `moems_vocabulary_activity.md` — Interactive vocabulary lesson plan
 - `moems_vocab_claude_md.md` — Extended vocabulary reference
