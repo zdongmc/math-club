@@ -765,51 +765,9 @@
                 </div>
             `;
 
-            // Forms Section
-            if (forms) {
-                const allComplete = forms.clubRegistration.completed && forms.extracurricularActivities.completed;
-                const sectionClass = allComplete ? 'forms-section all-complete' : 'forms-section';
-
-                html += `
-                    <div class="${sectionClass}">
-                        <div class="forms-title">📋 Required Forms</div>
-                `;
-
-                // Club Registration Form
-                html += `
-                    <div class="form-item">
-                        <div class="form-name">${escapeHtml(forms.clubRegistration.name)}</div>
-                        <div class="form-status">
-                `;
-                if (forms.clubRegistration.completed) {
-                    html += `<span class="form-complete">✓ Completed</span>`;
-                } else {
-                    html += `<a href="${forms.clubRegistration.url}" target="_blank" class="form-incomplete">Complete Form</a>`;
-                }
-                html += `
-                        </div>
-                    </div>
-                `;
-
-                // Extracurricular Activities Form
-                html += `
-                    <div class="form-item">
-                        <div class="form-name">${escapeHtml(forms.extracurricularActivities.name)}</div>
-                        <div class="form-status">
-                `;
-                if (forms.extracurricularActivities.completed) {
-                    html += `<span class="form-complete">✓ Completed</span>`;
-                } else {
-                    html += `<a href="${forms.extracurricularActivities.url}" target="_blank" class="form-incomplete">Complete Form</a>`;
-                }
-                html += `
-                        </div>
-                    </div>
-                `;
-
-                html += `
-                    </div>
-                `;
+            // End-of-Year Party Sign-Up
+            if (result.partySignUpStatus && (result.partySignUpStatus.open || result.partySignUpStatus.signedUp)) {
+              html += buildPartySignUpSection(result);
             }
 
             // End-of-Year Survey
@@ -1426,6 +1384,32 @@
 
             html += '</div>';
             html += '</div>';
+
+            // Required Forms (moved to bottom — registration period is over)
+            if (forms) {
+                const allComplete = forms.clubRegistration.completed && forms.extracurricularActivities.completed;
+                const sectionClass = allComplete ? 'forms-section all-complete' : 'forms-section';
+
+                html += `<div class="${sectionClass}"><div class="forms-title">📋 Required Forms</div>`;
+
+                html += `<div class="form-item"><div class="form-name">${escapeHtml(forms.clubRegistration.name)}</div><div class="form-status">`;
+                if (forms.clubRegistration.completed) {
+                    html += `<span class="form-complete">✓ Completed</span>`;
+                } else {
+                    html += `<a href="${forms.clubRegistration.url}" target="_blank" class="form-incomplete">Complete Form</a>`;
+                }
+                html += `</div></div>`;
+
+                html += `<div class="form-item"><div class="form-name">${escapeHtml(forms.extracurricularActivities.name)}</div><div class="form-status">`;
+                if (forms.extracurricularActivities.completed) {
+                    html += `<span class="form-complete">✓ Completed</span>`;
+                } else {
+                    html += `<a href="${forms.extracurricularActivities.url}" target="_blank" class="form-incomplete">Complete Form</a>`;
+                }
+                html += `</div></div>`;
+
+                html += `</div>`;
+            }
 
             document.getElementById('studentResults').innerHTML = html;
             document.getElementById('resultsSection').classList.add('show');
@@ -3372,6 +3356,101 @@
                 .submitVote(mcpsId, picks);
         }
 
+        function buildPartySignUpSection(result) {
+            const ps = result.partySignUpStatus || {};
+            const student = result.student || {};
+            const mcpsId = escapeHtml(student.mcpsId || '');
+            const studentName = escapeHtml(student.name || '');
+            const grade = escapeHtml(student.gradeLevel || '');
+
+            let h = '<h2 class="section-title">🎉 End-of-Year Party</h2>';
+            h += '<div style="background:#fdf4ff;border:2px solid #a855f7;border-radius:10px;padding:20px;margin-bottom:15px;">';
+            h += '<div style="font-weight:bold;color:#6b21a8;font-size:1.1rem;margin-bottom:2px;">Thursday, June 4 · 3:15–4:15 PM</div>';
+
+            if (ps.signedUp) {
+                const attendees = [];
+                if (ps.studentAttending) attendees.push(studentName);
+                if (ps.parent1Name) attendees.push(escapeHtml(ps.parent1Name));
+                if (ps.parent2Name) attendees.push(escapeHtml(ps.parent2Name));
+                h += '<div style="background:#d1fae5;border:2px solid #059669;border-radius:8px;padding:14px;margin:12px 0;">';
+                h += '<div style="font-weight:bold;color:#065f46;margin-bottom:6px;">✅ RSVP received!</div>';
+                if (attendees.length) {
+                    h += '<div style="color:#374151;font-size:0.9rem;">Attending: <strong>' + attendees.join(', ') + '</strong></div>';
+                } else {
+                    h += '<div style="color:#6b7280;font-size:0.9rem;">No attendees — update below if needed.</div>';
+                }
+                h += '</div>';
+            }
+
+            if (ps.open) {
+                h += '<div style="color:#6b7280;font-size:0.85rem;margin-bottom:14px;">RSVP by Wednesday, June 3 at midnight</div>';
+
+                // Student
+                h += '<div style="margin-bottom:14px;">';
+                h += '<div style="font-weight:bold;color:#374151;font-size:0.9rem;margin-bottom:8px;">Student</div>';
+                h += '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.95rem;color:#374151;">';
+                h += '<input type="checkbox" id="partyStudentAttending"' + (ps.studentAttending ? ' checked' : '') + ' style="width:18px;height:18px;cursor:pointer;">';
+                h += '<span>' + studentName + ' will attend</span>';
+                h += '</label>';
+                h += '</div>';
+
+                // Parents
+                h += '<div style="margin-bottom:14px;">';
+                h += '<div style="font-weight:bold;color:#374151;font-size:0.9rem;margin-bottom:4px;">Parents</div>';
+                h += '<div style="font-size:0.82rem;color:#6b7280;margin-bottom:10px;">Name as shown on driver\'s license or ID — required for check-in at the school office. Leave blank if not attending.</div>';
+                h += '<input type="text" id="partyParent1Name" placeholder="Parent name"';
+                h += ' value="' + escapeHtml(ps.parent1Name || '') + '"';
+                h += ' style="width:100%;padding:9px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:0.95rem;box-sizing:border-box;margin-bottom:8px;">';
+                h += '<input type="text" id="partyParent2Name" placeholder="Second parent name (if attending)"';
+                h += ' value="' + escapeHtml(ps.parent2Name || '') + '"';
+                h += ' style="width:100%;padding:9px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:0.95rem;box-sizing:border-box;">';
+                h += '</div>';
+
+                h += '<div id="partyRSVPError" style="color:#dc2626;font-size:0.85rem;margin-bottom:8px;display:none;"></div>';
+                h += '<div style="text-align:center;">';
+                h += '<button onclick="submitPartyRSVP(\'' + mcpsId + '\',\'' + studentName + '\',\'' + grade + '\')"';
+                h += ' id="partyRSVPBtn" style="background:#7c3aed;color:white;border:none;padding:11px 28px;border-radius:8px;font-size:1rem;font-weight:bold;cursor:pointer;">';
+                h += (ps.signedUp ? 'Update RSVP' : 'Submit RSVP') + '</button>';
+                h += '</div>';
+            } else {
+                h += '<div style="color:#6b7280;font-size:0.9rem;text-align:center;padding:8px;">RSVP is closed.</div>';
+            }
+
+            h += '</div>';
+            return h;
+        }
+
+        function submitPartyRSVP(mcpsId, studentName, grade) {
+            const studentAttending = !!(document.getElementById('partyStudentAttending') || {}).checked;
+            const parent1Name = (document.getElementById('partyParent1Name') || {}).value || '';
+            const parent2Name = (document.getElementById('partyParent2Name') || {}).value || '';
+            const errEl = document.getElementById('partyRSVPError');
+            const btn = document.getElementById('partyRSVPBtn');
+
+            if (!studentAttending && !parent1Name.trim() && !parent2Name.trim()) {
+                if (errEl) { errEl.textContent = 'Please indicate who will be attending.'; errEl.style.display = ''; }
+                return;
+            }
+            if (errEl) errEl.style.display = 'none';
+            if (btn) { btn.disabled = true; btn.textContent = '⏳ Submitting...'; }
+
+            google.script.run
+                .withSuccessHandler(function(res) {
+                    if (res.success) {
+                        showMessage(res.message, false);
+                        setTimeout(function() { lookupStudent(); }, 1500);
+                    } else {
+                        showMessage(res.message || 'Error. Please try again.', true);
+                        if (btn) { btn.disabled = false; btn.textContent = 'Submit RSVP'; }
+                    }
+                })
+                .withFailureHandler(function(err) {
+                    showMessage('Error. Please try again.', true);
+                    if (btn) { btn.disabled = false; btn.textContent = 'Submit RSVP'; }
+                })
+                .submitPartyRSVP(mcpsId, studentName, grade, studentAttending, parent1Name.trim(), parent2Name.trim());
+        }
+
         function buildSurveySection(result) {
             const student    = result.student;
             const ss         = result.surveyStatus || {};
@@ -3382,10 +3461,10 @@
 
             const contests = [
                 { key: 'mathcounts',   label: 'MATHCOUNTS',       done: !!result.mathcounts,   hasFee: true  },
-                { key: 'moems',        label: 'MOEMS',             done: !!result.moems,        hasFee: true  },
-                { key: 'mathleague',   label: 'MCPS Math League',  done: !!result.mathLeague,   hasFee: false },
+                { key: 'moems',        label: 'MOEMS',             done: !!(result.moems && result.moems.contests && result.moems.contests.some(function(c){return c.score !== null;})),        hasFee: true  },
+                { key: 'mathleague',   label: 'MCPS Math League',  done: !!(result.mathLeague && result.mathLeague.meetScores && result.mathLeague.meetScores.some(function(s){ return typeof s === 'number'; })),   hasFee: false },
                 { key: 'mathkangaroo', label: 'Math Kangaroo',     done: !!result.mathKangaroo, hasFee: true  },
-                { key: 'amc8',         label: 'AMC 8',             done: !!result.amc8,         hasFee: true,  schoolCovered: true },
+                { key: 'amc8',         label: 'AMC 8',             done: !!(result.amc8 && result.amc8.score !== null),         hasFee: true,  schoolCovered: true },
                 { key: 'noetic',       label: 'Noetic',            done: !!(result.noetic && result.noetic.signedUp),        hasFee: true  },
                 { key: 'purplecomet',  label: 'Purple Comet',      done: !!(result.purpleComet && result.purpleComet.myTeam), hasFee: false },
                 { key: 'carderock',    label: 'Carderock',         done: !!(result.carderock && result.carderock.signedUp), hasFee: false }

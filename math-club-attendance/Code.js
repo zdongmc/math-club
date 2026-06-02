@@ -7,6 +7,7 @@ const SCHOOL_LIST_SHEET_NAME = 'School List';
 const SURVEY_OPEN = true; // open for end-of-year survey
 const VOTING_OPEN = new Date() < new Date('2026-06-04T00:00:00-04:00'); // closes end of June 3 EDT
 const VOTING_PUBLISHED = new Date() >= new Date('2026-06-04T00:00:00-04:00'); // auto-publishes June 4
+const PARTY_SIGNUP_OPEN = new Date() < new Date('2026-06-04T00:00:00-04:00'); // closes end of Wednesday June 3 (party is Thursday June 4)
 
 function doGet(e) {
   // Handle sign-up action
@@ -1012,7 +1013,9 @@ function getAmc8Results(mcpsId) {
       const studentId = (row[1] || '').toString().trim(); // Column B (index 1)
 
       if (studentId === mcpsId.toString().trim()) {
-        const score    = row[3] ? parseInt(row[3]) : null;
+        const scoreRaw = row[3];
+        const scoreStr = (scoreRaw === '' || scoreRaw === null || scoreRaw === undefined) ? '' : scoreRaw.toString().toUpperCase().trim();
+        const score    = (scoreStr !== '' && scoreStr !== 'NA' && !isNaN(parseInt(scoreRaw))) ? parseInt(scoreRaw) : null;
         const ywmAward = !!(row[6] && row[6].toString().trim()); // Column G - Young Women in Mathematics Award
         const pdfLink  = (row[5] || '').toString().trim();
 
@@ -2673,6 +2676,13 @@ function lookupStudentByMcpsId(mcpsId) {
       Logger.log('Error getting voting status: ' + err.toString());
     }
 
+    let partySignUpStatus = null;
+    try {
+      partySignUpStatus = getPartySignUpStatus(mcpsIdStr);
+    } catch (err) {
+      Logger.log('Error getting party sign-up status: ' + err.toString());
+    }
+
     const result = {
       success: true,
       student: studentInfo,
@@ -2689,7 +2699,8 @@ function lookupStudentByMcpsId(mcpsId) {
       carderock: carderockResults,
       surveyStatus: surveyStatus,
       votingStatus: votingStatus,
-      votingTitle:  votingTitle
+      votingTitle:  votingTitle,
+      partySignUpStatus: partySignUpStatus
     };
 
     try {
@@ -3811,7 +3822,11 @@ function getPartySlideData() {
     if (sheets.mo && sheets.mo.getLastRow() > 1) sheets.mo.getDataRange().getValues().slice(1).forEach(function(r) {
       var id=(r[1]||'').toString().trim(), nm=(r[0]||'').toString().trim();
       if(id) {
-        did.moems.add(id);
+        // Only count as competed if at least one of the 5 contest scores is a number (not NA, not blank)
+        var attended = [r[3],r[4],r[5],r[6],r[7]].some(function(v) {
+          return v !== '' && v !== undefined && !isNaN(parseFloat((v || '').toString()));
+        });
+        if(attended) did.moems.add(id);
         if(r[14]) moemsPin.push(nm);
         if(r[15]) monemsPatch.push(nm);
         if(r[16]) moemsHA.push(nm);
@@ -3821,7 +3836,12 @@ function getPartySlideData() {
     if (sheets.ml && sheets.ml.getLastRow() > 1) {
       sheets.ml.getDataRange().getValues().slice(1).forEach(function(r) {
         var id=(r[1]||'').toString().trim(), nm=(r[0]||'').toString().trim(); if(!id) return;
-        did.mathleague.add(id);
+        // Only count as competed if at least one individual meet score is numeric (not NA, not blank)
+        var attended = [r[5],r[7],r[9],r[11]].some(function(v) {
+          var s = (v === '' || v === undefined || v === null) ? '' : v.toString().toUpperCase().trim();
+          return s !== '' && s !== 'NA' && !isNaN(parseFloat(s));
+        });
+        if(attended) did.mathleague.add(id);
         var t3=(r[8]||'').toString().trim();
         if(t3 && !t3.toLowerCase().startsWith('jv') && t3.toUpperCase()!=='NA' && t3.toLowerCase()!=='individual') {
           mlMeet3Varsity.add(id);
@@ -3840,9 +3860,15 @@ function getPartySlideData() {
         if(award) mkAwards.push({ name: n, award: award });
       }
     });
-    if (sheets.a8 && sheets.a8.getLastRow() > 1) sheets.a8.getDataRange().getValues().slice(1).forEach(function(r) { var id=(r[1]||'').toString().trim(); if(id){did.amc8.add(id); if(r[6]&&r[6].toString().trim()) ywmIds.add(id);} });
+    if (sheets.a8 && sheets.a8.getLastRow() > 1) sheets.a8.getDataRange().getValues().slice(1).forEach(function(r) {
+      var id=(r[1]||'').toString().trim(); if(!id) return;
+      // Only count as competed if col D has a numeric score (not NA, not blank); score 0 is valid
+      var s = (r[3] === '' || r[3] === undefined || r[3] === null) ? '' : r[3].toString().toUpperCase().trim();
+      if(s !== '' && s !== 'NA' && !isNaN(parseFloat(s))) did.amc8.add(id);
+      if(r[6] && r[6].toString().trim()) ywmIds.add(id);
+    });
     if (sheets.no && sheets.no.getLastRow() > 1) sheets.no.getDataRange().getValues().slice(1).forEach(function(r) { var id=(r[1]||'').toString().trim(), nm=(r[0]||'').toString().trim(); if(id){did.noetic.add(id); if(r[10]) noeticHM.push(nm); if(r[11]) noeticNHR.push(nm); if(r[12]) noeticTeamW.push(nm);} });
-    if (sheets.pc && sheets.pc.getLastRow() > 1) sheets.pc.getDataRange().getValues().slice(1).forEach(function(r) { var id=(r[1]||'').toString().trim(); if(id) did.purplecomet.add(id); });
+    if (sheets.pc && sheets.pc.getLastRow() > 1) sheets.pc.getDataRange().getValues().slice(1).forEach(function(r) { var id=(r[1]||'').toString().trim(), role=(r[4]||'').toString().trim().toLowerCase(); if(id && role !== 'invited') did.purplecomet.add(id); });
 
     // All competitors (any competition including Carderock)
     const allCompetitorIds = new Set();
@@ -3913,5 +3939,83 @@ function getPartySlideData() {
   } catch (err) {
     Logger.log('getPartySlideData error: ' + err.message);
     return { success: false, error: err.message };
+  }
+}
+
+// ── END-OF-YEAR PARTY SIGN-UP 2026 ───────────────────────────────────────────
+
+const PARTY_SIGNUP_SHEET_NAME = 'Party Sign-Up 2026';
+
+function getPartySignUpSheet() {
+  const ss = getSpreadsheet();
+  let sheet = ss.getSheetByName(PARTY_SIGNUP_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(PARTY_SIGNUP_SHEET_NAME);
+    const headers = ['Timestamp', 'MCPS ID', 'Student Name', 'Grade', 'StudentAttending', 'Parent1Name', 'Parent2Name'];
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+function getPartySignUpStatus(mcpsId) {
+  const idStr = (mcpsId || '').toString().trim();
+  const empty = { open: PARTY_SIGNUP_OPEN, signedUp: false, studentAttending: false, parent1Name: '', parent2Name: '' };
+  if (!idStr) return empty;
+
+  const sheet = getPartySignUpSheet();
+  if (sheet.getLastRow() > 1) {
+    const data = sheet.getDataRange().getValues().slice(1);
+    for (const row of data) {
+      if ((row[1] || '').toString().trim() === idStr) {
+        const studentAttending = row[4] === true || (row[4] || '').toString().toLowerCase() === 'true';
+        return {
+          open: PARTY_SIGNUP_OPEN,
+          signedUp: true,
+          studentAttending,
+          parent1Name: (row[5] || '').toString().trim(),
+          parent2Name: (row[6] || '').toString().trim()
+        };
+      }
+    }
+  }
+  return empty;
+}
+
+function submitPartyRSVP(mcpsId, studentName, grade, studentAttending, parent1Name, parent2Name) {
+  try {
+    if (!PARTY_SIGNUP_OPEN) return { success: false, message: 'RSVP is closed.' };
+
+    const idStr = (mcpsId || '').toString().trim();
+    if (!idStr) return { success: false, message: 'Missing student ID.' };
+
+    const attending = !!studentAttending;
+    const p1 = (parent1Name || '').toString().trim();
+    const p2 = (parent2Name || '').toString().trim();
+
+    const sheet = getPartySignUpSheet();
+
+    if (sheet.getLastRow() > 1) {
+      const data = sheet.getDataRange().getValues().slice(1);
+      for (let i = 0; i < data.length; i++) {
+        if ((data[i][1] || '').toString().trim() === idStr) {
+          const row = i + 2;
+          sheet.getRange(row, 1).setValue(new Date());
+          sheet.getRange(row, 5).setValue(attending);
+          sheet.getRange(row, 6).setValue(p1);
+          sheet.getRange(row, 7).setValue(p2);
+          return { success: true, message: 'RSVP updated! See you at the party! 🎉' };
+        }
+      }
+    }
+
+    const resolvedName = studentName || findStudentNameByMcpsId(idStr) || idStr;
+    sheet.appendRow([new Date(), idStr, resolvedName, grade || '', attending, p1, p2]);
+    Logger.log('Party RSVP recorded: ' + idStr);
+    return { success: true, message: 'RSVP received! See you at the party! 🎉' };
+
+  } catch (err) {
+    Logger.log('submitPartyRSVP error: ' + err.message);
+    return { success: false, message: 'Server error: ' + err.message };
   }
 }

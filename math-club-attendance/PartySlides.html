@@ -221,7 +221,7 @@ var dAudioCtx=null;
 function dEnsureAudio(){if(!dAudioCtx)dAudioCtx=new(window.AudioContext||window.webkitAudioContext)();if(dAudioCtx.state==='suspended')dAudioCtx.resume();return dAudioCtx;}
 function dPlayTick(s){try{var ac=dEnsureAudio(),osc=ac.createOscillator(),g=ac.createGain();osc.connect(g);g.connect(ac.destination);osc.type='triangle';osc.frequency.value=480+s*640;var v=0.07+s*0.06;g.gain.setValueAtTime(v,ac.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.045);osc.start();osc.stop(ac.currentTime+0.05);}catch(e){}}
 function dPlayFanfare(){try{var ac=dEnsureAudio(),seq=[{f:523,t:0,d:0.3},{f:659,t:0.13,d:0.3},{f:784,t:0.26,d:0.3},{f:1047,t:0.40,d:0.55},{f:1319,t:0.55,d:0.75},{f:523,t:0.72,d:1.1},{f:659,t:0.72,d:1.1},{f:784,t:0.72,d:1.1}];seq.forEach(function(n){var osc=ac.createOscillator(),g=ac.createGain();osc.connect(g);g.connect(ac.destination);osc.type='triangle';osc.frequency.value=n.f;var t=ac.currentTime+n.t;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.2,t+0.03);g.gain.exponentialRampToValueAtTime(0.001,t+n.d);osc.start(t);osc.stop(t+n.d+0.05);});}catch(e){}}
-var awardRevealed = [false,false,false,false,false,false,false];
+var awardRevealed = []; // unused — kept for safety
 var partyData = null, voteData = null, ponData = null;
 var loaded = 0;
 
@@ -292,6 +292,17 @@ function buildSlides() {
   // 6 — Full Competitors
   addSlide(el, badgeSlide('🥇', 'Full Competitors', 'All 7 open competitions', b.fullCompetitor));
 
+  // 6b — All 8 Competitions (Arjun + Fariq)
+  addSlide(el, html([
+    '<div class="emoji-big">🌟</div>',
+    '<div class="slide-title" style="margin-bottom:6px;">The <span class="gold">Completionists</span></div>',
+    '<div class="slide-subtitle" style="margin-bottom:28px;">The only members who competed in <strong style="color:white;">all 8 competitions</strong> — including Carderock</div>',
+    '<div class="name-grid">',
+      '<div class="name-chip" style="animation-delay:0.0s;font-size:clamp(1rem,2.5vw,1.4rem);padding:12px 28px;">Arjun Lakshmanan</div>',
+      '<div class="name-chip" style="animation-delay:0.15s;font-size:clamp(1rem,2.5vw,1.4rem);padding:12px 28px;">Fariq Molla</div>',
+    '</div>'
+  ]));
+
   // 7 — Multi-Sport
   addSlide(el, badgeSlide('🏆', 'Multi-Sport', '4–6 competitions', b.multiSport));
 
@@ -337,7 +348,27 @@ function buildSlides() {
     { label: '🥇 Team Winner', names: r.noeticTeamW, color: '#fbbf24' }
   ]));
 
-  // 8f — Carderock
+  // 8f — Purple Comet
+  addSlide(el, html([
+    '<div style="font-size:clamp(2.5rem,6vw,4rem);margin-bottom:8px;">☄️</div>',
+    '<div class="slide-title" style="margin-bottom:24px;"><span class="gold">Purple Comet Math Meet</span></div>',
+    '<div class="glass" style="max-width:680px;padding:28px 36px;text-align:center;">',
+      '<div style="font-size:1.4rem;font-weight:bold;color:#c0c0c0;margin-bottom:6px;">🥈 2nd Place</div>',
+      '<div style="font-size:0.9rem;color:rgba(255,255,255,0.5);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:20px;">High School · Mixed Team</div>',
+      '<div style="font-size:2rem;font-weight:bold;color:#fcd34d;margin-bottom:6px;">Comet Spiral</div>',
+      '<div style="font-size:1.1rem;color:rgba(255,255,255,0.65);margin-bottom:22px;">23 / 30 points</div>',
+      '<div style="border-top:1px solid rgba(255,255,255,0.15);padding-top:18px;">',
+        '<div style="font-size:0.8rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Team Members</div>',
+        '<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">',
+          '<div class="name-chip" style="animation-delay:0.0s;background:rgba(168,85,247,0.18);border-color:rgba(168,85,247,0.45);color:#d8b4fe;">Ella Shang · Hallie Wells MS</div>',
+          '<div class="name-chip" style="animation-delay:0.08s;">Students from Longfellow MS</div>',
+          '<div class="name-chip" style="animation-delay:0.16s;">Students from H-B Woodlawn</div>',
+        '</div>',
+      '</div>',
+    '</div>'
+  ]));
+
+  // 8g — Carderock
   addSlide(el, buildRecogSlide('🏔️', 'Carderock Math Contest', [
     { label: '🎯 Countdown Round', names: ['Arjun Lakshmanan'], color: '#f59e0b' }
   ]));
@@ -360,11 +391,13 @@ function buildSlides() {
     '<div class="slide-subtitle">Your classmates have spoken — time to announce the<br>2025–2026 Club Awards</div>'
   ]));
 
-  // 10–16 — Award reveals (awardStartIdx = 9)
+  // Award reveals — 2 slides per category (intro + reveal)
+  awardStartIdx = slides.length; // set dynamically so slide count changes don't break it
   var cats = voteData ? voteData.categories : [];
   for (var i = 0; i < 7; i++) {
     var cat = cats[i] || { key: '?', label: 'Award', emoji: '🏆', desc: '', tally: [] };
-    addSlide(el, buildAwardSlide(cat, i));
+    addSlide(el, buildAwardIntroSlide(cat));
+    addSlide(el, buildAwardRevealSlide(cat, i));
   }
 
   // 18 — 8th grade sendoff
@@ -453,31 +486,28 @@ function recognSection(label, names, color) {
     '</div>';
 }
 
-function buildAwardSlide(cat, awardIdx) {
-  var winner = cat.tally && cat.tally.length ? cat.tally[0] : null;
-  // Find all tied winners
-  var winners = [];
-  if (winner) {
-    winners = cat.tally.filter(function(t) { return t.votes === winner.votes; });
-  }
-  var winnerHtml = winners.length
-    ? winners.map(function(w) { return '<span class="winner-name pop">' + esc(w.name) + '</span>'; }).join('<br>')
-    : '<span class="winner-name pop" style="color:rgba(255,255,255,0.4);">No votes yet</span>';
-  var votesText = winner ? winner.votes + ' vote' + (winner.votes !== 1 ? 's' : '') : '';
+function buildAwardIntroSlide(cat) {
+  return html([
+    '<div style="font-size:clamp(3rem,8vw,6rem);margin-bottom:12px;">' + cat.emoji + '</div>',
+    '<div class="slide-title">' + esc(cat.label) + '</div>',
+    '<div class="award-desc">' + esc(cat.desc) + '</div>'
+  ]);
+}
 
-  return '<div class="award-phase1" id="ap1-' + awardIdx + '">' +
-      '<div style="font-size:clamp(3rem,8vw,6rem);margin-bottom:12px;">' + cat.emoji + '</div>' +
-      '<div class="slide-title">' + esc(cat.label) + '</div>' +
-      '<div class="award-desc">' + esc(cat.desc) + '</div>' +
-      '<div class="reveal-prompt">→ press arrow or click to reveal</div>' +
-    '</div>' +
-    '<div class="award-phase2" id="ap2-' + awardIdx + '">' +
-      '<div style="font-size:clamp(2rem,5vw,3.5rem);margin-bottom:8px;">' + cat.emoji + '</div>' +
-      '<div class="winner-label">' + esc(cat.label) + '</div>' +
-      '<div id="winner-name-' + awardIdx + '">' + winnerHtml + '</div>' +
-      '<div class="winner-votes" style="margin-top:14px;">' + votesText + '</div>' +
-      confettiHtml() +
-    '</div>';
+function buildAwardRevealSlide(cat, ai) {
+  var winner = cat.tally && cat.tally.length ? cat.tally[0] : null;
+  var winners = winner ? cat.tally.filter(function(t) { return t.votes === winner.votes; }) : [];
+  var winnerHtml = winners.length
+    ? winners.map(function(w) { return '<span class="winner-name">' + esc(w.name) + '</span>'; }).join('<br>')
+    : '<span class="winner-name" style="color:rgba(255,255,255,0.4);">No votes yet</span>';
+  var votesText = winner ? winner.votes + ' vote' + (winner.votes !== 1 ? 's' : '') : '';
+  return html([
+    '<div style="font-size:clamp(2rem,5vw,3.5rem);margin-bottom:8px;">' + cat.emoji + '</div>',
+    '<div class="winner-label">' + esc(cat.label) + '</div>',
+    '<div id="award-winners-' + ai + '">' + winnerHtml + '</div>',
+    '<div class="winner-votes" style="margin-top:14px;">' + votesText + '</div>',
+    confettiHtml()
+  ]);
 }
 
 function confettiHtml() {
@@ -730,10 +760,20 @@ function buildPONSlide() {
   ]);
 }
 
+function normalizeHighSchool(hs) {
+  if (!hs) return '';
+  var s = hs.trim();
+  if (/clarksburg/i.test(s))  return 'Clarksburg HS';
+  if (/poolesville/i.test(s)) return 'Poolesville HS';
+  if (/damascus/i.test(s))    return 'Damascus HS';
+  return s;
+}
+
 function buildEighthGrade(grads) {
   var entries = grads.map(function(g) {
+    var school = normalizeHighSchool(g.highSchool);
     return '<div class="grad-entry"><div class="grad-name">' + esc(g.name) + '</div>' +
-      (g.highSchool ? '<div class="grad-school">' + esc(g.highSchool) + '</div>' : '') + '</div>';
+      (school ? '<div class="grad-school">' + esc(school) + '</div>' : '') + '</div>';
   }).join('');
   return html([
     '<div class="slide-title" style="margin-bottom:4px;"><span class="gold">Class of 2026</span> 🎓</div>',
@@ -744,56 +784,35 @@ function buildEighthGrade(grads) {
 }
 
 // ── Navigation ────────────────────────────────────────────────────────────────
+function isAwardRevealSlide(idx) {
+  return idx >= awardStartIdx && idx < awardStartIdx + 14 && (idx - awardStartIdx) % 2 === 1;
+}
+
 function showSlide(idx) {
   slides.forEach(function(s) { s.classList.remove('active'); });
   slides[idx].classList.add('active');
   document.getElementById('counter').textContent = (idx + 1) + ' / ' + slides.length;
   if (idx === dSlideIdx) dInitWheel();
-}
-
-function isAwardSlide(idx) { return idx >= awardStartIdx && idx < awardStartIdx + 7; }
-function awardIdx(idx) { return idx - awardStartIdx; }
-
-function revealWinner(ai) {
-  var p1 = document.getElementById('ap1-' + ai);
-  var p2 = document.getElementById('ap2-' + ai);
-  if (p1) p1.style.display = 'none';
-  if (p2) p2.style.display = 'flex';
-  var nameEl = document.getElementById('winner-name-' + ai);
-  if (nameEl) {
-    nameEl.querySelectorAll('.winner-name').forEach(function(el) {
-      el.classList.remove('pop');
-      void el.offsetWidth;
-      el.classList.add('pop');
-    });
+  if (isAwardRevealSlide(idx)) {
+    var ai = (idx - awardStartIdx - 1) / 2;
+    var container = document.getElementById('award-winners-' + ai);
+    if (container) {
+      container.querySelectorAll('.winner-name').forEach(function(el) {
+        el.classList.remove('pop');
+        void el.offsetWidth;
+        el.classList.add('pop');
+      });
+    }
+    setTimeout(function() { dPlayFanfare(); }, 200);
   }
-}
-
-function hideWinner(ai) {
-  var p1 = document.getElementById('ap1-' + ai);
-  var p2 = document.getElementById('ap2-' + ai);
-  if (p1) p1.style.display = 'flex';
-  if (p2) p2.style.display = 'none';
 }
 
 function advance() {
   if (currentIdx === dSlideIdx && dIsSpinning) return;
-  if (isAwardSlide(currentIdx)) {
-    var ai = awardIdx(currentIdx);
-    if (!awardRevealed[ai]) {
-      awardRevealed[ai] = true;
-      revealWinner(ai);
-      return;
-    }
-  }
   if (currentIdx < slides.length - 1) { currentIdx++; showSlide(currentIdx); }
 }
 
 function retreat() {
-  if (isAwardSlide(currentIdx)) {
-    var ai = awardIdx(currentIdx);
-    if (awardRevealed[ai]) { awardRevealed[ai] = false; hideWinner(ai); return; }
-  }
   if (currentIdx > 0) { currentIdx--; showSlide(currentIdx); }
 }
 

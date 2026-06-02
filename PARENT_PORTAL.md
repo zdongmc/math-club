@@ -79,6 +79,14 @@ Student self-serve check-in used at the start of each club meeting. Teacher open
 - `signUpForCarderock(mcpsId, studentName, grade)`, `dropCarderockSignUp(mcpsId)`
 - Portal display (post-contest): team badge + score tiles (Sprint/Target/Individual/Indiv.Rank/TeamRound/TeamScore/TeamRank) + Score Report link + Permission Slip link
 
+**End-of-Year Party Sign-Up:**
+- `const PARTY_SIGNUP_OPEN = new Date() < new Date('2026-06-04T00:00:00-04:00')` — auto-closes end of Wednesday June 3 (party is Thursday June 4, 3:15–4:15 PM)
+- `getPartySignUpSheet()` — get/create "Party Sign-Up 2026" sheet (cols: Timestamp, MCPS ID, Student Name, Grade, StudentAttending, Parent1Name, Parent2Name)
+- `getPartySignUpStatus(mcpsId)` — returns `{open, signedUp, studentAttending, parent1Name, parent2Name}`
+- `submitPartyRSVP(mcpsId, studentName, grade, studentAttending, parent1Name, parent2Name)` — gates on deadline; upserts by MCPS ID; parent names required for office check-in
+- Shown in portal when `open` OR already `signedUp`; student checkbox + up to 2 parent name fields
+- `lookupStudentByMcpsId` returns `partySignUpStatus` alongside other data
+
 **End-of-Year Survey:**
 - `const SURVEY_OPEN = true` — currently open; set to `false` and redeploy to close
 - `getSurveySheet()` — get/create "Survey 2026" sheet
@@ -167,7 +175,7 @@ MCPS ID lookup form (variable-length numeric IDs, validated with `/^\d+$/`).
 - All certs drawn: gray "all certificates drawn" message
 
 **📋 End of Year Survey** (shown when `SURVEY_OPEN = true` in Code.js, or always when `?surveyPreview=1`):
-- Appears right after Required Forms
+- Appears after the Party RSVP section; Required Forms moved to bottom of page (registration period over)
 - Parent / Student role toggle — each role submits independently; one submission per (MCPS ID + role) enforced server-side
 - Default tab: Parent; auto-switches to Student if parent already submitted but student hasn't
 - **8th grade detection:** `is8th = /^8/.test(gradeLevel)` — handles "8th grade", "8", "8th" etc.
@@ -248,13 +256,29 @@ Served at `[production URL]?party=1`. Full-screen projected slides for the June 
 - **Drawing slide:** embedded spinning wheel (same wheel/audio as CertDraw) — spin, confirm saves winner and refreshes pool, spin again for next drawing; cert winners slide rebuilds automatically; PON slide also refreshes after each draw
 - **Cert winners slide:** shows drawing winners + a note that all other students receive a 25% off coupon (distributed at the party)
 - **Badge slides:** name chips animate in with staggered pop-in (60ms stagger)
-- **Competition highlights:** MATHCOUNTS, Math League, AMC 8, MOEMS, Noetic, Carderock (hardcoded: Arjun Lakshmanan — Countdown Round); no Math Kangaroo slide (no national/state winners)
-- **Award reveals:** two-phase (category shown → click to reveal winner with pop animation + fanfare); no sound on reveal
+- **Competition highlights:** MATHCOUNTS, Math League, AMC 8, MOEMS, Noetic, Purple Comet (hardcoded: Comet Spiral — 2nd place High School Mixed Team, 23/30, Ella Shang + students from Longfellow & H-B Woodlawn), Carderock (hardcoded: Arjun Lakshmanan — Countdown Round); no Math Kangaroo slide
+- **Completionists slide:** hardcoded — Arjun Lakshmanan & Fariq Molla (all 8 competitions including Carderock); appears after Full Competitors badge slide
+- **Award reveals:** 2 slides per award — intro slide (category + description) then reveal slide (winner pops in + fanfare plays automatically); `awardStartIdx` set dynamically in `buildSlides()` so slide count changes don't break it
 - **Parent thank you slide:** name chips animate in, then closing "every math club parent" message fades in after (~0.9s delay)
-- **8th grade sendoff:** names + high schools from survey responses
+- **8th grade sendoff:** names + high schools from survey responses; high school names normalized (`normalizeHighSchool()`) — Clarksburg HS, Poolesville HS, Damascus HS; others shown as-is
 - **PON leaderboard slide:** shows preset ranges (1–20, 21–40, 41–60, 61–80, 81–100) only; fetches live from PON API
 
 `getPartySlideData()` returns: stats, badges (dedicated/regular/fullCompetitor/multiSport/competitor), recognitions (mcTeam, mcIndividual, mcState, mathLeagueMeet3Teams grouped by team, ywmAward, noeticHM/NHR/TeamW, moemsHA/Pin/Patch), eighthGraders (with highSchool from survey), certWinners
+
+**Competition participation counting** (used for badge logic in `getPartySlideData()` and `done` flags in the portal `contests` array):
+
+| Competition | Counts as competed when… |
+|---|---|
+| MATHCOUNTS | Row exists in sheet (proctored exam) |
+| MOEMS | ≥1 of 5 contest scores (cols D–H) is a number — all-NA students excluded |
+| Math League | ≥1 of 4 individual meet scores (cols F/H/J/L) is a number — all-NA students excluded |
+| Math Kangaroo | Row exists in sheet (registration = participation; no scores available) |
+| AMC 8 | Score (col D) is a number 0–25; NA/blank excluded; score=0 is valid |
+| Noetic | `signedUp = true` (sign-up = participation) |
+| Purple Comet | Row exists with `role ≠ 'invited'` (excludes pending invites) |
+| Carderock | Signed up (field trip — signed up = attended) |
+
+Badges: 🥇 Full Competitor = all 7 open competitions (excludes Carderock); 🏆 Multi-Sport = 4–6; 🎽 Competitor = 1–3. AMC 8 `score=0` bug fixed: `getAmc8Results()` uses explicit null-check instead of falsy check.
 
 ## `doGet()` URL Routing
 
