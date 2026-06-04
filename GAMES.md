@@ -184,6 +184,25 @@ API URL: https://script.google.com/macros/s/AKfycbwddZFUQ7G0s4NrXfvbUQcSR2wTAPQ3
 
 ---
 
+## Zebra Tournament
+
+**File:** `games/zebra/tournament.html`  
+**No backend** — fully self-contained HTML, no Google Sheets integration.
+
+**Format:** Single-elimination bracket, rolling (not round-locked). Up to 7 simultaneous games on physical boards. Supports any number of students; bracket size rounds up to the next power of 2.
+
+**Bye distribution:** Byes are spread randomly across round-1 matches — one bye per match, never two byes in the same match. This guarantees every player gets at most one bye and no one advances past round 1 without playing. Mathematically guaranteed for any N: since N > bracketSize/2 by definition, numByes < halfSize always holds.
+
+**Setup:** Teacher enters student names (one per line) → randomized seeding → bracket generated with byes distributed automatically.
+
+**Running view:** Left panel shows active board cards (teacher taps player name to declare winner, with confirmation step + single-level undo). Right panel shows the full bracket tree with SVG connector lines, color-coded by status (active/done/ready/pending). "Up Next" queue lists matches ready to start as soon as a board frees.
+
+**Timing:** With 20–25 students and 7 boards, rolling format completes in ~40–45 min. Variable board sizes (small boards = faster games) don't affect total time — boards refill immediately.
+
+**Champion screen:** Full-screen winner reveal with confetti.
+
+---
+
 ## Standalone Games Pattern
 
 Each game with Google Sheets integration gets its own Apps Script project:

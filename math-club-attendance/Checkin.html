@@ -781,6 +781,9 @@
               html += buildVotingSection(result);
             }
 
+            // Summer Certificate Drawing placeholder (filled by separate async call)
+            html += '<div id="summerDrawingSection"><div style="padding:16px; text-align:center; color:#92400e; font-style:italic;">Loading drawing status…</div></div>';
+
             html += `
                 <!-- Club Meetings -->
                 <h2 class="section-title">📅 Club Meetings</h2>
@@ -1110,9 +1113,6 @@
 
             html += '</div>';
             html += '</div>';
-
-            // Summer Certificate Drawing placeholder (filled by separate async call)
-            html += '<div id="summerDrawingSection"><div style="padding:16px; text-align:center; color:#92400e; font-style:italic;">Loading drawing status…</div></div>';
 
             // Purple Comet Math Meet Section
             const purpleComet = result.purpleComet || null;

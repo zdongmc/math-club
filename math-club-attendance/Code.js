@@ -2476,6 +2476,27 @@ function lookupStudentByMcpsId(mcpsId) {
       }
     }
 
+    if (!studentInfo.gradeLevel) {
+      Logger.log('Grade not found yet, checking Form Responses 1 by name for grade...');
+      const registrationSheet = getRegistrationSheet();
+      if (registrationSheet && registrationSheet.getLastRow() > 1) {
+        const registrationData = registrationSheet.getDataRange().getValues();
+        const studentNameLower = studentInfo.name.toLowerCase();
+        for (let i = 1; i < registrationData.length; i++) {
+          const row = registrationData[i];
+          const fullName = ((row[1] || '') + ' ' + (row[2] || '')).trim().toLowerCase();
+          if (fullName === studentNameLower) {
+            const gradeLevel = (row[3] || '').toString().trim();
+            if (gradeLevel) {
+              studentInfo.gradeLevel = gradeLevel;
+              Logger.log('Grade found in Form Responses 1 by name: ' + gradeLevel);
+            }
+            break;
+          }
+        }
+      }
+    }
+
     Logger.log('Student found: ' + JSON.stringify(studentInfo));
 
     // Get attendance history
@@ -3922,7 +3943,7 @@ function getPartySlideData() {
     return {
       success: true,
       stats: { totalMembers: students.length, regularMembers: students.filter(function(s){return s.count>=14;}).length,
-               totalMeetings: 54, contentWeeks: 27, competitionsOffered: 8, certificatesAwarded: certsAwarded,
+               totalMeetings: 55, contentWeeks: 28, competitionsOffered: 8, certificatesAwarded: certsAwarded,
                totalCompetitors: allCompetitorIds.size },
       certWinners: certWinners,
       badges: badges,

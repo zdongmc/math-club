@@ -33,7 +33,7 @@ Student self-serve check-in used at the start of each club meeting. Teacher open
 ## Backend Functions (`Code.js`)
 
 **Core lookup:**
-- `lookupStudentByMcpsId()` — Main entry point: searches 4 sheets, returns student info, attendance, competitions, forms, and results
+- `lookupStudentByMcpsId()` — Main entry point: searches 4 sheets, returns student info, attendance, competitions, forms, and results. Grade fallback order: Form Responses 1 (by email) → Form Responses 2 (by MCPS ID) → Form Responses 1 (by name match, for students whose Form Responses 1 email doesn't follow the `mcpsid@mcpsmd.net` pattern but were found via Attendance Records or School List)
 - `findStudentNameByMcpsId()` — Lightweight version: name only, no competition data; used by kiosk
 - `getStudentAttendanceHistory()` — Attendance by student name
 - `getStudentCompetitionSignups()` — Competition sign-ups by MCPS ID
@@ -166,7 +166,7 @@ MCPS ID lookup form (variable-length numeric IDs, validated with `/^\d+$/`).
 - After deadline: purple "Contest Complete" banner + read-only card + submission/score report/certificate PDFs (cols J/K/L) + results grid (cols M–P: team score, overall/country/state rank)
 - All actions use `google.script.run` + `showMessage()` + `lookupStudent()` refresh
 
-**☀️ Summer Certificate Drawing** (shown to all students):
+**☀️ Summer Certificate Drawing** (shown to all students; appears just below the Club Awards vote card):
 - All students see this section — not gated by Noetic sign-up
 - Noetic participants: gold entry-count banner showing `baseEntry (1) + ponEntries`; per-range standings table (⭐ = ranges where they currently lead); link to Prime or Not game
 - Non-Noetic with entries: same banner but `baseEntry = 0`; entry count = ranges led only
@@ -250,7 +250,7 @@ Served at `[production URL]?survey=1`. Standalone page showing end-of-year surve
 
 ## Year-End Party Slides (`PartySlides.html`)
 
-Served at `[production URL]?party=1`. Full-screen projected slides for the June 4 year-end party.
+Served at `[production URL]?party=1`. Full-screen projected slides for the June 4 year-end party. Hardcoded stats: `totalMeetings=55`, `contentWeeks=28`, `competitionsOffered=8`.
 - Data loaded on startup via `getPartySlideData()` (batch function reading all competition/attendance sheets) + `getVoteResults()` + PON leaderboard API fetch
 - Navigation: arrow keys, spacebar, or click to advance
 - **Drawing slide:** embedded spinning wheel (same wheel/audio as CertDraw) — spin, confirm saves winner and refreshes pool, spin again for next drawing; cert winners slide rebuilds automatically; PON slide also refreshes after each draw

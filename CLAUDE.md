@@ -11,7 +11,7 @@ Static HTML website for the Hallie Wells Middle School Competition Math Club, wi
 | `mathcounts/` | MATHCOUNTS competition tools and materials |
 | `math-league/` | Math League meet timer and documentation |
 | `moems/` | MOEMS teaching materials and vocabulary activities |
-| `games/` | Interactive games: Math Detective, Training Kitchen, Algebra Kitchen, Prime or Not, Would You Rather? |
+| `games/` | Interactive games: Math Detective, Training Kitchen, Algebra Kitchen, Prime or Not, Would You Rather?, Which Is Bigger, Zebra Tournament |
 | Root | Config files, this file, companion docs below |
 
 ## Documentation Index
@@ -21,7 +21,7 @@ Static HTML website for the Hallie Wells Middle School Competition Math Club, wi
 | Website pages, navigation, styling | [ARCHITECTURE.md](ARCHITECTURE.md) |
 | Parent portal: functions, UI behavior, Google Sheets schemas, deployment | [PARENT_PORTAL.md](PARENT_PORTAL.md) |
 | MATHCOUNTS, Math League, MOEMS materials | [COMPETITIONS.md](COMPETITIONS.md) |
-| Training Kitchen, Algebra Kitchen, Math Detective, Prime or Not | [GAMES.md](GAMES.md) |
+| Math Detective, Training Kitchen, Algebra Kitchen, Would You Rather, Which Is Bigger, Prime or Not, Zebra Tournament | [GAMES.md](GAMES.md) |
 | Development workflow, data quality, design patterns, external URLs | [DEVELOPMENT.md](DEVELOPMENT.md) |
 
 ## Critical Guidelines

@@ -18,14 +18,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .stat-lbl  { font-size:0.78rem; color:#6b7280; margin-top:4px; font-weight:600; }
 .section-title { font-size:1rem; font-weight:700; color:#374151; margin:24px 0 12px;
                  padding-bottom:6px; border-bottom:2px solid #e5e7eb; }
-.tally-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px; margin-bottom:8px; }
+.tally-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; margin-bottom:8px; }
 .tally-card { background:white; border-radius:10px; padding:16px; box-shadow:0 2px 8px rgba(0,0,0,0.07); }
 .tally-title { font-size:0.8rem; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:10px; }
-.tally-row  { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
-.tally-lbl  { font-size:0.82rem; color:#374151; min-width:0; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.tally-track { flex:2; background:#f3f4f6; border-radius:4px; height:10px; overflow:hidden; }
+.tally-row  { margin-bottom:10px; }
+.tally-lbl  { font-size:0.85rem; color:#374151; line-height:1.35; margin-bottom:4px; }
+.tally-bar-row { display:flex; align-items:center; gap:8px; }
+.tally-track { flex:1; background:#f3f4f6; border-radius:4px; height:10px; overflow:hidden; }
 .tally-fill  { background:#dc2626; height:100%; border-radius:4px; transition:width 0.6s ease; }
-.tally-count { font-size:0.8rem; font-weight:700; color:#dc2626; min-width:22px; text-align:right; }
+.tally-count { font-size:0.8rem; font-weight:700; color:#dc2626; min-width:28px; text-align:right; }
 .empty { text-align:center; color:#9ca3af; padding:40px; font-style:italic; }
 .refresh-btn { background:#dc2626; color:white; border:none; border-radius:20px; padding:8px 20px;
                font-weight:bold; cursor:pointer; font-size:0.85rem; margin-left:12px; }
@@ -127,9 +128,11 @@ function tally(title, obj) {
   entries.forEach(function(e) {
     var pct = max ? Math.round(e[1]/max*100) : 0;
     h += '<div class="tally-row">';
-    h += '<div class="tally-lbl" title="' + e[0] + '">' + e[0] + '</div>';
+    h += '<div class="tally-lbl">' + e[0] + '</div>';
+    h += '<div class="tally-bar-row">';
     h += '<div class="tally-track"><div class="tally-fill" style="width:' + pct + '%"></div></div>';
     h += '<div class="tally-count">' + e[1] + '</div>';
+    h += '</div>';
     h += '</div>';
   });
   return h + '</div>';

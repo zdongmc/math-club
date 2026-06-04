@@ -260,7 +260,7 @@ function buildSlides() {
     statCard(s.regularMembers, 'regular members'),
     statCard(s.contentWeeks, 'weeks of meetings'),
     statCard(s.competitionsOffered, 'competitions offered'),
-    statCard(s.totalCompetitors, 'competition competitors'),
+    statCard(s.totalCompetitors, 'competitors'),
     '</div>'
   ]));
 
@@ -310,7 +310,7 @@ function buildSlides() {
   addSlide(el, html([
     '<div class="emoji-big">🏅</div>',
     '<div class="slide-title">Competition <span class="gold">Highlights</span></div>',
-    '<div class="slide-subtitle">Recognizing outstanding achievements across all 8 competitions</div>'
+    '<div class="slide-subtitle">Recognizing outstanding achievements across competitions</div>'
   ]));
 
   // 8a — MATHCOUNTS
@@ -764,7 +764,7 @@ function normalizeHighSchool(hs) {
   if (!hs) return '';
   var s = hs.trim();
   if (/clarksburg/i.test(s))  return 'Clarksburg HS';
-  if (/poolesville/i.test(s)) return 'Poolesville HS';
+  if (/pool.*ville/i.test(s)) return 'Poolesville HS';
   if (/damascus/i.test(s))    return 'Damascus HS';
   return s;
 }
