@@ -3398,6 +3398,15 @@ function recordCertWinner(mcpsId, entriesAtWin) {
 
 // ── END-OF-YEAR SURVEY 2026 ───────────────────────────────────────────────────
 
+function normalizeHighSchool(hs) {
+  if (!hs) return '';
+  var s = hs.trim();
+  if (/clarksburg/i.test(s))  return 'Clarksburg HS';
+  if (/pool.*ville/i.test(s)) return 'Poolesville HS';
+  if (/damascus/i.test(s))    return 'Damascus HS';
+  return s;
+}
+
 const SURVEY_SHEET_NAME = 'Survey 2026';
 
 function getSurveySheet() {
@@ -3547,7 +3556,7 @@ function getSurveySummary() {
       if (role === 'parent')  parentCount++;
       if (role === 'student') studentCount++;
 
-      tally(tallies.returning,         row[4]);
+      tally(tallies.returning,         normalizeHighSchool(row[4]));
       tally(tallies.coachingInterest,  row[5]);
       tally(tallies.volunteerInterest, row[7]);
       tally(tallies.coachingSupport,   row[9]);
@@ -3918,7 +3927,7 @@ function getPartySlideData() {
     if (surveySheet && surveySheet.getLastRow() > 1) {
       surveySheet.getDataRange().getValues().slice(1).forEach(function(r) {
         var id=(r[1]||'').toString().trim(), role=(r[3]||'').toString().trim().toLowerCase(), hs=(r[4]||'').toString().trim();
-        if(id && role==='student' && hs) surveyHighSchools[id]=hs;
+        if(id && role==='student' && hs) surveyHighSchools[id]=normalizeHighSchool(hs);
       });
     }
     const eighthGraders = students
