@@ -72,6 +72,8 @@ Accepts `mcpsId` URL param for auto-login from Training Kitchen.
 
 Script ID: `1we0rmj2d9JFEhogb0b1Ag82MMarJCKkdfVG92cmVe3GTv8HkORT6Lme_`
 
+**Future dishes:** Architecture supports Dish 2+ — add columns D, E, F... to the Algebra Kitchen tab, extend `recordAlgebraProgress` (already takes a `dish` param) and add a new problem-generator factory + lesson content per dish.
+
 ---
 
 ## Would You Rather? Math Edition
