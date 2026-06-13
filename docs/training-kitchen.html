@@ -855,7 +855,7 @@
                         <div class="example-box">
                             <h4>Kitchen Example</h4>
                             <p class="problem">Each cupcake needs 2 tablespoons of frosting. You're making 6 cupcakes. How much frosting total?</p>
-                            <p class="solution">2 x 6 = 12 tablespoons of frosting</p>
+                            <p class="solution">2 × 6 = 12 tablespoons of frosting</p>
                         </div>
                         <div class="example-box">
                             <h4>Kitchen Example</h4>
@@ -898,39 +898,30 @@
                 lessons: [
                     {
                         title: 'The Mystery Ingredient',
-                        content: `<p>Sometimes a recipe card gets smudged and you can't read one of the amounts. In math, we call this unknown amount a <strong>variable</strong>, usually written as x, y, or ?.</p>
-                        <p>Finding the missing ingredient is just like solving for the variable!</p>
+                        content: `<p>Sometimes a recipe tells you how much of an ingredient you need in total — and you can see how much you already have — but you need to figure out how much more to add. Say a recipe needs 7 cups of flour total, and you've got 3 cups in the pantry. How many more cups do you need? That missing amount is the unknown — in math we call it a <strong>variable</strong>, usually written as x, y, or ?.</p>
+                        <p>Finding the missing amount is just like solving for the variable!</p>
                         <div class="example-box">
                             <h4>Kitchen Mystery</h4>
-                            <p class="problem">You have ? cups of flour. After adding 3 more cups, you have 7 cups total.</p>
-                            <p class="solution">? + 3 = 7, so ? = 4 cups</p>
+                            <p class="problem">A recipe needs 7 cups of flour total. You have 3 cups in the pantry. How many more cups do you need?</p>
+                            <p class="solution">3 + ? = 7, so ? = 4 cups</p>
                         </div>`
                     },
                     {
-                        title: 'Addition Mysteries',
-                        content: `<p>When the mystery involves addition, we use subtraction to solve it.</p>
+                        title: 'Addition & Subtraction Mysteries',
+                        content: `<p>When the mystery involves addition, we use subtraction to solve it — and when it involves subtraction, we use addition.</p>
                         <div class="example-box">
-                            <h4>Example</h4>
+                            <h4>Addition Example</h4>
                             <p class="problem">x + 5 = 12</p>
                             <p class="solution">To find x, subtract 5 from both sides: x = 12 - 5 = 7</p>
                         </div>
-                        <div class="tip-box">
-                            <h4>Chef's Tip</h4>
-                            <p>Think: "What number plus 5 equals 12?" You can also think backwards: 12 minus 5 equals what?</p>
-                        </div>`
-                    },
-                    {
-                        title: 'Subtraction Mysteries',
-                        content: `<p>When the mystery involves subtraction, we use addition to solve it.</p>
                         <div class="example-box">
-                            <h4>Example</h4>
+                            <h4>Subtraction Example</h4>
                             <p class="problem">x - 4 = 9</p>
                             <p class="solution">To find x, add 4 to both sides: x = 9 + 4 = 13</p>
                         </div>
-                        <div class="example-box">
-                            <h4>Kitchen Example</h4>
-                            <p class="problem">You had some eggs. After using 6 for breakfast, you have 8 left. How many did you start with?</p>
-                            <p class="solution">x - 6 = 8, so x = 8 + 6 = 14 eggs</p>
+                        <div class="tip-box">
+                            <h4>Chef's Tip</h4>
+                            <p>Think: "What number plus 5 equals 12?" You can also think backwards: 12 minus 5 equals what? The same trick works in reverse for subtraction mysteries.</p>
                         </div>`
                     },
                     {
@@ -944,7 +935,31 @@
                         <div class="example-box">
                             <h4>Division Example</h4>
                             <p class="problem">x ÷ 4 = 6</p>
-                            <p class="solution">Multiply both sides by 4: x = 6 x 4 = 24</p>
+                            <p class="solution">Multiply both sides by 4: x = 6 × 4 = 24</p>
+                        </div>`
+                    },
+                    {
+                        title: 'More Examples',
+                        content: `<p>Let's put it all together — here's a kitchen mystery for each operation.</p>
+                        <div class="example-box">
+                            <h4>Addition Mystery</h4>
+                            <p class="problem">A recipe needs 12 cookies for the bake sale. You've already baked 7. How many more do you need?</p>
+                            <p class="solution">7 + ? = 12, so ? = 5 cookies</p>
+                        </div>
+                        <div class="example-box">
+                            <h4>Subtraction Mystery</h4>
+                            <p class="problem">You had some eggs. After using 6 for breakfast, you have 8 left. How many did you start with?</p>
+                            <p class="solution">x - 6 = 8, so x = 8 + 6 = 14 eggs</p>
+                        </div>
+                        <div class="example-box">
+                            <h4>Multiplication Mystery</h4>
+                            <p class="problem">Each batch of cookies needs 3 cups of flour. You have 15 cups. How many batches can you make?</p>
+                            <p class="solution">3x = 15, so x = 15 ÷ 3 = 5 batches</p>
+                        </div>
+                        <div class="example-box">
+                            <h4>Division Mystery</h4>
+                            <p class="problem">You split a tray of cookies evenly among 4 friends, and each got 6 cookies. How many cookies were on the tray?</p>
+                            <p class="solution">x ÷ 4 = 6, so x = 6 × 4 = 24 cookies</p>
                         </div>`
                     },
                     {
@@ -977,35 +992,52 @@
                         </ul>`
                     },
                     {
-                        title: 'Parentheses First',
+                        title: 'Parentheses & Exponents',
                         content: `<p>Parentheses group operations together, like grouping ingredients that need to be mixed first.</p>
                         <div class="example-box">
                             <h4>Example</h4>
-                            <p class="problem">2 x (3 + 4) = ?</p>
-                            <p class="solution">First: (3 + 4) = 7<br>Then: 2 x 7 = 14</p>
+                            <p class="problem">2 × (3 + 4) = ?</p>
+                            <p class="solution">First: (3 + 4) = 7<br>Then: 2 × 7 = 14</p>
                         </div>
                         <div class="example-box">
                             <h4>Kitchen Example</h4>
                             <p class="problem">Prep time (10 + 5) minutes, doubled for two batches.</p>
-                            <p class="solution">2 x (10 + 5) = 2 x 15 = 30 minutes</p>
+                            <p class="solution">2 × (10 + 5) = 2 × 15 = 30 minutes</p>
+                        </div>
+                        <p style="margin-top: 20px;"><strong>Exponents</strong> are repeated multiplication — they come right after parentheses.</p>
+                        <div class="example-box">
+                            <h4>Example</h4>
+                            <p class="problem">2 + 3² = ?</p>
+                            <p class="solution">First: 3² = 3 × 3 = 9<br>Then: 2 + 9 = 11</p>
+                        </div>
+                        <div class="example-box">
+                            <h4>Kitchen Example</h4>
+                            <p class="problem">A square baking pan is 4 inches on each side. What's its area?</p>
+                            <p class="solution">4² = 4 × 4 = 16 square inches</p>
                         </div>`
                     },
                     {
                         title: 'Multiplication Before Addition',
-                        content: `<p>Without parentheses, multiplication comes before addition.</p>
+                        content: `<p>Without parentheses, multiplication and division come before addition and subtraction.</p>
                         <div class="example-box">
                             <h4>Compare These</h4>
-                            <p class="problem">2 + 3 x 4 = ?</p>
-                            <p class="solution">First multiply: 3 x 4 = 12<br>Then add: 2 + 12 = 14</p>
+                            <p class="problem">2 + 3 × 4 = ?</p>
+                            <p class="solution">First multiply: 3 × 4 = 12<br>Then add: 2 + 12 = 14</p>
+                        </div>
+                        <p style="margin-top: 20px;">When operations are at the <strong>same level</strong> — like two multiplications/divisions in a row, or two additions/subtractions — work <strong>left to right</strong>.</p>
+                        <div class="example-box">
+                            <h4>Left to Right</h4>
+                            <p class="problem">20 ÷ 4 × 5 = ?</p>
+                            <p class="solution">Left to right: 20 ÷ 4 = 5, then 5 × 5 = 25</p>
                         </div>
                         <div class="example-box">
-                            <h4>With Parentheses</h4>
-                            <p class="problem">(2 + 3) x 4 = ?</p>
-                            <p class="solution">First parentheses: 2 + 3 = 5<br>Then multiply: 5 x 4 = 20</p>
+                            <h4>Kitchen Example</h4>
+                            <p class="problem">A recipe makes 12 muffins. First you halve the batch, then triple what's left.</p>
+                            <p class="solution">12 ÷ 2 × 3 = 6 × 3 = 18 muffins</p>
                         </div>
                         <div class="tip-box">
                             <h4>Chef's Tip</h4>
-                            <p>The parentheses changed the answer from 14 to 20! Order matters!</p>
+                            <p>Going right to left would give 20 ÷ (4 × 5) = 20 ÷ 20 = 1 — a totally different (and wrong) answer! Always work left to right when operations tie.</p>
                         </div>`
                     },
                     {
@@ -1013,13 +1045,13 @@
                         content: `<p>Sometimes we have multiple operations to coordinate.</p>
                         <div class="example-box">
                             <h4>Example</h4>
-                            <p class="problem">Total time: 2 x (15 + 5) - 10 = ?</p>
-                            <p class="solution">Step 1: (15 + 5) = 20<br>Step 2: 2 x 20 = 40<br>Step 3: 40 - 10 = 30 minutes</p>
+                            <p class="problem">Total time: 2 × (15 + 5) - 10 = ?</p>
+                            <p class="solution">Step 1: (15 + 5) = 20<br>Step 2: 2 × 20 = 40<br>Step 3: 40 - 10 = 30 minutes</p>
                         </div>
                         <div class="example-box">
                             <h4>Example</h4>
-                            <p class="problem">18 ÷ 3 + 2 x 4 = ?</p>
-                            <p class="solution">Step 1: 18 ÷ 3 = 6<br>Step 2: 2 x 4 = 8<br>Step 3: 6 + 8 = 14</p>
+                            <p class="problem">18 ÷ 3 + 2 × 4 = ?</p>
+                            <p class="solution">Step 1: 18 ÷ 3 = 6<br>Step 2: 2 × 4 = 8<br>Step 3: 6 + 8 = 14</p>
                         </div>`
                     },
                     {
@@ -1082,13 +1114,13 @@
                         content: `<p>To multiply fractions, multiply the tops together and the bottoms together.</p>
                         <div class="example-box">
                             <h4>Example</h4>
-                            <p class="problem">1/2 x 3/4 = ?</p>
-                            <p class="solution">1 x 3 = 3 (top)<br>2 x 4 = 8 (bottom)<br>Answer: 3/8</p>
+                            <p class="problem">1/2 × 3/4 = ?</p>
+                            <p class="solution">1 × 3 = 3 (top)<br>2 × 4 = 8 (bottom)<br>Answer: 3/8</p>
                         </div>
                         <div class="example-box">
                             <h4>Halving a Recipe</h4>
-                            <p class="problem">Recipe calls for 3/4 cup. You're making half. 1/2 x 3/4 = ?</p>
-                            <p class="solution">1/2 x 3/4 = 3/8 cup</p>
+                            <p class="problem">Recipe calls for 3/4 cup. You're making half. 1/2 × 3/4 = ?</p>
+                            <p class="solution">1/2 × 3/4 = 3/8 cup</p>
                         </div>`
                     },
                     {
